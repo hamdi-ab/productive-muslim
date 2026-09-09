@@ -7,7 +7,7 @@
   "tasksCount": "{count, plural, =0{No tasks} =1{1 task} other{{count} tasks}}",
   "intentionSet": "Your intention has been set",
   "getStarted": "Get Started",
-  "continue": "Continue",
+  "nextStep": "Continue",
   "setMyIntention": "Set My Intention",
   "startYourDay": "Start Your Day",
   "name": "Name",

@@ -8,9 +8,9 @@ metadata:
   model: models/gemini-3.1-pro-preview
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
   versions:
-    flutter_bloc: ^9.0.0
-    flutter_bloc_test: ^9.1.0
-    freezed: ^2.5.0
+    flutter_bloc: ^9.1.1
+    bloc_test: ^10.0.0
+    freezed: ^4.0.1
 ---
 
 # BLoC State Management

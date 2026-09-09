@@ -5,15 +5,15 @@ A Flutter mobile app for university students and young professionals that helps 
 ## Technical Stack
 
 - **Framework**: Flutter 3.47+ with Dart 3.13+
-- **State management**: `flutter_bloc` ^9.0.0
-- **Routing**: `go_router` ^14.0.0
-- **Dependency injection**: `get_it` ^7.6.0
-- **Local storage**: `drift` ^2.34.0 (SQLite) + `shared_preferences` for settings
-- **Serialization**: `freezed` ^2.5.0 + `json_serializable` ^6.8.0
-- **Localization**: `flutter_localizations` + `intl` ^0.19.0 (English + Arabic)
-- **Notifications**: `flutter_local_notifications` ^18.0.0
-- **Prayer times**: `adhan_dart` ^2.0.0 + `timezone` ^0.11.0
-- **Location**: `geolocator` ^11.0.0 + `permission_handler` ^12.0.0
+- **State management**: `flutter_bloc` ^9.1.1
+- **Routing**: `go_router` ^18.0.1
+- **Dependency injection**: `get_it` ^9.2.1
+- **Local storage**: `drift` ^2.34.4 (SQLite) + `shared_preferences` for settings
+- **Serialization**: `freezed` ^4.0.1 + `json_serializable` ^6.14.0
+- **Localization**: `flutter_localizations` + `intl` ^0.20.3 (English + Arabic)
+- **Notifications**: `flutter_local_notifications` ^22.3.0
+- **Prayer times**: `adhan_dart` ^2.0.1 + `timezone` ^0.11.1
+- **Location**: `geolocator` ^14.0.3 + `permission_handler` ^13.0.2
 - **Dev tooling**: `device_preview` ^3.0.0 (debug/profile only, off in release)
 
 ## Architecture

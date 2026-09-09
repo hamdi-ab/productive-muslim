@@ -8,7 +8,7 @@ metadata:
   model: models/gemini-3.1-pro-preview
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
   versions:
-    get_it: ^7.6.0
+    get_it: ^9.2.1
 ---
 
 # Dependency Injection with get_it

@@ -9,7 +9,7 @@ metadata:
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
   versions:
     flutter_localizations: sdk:flutter
-    intl: ^0.19.0
+    intl: ^0.20.3
 ---
 
 # Arabic + English Localization with RTL Support

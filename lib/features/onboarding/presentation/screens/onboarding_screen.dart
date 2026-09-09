@@ -132,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Text(
                   _currentStep == _steps.length - 1
                       ? l10n.startYourDay
-                      : l10n.continue,
+                      : l10n.nextStep,
                 ),
               ),
               const SizedBox(height: 16),

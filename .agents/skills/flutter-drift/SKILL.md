@@ -8,10 +8,9 @@ metadata:
   model: models/gemini-3.1-pro-preview
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
   versions:
-    drift: ^2.34.0
-    drift_flutter: ^2.34.0
-    build_runner: ^2.4.0
-    drift_dev: ^2.34.0
+    drift: ^2.34.4
+    drift_dev: ^2.34.6
+    build_runner: ^2.16.1
 ---
 
 # Drift Database for The Productive Muslim App
