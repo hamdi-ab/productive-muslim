@@ -1,6 +1,7 @@
 ---
 name: flutter-bloc
 description: Use flutter_bloc for all feature state management in this app. Covers Bloc events (past-tense verbs), freezed states, BlocProvider placement, BlocBuilder/BlocListener/BlocConsumer usage, and bloc_test patterns. Use when creating a Bloc, adding state management to a feature, refactoring state logic, writing bloc tests, or debugging state issues. Trigger phrases: "create a bloc", "add state management", "bloc for [feature]", "bloc test", "state not updating", "emitting state".
+package: flutter_bloc
 aliases: [bloc, state-management, bloc-pattern]
 sources: [chat, code]
 metadata:

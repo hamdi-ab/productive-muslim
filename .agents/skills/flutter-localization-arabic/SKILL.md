@@ -1,6 +1,7 @@
 ---
 name: flutter-localization-arabic
 description: Configure Arabic + English localization with RTL support for this Flutter app. Covers flutter_localizations, intl, ARB files, Arabic-specific gotchas (font fallback, date formatting, directionality), and Islamic terminology. Use when adding, modifying, or reviewing localized strings or RTL-safe widgets.
+package: intl
 aliases: [arabic, rtl, localization, l10n, i18n]
 sources: [chat, code]
 metadata:

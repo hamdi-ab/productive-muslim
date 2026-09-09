@@ -1,6 +1,7 @@
 ---
 name: flutter-di-getit
 description: Configure get_it as the dependency injection container for this Flutter app. Covers service locator setup, registration patterns, lazy vs eager loading, and scope management. Use when wiring up repositories, data sources, or any cross-cutting dependency.
+package: get_it
 aliases: [getit, di, service-locator, dependency-injection]
 sources: [chat, code]
 metadata:

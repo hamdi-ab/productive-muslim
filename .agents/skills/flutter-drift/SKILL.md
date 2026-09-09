@@ -1,6 +1,7 @@
 ---
 name: flutter-drift
 description: Use Drift (SQLite) for all structured local data in this app. Covers table definitions with Drift annotations, DAO classes, reactive watch() queries, migrations, and database initialization. Use when creating a table, adding a DAO, querying local data, setting up migrations, or debugging database issues. Trigger phrases: "create table", "add DAO", "query tasks/habits/barakah", "local database", "offline storage", "migration", "drift", "sqlite", "watch tasks for date".
+package: drift
 aliases: [drift, sqlite, local-database]
 sources: [chat, code]
 metadata:
