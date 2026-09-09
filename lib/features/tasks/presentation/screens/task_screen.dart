@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
@@ -145,7 +146,7 @@ class _TaskTile extends StatelessWidget {
       leading: IconButton(
         icon: Icon(
           task.completed ? Icons.check_circle : Icons.check_circle_outline,
-          color: task.completed ? Colors.green : null,
+          color: task.completed ? AppColors.success : null,
         ),
         onPressed: () => context.read<TaskBloc>().add(TaskToggled(task.id)),
       ),

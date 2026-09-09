@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
@@ -33,7 +34,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
             appBar: AppBar(title: Text(l10n.barakah)),
             body: state is Loaded
                 ? ListView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     children: [
                       _buildPromptCard(context, today),
                       const SizedBox(height: 16),
@@ -60,7 +61,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
   Widget _buildPromptCard(BuildContext context, String today) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           children: [
             const Icon(Icons.spa_outlined, size: 48),
@@ -209,7 +210,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
           return ListTile(
             leading: entry.skipped
                 ? const Icon(Icons.remove_circle_outline)
-                : const Icon(Icons.spa_outlined, color: Colors.green),
+                : const Icon(Icons.spa_outlined, color: AppColors.success),
             title: entry.skipped
                 ? const Text('Skipped')
                 : Text(entry.sourceIds.join(', ')),
