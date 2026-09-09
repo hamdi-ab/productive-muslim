@@ -18,7 +18,7 @@ class BarakahScreen extends StatefulWidget {
 
 class _BarakahScreenState extends State<BarakahScreen> {
   final List<String> _selectedSources = [];
-  final _noteController = StringBuffer();
+  final _noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -160,15 +160,18 @@ class _BarakahScreenState extends State<BarakahScreen> {
     );
   }
 
-  Widget _buildNoteInput() {
+Widget _buildNoteInput() {
     return TextField(
-      controller: null,
+      controller: _noteController,
       decoration: const BoxDecoration(
         labelText: 'Add a note (optional)',
-        border: OutlineInputBorder(),
+        border: EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
       ),
       maxLines: 2,
-      onChanged: (value) => _noteController.clear()..write(value),
+      onChanged: (value) => setState(() {}),
     );
   }
 
@@ -181,9 +184,9 @@ class _BarakahScreenState extends State<BarakahScreen> {
                     id: 0,
                     date: today,
                     sourceIds: _selectedSources,
-                    note: _noteController.toString().isEmpty
+                    note: _noteController.text.isEmpty
                         ? null
-                        : _noteController.toString(),
+                        : _noteController.text,
                     createdAt: DateTime.now().millisecondsSinceEpoch,
                   )));
               _selectedSources.clear();
