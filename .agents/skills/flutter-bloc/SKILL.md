@@ -1,11 +1,15 @@
 ---
 name: flutter-bloc
-description: Implement BLoC state management for Flutter features using flutter_bloc. Covers events, states, the Bloc class, BlocProvider, BlocBuilder, BlocListener, BlocConsumer, and bloc_test. Use when creating, refactoring, or testing state management for any feature in this app.
+description: Use flutter_bloc for all feature state management in this app. Covers Bloc events (past-tense verbs), freezed states, BlocProvider placement, BlocBuilder/BlocListener/BlocConsumer usage, and bloc_test patterns. Use when creating a Bloc, adding state management to a feature, refactoring state logic, writing bloc tests, or debugging state issues. Trigger phrases: "create a bloc", "add state management", "bloc for [feature]", "bloc test", "state not updating", "emitting state".
 aliases: [bloc, state-management, bloc-pattern]
 sources: [chat, code]
 metadata:
   model: models/gemini-3.1-pro-preview
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
+  versions:
+    flutter_bloc: ^9.0.0
+    flutter_bloc_test: ^9.1.0
+    freezed: ^2.5.0
 ---
 
 # BLoC State Management

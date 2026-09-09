@@ -6,6 +6,8 @@ sources: [chat, code]
 metadata:
   model: models/gemini-3.1-pro-preview
   last_modified: Wed, 09 Sep 2026 14:54:00 GMT
+  versions:
+    get_it: ^7.6.0
 ---
 
 # Dependency Injection with get_it
@@ -19,7 +21,7 @@ This app uses `get_it` as the service locator for dependency injection. All repo
 3. Use lazy registration (`getIt.registerLazySingleton`) for everything unless you have a specific reason for eager registration.
 4. Use factory registration (`getIt.registerFactory`) for objects that must be created fresh each time (e.g., Blocs).
 5. Never register UI widgets or Blocs in the container. Register only data-layer dependencies.
-6. Access the container through extension methods (`getIt.getIt<Repository>()`), never directly.
+6. Access the container through `getIt<Type>()` or extension methods, never directly.
 7. Keep the container setup code pure — no async initialization in registration. Use a separate `init()` function for async setup.
 
 ## Project Structure
@@ -131,6 +133,21 @@ class TaskScreen extends StatelessWidget {
 }
 
 // CORRECT — inside a Bloc or repository
+class TaskBloc extends Bloc<TaskEvent, TaskState> {
+  final TaskRepository _repository;
+
+  TaskBloc(this._repository) : super(const TaskState.initial()) {
+    // ...
+  }
+}
+
+// WRONG — accessing in widget build method
+@override
+Widget build(BuildContext context) {
+  final repository = getIt<TaskRepository>(); // WRONG — bypasses Bloc
+  final tasks = await repository.getTasksForDate(today); // WRONG — async in build
+  return TaskList(tasks: tasks);
+}
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final TaskRepository _repository;
 
