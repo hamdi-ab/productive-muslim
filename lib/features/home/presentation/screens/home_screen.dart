@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
+            onPressed: () => context.go('/settings'),
           ),
         ],
       ),
@@ -54,39 +54,23 @@ class HomeScreen extends StatelessWidget {
   }
 
   static int _getIndexForLocation(String location) {
-    switch (location) {
-      case '/':
-        return 0;
-      case '/tasks':
-        return 1;
-      case '/habits':
-        return 2;
-      case '/barakah':
-        return 3;
-      case '/journal':
-        return 4;
-      default:
-        return 0;
-    }
+    return switch (location) {
+      '/' => 0,
+      '/tasks' => 1,
+      '/habits' => 2,
+      '/barakah' => 3,
+      '/journal' => 4,
+      _ => 0,
+    };
   }
 
   static void _navigateToIndex(BuildContext context, int index) {
     switch (index) {
-      case 0:
-        context.go('/');
-        break;
-      case 1:
-        context.go('/tasks');
-        break;
-      case 2:
-        context.go('/habits');
-        break;
-      case 3:
-        context.go('/barakah');
-        break;
-      case 4:
-        context.go('/journal');
-        break;
+      case 0 => context.go('/');
+      case 1 => context.go('/tasks');
+      case 2 => context.go('/habits');
+      case 3 => context.go('/barakah');
+      case 4 => context.go('/journal');
     }
   }
 }

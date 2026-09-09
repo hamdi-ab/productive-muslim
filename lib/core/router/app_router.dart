@@ -20,6 +20,13 @@ class AppRouter {
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => Scaffold(
+          appBar: AppBar(title: const Text('Settings')),
+          body: const Center(child: Text('Settings')),
+        ),
+      ),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
