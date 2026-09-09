@@ -21,6 +21,8 @@ A shipped Flutter mobile app (Android first, iOS later) for university students 
 - [Navigation structure and onboarding](tickets/prototype-navigation-resolution.md) — 5-tab bottom nav (Home, Tasks, Habits, Barakah, Journal), 4-screen onboarding (<90s), Home as daily command center with prayer card + quick stats + Today's Focus feed
 - [Core feature flows](tickets/prototype-features-resolution.md) — Taskinator (time-blocking with 4 life areas), Habitator (category-grouped checklists with streaks), Barakah (daily prompt cards with reflection logging), Intentions (single-active-intention journal with Active/Reflected/Archived status)
 - [State management](ticket-task-init-flutter.md) — Bloc chosen over Riverpod for experimentation; clean architecture with domain/data/presentation layers
+- [Dependency injection](ticket-task-init-flutter.md) — get_it service locator for repositories and Blocs
+- [Development device preview](ticket-task-init-flutter.md) — device_preview 3.0.0 for multi-device simulation in debug/profile only; off in release
 
 ## Not yet specified
 
