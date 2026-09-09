@@ -4,6 +4,7 @@
   "homeGreeting": "Good morning, {name}",
   "prayerTimes": "Prayer Times",
   "taskTitle": "Task Title",
+  "lifeArea": "Life Area",
   "tasksCount": "{count, plural, =0{No tasks} =1{1 task} other{{count} tasks}}",
   "intentionSet": "Your intention has been set",
   "getStarted": "Get Started",

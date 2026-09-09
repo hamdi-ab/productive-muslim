@@ -4,6 +4,7 @@
   "homeGreeting": "صباح الخير، {name}",
   "prayerTimes": "مواقيت الصلاة",
   "taskTitle": "عنوان المهمة",
+  "lifeArea": "مجال الحياة",
   "tasksCount": "{count, plural, =0{لا توجد مهام} =1{مهمة واحدة} other{{count} مهام}}",
   "intentionSet": "تم تحديد نيتك",
   "getStarted": "ابدأ",
