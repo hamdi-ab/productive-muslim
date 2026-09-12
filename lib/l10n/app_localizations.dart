@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Task Title'**
   String get taskTitle;
 
+  /// No description provided for @lifeArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Life Area'**
+  String get lifeArea;
+
   /// No description provided for @tasksCount.
   ///
   /// In en, this message translates to:

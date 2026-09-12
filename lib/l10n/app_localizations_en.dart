@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taskTitle => 'Task Title';
 
   @override
+  String get lifeArea => 'Life Area';
+
+  @override
   String tasksCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
