@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
@@ -9,7 +10,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final location = GoRouterState.of(context).matchedLocation;
 
     return Scaffold(
@@ -28,23 +29,23 @@ class HomeScreen extends StatelessWidget {
         currentIndex: _getIndexForLocation(location),
         onTap: (index) => _navigateToIndex(context, index),
         items: [
-          BottomNavigationItem(
+          BottomNavigationBarItem(
             icon: const Icon(Icons.home_outlined),
             label: l10n.home,
           ),
-          BottomNavigationItem(
+          BottomNavigationBarItem(
             icon: const Icon(Icons.check_circle_outlined),
             label: l10n.tasks,
           ),
-          BottomNavigationItem(
+          BottomNavigationBarItem(
             icon: const Icon(Icons.repeat_outlined),
             label: l10n.habits,
           ),
-          BottomNavigationItem(
+          BottomNavigationBarItem(
             icon: const Icon(Icons.spa_outlined),
             label: l10n.barakah,
           ),
-          BottomNavigationItem(
+          BottomNavigationBarItem(
             icon: const Icon(Icons.book_outlined),
             label: l10n.journal,
           ),
@@ -66,11 +67,21 @@ class HomeScreen extends StatelessWidget {
 
   static void _navigateToIndex(BuildContext context, int index) {
     switch (index) {
-      case 0 => context.go('/');
-      case 1 => context.go('/tasks');
-      case 2 => context.go('/habits');
-      case 3 => context.go('/barakah');
-      case 4 => context.go('/journal');
+      case 0:
+        context.go('/');
+        break;
+      case 1:
+        context.go('/tasks');
+        break;
+      case 2:
+        context.go('/habits');
+        break;
+      case 3:
+        context.go('/barakah');
+        break;
+      case 4:
+        context.go('/journal');
+        break;
     }
   }
 }
@@ -80,7 +91,7 @@ class _PrayerCountdownSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
