@@ -1,3 +1,5 @@
+import 'package:productive_muslim/domain/models/task.dart';
+
 sealed class TaskState {
   const TaskState();
 

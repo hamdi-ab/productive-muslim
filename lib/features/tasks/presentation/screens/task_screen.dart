@@ -6,6 +6,7 @@ import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
 import 'package:productive_muslim/domain/models/task.dart';
+import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return BlocProvider(
@@ -65,39 +66,37 @@ class _TaskScreenState extends State<TaskScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context).newTask),
+        title: Text(AppLocalizations.of(context)!.newTask),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: BoxDecoration(
-                labelText: AppLocalizations.of(context).taskTitle,
-              ),
+              decoration: const InputDecoration(),
             ),
             const SizedBox(height: 16),
-            Text(AppLocalizations.of(context).lifeArea),
+            Text(AppLocalizations.of(context)!.lifeArea),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).islam),
+                  label: Text(AppLocalizations.of(context)!.islam),
                   selected: _lifeArea == 'islam',
                   onSelected: (selected) => setState(() => _lifeArea = 'islam'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).family),
+                  label: Text(AppLocalizations.of(context)!.family),
                   selected: _lifeArea == 'family',
                   onSelected: (selected) => setState(() => _lifeArea = 'family'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).work),
+                  label: Text(AppLocalizations.of(context)!.work),
                   selected: _lifeArea == 'work',
                   onSelected: (selected) => setState(() => _lifeArea = 'work'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).personalDev),
+                  label: Text(AppLocalizations.of(context)!.personalDev),
                   selected: _lifeArea == 'personal_dev',
                   onSelected: (selected) => setState(() => _lifeArea = 'personal_dev'),
                 ),
@@ -108,7 +107,7 @@ class _TaskScreenState extends State<TaskScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context).cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -122,7 +121,7 @@ class _TaskScreenState extends State<TaskScreen> {
               )));
               Navigator.pop(dialogContext);
             },
-            child: Text(AppLocalizations.of(context).save),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),
@@ -135,6 +134,8 @@ class _TaskTile extends StatelessWidget {
 
   const _TaskTile({required this.task});
 
+  static const _successColor = Color(0xFF388E3C);
+
   @override
   Widget build(BuildContext context) {
     final time = task.startMinutes != null && task.endMinutes != null
@@ -145,7 +146,7 @@ class _TaskTile extends StatelessWidget {
       leading: IconButton(
         icon: Icon(
           task.completed ? Icons.check_circle : Icons.check_circle_outline,
-          color: task.completed ? Colors.green : null,
+          color: task.completed ? _successColor : null,
         ),
         onPressed: () => context.read<TaskBloc>().add(TaskToggled(task.id)),
       ),

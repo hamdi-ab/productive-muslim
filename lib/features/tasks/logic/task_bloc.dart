@@ -1,9 +1,8 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
-import 'package:productive_muslim/domain/models/task.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final TaskRepository _repository;
