@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
