@@ -22,7 +22,10 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Future<List<task_model.Task>> getTasksForRange(String startDate, String endDate) {
+  Future<List<task_model.Task>> getTasksForRange(
+    String startDate,
+    String endDate,
+  ) {
     return _taskDao.getTasksForRange(startDate, endDate);
   }
 
@@ -33,18 +36,20 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<int> insertTask(task_model.Task task) {
-    return _taskDao.insertTask(TasksCompanion(
-      title: Value(task.title),
-      lifeArea: Value(task.lifeArea),
-      startMinutes: Value(task.startMinutes),
-      endMinutes: Value(task.endMinutes),
-      date: Value(task.date),
-      repeatDaily: Value(task.repeatDaily),
-      repeatWeekly: Value(task.repeatWeekly),
-      repeatDays: Value(task.repeatDays),
-      notes: Value(task.notes),
-      createdAt: Value(task.createdAt),
-    ));
+    return _taskDao.insertTask(
+      TasksCompanion(
+        title: Value(task.title),
+        lifeArea: Value(task.lifeArea),
+        startMinutes: Value(task.startMinutes),
+        endMinutes: Value(task.endMinutes),
+        date: Value(task.date),
+        repeatDaily: Value(task.repeatDaily),
+        repeatWeekly: Value(task.repeatWeekly),
+        repeatDays: Value(task.repeatDays),
+        notes: Value(task.notes),
+        createdAt: Value(task.createdAt),
+      ),
+    );
   }
 
   @override

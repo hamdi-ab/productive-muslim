@@ -109,10 +109,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: BoxDecoration(
                         color: i <= _currentStep
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant
-                                .withValues(alpha: 0.2),
+                            : Theme.of(context).colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                     ),

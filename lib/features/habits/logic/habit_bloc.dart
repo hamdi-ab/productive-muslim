@@ -48,7 +48,9 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
       await _repository.deactivateHabit(event.habitId);
       final current = state;
       if (current is Loaded) {
-        final updated = current.habits.where((h) => h.id != event.habitId).toList();
+        final updated = current.habits
+            .where((h) => h.id != event.habitId)
+            .toList();
         emit(Loaded(updated));
       }
     } catch (e) {

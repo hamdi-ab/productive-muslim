@@ -44,10 +44,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
 
   Future<int> toggleTask(int id) {
     return (update(tasks)..where((t) => t.id.equals(id))).write(
-      const TasksCompanion(
-        completed: Value(true),
-        completedAt: Value(0),
-      ),
+      const TasksCompanion(completed: Value(true), completedAt: Value(0)),
     );
   }
 

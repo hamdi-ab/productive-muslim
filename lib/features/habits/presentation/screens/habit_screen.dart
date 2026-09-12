@@ -26,8 +26,8 @@ class _HabitScreenState extends State<HabitScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return BlocProvider(
-      create: (context) => HabitBloc(context.read<HabitRepository>())
-        ..add(const HabitLoaded()),
+      create: (context) =>
+          HabitBloc(context.read<HabitRepository>())..add(const HabitLoaded()),
       child: BlocBuilder<HabitBloc, HabitState>(
         builder: (context, state) {
           return Scaffold(
@@ -42,13 +42,13 @@ class _HabitScreenState extends State<HabitScreen> {
             ),
             body: state is Loaded
                 ? state.habits.isEmpty
-                    ? Center(child: Text(l10n.emptyHabits))
-                    : _buildHabitList(state.habits)
+                      ? Center(child: Text(l10n.emptyHabits))
+                      : _buildHabitList(state.habits)
                 : state is Loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : state is Error
-                        ? Center(child: Text(state.message))
-                        : const Center(child: SizedBox.shrink()),
+                ? const Center(child: CircularProgressIndicator())
+                : state is Error
+                ? Center(child: Text(state.message))
+                : const Center(child: SizedBox.shrink()),
           );
         },
       ),
@@ -111,7 +111,8 @@ class _HabitScreenState extends State<HabitScreen> {
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.family),
                   selected: _category == 'family',
-                  onSelected: (selected) => setState(() => _category = 'family'),
+                  onSelected: (selected) =>
+                      setState(() => _category = 'family'),
                 ),
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.work),
@@ -121,7 +122,8 @@ class _HabitScreenState extends State<HabitScreen> {
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.personalDev),
                   selected: _category == 'personal_dev',
-                  onSelected: (selected) => setState(() => _category = 'personal_dev'),
+                  onSelected: (selected) =>
+                      setState(() => _category = 'personal_dev'),
                 ),
               ],
             ),
@@ -143,12 +145,16 @@ class _HabitScreenState extends State<HabitScreen> {
               }
               nameController.dispose();
               final bloc = context.read<HabitBloc>();
-              bloc.add(HabitCreated(Habit(
-                id: 0,
-                name: name,
-                category: _category,
-                createdAt: DateTime.now().millisecondsSinceEpoch,
-              )));
+              bloc.add(
+                HabitCreated(
+                  Habit(
+                    id: 0,
+                    name: name,
+                    category: _category,
+                    createdAt: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                ),
+              );
               Navigator.pop(dialogContext);
             },
             child: Text(AppLocalizations.of(context)!.save),

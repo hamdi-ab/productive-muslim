@@ -97,11 +97,7 @@ class _PrayerCountdownSheet extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-          ),
-        ),
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
       child: Row(
         spacing: 12,

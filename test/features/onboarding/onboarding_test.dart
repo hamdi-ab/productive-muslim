@@ -17,7 +17,9 @@ void main() {
 
     expect(find.text('Build your day around what matters'), findsOneWidget);
     expect(
-      find.text('Prayer, tasks, habits, and intentions — together in one space'),
+      find.text(
+        'Prayer, tasks, habits, and intentions — together in one space',
+      ),
       findsOneWidget,
     );
   });
@@ -81,10 +83,7 @@ void main() {
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Set up prayer times'),
-      findsOneWidget,
-    );
+    expect(find.text('Set up prayer times'), findsOneWidget);
     expect(
       find.text('Get accurate adhan notifications for your location'),
       findsOneWidget,

@@ -15,9 +15,7 @@ class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   }
 
   Future<List<Habit>> getActiveHabits() {
-    return (select(habits)
-          ..where((h) => h.active.equals(1)))
-        .get();
+    return (select(habits)..where((h) => h.active.equals(1))).get();
   }
 
   Future<Habit?> getHabitById(int id) {

@@ -15,7 +15,10 @@ class BarakahBloc extends Bloc<BarakahEvent, BarakahState> {
     on<BarakahDeleted>(_onDeleted);
   }
 
-  Future<void> _onLoaded(BarakahLoaded event, Emitter<BarakahState> emit) async {
+  Future<void> _onLoaded(
+    BarakahLoaded event,
+    Emitter<BarakahState> emit,
+  ) async {
     emit(const Loading());
     try {
       final entries = await _repository.getEntriesForDate(event.date);
@@ -25,7 +28,10 @@ class BarakahBloc extends Bloc<BarakahEvent, BarakahState> {
     }
   }
 
-  Future<void> _onLogged(BarakahLogged event, Emitter<BarakahState> emit) async {
+  Future<void> _onLogged(
+    BarakahLogged event,
+    Emitter<BarakahState> emit,
+  ) async {
     try {
       await _repository.insertEntry(event.entry);
       final entries = await _repository.getEntriesForDate(event.entry.date);
@@ -35,7 +41,10 @@ class BarakahBloc extends Bloc<BarakahEvent, BarakahState> {
     }
   }
 
-  Future<void> _onSkipped(BarakahSkipped event, Emitter<BarakahState> emit) async {
+  Future<void> _onSkipped(
+    BarakahSkipped event,
+    Emitter<BarakahState> emit,
+  ) async {
     try {
       final entry = BarakahEntry(
         id: 0,
@@ -52,12 +61,17 @@ class BarakahBloc extends Bloc<BarakahEvent, BarakahState> {
     }
   }
 
-  Future<void> _onDeleted(BarakahDeleted event, Emitter<BarakahState> emit) async {
+  Future<void> _onDeleted(
+    BarakahDeleted event,
+    Emitter<BarakahState> emit,
+  ) async {
     try {
       await _repository.deleteEntry(event.entryId);
       final current = state;
       if (current is Loaded) {
-        final updated = current.entries.where((e) => e.id != event.entryId).toList();
+        final updated = current.entries
+            .where((e) => e.id != event.entryId)
+            .toList();
         emit(Loaded(updated));
       }
     } catch (e) {

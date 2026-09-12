@@ -40,9 +40,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       final current = state;
       if (current is Loaded) {
         final updated = current.tasks
-            .map((t) => t.id == event.taskId
-                ? t.copyWith(completed: !t.completed)
-                : t)
+            .map(
+              (t) => t.id == event.taskId
+                  ? t.copyWith(completed: !t.completed)
+                  : t,
+            )
             .toList();
         emit(Loaded(updated));
       }
@@ -56,7 +58,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       await _repository.deactivateTask(event.taskId);
       final current = state;
       if (current is Loaded) {
-        final updated = current.tasks.where((t) => t.id != event.taskId).toList();
+        final updated = current.tasks
+            .where((t) => t.id != event.taskId)
+            .toList();
         emit(Loaded(updated));
       }
     } catch (e) {

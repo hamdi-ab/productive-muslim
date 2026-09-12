@@ -27,15 +27,17 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<int> insertHabit(habit_model.Habit habit) {
-    return _habitDao.insertHabit(HabitsCompanion(
-      name: Value(habit.name),
-      category: Value(habit.category),
-      frequency: Value(habit.frequency),
-      targetDays: Value(habit.targetDays),
-      reminderEnabled: Value(habit.reminderEnabled),
-      reminderTime: Value(habit.reminderTime),
-      createdAt: Value(habit.createdAt),
-    ));
+    return _habitDao.insertHabit(
+      HabitsCompanion(
+        name: Value(habit.name),
+        category: Value(habit.category),
+        frequency: Value(habit.frequency),
+        targetDays: Value(habit.targetDays),
+        reminderEnabled: Value(habit.reminderEnabled),
+        reminderTime: Value(habit.reminderTime),
+        createdAt: Value(habit.createdAt),
+      ),
+    );
   }
 
   @override

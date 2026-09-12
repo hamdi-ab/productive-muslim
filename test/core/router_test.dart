@@ -29,8 +29,11 @@ void main() {
       }
       return false;
     });
-    expect(hasOnboarding, isTrue,
-        reason: 'Router must define a GoRoute at /onboarding');
+    expect(
+      hasOnboarding,
+      isTrue,
+      reason: 'Router must define a GoRoute at /onboarding',
+    );
   });
 
   test('router has home shell route with 5 child routes', () {
@@ -49,13 +52,19 @@ void main() {
       }
       return false;
     });
-    expect(hasShell, isTrue,
-        reason: 'Router must define a ShellRoute with 5 child routes');
+    expect(
+      hasShell,
+      isTrue,
+      reason: 'Router must define a ShellRoute with 5 child routes',
+    );
   });
 
   test('router has error builder', () {
-    expect(AppRouter.router.errorBuilder, isNotNull,
-        reason: 'Router must define an errorBuilder');
+    expect(
+      AppRouter.router.errorBuilder,
+      isNotNull,
+      reason: 'Router must define an errorBuilder',
+    );
   });
 
   test('DI container registers GoRouter after setupDi', () async {

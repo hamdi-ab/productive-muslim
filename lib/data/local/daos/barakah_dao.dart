@@ -16,19 +16,22 @@ class BarakahDao extends DatabaseAccessor<AppDatabase> with _$BarakahDaoMixin {
   }
 
   Future<List<BarakahEntry>> getEntriesForDate(String date) {
-    return (select(barakahEntries)
-          ..where((e) => e.date.equals(date)))
-        .get();
+    return (select(barakahEntries)..where((e) => e.date.equals(date))).get();
   }
 
-  Future<List<BarakahEntry>> getEntriesForRange(String startDate, String endDate) {
-    return (select(barakahEntries)
-          ..where((e) => e.date.isBetweenValues(startDate, endDate)))
-        .get();
+  Future<List<BarakahEntry>> getEntriesForRange(
+    String startDate,
+    String endDate,
+  ) {
+    return (select(
+      barakahEntries,
+    )..where((e) => e.date.isBetweenValues(startDate, endDate))).get();
   }
 
   Future<BarakahEntry?> getEntryById(int id) {
-    return (select(barakahEntries)..where((e) => e.id.equals(id))).getSingleOrNull();
+    return (select(
+      barakahEntries,
+    )..where((e) => e.id.equals(id))).getSingleOrNull();
   }
 
   Future<int> insertEntry(BarakahEntriesCompanion insert) {

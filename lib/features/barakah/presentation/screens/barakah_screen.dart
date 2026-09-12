@@ -26,8 +26,9 @@ class _BarakahScreenState extends State<BarakahScreen> {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return BlocProvider(
-      create: (context) => BarakahBloc(context.read<BarakahRepository>())
-        ..add(BarakahLoaded(today)),
+      create: (context) =>
+          BarakahBloc(context.read<BarakahRepository>())
+            ..add(BarakahLoaded(today)),
       child: BlocBuilder<BarakahBloc, BarakahState>(
         builder: (context, state) {
           return Scaffold(
@@ -48,10 +49,10 @@ class _BarakahScreenState extends State<BarakahScreen> {
                     ],
                   )
                 : state is Loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : state is Error
-                        ? Center(child: Text(state.message))
-                        : const Center(child: SizedBox.shrink()),
+                ? const Center(child: CircularProgressIndicator())
+                : state is Error
+                ? Center(child: Text(state.message))
+                : const Center(child: SizedBox.shrink()),
           );
         },
       ),
@@ -89,12 +90,16 @@ class _BarakahScreenState extends State<BarakahScreen> {
                 Expanded(
                   child: FilledButton(
                     onPressed: () {
-                      context.read<BarakahBloc>().add(BarakahLogged(BarakahEntry(
-                        id: 0,
-                        date: today,
-                        sourceIds: _selectedSources,
-                        createdAt: DateTime.now().millisecondsSinceEpoch,
-                      )));
+                      context.read<BarakahBloc>().add(
+                        BarakahLogged(
+                          BarakahEntry(
+                            id: 0,
+                            date: today,
+                            sourceIds: _selectedSources,
+                            createdAt: DateTime.now().millisecondsSinceEpoch,
+                          ),
+                        ),
+                      );
                       _selectedSources.clear();
                     },
                     child: const Text('Yes'),
@@ -160,7 +165,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
     );
   }
 
-Widget _buildNoteInput() {
+  Widget _buildNoteInput() {
     return TextField(
       controller: _noteController,
       decoration: const BoxDecoration(
@@ -180,7 +185,9 @@ Widget _buildNoteInput() {
       onPressed: _selectedSources.isEmpty
           ? null
           : () {
-              context.read<BarakahBloc>().add(BarakahLogged(BarakahEntry(
+              context.read<BarakahBloc>().add(
+                BarakahLogged(
+                  BarakahEntry(
                     id: 0,
                     date: today,
                     sourceIds: _selectedSources,
@@ -188,7 +195,9 @@ Widget _buildNoteInput() {
                         ? null
                         : _noteController.text,
                     createdAt: DateTime.now().millisecondsSinceEpoch,
-                  )));
+                  ),
+                ),
+              );
               _selectedSources.clear();
               _noteController.clear();
             },
@@ -220,9 +229,8 @@ Widget _buildNoteInput() {
             subtitle: entry.note != null ? Text(entry.note!) : null,
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline, size: 20),
-              onPressed: () => context
-                  .read<BarakahBloc>()
-                  .add(BarakahDeleted(entry.id)),
+              onPressed: () =>
+                  context.read<BarakahBloc>().add(BarakahDeleted(entry.id)),
             ),
           );
         }),

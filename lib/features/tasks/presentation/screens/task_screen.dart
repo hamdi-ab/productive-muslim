@@ -26,8 +26,8 @@ class _TaskScreenState extends State<TaskScreen> {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return BlocProvider(
-      create: (context) => TaskBloc(context.read<TaskRepository>())
-        ..add(TaskLoaded(today)),
+      create: (context) =>
+          TaskBloc(context.read<TaskRepository>())..add(TaskLoaded(today)),
       child: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Scaffold(
@@ -42,19 +42,19 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
             body: state is Loaded
                 ? state.tasks.isEmpty
-                    ? Center(child: Text(l10n.emptyTasks))
-                    : ListView.builder(
-                        itemCount: state.tasks.length,
-                        itemBuilder: (context, index) {
-                          final task = state.tasks[index];
-                          return _TaskTile(task: task);
-                        },
-                      )
+                      ? Center(child: Text(l10n.emptyTasks))
+                      : ListView.builder(
+                          itemCount: state.tasks.length,
+                          itemBuilder: (context, index) {
+                            final task = state.tasks[index];
+                            return _TaskTile(task: task);
+                          },
+                        )
                 : state is Loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : state is Error
-                        ? Center(child: Text(state.message))
-                        : const Center(child: SizedBox.shrink()),
+                ? const Center(child: CircularProgressIndicator())
+                : state is Error
+                ? Center(child: Text(state.message))
+                : const Center(child: SizedBox.shrink()),
           );
         },
       ),
@@ -91,7 +91,8 @@ class _TaskScreenState extends State<TaskScreen> {
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.family),
                   selected: _lifeArea == 'family',
-                  onSelected: (selected) => setState(() => _lifeArea = 'family'),
+                  onSelected: (selected) =>
+                      setState(() => _lifeArea = 'family'),
                 ),
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.work),
@@ -101,7 +102,8 @@ class _TaskScreenState extends State<TaskScreen> {
                 FilterChip(
                   label: Text(AppLocalizations.of(context)!.personalDev),
                   selected: _lifeArea == 'personal_dev',
-                  onSelected: (selected) => setState(() => _lifeArea = 'personal_dev'),
+                  onSelected: (selected) =>
+                      setState(() => _lifeArea = 'personal_dev'),
                 ),
               ],
             ),
@@ -115,13 +117,17 @@ class _TaskScreenState extends State<TaskScreen> {
           FilledButton(
             onPressed: () {
               final bloc = context.read<TaskBloc>();
-              bloc.add(TaskCreated(Task(
-                id: 0,
-                title: titleController.text,
-                lifeArea: _lifeArea,
-                date: today,
-                createdAt: DateTime.now().millisecondsSinceEpoch,
-              )));
+              bloc.add(
+                TaskCreated(
+                  Task(
+                    id: 0,
+                    title: titleController.text,
+                    lifeArea: _lifeArea,
+                    date: today,
+                    createdAt: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                ),
+              );
               Navigator.pop(dialogContext);
             },
             child: Text(AppLocalizations.of(context)!.save),
