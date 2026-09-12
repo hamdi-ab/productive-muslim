@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -41,7 +42,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get getStarted => 'ابدأ';
 
   @override
-  String get continue => 'استمر';
+  String get nextStep => 'استمر';
 
   @override
   String get setMyIntention => 'حدد نيتك';
@@ -71,7 +72,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get writeYourOwn => 'أو اكتب半个تك';
 
   @override
-  String get allowLocation => 'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+  String get allowLocation =>
+      'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
 
   @override
   String get calculationMethod => 'طريقة الحساب';

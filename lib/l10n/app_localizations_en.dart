@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -41,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getStarted => 'Get Started';
 
   @override
-  String get continue => 'Continue';
+  String get nextStep => 'Continue';
 
   @override
   String get setMyIntention => 'Set My Intention';
@@ -71,7 +72,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writeYourOwn => 'Or write your own';
 
   @override
-  String get allowLocation => 'Allow location access for accurate prayer times?';
+  String get allowLocation =>
+      'Allow location access for accurate prayer times?';
 
   @override
   String get calculationMethod => 'Calculation Method';

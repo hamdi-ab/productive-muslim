@@ -10,7 +10,6 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
-  final PageController _pageController = PageController();
 
   final List<OnboardingStep> _steps = [
     OnboardingStep(
@@ -40,22 +39,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _nextStep() {
     if (_currentStep < _steps.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      setState(() => _currentStep++);
     } else {
-      // Complete onboarding
       Navigator.pushReplacementNamed(context, '/');
     }
   }
 
   void _previousStep() {
     if (_currentStep > 0) {
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      setState(() => _currentStep--);
     }
   }
 
@@ -94,18 +86,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(height: 32),
               Text(
                 step.title,
-                style: Theme.of(context). typography.headlineMedium,
+                style: Theme.of(context).typography.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               if (step.subtitle != null)
                 Text(
                   step.subtitle,
-                  style: Theme.of(context). typography.bodyMedium,
+                  style: Theme.of(context).typography.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 48),
-              // Step indicator
               Row(
                 spacing: 8,
                 children: List.generate(_steps.length, (i) {
@@ -115,7 +106,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: BoxDecoration(
                         color: i <= _currentStep
                             ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -144,9 +138,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildNameInput() {
-    return TextField(
-      decoration: const BoxDecoration(),
+    return const TextField(
       textCapitalization: TextCapitalization.words,
+      decoration: EdgeInsets(),
     );
   }
 
@@ -181,7 +175,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const SizedBox(height: 16),
             Text(
               'Allow location access for accurate prayer times?',
-              style: Theme.of(context). typography.bodyMedium,
+              style: Theme.of(context).typography.bodyMedium,
               textAlign: TextAlign.center,
             ),
           ],
