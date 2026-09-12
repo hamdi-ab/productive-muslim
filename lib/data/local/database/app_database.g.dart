@@ -2203,6 +2203,505 @@ class TasksCompanion extends UpdateCompanion<Task> {
   }
 }
 
+class $IntentionEntriesTable extends IntentionEntries
+    with TableInfo<$IntentionEntriesTable, IntentionEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IntentionEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statementMeta = const VerificationMeta(
+    'statement',
+  );
+  @override
+  late final GeneratedColumn<String> statement = GeneratedColumn<String>(
+    'statement',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _completedMeta = const VerificationMeta(
+    'completed',
+  );
+  @override
+  late final GeneratedColumn<int> completed = GeneratedColumn<int>(
+    'completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _reflectionMeta = const VerificationMeta(
+    'reflection',
+  );
+  @override
+  late final GeneratedColumn<String> reflection = GeneratedColumn<String>(
+    'reflection',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    title,
+    statement,
+    category,
+    completed,
+    reflection,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'intention_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<IntentionEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('statement')) {
+      context.handle(
+        _statementMeta,
+        statement.isAcceptableOrUnknown(data['statement']!, _statementMeta),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    if (data.containsKey('completed')) {
+      context.handle(
+        _completedMeta,
+        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
+    }
+    if (data.containsKey('reflection')) {
+      context.handle(
+        _reflectionMeta,
+        reflection.isAcceptableOrUnknown(data['reflection']!, _reflectionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  IntentionEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return IntentionEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      statement: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}statement'],
+      ),
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      ),
+      completed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed'],
+      )!,
+      reflection: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reflection'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $IntentionEntriesTable createAlias(String alias) {
+    return $IntentionEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class IntentionEntry extends DataClass implements Insertable<IntentionEntry> {
+  final int id;
+  final String date;
+  final String title;
+  final String? statement;
+  final String? category;
+  final int completed;
+  final String? reflection;
+  final int createdAt;
+  const IntentionEntry({
+    required this.id,
+    required this.date,
+    required this.title,
+    this.statement,
+    this.category,
+    required this.completed,
+    this.reflection,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<String>(date);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || statement != null) {
+      map['statement'] = Variable<String>(statement);
+    }
+    if (!nullToAbsent || category != null) {
+      map['category'] = Variable<String>(category);
+    }
+    map['completed'] = Variable<int>(completed);
+    if (!nullToAbsent || reflection != null) {
+      map['reflection'] = Variable<String>(reflection);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  IntentionEntriesCompanion toCompanion(bool nullToAbsent) {
+    return IntentionEntriesCompanion(
+      id: Value(id),
+      date: Value(date),
+      title: Value(title),
+      statement: statement == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statement),
+      category: category == null && nullToAbsent
+          ? const Value.absent()
+          : Value(category),
+      completed: Value(completed),
+      reflection: reflection == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reflection),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory IntentionEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return IntentionEntry(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<String>(json['date']),
+      title: serializer.fromJson<String>(json['title']),
+      statement: serializer.fromJson<String?>(json['statement']),
+      category: serializer.fromJson<String?>(json['category']),
+      completed: serializer.fromJson<int>(json['completed']),
+      reflection: serializer.fromJson<String?>(json['reflection']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<String>(date),
+      'title': serializer.toJson<String>(title),
+      'statement': serializer.toJson<String?>(statement),
+      'category': serializer.toJson<String?>(category),
+      'completed': serializer.toJson<int>(completed),
+      'reflection': serializer.toJson<String?>(reflection),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  IntentionEntry copyWith({
+    int? id,
+    String? date,
+    String? title,
+    Value<String?> statement = const Value.absent(),
+    Value<String?> category = const Value.absent(),
+    int? completed,
+    Value<String?> reflection = const Value.absent(),
+    int? createdAt,
+  }) => IntentionEntry(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    title: title ?? this.title,
+    statement: statement.present ? statement.value : this.statement,
+    category: category.present ? category.value : this.category,
+    completed: completed ?? this.completed,
+    reflection: reflection.present ? reflection.value : this.reflection,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  IntentionEntry copyWithCompanion(IntentionEntriesCompanion data) {
+    return IntentionEntry(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      title: data.title.present ? data.title.value : this.title,
+      statement: data.statement.present ? data.statement.value : this.statement,
+      category: data.category.present ? data.category.value : this.category,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      reflection: data.reflection.present
+          ? data.reflection.value
+          : this.reflection,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IntentionEntry(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('title: $title, ')
+          ..write('statement: $statement, ')
+          ..write('category: $category, ')
+          ..write('completed: $completed, ')
+          ..write('reflection: $reflection, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    date,
+    title,
+    statement,
+    category,
+    completed,
+    reflection,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IntentionEntry &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.title == this.title &&
+          other.statement == this.statement &&
+          other.category == this.category &&
+          other.completed == this.completed &&
+          other.reflection == this.reflection &&
+          other.createdAt == this.createdAt);
+}
+
+class IntentionEntriesCompanion extends UpdateCompanion<IntentionEntry> {
+  final Value<int> id;
+  final Value<String> date;
+  final Value<String> title;
+  final Value<String?> statement;
+  final Value<String?> category;
+  final Value<int> completed;
+  final Value<String?> reflection;
+  final Value<int> createdAt;
+  const IntentionEntriesCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.title = const Value.absent(),
+    this.statement = const Value.absent(),
+    this.category = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.reflection = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  IntentionEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String date,
+    required String title,
+    this.statement = const Value.absent(),
+    this.category = const Value.absent(),
+    this.completed = const Value.absent(),
+    this.reflection = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : date = Value(date),
+       title = Value(title);
+  static Insertable<IntentionEntry> custom({
+    Expression<int>? id,
+    Expression<String>? date,
+    Expression<String>? title,
+    Expression<String>? statement,
+    Expression<String>? category,
+    Expression<int>? completed,
+    Expression<String>? reflection,
+    Expression<int>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (title != null) 'title': title,
+      if (statement != null) 'statement': statement,
+      if (category != null) 'category': category,
+      if (completed != null) 'completed': completed,
+      if (reflection != null) 'reflection': reflection,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  IntentionEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? date,
+    Value<String>? title,
+    Value<String?>? statement,
+    Value<String?>? category,
+    Value<int>? completed,
+    Value<String?>? reflection,
+    Value<int>? createdAt,
+  }) {
+    return IntentionEntriesCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      title: title ?? this.title,
+      statement: statement ?? this.statement,
+      category: category ?? this.category,
+      completed: completed ?? this.completed,
+      reflection: reflection ?? this.reflection,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (statement.present) {
+      map['statement'] = Variable<String>(statement.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<int>(completed.value);
+    }
+    if (reflection.present) {
+      map['reflection'] = Variable<String>(reflection.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IntentionEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('title: $title, ')
+          ..write('statement: $statement, ')
+          ..write('category: $category, ')
+          ..write('completed: $completed, ')
+          ..write('reflection: $reflection, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2210,9 +2709,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BarakahPromptsTable barakahPrompts = $BarakahPromptsTable(this);
   late final $HabitsTable habits = $HabitsTable(this);
   late final $TasksTable tasks = $TasksTable(this);
+  late final $IntentionEntriesTable intentionEntries = $IntentionEntriesTable(
+    this,
+  );
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
+  late final IntentionDao intentionDao = IntentionDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2222,6 +2725,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     barakahPrompts,
     habits,
     tasks,
+    intentionEntries,
   ];
 }
 
@@ -3348,6 +3852,274 @@ typedef $$TasksTableProcessedTableManager =
       Task,
       PrefetchHooks Function()
     >;
+typedef $$IntentionEntriesTableCreateCompanionBuilder =
+    IntentionEntriesCompanion Function({
+      Value<int> id,
+      required String date,
+      required String title,
+      Value<String?> statement,
+      Value<String?> category,
+      Value<int> completed,
+      Value<String?> reflection,
+      Value<int> createdAt,
+    });
+typedef $$IntentionEntriesTableUpdateCompanionBuilder =
+    IntentionEntriesCompanion Function({
+      Value<int> id,
+      Value<String> date,
+      Value<String> title,
+      Value<String?> statement,
+      Value<String?> category,
+      Value<int> completed,
+      Value<String?> reflection,
+      Value<int> createdAt,
+    });
+
+class $$IntentionEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $IntentionEntriesTable> {
+  $$IntentionEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get statement => $composableBuilder(
+    column: $table.statement,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reflection => $composableBuilder(
+    column: $table.reflection,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$IntentionEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $IntentionEntriesTable> {
+  $$IntentionEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get statement => $composableBuilder(
+    column: $table.statement,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reflection => $composableBuilder(
+    column: $table.reflection,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$IntentionEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IntentionEntriesTable> {
+  $$IntentionEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get statement =>
+      $composableBuilder(column: $table.statement, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<int> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<String> get reflection => $composableBuilder(
+    column: $table.reflection,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$IntentionEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IntentionEntriesTable,
+          IntentionEntry,
+          $$IntentionEntriesTableFilterComposer,
+          $$IntentionEntriesTableOrderingComposer,
+          $$IntentionEntriesTableAnnotationComposer,
+          $$IntentionEntriesTableCreateCompanionBuilder,
+          $$IntentionEntriesTableUpdateCompanionBuilder,
+          (
+            IntentionEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $IntentionEntriesTable,
+              IntentionEntry
+            >,
+          ),
+          IntentionEntry,
+          PrefetchHooks Function()
+        > {
+  $$IntentionEntriesTableTableManager(
+    _$AppDatabase db,
+    $IntentionEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IntentionEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$IntentionEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$IntentionEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> statement = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+                Value<int> completed = const Value.absent(),
+                Value<String?> reflection = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+              }) => IntentionEntriesCompanion(
+                id: id,
+                date: date,
+                title: title,
+                statement: statement,
+                category: category,
+                completed: completed,
+                reflection: reflection,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String date,
+                required String title,
+                Value<String?> statement = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+                Value<int> completed = const Value.absent(),
+                Value<String?> reflection = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+              }) => IntentionEntriesCompanion.insert(
+                id: id,
+                date: date,
+                title: title,
+                statement: statement,
+                category: category,
+                completed: completed,
+                reflection: reflection,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$IntentionEntriesTable, IntentionEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $IntentionEntriesTable,
+                    IntentionEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$IntentionEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IntentionEntriesTable,
+      IntentionEntry,
+      $$IntentionEntriesTableFilterComposer,
+      $$IntentionEntriesTableOrderingComposer,
+      $$IntentionEntriesTableAnnotationComposer,
+      $$IntentionEntriesTableCreateCompanionBuilder,
+      $$IntentionEntriesTableUpdateCompanionBuilder,
+      (
+        IntentionEntry,
+        BaseReferences<_$AppDatabase, $IntentionEntriesTable, IntentionEntry>,
+      ),
+      IntentionEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3360,4 +4132,6 @@ class $AppDatabaseManager {
       $$HabitsTableTableManager(_db, _db.habits);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
+  $$IntentionEntriesTableTableManager get intentionEntries =>
+      $$IntentionEntriesTableTableManager(_db, _db.intentionEntries);
 }
