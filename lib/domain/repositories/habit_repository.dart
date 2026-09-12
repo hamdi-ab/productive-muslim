@@ -1,3 +1,5 @@
+import 'package:productive_muslim/domain/models/habit.dart';
+
 abstract class HabitRepository {
   Stream<List<Habit>> watchActiveHabits();
   Future<List<Habit>> getActiveHabits();

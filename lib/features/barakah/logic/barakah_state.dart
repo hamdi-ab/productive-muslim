@@ -1,3 +1,5 @@
+import 'package:productive_muslim/domain/models/barakah_entry.dart';
+
 sealed class BarakahState {
   const BarakahState();
 

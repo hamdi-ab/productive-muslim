@@ -1,15 +1,17 @@
+import 'package:productive_muslim/domain/models/task.dart';
+
 sealed class TaskEvent {
   const TaskEvent();
 
-  factory TaskEvent.loaded(String date) = TaskLoaded;
+  factory TaskEvent.loaded(String date) = TaskEntriesLoaded;
   factory TaskEvent.created(Task task) = TaskCreated;
   factory TaskEvent.toggled(int taskId) = TaskToggled;
   factory TaskEvent.deleted(int taskId) = TaskDeleted;
 }
 
-class TaskLoaded extends TaskEvent {
+class TaskEntriesLoaded extends TaskEvent {
   final String date;
-  TaskLoaded(this.date);
+  TaskEntriesLoaded(this.date);
 }
 
 class TaskCreated extends TaskEvent {

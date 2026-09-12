@@ -224,5 +224,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get work => 'عمل';
 
   @override
-  String get personalDev => 'تطور شخصي';
+  String get personalDev => 'تطوير شخصي';
+
+  @override
+  String get completed => 'مكتمل';
+
+  @override
+  String get todayIntentions => 'نيات اليوم';
+
+  @override
+  String get noIntentionsToday => 'لم يتم تحديد نيات اليوم';
+
+  @override
+  String get reflection => 'reflect';
+
+  @override
+  String get saveReflection => 'حفظ reflect';
+
+  @override
+  String get newIntention => 'نية جديدة';
+
+  @override
+  String get titleSmall => 'عنوان صغير';
 }

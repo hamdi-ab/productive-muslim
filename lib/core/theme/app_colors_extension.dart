@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  AppColors._();
+  const AppColors._();
 
   // Branding
   static const Color primary = Color(0xFF2E7D4F);
@@ -34,5 +34,5 @@ class AppColors {
 }
 
 extension AppColorsExtension on BuildContext {
-  AppColors get appColors => AppColors();
+  AppColors get appColors => const AppColors._();
 }

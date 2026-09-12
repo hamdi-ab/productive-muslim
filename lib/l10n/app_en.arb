@@ -66,5 +66,12 @@
   "islam": "Islam",
   "family": "Family",
   "work": "Work",
-  "personalDev": "Personal Development"
+  "personalDev": "Personal Development",
+  "completed": "Completed",
+  "todayIntentions": "Today's Intentions",
+  "noIntentionsToday": "No intentions set for today",
+  "reflection": "Reflection",
+  "saveReflection": "Save Reflection",
+  "newIntention": "New Intention",
+  "titleSmall": "Title Small"
 }

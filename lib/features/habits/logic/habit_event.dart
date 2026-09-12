@@ -1,14 +1,16 @@
+import 'package:productive_muslim/domain/models/habit.dart';
+
 sealed class HabitEvent {
   const HabitEvent();
 
-  factory HabitEvent.loaded() = HabitLoaded;
+  factory HabitEvent.loaded() = HabitEntriesLoaded;
   factory HabitEvent.created(Habit habit) = HabitCreated;
   factory HabitEvent.toggled(int habitId) = HabitToggled;
   factory HabitEvent.deleted(int habitId) = HabitDeleted;
 }
 
-class HabitLoaded extends HabitEvent {
-  const HabitLoaded();
+class HabitEntriesLoaded extends HabitEvent {
+  const HabitEntriesLoaded();
 }
 
 class HabitCreated extends HabitEvent {

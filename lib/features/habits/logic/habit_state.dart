@@ -1,26 +1,28 @@
+import 'package:productive_muslim/domain/models/habit.dart';
+
 sealed class HabitState {
   const HabitState();
 
-  const factory HabitState.initial() = Initial;
-  const factory HabitState.loading() = Loading;
-  const factory HabitState.loaded(List<Habit> habits) = Loaded;
-  const factory HabitState.error(String message) = Error;
+  const factory HabitState.initial() = HabitInitial;
+  const factory HabitState.loading() = HabitLoading;
+  const factory HabitState.loaded(List<Habit> habits) = HabitLoaded;
+  const factory HabitState.error(String message) = HabitError;
 }
 
-class Initial extends HabitState {
-  const Initial();
+class HabitInitial extends HabitState {
+  const HabitInitial();
 }
 
-class Loading extends HabitState {
-  const Loading();
+class HabitLoading extends HabitState {
+  const HabitLoading();
 }
 
-class Loaded extends HabitState {
+class HabitLoaded extends HabitState {
   final List<Habit> habits;
-  const Loaded(this.habits);
+  const HabitLoaded(this.habits);
 }
 
-class Error extends HabitState {
+class HabitError extends HabitState {
   final String message;
-  const Error(this.message);
+  const HabitError(this.message);
 }

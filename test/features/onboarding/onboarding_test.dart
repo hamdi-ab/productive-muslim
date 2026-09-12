@@ -121,9 +121,12 @@ void main() {
     await tester.pumpAndSettle();
 
     // Each step indicator is a Container with height 4 inside a Row
-    final row = find.byType(Row).evaluate().first;
-    final children = row.children;
-    expect(children.length, equals(4));
+    final rowFinder = find.byType(Row);
+    final rowElement = rowFinder.evaluate().first;
+    final childCount = rowElement.renderObject != null
+        ? (rowElement.renderObject as dynamic).childCount ?? 0
+        : 0;
+    expect(childCount, equals(4));
   });
 
   testWidgets('renders in Arabic locale', (tester) async {

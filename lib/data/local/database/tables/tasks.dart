@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'package:productive_muslim/data/local/database/app_database.dart';
-
-@TableIndex(name: 'tasks_date_start', columns: {Column(name: 'date'), Column(name: 'start_time')})
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text()();

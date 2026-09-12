@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/constants/app_radius.dart';
+import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -17,7 +18,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingStep> _steps = [
     OnboardingStep(
       title: 'Build your day around what matters',
-      subtitle: 'Prayer, tasks, habits, and intentions — together in one space',
+      subtitle: 'Prayer, tasks, habits, and intentions together in one space',
       icon: Icons.spa_outlined,
     ),
     OnboardingStep(
@@ -56,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final step = _steps[_currentStep];
 
     return Scaffold(
@@ -89,14 +90,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(height: 32),
               Text(
                 step.title,
-                style: Theme.of(context).typography.headlineMedium,
+                style: context.appTypography.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               if (step.subtitle != null)
                 Text(
-                  step.subtitle,
-                  style: Theme.of(context).typography.bodyMedium,
+                  step.subtitle!,
+                  style: context.appTypography.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 48),
@@ -143,25 +144,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildNameInput() {
     return const TextField(
       textCapitalization: TextCapitalization.words,
-      decoration: EdgeInsets(),
+      decoration: InputDecoration(),
     );
   }
 
   Widget _buildIntentionChips() {
+    final l10n = AppLocalizations.of(context)!;
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         FilterChip(
-          label: const Text('Seeking barakah in my time'),
+          label: Text(l10n.seekingBarakah),
           onSelected: (selected) {},
         ),
         FilterChip(
-          label: const Text('Consistent worship & routine'),
+          label: Text(l10n.consistentWorship),
           onSelected: (selected) {},
         ),
         FilterChip(
-          label: const Text('Mindful productivity'),
+          label: Text(l10n.mindfulProductivity),
           onSelected: (selected) {},
         ),
       ],
@@ -178,7 +180,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const SizedBox(height: 16),
             Text(
               'Allow location access for accurate prayer times?',
-              style: Theme.of(context).typography.bodyMedium,
+              style: context.appTypography.bodyMedium,
               textAlign: TextAlign.center,
             ),
           ],
@@ -191,7 +193,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class OnboardingStep {
   final String title;
   final String? subtitle;
-  final Icons icon;
+  final IconData icon;
   final bool hasInput;
   final bool hasChips;
   final bool hasPermission;

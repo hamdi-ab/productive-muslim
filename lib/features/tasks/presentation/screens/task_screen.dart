@@ -7,6 +7,7 @@ import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
 import 'package:productive_muslim/domain/models/task.dart';
+import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -21,12 +22,12 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return BlocProvider(
       create: (context) => TaskBloc(context.read<TaskRepository>())
-        ..add(TaskLoaded(today)),
+        ..add(TaskEntriesLoaded(today)),
       child: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Scaffold(
@@ -39,7 +40,7 @@ class _TaskScreenState extends State<TaskScreen> {
                 ),
               ],
             ),
-            body: state is Loaded
+            body: state is TaskLoaded
                 ? state.tasks.isEmpty
                     ? Center(child: Text(l10n.emptyTasks))
                     : ListView.builder(
@@ -49,9 +50,9 @@ class _TaskScreenState extends State<TaskScreen> {
                           return _TaskTile(task: task);
                         },
                       )
-                : state is Loading
+                : state is TaskLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : state is Error
+                    : state is TaskError
                         ? Center(child: Text(state.message))
                         : const Center(child: SizedBox.shrink()),
           );
@@ -63,42 +64,40 @@ class _TaskScreenState extends State<TaskScreen> {
   void _showAddTaskDialog(BuildContext context, String today) {
     final titleController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context).newTask),
+        title: Text(AppLocalizations.of(context)!.newTask),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: BoxDecoration(
-                labelText: AppLocalizations.of(context).taskTitle,
-              ),
+              decoration: const InputDecoration(),
             ),
             const SizedBox(height: 16),
-            Text(AppLocalizations.of(context).lifeArea),
+            Text(AppLocalizations.of(context)!.lifeArea),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).islam),
+                  label: Text(AppLocalizations.of(context)!.islam),
                   selected: _lifeArea == 'islam',
                   onSelected: (selected) => setState(() => _lifeArea = 'islam'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).family),
+                  label: Text(AppLocalizations.of(context)!.family),
                   selected: _lifeArea == 'family',
                   onSelected: (selected) => setState(() => _lifeArea = 'family'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).work),
+                  label: Text(AppLocalizations.of(context)!.work),
                   selected: _lifeArea == 'work',
                   onSelected: (selected) => setState(() => _lifeArea = 'work'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).personalDev),
+                  label: Text(AppLocalizations.of(context)!.personalDev),
                   selected: _lifeArea == 'personal_dev',
                   onSelected: (selected) => setState(() => _lifeArea = 'personal_dev'),
                 ),
@@ -109,7 +108,7 @@ class _TaskScreenState extends State<TaskScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context).cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -123,7 +122,7 @@ class _TaskScreenState extends State<TaskScreen> {
               )));
               Navigator.pop(dialogContext);
             },
-            child: Text(AppLocalizations.of(context).save),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),

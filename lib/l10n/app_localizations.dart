@@ -499,6 +499,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Personal Development'**
   String get personalDev;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @todayIntentions.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Intentions'**
+  String get todayIntentions;
+
+  /// No description provided for @noIntentionsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No intentions set for today'**
+  String get noIntentionsToday;
+
+  /// No description provided for @reflection.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection'**
+  String get reflection;
+
+  /// No description provided for @saveReflection.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Reflection'**
+  String get saveReflection;
+
+  /// No description provided for @newIntention.
+  ///
+  /// In en, this message translates to:
+  /// **'New Intention'**
+  String get newIntention;
+
+  /// No description provided for @titleSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Title Small'**
+  String get titleSmall;
 }
 
 class _AppLocalizationsDelegate

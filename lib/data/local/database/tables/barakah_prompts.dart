@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'package:productive_muslim/data/local/database/app_database.dart';
-
 class BarakahPrompts extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get sourceIds => text()();

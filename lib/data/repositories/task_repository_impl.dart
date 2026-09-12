@@ -1,9 +1,5 @@
-import 'package:drift/drift.dart';
-
-import 'package:productive_muslim/data/local/database/app_database.dart';
-import 'package:productive_muslim/data/local/database/tables/tasks.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
-import 'package:productive_muslim/data/models/task.dart' as task_model;
+import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
 class TaskRepositoryImpl implements TaskRepository {
@@ -12,43 +8,32 @@ class TaskRepositoryImpl implements TaskRepository {
   final TaskDao _taskDao;
 
   @override
-  Stream<List<task_model.Task>> watchTasksForDate(String date) {
+  Stream<List<Task>> watchTasksForDate(String date) {
     return _taskDao.watchTasksForDate(date);
   }
 
   @override
-  Future<List<task_model.Task>> getTasksForDate(String date) {
+  Future<List<Task>> getTasksForDate(String date) {
     return _taskDao.getTasksForDate(date);
   }
 
   @override
-  Future<List<task_model.Task>> getTasksForRange(String startDate, String endDate) {
+  Future<List<Task>> getTasksForRange(String startDate, String endDate) {
     return _taskDao.getTasksForRange(startDate, endDate);
   }
 
   @override
-  Future<task_model.Task?> getTaskById(int id) {
+  Future<Task?> getTaskById(int id) {
     return _taskDao.getTaskById(id);
   }
 
   @override
-  Future<int> insertTask(task_model.Task task) {
-    return _taskDao.insertTask(TasksCompanion(
-      title: Value(task.title),
-      lifeArea: Value(task.lifeArea),
-      startMinutes: Value(task.startMinutes),
-      endMinutes: Value(task.endMinutes),
-      date: Value(task.date),
-      repeatDaily: Value(task.repeatDaily),
-      repeatWeekly: Value(task.repeatWeekly),
-      repeatDays: Value(task.repeatDays),
-      notes: Value(task.notes),
-      createdAt: Value(task.createdAt),
-    ));
+  Future<int> insertTask(Task task) {
+    return _taskDao.insertTask(task);
   }
 
   @override
-  Future<bool> updateTask(task_model.Task task) {
+  Future<bool> updateTask(Task task) {
     return _taskDao.updateTask(task);
   }
 

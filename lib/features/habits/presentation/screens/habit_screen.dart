@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:productive_muslim/core/constants/app_spacing.dart';
-import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
+import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HabitScreen extends StatefulWidget {
@@ -17,16 +17,15 @@ class HabitScreen extends StatefulWidget {
 }
 
 class _HabitScreenState extends State<HabitScreen> {
-  String _name = '';
   String _category = 'islam';
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocProvider(
       create: (context) => HabitBloc(context.read<HabitRepository>())
-        ..add(const HabitLoaded()),
+        ..add(const HabitEntriesLoaded()),
       child: BlocBuilder<HabitBloc, HabitState>(
         builder: (context, state) {
           return Scaffold(
@@ -39,13 +38,13 @@ class _HabitScreenState extends State<HabitScreen> {
                 ),
               ],
             ),
-            body: state is Loaded
+            body: state is HabitLoaded
                 ? state.habits.isEmpty
                     ? Center(child: Text(l10n.emptyHabits))
                     : _buildHabitList(state.habits)
-                : state is Loading
+                : state is HabitLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : state is Error
+                    : state is HabitError
                         ? Center(child: Text(state.message))
                         : const Center(child: SizedBox.shrink()),
           );
@@ -69,7 +68,7 @@ class _HabitScreenState extends State<HabitScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 entry.key,
-                style: Theme.of(context).typography.titleSmall,
+                style: context.appTypography.labelLarge,
               ),
             ),
             ...entry.value.map((habit) => _HabitTile(habit: habit)),
@@ -83,42 +82,40 @@ class _HabitScreenState extends State<HabitScreen> {
   void _showAddHabitDialog(BuildContext context) {
     final nameController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(AppLocalizations.of(context).newHabit),
+        title: Text(AppLocalizations.of(context)!.newHabit),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: BoxDecoration(
-                labelText: AppLocalizations.of(context).name,
-              ),
+              decoration: const InputDecoration(),
             ),
             const SizedBox(height: 16),
-            Text(AppLocalizations.of(context).lifeArea),
+            Text(AppLocalizations.of(context)!.lifeArea),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               children: [
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).islam),
+                  label: Text(AppLocalizations.of(context)!.islam),
                   selected: _category == 'islam',
                   onSelected: (selected) => setState(() => _category = 'islam'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).family),
+                  label: Text(AppLocalizations.of(context)!.family),
                   selected: _category == 'family',
                   onSelected: (selected) => setState(() => _category = 'family'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).work),
+                  label: Text(AppLocalizations.of(context)!.work),
                   selected: _category == 'work',
                   onSelected: (selected) => setState(() => _category = 'work'),
                 ),
                 FilterChip(
-                  label: Text(AppLocalizations.of(context).personalDev),
+                  label: Text(AppLocalizations.of(context)!.personalDev),
                   selected: _category == 'personal_dev',
                   onSelected: (selected) => setState(() => _category = 'personal_dev'),
                 ),
@@ -129,7 +126,7 @@ class _HabitScreenState extends State<HabitScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(AppLocalizations.of(context).cancel),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -142,7 +139,7 @@ class _HabitScreenState extends State<HabitScreen> {
               )));
               Navigator.pop(dialogContext);
             },
-            child: Text(AppLocalizations.of(context).save),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),

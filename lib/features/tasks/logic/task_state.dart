@@ -1,26 +1,28 @@
+import 'package:productive_muslim/domain/models/task.dart';
+
 sealed class TaskState {
   const TaskState();
 
-  const factory TaskState.initial() = Initial;
-  const factory TaskState.loading() = Loading;
-  const factory TaskState.loaded(List<Task> tasks) = Loaded;
-  const factory TaskState.error(String message) = Error;
+  const factory TaskState.initial() = TaskInitial;
+  const factory TaskState.loading() = TaskLoading;
+  const factory TaskState.loaded(List<Task> tasks) = TaskLoaded;
+  const factory TaskState.error(String message) = TaskError;
 }
 
-class Initial extends TaskState {
-  const Initial();
+class TaskInitial extends TaskState {
+  const TaskInitial();
 }
 
-class Loading extends TaskState {
-  const Loading();
+class TaskLoading extends TaskState {
+  const TaskLoading();
 }
 
-class Loaded extends TaskState {
+class TaskLoaded extends TaskState {
   final List<Task> tasks;
-  const Loaded(this.tasks);
+  const TaskLoaded(this.tasks);
 }
 
-class Error extends TaskState {
+class TaskError extends TaskState {
   final String message;
-  const Error(this.message);
+  const TaskError(this.message);
 }
