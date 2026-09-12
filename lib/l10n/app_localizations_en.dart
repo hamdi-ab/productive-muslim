@@ -225,4 +225,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personalDev => 'Personal Development';
+
+  @override
+  String get todayIntentions => 'Today\'s Intentions';
+
+  @override
+  String get noIntentionsToday => 'No intentions for today';
+
+  @override
+  String get reflection => 'Reflection';
+
+  @override
+  String get completed => 'completed';
+
+  @override
+  String get saveReflection => 'Save Reflection';
+
+  @override
+  String get newIntention => 'New Intention';
 }

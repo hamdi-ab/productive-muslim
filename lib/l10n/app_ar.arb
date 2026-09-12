@@ -66,5 +66,11 @@
   "islam": "إسلام",
   "family": "أسماء",
   "work": "عمل",
-  "personalDev": "تطور شخصي"
+  "personalDev": "تطور شخصي",
+  "todayIntentions": "نيات اليوم",
+  "noIntentionsToday": "لا توجد نيات لليوم",
+  "reflection": "تأمل",
+  "completed": "مكتمل",
+  "saveReflection": "حفظ التأمل",
+  "newIntention": "نية جديدة"
 }

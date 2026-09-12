@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
+import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -41,7 +42,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/journal',
-            builder: (context, state) => const Center(child: Text('Journal')),
+            builder: (context, state) => const IntentionScreen(),
           ),
           GoRoute(
             path: '/settings',
