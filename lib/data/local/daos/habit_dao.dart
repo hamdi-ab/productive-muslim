@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/database/tables/habits.dart';
 
+part 'habit_dao.g.dart';
+
 @DriftAccessor(tables: [Habits])
 class HabitDao extends DatabaseAccessor<AppDatabase> with _$HabitDaoMixin {
   HabitDao(super.db);

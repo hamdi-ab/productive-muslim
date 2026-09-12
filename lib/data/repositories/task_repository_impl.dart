@@ -1,9 +1,8 @@
 import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
-import 'package:productive_muslim/data/local/database/tables/tasks.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
-import 'package:productive_muslim/data/models/task.dart' as task_model;
+import 'package:productive_muslim/domain/models/task.dart' as task_model;
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
 class TaskRepositoryImpl implements TaskRepository {

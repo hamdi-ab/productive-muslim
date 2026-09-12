@@ -1,14 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'package:productive_muslim/data/local/database/app_database.dart';
-
-@TableIndex(
-  name: 'tasks_date_start',
-  columns: {
-    Column(name: 'date'),
-    Column(name: 'start_time'),
-  },
-)
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text()();
@@ -24,7 +15,4 @@ class Tasks extends Table {
   IntColumn get completedAt => integer().nullable()();
   IntColumn get createdAt => integer().withDefault(const Constant(0))();
   IntColumn get active => integer().withDefault(const Constant(1))();
-
-  @override
-  Set<Column> get primaryKey => {id};
 }

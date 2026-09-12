@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'package:productive_muslim/data/local/database/app_database.dart';
-
 class Habits extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
@@ -12,7 +10,4 @@ class Habits extends Table {
   IntColumn get reminderTime => integer().nullable()();
   IntColumn get active => integer().withDefault(const Constant(1))();
   IntColumn get createdAt => integer().withDefault(const Constant(0))();
-
-  @override
-  Set<Column> get primaryKey => {id};
 }

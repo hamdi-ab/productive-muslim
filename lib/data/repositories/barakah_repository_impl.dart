@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
-import 'package:productive_muslim/data/models/barakah_entry.dart'
+import 'package:productive_muslim/domain/models/barakah_entry.dart'
     as barakah_model;
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 

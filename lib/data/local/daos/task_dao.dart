@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/database/tables/tasks.dart';
 
+part 'task_dao.g.dart';
+
 @DriftAccessor(tables: [Tasks])
 class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   TaskDao(super.db);
@@ -44,7 +46,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
 
   Future<int> toggleTask(int id) {
     return (update(tasks)..where((t) => t.id.equals(id))).write(
-      const TasksCompanion(completed: Value(true), completedAt: Value(0)),
+      const TasksCompanion(completed: Value(1), completedAt: Value(0)),
     );
   }
 

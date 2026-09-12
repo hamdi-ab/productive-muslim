@@ -4,6 +4,8 @@ import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_prompts.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_entries.dart';
 
+part 'barakah_dao.g.dart';
+
 @DriftAccessor(tables: [BarakahPrompts, BarakahEntries])
 class BarakahDao extends DatabaseAccessor<AppDatabase> with _$BarakahDaoMixin {
   BarakahDao(super.db);

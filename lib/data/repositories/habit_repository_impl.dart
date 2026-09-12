@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
-import 'package:productive_muslim/data/models/habit.dart' as habit_model;
+import 'package:productive_muslim/domain/models/habit.dart' as habit_model;
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 
 class HabitRepositoryImpl implements HabitRepository {
