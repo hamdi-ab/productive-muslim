@@ -1,3 +1,5 @@
+import 'package:productive_muslim/domain/models/habit.dart';
+
 sealed class HabitState {
   const HabitState();
 

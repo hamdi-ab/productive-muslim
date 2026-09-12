@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
-import 'package:productive_muslim/domain/models/habit.dart';
 
 class HabitBloc extends Bloc<HabitEvent, HabitState> {
   final HabitRepository _repository;

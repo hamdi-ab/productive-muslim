@@ -34,5 +34,5 @@ class AppColors {
 }
 
 extension AppColorsExtension on BuildContext {
-  AppColors get appColors => AppColors();
+  AppColors get appColors => AppColors._();
 }

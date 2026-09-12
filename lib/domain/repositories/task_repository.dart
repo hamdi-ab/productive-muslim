@@ -1,6 +1,4 @@
-import 'package:freezed_annotation/freezed.dart';
-
-part 'task_repository.g.dart';
+import 'package:productive_muslim/domain/models/task.dart';
 
 abstract class TaskRepository {
   Stream<List<Task>> watchTasksForDate(String date);

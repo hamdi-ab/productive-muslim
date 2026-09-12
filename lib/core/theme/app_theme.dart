@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:productive_muslim/core/constants/app_spacing.dart';
-import 'package:productive_muslim/core/constants/app_radius.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 
 class AppTheme {
   AppTheme._();

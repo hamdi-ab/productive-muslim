@@ -12,39 +12,72 @@ class BarakahRepositoryImpl implements BarakahRepository {
 
   final BarakahDao _barakahDao;
 
-  @override
-  Stream<List<barakah_model.BarakahEntry>> watchEntriesForDate(String date) {
-    return _barakahDao.watchEntriesForDate(date);
+  barakah_model.BarakahEntry _toDomain(BarakahEntry row) {
+    return barakah_model.BarakahEntry(
+      id: row.id,
+      date: row.date,
+      sourceIds: row.sourceIds.split(',').where((s) => s.isNotEmpty).toList(),
+      promptId: row.promptId,
+      intensity: row.intensity,
+      note: row.note,
+      skipped: row.skipped == 1,
+      createdAt: row.createdAt,
+    );
+  }
+
+  BarakahEntry _toDrift(barakah_model.BarakahEntry entry) {
+    return BarakahEntry(
+      id: entry.id,
+      date: entry.date,
+      sourceIds: entry.sourceIds.join(','),
+      promptId: entry.promptId,
+      intensity: entry.intensity,
+      note: entry.note,
+      skipped: entry.skipped ? 1 : 0,
+      createdAt: entry.createdAt,
+    );
   }
 
   @override
-  Future<List<barakah_model.BarakahEntry>> getEntriesForDate(String date) {
-    return _barakahDao.getEntriesForDate(date);
+  Stream<List<barakah_model.BarakahEntry>> watchEntriesForDate(String date) {
+    return _barakahDao
+        .watchEntriesForDate(date)
+        .map((entries) => entries.map(_toDomain).toList());
+  }
+
+  @override
+  Future<List<barakah_model.BarakahEntry>> getEntriesForDate(
+    String date,
+  ) async {
+    final entries = await _barakahDao.getEntriesForDate(date);
+    return entries.map(_toDomain).toList();
   }
 
   @override
   Future<List<barakah_model.BarakahEntry>> getEntriesForRange(
     String startDate,
     String endDate,
-  ) {
-    return _barakahDao.getEntriesForRange(startDate, endDate);
+  ) async {
+    final entries = await _barakahDao.getEntriesForRange(startDate, endDate);
+    return entries.map(_toDomain).toList();
   }
 
   @override
-  Future<barakah_model.BarakahEntry?> getEntryById(int id) {
-    return _barakahDao.getEntryById(id);
+  Future<barakah_model.BarakahEntry?> getEntryById(int id) async {
+    final entry = await _barakahDao.getEntryById(id);
+    return entry == null ? null : _toDomain(entry);
   }
 
   @override
   Future<int> insertEntry(barakah_model.BarakahEntry entry) {
     return _barakahDao.insertEntry(
-      BarakahEntriesCompanion(
-        date: Value(entry.date),
-        sourceIds: Value(entry.sourceIds.join(',')),
+      BarakahEntriesCompanion.insert(
+        date: entry.date,
+        sourceIds: entry.sourceIds.join(','),
         promptId: Value(entry.promptId),
         intensity: Value(entry.intensity),
         note: Value(entry.note),
-        skipped: Value(entry.skipped),
+        skipped: Value(entry.skipped ? 1 : 0),
         createdAt: Value(entry.createdAt),
       ),
     );
@@ -52,7 +85,7 @@ class BarakahRepositoryImpl implements BarakahRepository {
 
   @override
   Future<bool> updateEntry(barakah_model.BarakahEntry entry) {
-    return _barakahDao.updateEntry(entry);
+    return _barakahDao.updateEntry(_toDrift(entry));
   }
 
   @override

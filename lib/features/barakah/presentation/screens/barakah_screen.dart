@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart';
+import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class BarakahScreen extends StatefulWidget {
@@ -32,7 +34,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
       child: BlocBuilder<BarakahBloc, BarakahState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n.barakah)),
+            appBar: AppBar(title: Text(l10n!.barakah)),
             body: state is Loaded
                 ? ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -168,12 +170,9 @@ class _BarakahScreenState extends State<BarakahScreen> {
   Widget _buildNoteInput() {
     return TextField(
       controller: _noteController,
-      decoration: const BoxDecoration(
+      decoration: const InputDecoration(
         labelText: 'Add a note (optional)',
-        border: EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        border: OutlineInputBorder(),
       ),
       maxLines: 2,
       onChanged: (value) => setState(() {}),

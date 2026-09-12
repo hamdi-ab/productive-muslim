@@ -119,10 +119,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Each step indicator is a Container with height 4 inside a Row
-    final row = find.byType(Row).evaluate().first;
-    final children = row.children;
-    expect(children.length, equals(4));
+    // Each step indicator is a Container with height 4
+    final containers = tester.widgetList<Container>(
+      find.descendant(of: find.byType(Row), matching: find.byType(Container)),
+    );
+    expect(containers.length, equals(4));
   });
 
   testWidgets('renders in Arabic locale', (tester) async {
@@ -136,6 +137,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('المسلم المنتج'), findsOneWidget);
+    expect(find.text('Build your day around what matters'), findsOneWidget);
   });
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/constants/app_radius.dart';
+import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,24 +15,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
 
   final List<OnboardingStep> _steps = [
-    OnboardingStep(
+    const OnboardingStep(
       title: 'Build your day around what matters',
       subtitle: 'Prayer, tasks, habits, and intentions — together in one space',
       icon: Icons.spa_outlined,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       title: 'What is your name?',
       subtitle: 'We use it to personalize your experience',
       icon: Icons.person_outline,
       hasInput: true,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       title: 'What brings you today?',
       subtitle: 'Choose or write your own intention',
       icon: Icons.flag_outlined,
       hasChips: true,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       title: 'Set up prayer times',
       subtitle: 'Get accurate adhan notifications for your location',
       icon: Icons.notifications_outlined,
@@ -56,7 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final step = _steps[_currentStep];
 
     return Scaffold(
@@ -89,14 +89,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               const SizedBox(height: 32),
               Text(
                 step.title,
-                style: Theme.of(context).typography.headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               if (step.subtitle != null)
                 Text(
-                  step.subtitle,
-                  style: Theme.of(context).typography.bodyMedium,
+                  step.subtitle!,
+                  style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 48),
@@ -141,7 +141,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildNameInput() {
     return const TextField(
       textCapitalization: TextCapitalization.words,
-      decoration: EdgeInsets(),
+      decoration: InputDecoration(),
     );
   }
 
@@ -176,7 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             const SizedBox(height: 16),
             Text(
               'Allow location access for accurate prayer times?',
-              style: Theme.of(context).typography.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
           ],
@@ -189,12 +189,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class OnboardingStep {
   final String title;
   final String? subtitle;
-  final Icons icon;
+  final IconData icon;
   final bool hasInput;
   final bool hasChips;
   final bool hasPermission;
 
-  OnboardingStep({
+  const OnboardingStep({
     required this.title,
     this.subtitle,
     required this.icon,

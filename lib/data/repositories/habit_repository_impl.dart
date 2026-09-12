@@ -10,31 +10,64 @@ class HabitRepositoryImpl implements HabitRepository {
 
   final HabitDao _habitDao;
 
+  habit_model.Habit _toDomain(Habit row) {
+    return habit_model.Habit(
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      frequency: row.frequency,
+      targetDays: row.targetDays,
+      reminderEnabled: row.reminderEnabled == 1,
+      reminderTime: row.reminderTime,
+      active: row.active == 1,
+      createdAt: row.createdAt,
+    );
+  }
+
+  Habit _toDrift(habit_model.Habit habit) {
+    return Habit(
+      id: habit.id,
+      name: habit.name,
+      category: habit.category,
+      frequency: habit.frequency,
+      targetDays: habit.targetDays,
+      reminderEnabled: habit.reminderEnabled ? 1 : 0,
+      reminderTime: habit.reminderTime,
+      active: habit.active ? 1 : 0,
+      createdAt: habit.createdAt,
+    );
+  }
+
   @override
   Stream<List<habit_model.Habit>> watchActiveHabits() {
-    return _habitDao.watchActiveHabits();
+    return _habitDao.watchActiveHabits().map(
+      (habits) => habits.map(_toDomain).toList(),
+    );
   }
 
   @override
-  Future<List<habit_model.Habit>> getActiveHabits() {
-    return _habitDao.getActiveHabits();
+  Future<List<habit_model.Habit>> getActiveHabits() async {
+    final habits = await _habitDao.getActiveHabits();
+    return habits.map(_toDomain).toList();
   }
 
   @override
-  Future<habit_model.Habit?> getHabitById(int id) {
-    return _habitDao.getHabitById(id);
+  Future<habit_model.Habit?> getHabitById(int id) async {
+    final habit = await _habitDao.getHabitById(id);
+    return habit == null ? null : _toDomain(habit);
   }
 
   @override
   Future<int> insertHabit(habit_model.Habit habit) {
     return _habitDao.insertHabit(
-      HabitsCompanion(
-        name: Value(habit.name),
-        category: Value(habit.category),
+      HabitsCompanion.insert(
+        name: habit.name,
+        category: habit.category,
         frequency: Value(habit.frequency),
         targetDays: Value(habit.targetDays),
-        reminderEnabled: Value(habit.reminderEnabled),
+        reminderEnabled: Value(habit.reminderEnabled ? 1 : 0),
         reminderTime: Value(habit.reminderTime),
+        active: Value(habit.active ? 1 : 0),
         createdAt: Value(habit.createdAt),
       ),
     );
@@ -42,7 +75,7 @@ class HabitRepositoryImpl implements HabitRepository {
 
   @override
   Future<bool> updateHabit(habit_model.Habit habit) {
-    return _habitDao.updateHabit(habit);
+    return _habitDao.updateHabit(_toDrift(habit));
   }
 
   @override

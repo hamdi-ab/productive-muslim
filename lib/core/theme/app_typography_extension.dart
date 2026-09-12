@@ -59,5 +59,5 @@ class AppTypography {
 }
 
 extension AppTypographyExtension on BuildContext {
-  AppTypography get appTypography => AppTypography();
+  AppTypography get appTypography => AppTypography._();
 }

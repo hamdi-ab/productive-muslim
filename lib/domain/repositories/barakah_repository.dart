@@ -1,3 +1,5 @@
+import 'package:productive_muslim/domain/models/barakah_entry.dart';
+
 abstract class BarakahRepository {
   Stream<List<BarakahEntry>> watchEntriesForDate(String date);
   Future<List<BarakahEntry>> getEntriesForDate(String date);

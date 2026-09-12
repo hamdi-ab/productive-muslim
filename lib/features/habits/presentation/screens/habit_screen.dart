@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:productive_muslim/core/constants/app_spacing.dart';
-import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
@@ -18,7 +16,6 @@ class HabitScreen extends StatefulWidget {
 }
 
 class _HabitScreenState extends State<HabitScreen> {
-  String _name = '';
   String _category = 'islam';
 
   @override
@@ -70,7 +67,7 @@ class _HabitScreenState extends State<HabitScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 entry.key,
-                style: Theme.of(context).typography.titleSmall,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ),
             ...entry.value.map((habit) => _HabitTile(habit: habit)),
