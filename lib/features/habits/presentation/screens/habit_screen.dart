@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
@@ -16,6 +18,7 @@ class HabitScreen extends StatefulWidget {
 }
 
 class _HabitScreenState extends State<HabitScreen> {
+  String _name = '';
   String _category = 'islam';
 
   @override
@@ -37,13 +40,13 @@ class _HabitScreenState extends State<HabitScreen> {
                 ),
               ],
             ),
-            body: state is HabitLoaded
+            body: state is Loaded
                 ? state.habits.isEmpty
                     ? Center(child: Text(l10n.emptyHabits))
                     : _buildHabitList(state.habits)
-                : state is HabitLoading
+                : state is Loading
                     ? const Center(child: CircularProgressIndicator())
-                    : state is HabitError
+                    : state is Error
                         ? Center(child: Text(state.message))
                         : const Center(child: SizedBox.shrink()),
           );
@@ -90,6 +93,9 @@ class _HabitScreenState extends State<HabitScreen> {
           children: [
             TextField(
               controller: nameController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.name,
+              ),
             ),
             const SizedBox(height: 16),
             Text(AppLocalizations.of(context)!.lifeArea),
@@ -173,4 +179,3 @@ class _HabitTile extends StatelessWidget {
     );
   }
 }
-

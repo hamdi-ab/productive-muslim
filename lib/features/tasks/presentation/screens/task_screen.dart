@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
@@ -72,7 +73,9 @@ class _TaskScreenState extends State<TaskScreen> {
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.taskTitle,
+              ),
             ),
             const SizedBox(height: 16),
             Text(AppLocalizations.of(context)!.lifeArea),
@@ -134,8 +137,6 @@ class _TaskTile extends StatelessWidget {
 
   const _TaskTile({required this.task});
 
-  static const _successColor = Color(0xFF388E3C);
-
   @override
   Widget build(BuildContext context) {
     final time = task.startMinutes != null && task.endMinutes != null
@@ -146,7 +147,7 @@ class _TaskTile extends StatelessWidget {
       leading: IconButton(
         icon: Icon(
           task.completed ? Icons.check_circle : Icons.check_circle_outline,
-          color: task.completed ? _successColor : null,
+          color: task.completed ? AppColors.success : null,
         ),
         onPressed: () => context.read<TaskBloc>().add(TaskToggled(task.id)),
       ),

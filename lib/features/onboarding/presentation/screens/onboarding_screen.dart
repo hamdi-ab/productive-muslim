@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/constants/app_radius.dart';
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -110,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 .colorScheme
                                 .onSurfaceVariant
                                 .withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                     ),
                   );
@@ -168,7 +171,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildPermissionCard() {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           children: [
             const Icon(Icons.location_on_outlined, size: 48),
