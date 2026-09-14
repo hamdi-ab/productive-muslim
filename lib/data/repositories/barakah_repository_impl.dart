@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
+import 'package:productive_muslim/data/mappers/barakah_mapper.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart'
     as barakah_model;
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
@@ -11,46 +12,21 @@ class BarakahRepositoryImpl implements BarakahRepository {
     : _barakahDao = barakahDao;
 
   final BarakahDao _barakahDao;
-
-  barakah_model.BarakahEntry _toDomain(BarakahEntry row) {
-    return barakah_model.BarakahEntry(
-      id: row.id,
-      date: row.date,
-      sourceIds: row.sourceIds.split(',').where((s) => s.isNotEmpty).toList(),
-      promptId: row.promptId,
-      intensity: row.intensity,
-      note: row.note,
-      skipped: row.skipped == 1,
-      createdAt: row.createdAt,
-    );
-  }
-
-  BarakahEntry _toDrift(barakah_model.BarakahEntry entry) {
-    return BarakahEntry(
-      id: entry.id,
-      date: entry.date,
-      sourceIds: entry.sourceIds.join(','),
-      promptId: entry.promptId,
-      intensity: entry.intensity,
-      note: entry.note,
-      skipped: entry.skipped ? 1 : 0,
-      createdAt: entry.createdAt,
-    );
-  }
+  final _mapper = BarakahMapper();
 
   @override
   Stream<List<barakah_model.BarakahEntry>> watchEntriesForDate(String date) {
     return _barakahDao
         .watchEntriesForDate(date)
-        .map((entries) => entries.map(_toDomain).toList());
+        .map((rows) => rows.map(_mapper.toDomain).toList());
   }
 
   @override
   Future<List<barakah_model.BarakahEntry>> getEntriesForDate(
     String date,
   ) async {
-    final entries = await _barakahDao.getEntriesForDate(date);
-    return entries.map(_toDomain).toList();
+    final rows = await _barakahDao.getEntriesForDate(date);
+    return rows.map(_mapper.toDomain).toList();
   }
 
   @override
@@ -58,14 +34,14 @@ class BarakahRepositoryImpl implements BarakahRepository {
     String startDate,
     String endDate,
   ) async {
-    final entries = await _barakahDao.getEntriesForRange(startDate, endDate);
-    return entries.map(_toDomain).toList();
+    final rows = await _barakahDao.getEntriesForRange(startDate, endDate);
+    return rows.map(_mapper.toDomain).toList();
   }
 
   @override
   Future<barakah_model.BarakahEntry?> getEntryById(int id) async {
-    final entry = await _barakahDao.getEntryById(id);
-    return entry == null ? null : _toDomain(entry);
+    final row = await _barakahDao.getEntryById(id);
+    return row == null ? null : _mapper.toDomain(row);
   }
 
   @override
@@ -85,7 +61,7 @@ class BarakahRepositoryImpl implements BarakahRepository {
 
   @override
   Future<bool> updateEntry(barakah_model.BarakahEntry entry) {
-    return _barakahDao.updateEntry(_toDrift(entry));
+    return _barakahDao.updateEntry(_mapper.toRow(entry));
   }
 
   @override

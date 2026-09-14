@@ -32,7 +32,3 @@ class AppColors {
   static const darkTextPrimary = Color(0xFFFFFFFF);
   static const darkTextSecondary = Color(0xFFB0B0B0);
 }
-
-extension AppColorsExtension on BuildContext {
-  AppColors get appColors => AppColors._();
-}

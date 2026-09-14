@@ -56,8 +56,18 @@ class AppTypography {
     fontWeight: FontWeight.w500,
     height: 1.4,
   );
-}
 
-extension AppTypographyExtension on BuildContext {
-  AppTypography get appTypography => AppTypography._();
+  static TextTheme toTextTheme() {
+    return const TextTheme(
+      headlineLarge: headlineLarge,
+      headlineMedium: headlineMedium,
+      headlineSmall: headlineSmall,
+      bodyLarge: bodyLarge,
+      bodyMedium: bodyMedium,
+      bodySmall: bodySmall,
+      labelLarge: labelLarge,
+      labelMedium: labelMedium,
+      labelSmall: labelSmall,
+    );
+  }
 }
