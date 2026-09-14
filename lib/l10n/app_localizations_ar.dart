@@ -243,4 +243,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get newIntention => 'نية جديدة';
+
+  @override
+  String get goodMorning => 'صباح الخير';
+
+  @override
+  String get goodAfternoon => 'مساء الخير';
+
+  @override
+  String get goodEvening => 'مساء الخير';
 }

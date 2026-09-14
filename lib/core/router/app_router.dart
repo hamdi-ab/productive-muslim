@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
+import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
+import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
+import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
+import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 
 class AppRouter {
@@ -24,21 +28,18 @@ class AppRouter {
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => const Center(child: Text('Home')),
-          ),
+          GoRoute(path: '/', builder: (context, state) => const HomeContent()),
           GoRoute(
             path: '/tasks',
-            builder: (context, state) => const Center(child: Text('Tasks')),
+            builder: (context, state) => const TaskScreen(),
           ),
           GoRoute(
             path: '/habits',
-            builder: (context, state) => const Center(child: Text('Habits')),
+            builder: (context, state) => const HabitScreen(),
           ),
           GoRoute(
             path: '/barakah',
-            builder: (context, state) => const Center(child: Text('Barakah')),
+            builder: (context, state) => const BarakahScreen(),
           ),
           GoRoute(
             path: '/journal',

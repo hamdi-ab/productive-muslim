@@ -72,5 +72,8 @@
   "reflection": "تأمل",
   "completed": "مكتمل",
   "saveReflection": "حفظ التأمل",
-  "newIntention": "نية جديدة"
+  "newIntention": "نية جديدة",
+  "goodMorning": "صباح الخير",
+  "goodAfternoon": "مساء الخير",
+  "goodEvening": "مساء الخير"
 }

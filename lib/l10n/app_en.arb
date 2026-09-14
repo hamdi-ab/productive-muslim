@@ -72,5 +72,8 @@
   "reflection": "Reflection",
   "completed": "completed",
   "saveReflection": "Save Reflection",
-  "newIntention": "New Intention"
+  "newIntention": "New Intention",
+  "goodMorning": "Good Morning",
+  "goodAfternoon": "Good Afternoon",
+  "goodEvening": "Good Evening"
 }
