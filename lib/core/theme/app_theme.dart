@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 
 class AppTheme {
   AppTheme._();
@@ -17,6 +18,7 @@ class AppTheme {
       error: AppColors.error,
     ),
     scaffoldBackgroundColor: AppColors.background,
+    textTheme: AppTypography.toTextTheme(),
     useMaterial3: true,
   );
 
@@ -32,6 +34,7 @@ class AppTheme {
       error: AppColors.error,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
+    textTheme: AppTypography.toTextTheme(),
     useMaterial3: true,
   );
 }

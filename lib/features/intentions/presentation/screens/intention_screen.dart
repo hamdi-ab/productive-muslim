@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_state.dart';
@@ -73,10 +72,16 @@ class _IntentionScreenState extends State<IntentionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.todayIntentions, style: AppTypography.headlineSmall),
+            Text(
+              l10n.todayIntentions,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: AppSpacing.sm),
             if (entries.isEmpty)
-              Text(l10n.noIntentionsToday, style: AppTypography.bodyMedium)
+              Text(
+                l10n.noIntentionsToday,
+                style: Theme.of(context).textTheme.bodyMedium,
+              )
             else
               ...entries.map((entry) => _buildIntentionTile(context, entry)),
           ],
@@ -120,11 +125,14 @@ class _IntentionScreenState extends State<IntentionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.reflection, style: AppTypography.headlineSmall),
+            Text(
+              l10n.reflection,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               '${completed.length} / $total ${l10n.completed}',
-              style: AppTypography.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.sm),
             LinearProgressIndicator(value: ratio),

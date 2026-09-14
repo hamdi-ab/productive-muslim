@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
+import 'package:productive_muslim/data/mappers/task_mapper.dart';
 import 'package:productive_muslim/domain/models/task.dart' as task_model;
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
@@ -9,56 +10,19 @@ class TaskRepositoryImpl implements TaskRepository {
   TaskRepositoryImpl({required TaskDao taskDao}) : _taskDao = taskDao;
 
   final TaskDao _taskDao;
-
-  task_model.Task _toDomain(Task row) {
-    return task_model.Task(
-      id: row.id,
-      title: row.title,
-      lifeArea: row.lifeArea,
-      startMinutes: row.startMinutes,
-      endMinutes: row.endMinutes,
-      date: row.date,
-      repeatDaily: row.repeatDaily == 1,
-      repeatWeekly: row.repeatWeekly == 1,
-      repeatDays: row.repeatDays,
-      notes: row.notes,
-      completed: row.completed == 1,
-      completedAt: row.completedAt,
-      createdAt: row.createdAt,
-      active: row.active == 1,
-    );
-  }
-
-  Task _toDrift(task_model.Task task) {
-    return Task(
-      id: task.id,
-      title: task.title,
-      lifeArea: task.lifeArea,
-      startMinutes: task.startMinutes,
-      endMinutes: task.endMinutes,
-      date: task.date,
-      repeatDaily: task.repeatDaily ? 1 : 0,
-      repeatWeekly: task.repeatWeekly ? 1 : 0,
-      repeatDays: task.repeatDays,
-      notes: task.notes,
-      completed: task.completed ? 1 : 0,
-      completedAt: task.completedAt,
-      createdAt: task.createdAt,
-      active: task.active ? 1 : 0,
-    );
-  }
+  final _mapper = TaskMapper();
 
   @override
   Stream<List<task_model.Task>> watchTasksForDate(String date) {
     return _taskDao
         .watchTasksForDate(date)
-        .map((tasks) => tasks.map(_toDomain).toList());
+        .map((rows) => rows.map(_mapper.toDomain).toList());
   }
 
   @override
   Future<List<task_model.Task>> getTasksForDate(String date) async {
-    final tasks = await _taskDao.getTasksForDate(date);
-    return tasks.map(_toDomain).toList();
+    final rows = await _taskDao.getTasksForDate(date);
+    return rows.map(_mapper.toDomain).toList();
   }
 
   @override
@@ -66,14 +30,14 @@ class TaskRepositoryImpl implements TaskRepository {
     String startDate,
     String endDate,
   ) async {
-    final tasks = await _taskDao.getTasksForRange(startDate, endDate);
-    return tasks.map(_toDomain).toList();
+    final rows = await _taskDao.getTasksForRange(startDate, endDate);
+    return rows.map(_mapper.toDomain).toList();
   }
 
   @override
   Future<task_model.Task?> getTaskById(int id) async {
-    final task = await _taskDao.getTaskById(id);
-    return task == null ? null : _toDomain(task);
+    final row = await _taskDao.getTaskById(id);
+    return row == null ? null : _mapper.toDomain(row);
   }
 
   @override
@@ -99,7 +63,7 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<bool> updateTask(task_model.Task task) {
-    return _taskDao.updateTask(_toDrift(task));
+    return _taskDao.updateTask(_mapper.toRow(task));
   }
 
   @override
