@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
@@ -11,6 +12,7 @@ import 'package:productive_muslim/data/repositories/barakah_repository_impl.dart
 import 'package:productive_muslim/data/repositories/habit_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/intention_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/task_repository_impl.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
@@ -19,6 +21,13 @@ import 'package:productive_muslim/domain/repositories/task_repository.dart';
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
+  // SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(prefs);
+
+  // Settings
+  getIt.registerSingleton<SettingsService>(SettingsService(prefs: prefs));
+
   // Database
   final database = AppDatabase();
   getIt.registerSingleton<AppDatabase>(database);

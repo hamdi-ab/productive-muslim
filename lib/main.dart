@@ -12,9 +12,10 @@ import 'domain/repositories/intention_repository.dart';
 import 'domain/repositories/task_repository.dart';
 import 'l10n/app_localizations.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   DevicePreview.enable();
-  setupDi();
+  await setupDi();
   runApp(const MyApp());
 }
 

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/constants/app_radius.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final SettingsService? settings;
+
+  const OnboardingScreen({super.key, this.settings});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -13,6 +17,10 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
+  String _selectedIntention = '';
+  final _nameController = TextEditingController();
+
+  SettingsService get _settings => widget.settings ?? SettingsService.empty();
 
   final List<OnboardingStep> _steps = [
     const OnboardingStep(
@@ -40,11 +48,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
-  void _nextStep() {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() async {
+    if (_currentStep == 1 && _nameController.text.isNotEmpty) {
+      await _settings.setUserName(_nameController.text);
+    }
+
+    if (_currentStep == 2 && _selectedIntention.isNotEmpty) {
+      await _settings.setUserIntention(_selectedIntention);
+    }
+
     if (_currentStep < _steps.length - 1) {
       setState(() => _currentStep++);
     } else {
-      Navigator.pushReplacementNamed(context, '/');
+      await _settings.setOnboardingCompleted();
+      if (mounted) context.go('/');
     }
   }
 
@@ -52,6 +75,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     }
+  }
+
+  void _skip() async {
+    await _settings.setOnboardingCompleted();
+    if (mounted) context.go('/');
   }
 
   @override
@@ -68,10 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )
             : null,
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-            child: Text(l10n.skip),
-          ),
+          TextButton(onPressed: _skip, child: Text(l10n.skip)),
           const SizedBox(width: 8),
         ],
       ),
@@ -139,9 +164,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildNameInput() {
-    return const TextField(
+    return TextField(
+      controller: _nameController,
       textCapitalization: TextCapitalization.words,
-      decoration: InputDecoration(),
+      decoration: const InputDecoration(),
     );
   }
 
@@ -152,15 +178,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       children: [
         FilterChip(
           label: const Text('Seeking barakah in my time'),
-          onSelected: (selected) {},
+          selected: _selectedIntention == 'barakah',
+          onSelected: (selected) {
+            setState(() => _selectedIntention = selected ? 'barakah' : '');
+          },
         ),
         FilterChip(
           label: const Text('Consistent worship & routine'),
-          onSelected: (selected) {},
+          selected: _selectedIntention == 'worship',
+          onSelected: (selected) {
+            setState(() => _selectedIntention = selected ? 'worship' : '');
+          },
         ),
         FilterChip(
           label: const Text('Mindful productivity'),
-          onSelected: (selected) {},
+          selected: _selectedIntention == 'productivity',
+          onSelected: (selected) {
+            setState(() => _selectedIntention = selected ? 'productivity' : '');
+          },
         ),
       ],
     );

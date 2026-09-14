@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
@@ -12,18 +14,34 @@ import 'package:productive_muslim/features/intentions/presentation/screens/inten
 class AppRouter {
   AppRouter._();
 
+  static bool _isOnboardingDone() {
+    try {
+      return getIt<SettingsService>().onboardingCompleted;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static final GoRouter router = GoRouter(
-    initialLocation: '/onboarding',
+    initialLocation: '/',
     redirect: (context, state) {
-      // TODO: check onboarding_completed from SharedPreferences
-      // If not completed and not on /onboarding, redirect to /onboarding
-      // If completed and on /onboarding, redirect to /
+      final onboardingDone = _isOnboardingDone();
+      final goingToOnboarding = state.matchedLocation == '/onboarding';
+
+      if (!onboardingDone && !goingToOnboarding) return '/onboarding';
+      if (onboardingDone && goingToOnboarding) return '/';
       return null;
     },
     routes: [
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) {
+          try {
+            return OnboardingScreen(settings: getIt<SettingsService>());
+          } catch (_) {
+            return const OnboardingScreen();
+          }
+        },
       ),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
