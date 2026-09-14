@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+
+class MockPrayerTimeService extends PrayerTimeService {
+  @override
+  Future<Position?> getCurrentPosition() async => null;
+}
 
 GoRouter _testRouter({required Widget child}) {
   return GoRouter(
@@ -11,7 +18,10 @@ GoRouter _testRouter({required Widget child}) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => HomeScreen(child: child),
+        builder: (context, state) => HomeScreen(
+          prayerTimeService: MockPrayerTimeService(),
+          child: child,
+        ),
       ),
     ],
   );
@@ -62,7 +72,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Next Prayer'), findsOneWidget);
-    expect(find.text('00:00:00'), findsOneWidget);
   });
 
   testWidgets('settings button is rendered', (tester) async {

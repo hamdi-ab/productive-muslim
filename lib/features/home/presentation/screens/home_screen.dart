@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
+  final PrayerTimeService? prayerTimeService;
 
-  const HomeScreen({super.key, required this.child});
+  const HomeScreen({super.key, required this.child, this.prayerTimeService});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,9 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: child,
-      bottomSheet: const _PrayerCountdownSheet(),
+      bottomSheet: _PrayerCountdownSheet(
+        service: prayerTimeService ?? PrayerTimeService(),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _getIndexForLocation(location),
         onTap: (index) => _navigateToIndex(context, index),
@@ -86,8 +90,71 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _PrayerCountdownSheet extends StatelessWidget {
-  const _PrayerCountdownSheet();
+class _PrayerCountdownSheet extends StatefulWidget {
+  final PrayerTimeService service;
+
+  const _PrayerCountdownSheet({required this.service});
+
+  @override
+  State<_PrayerCountdownSheet> createState() => _PrayerCountdownSheetState();
+}
+
+class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
+  String _nextPrayer = '';
+  String _countdown = '';
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrayerTimes();
+  }
+
+  Future<void> _loadPrayerTimes() async {
+    final position = await widget.service.getCurrentPosition();
+    if (position == null) {
+      if (mounted) {
+        setState(() {
+          _nextPrayer = '--';
+          _countdown = '--:--';
+          _loading = false;
+        });
+      }
+      return;
+    }
+
+    final prayerTimes = widget.service.getPrayerTimes(position);
+    if (prayerTimes == null) {
+      if (mounted) {
+        setState(() {
+          _nextPrayer = '--';
+          _countdown = '--:--';
+          _loading = false;
+        });
+      }
+      return;
+    }
+
+    final nextPrayer = widget.service.getNextPrayerName(prayerTimes);
+    final timeUntil = widget.service.getTimeUntilNextPrayer(prayerTimes);
+
+    if (mounted) {
+      setState(() {
+        _nextPrayer = nextPrayer ?? '--';
+        _countdown = timeUntil != null ? _formatDuration(timeUntil) : '--:--';
+        _loading = false;
+      });
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    return '${minutes}m';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +172,14 @@ class _PrayerCountdownSheet extends StatelessWidget {
           const Icon(Icons.access_time_outlined, size: 20),
           Text(l10n.nextPrayer),
           const Spacer(),
-          const Text('00:00:00'),
+          if (_loading)
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Text('$_nextPrayer in $_countdown'),
         ],
       ),
     );
