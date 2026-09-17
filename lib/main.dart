@@ -13,7 +13,6 @@ import 'domain/repositories/task_repository.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   DevicePreview.enable();
   await setupDi();
   runApp(const MyApp());
