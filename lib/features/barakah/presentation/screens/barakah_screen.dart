@@ -23,6 +23,12 @@ class _BarakahScreenState extends State<BarakahScreen> {
   final _noteController = TextEditingController();
 
   @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -47,7 +53,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
                       const SizedBox(height: 16),
                       _buildLogButton(context, today),
                       const SizedBox(height: 32),
-                      _buildHistory(state.entries),
+                      _buildHistory(context, state.entries),
                     ],
                   )
                 : state is Loading
@@ -91,19 +97,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      context.read<BarakahBloc>().add(
-                        BarakahLogged(
-                          BarakahEntry(
-                            id: 0,
-                            date: today,
-                            sourceIds: _selectedSources,
-                            createdAt: DateTime.now().millisecondsSinceEpoch,
-                          ),
-                        ),
-                      );
-                      _selectedSources.clear();
-                    },
+                    onPressed: () => _logEntry(context, today),
                     child: const Text('Yes'),
                   ),
                 ),
@@ -183,28 +177,30 @@ class _BarakahScreenState extends State<BarakahScreen> {
     return FilledButton(
       onPressed: _selectedSources.isEmpty
           ? null
-          : () {
-              context.read<BarakahBloc>().add(
-                BarakahLogged(
-                  BarakahEntry(
-                    id: 0,
-                    date: today,
-                    sourceIds: _selectedSources,
-                    note: _noteController.text.isEmpty
-                        ? null
-                        : _noteController.text,
-                    createdAt: DateTime.now().millisecondsSinceEpoch,
-                  ),
-                ),
-              );
-              _selectedSources.clear();
-              _noteController.clear();
-            },
+          : () => _logEntry(context, today),
       child: const Text('Log Barakah'),
     );
   }
 
-  Widget _buildHistory(List<BarakahEntry> entries) {
+  void _logEntry(BuildContext context, String today) {
+    context.read<BarakahBloc>().add(
+      BarakahLogged(
+        BarakahEntry(
+          id: 0,
+          date: today,
+          sourceIds: List<String>.unmodifiable(_selectedSources),
+          note: _noteController.text.isEmpty ? null : _noteController.text,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+        ),
+      ),
+    );
+    setState(() {
+      _selectedSources.clear();
+      _noteController.clear();
+    });
+  }
+
+  Widget _buildHistory(BuildContext context, List<BarakahEntry> entries) {
     if (entries.isEmpty) {
       return const Center(child: Text('No barakah entries yet'));
     }
@@ -228,8 +224,10 @@ class _BarakahScreenState extends State<BarakahScreen> {
             subtitle: entry.note != null ? Text(entry.note!) : null,
             trailing: IconButton(
               icon: const Icon(Icons.delete_outline, size: 20),
-              onPressed: () =>
-                  context.read<BarakahBloc>().add(BarakahDeleted(entry.id)),
+              onPressed: () {
+                final bloc = context.read<BarakahBloc>();
+                bloc.add(BarakahDeleted(entry.id));
+              },
             ),
           );
         }),
