@@ -6,6 +6,8 @@ part of 'barakah_dao.dart';
 mixin _$BarakahDaoMixin on DatabaseAccessor<AppDatabase> {
   $BarakahPromptsTable get barakahPrompts => attachedDatabase.barakahPrompts;
   $BarakahEntriesTable get barakahEntries => attachedDatabase.barakahEntries;
+  $BarakahDailyResponsesTable get barakahDailyResponses =>
+      attachedDatabase.barakahDailyResponses;
   BarakahDaoManager get managers => BarakahDaoManager(this);
 }
 
@@ -21,5 +23,10 @@ class BarakahDaoManager {
       $$BarakahEntriesTableTableManager(
         _db.attachedDatabase,
         _db.barakahEntries,
+      );
+  $$BarakahDailyResponsesTableTableManager get barakahDailyResponses =>
+      $$BarakahDailyResponsesTableTableManager(
+        _db.attachedDatabase,
+        _db.barakahDailyResponses,
       );
 }

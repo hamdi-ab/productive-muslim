@@ -252,4 +252,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goodEvening => 'Good Evening';
+
+  @override
+  String get barakahDailyTitle => 'Daily Barakah reflection';
+
+  @override
+  String barakahDailyQuestion(String promptId) {
+    String _temp0 = intl.Intl.selectLogic(promptId, {
+      'good_intentions_v1': 'Did you renew your intention for Allah today?',
+      'piety_v1': 'Did mindfulness of Allah guide your choices today?',
+      'trust_in_allah_v1':
+          'Did you put your trust in Allah while doing your part today?',
+      'quran_v1': 'Did you make time for the Quran today?',
+      'bismillah_v1': 'Did you begin your activities with Bismillah today?',
+      'eating_together_v1': 'Did you share a meal with others today?',
+      'honesty_in_trade_v1': 'Were you honest in your dealings today?',
+      'dua_v1': 'Did you turn to Allah in dua today?',
+      'halal_income_v1': 'Did you seek or use halal income today?',
+      'sunnah_v1': 'Did you follow a Sunnah practice today?',
+      'istikhara_v1': 'Did you seek Allah\'s guidance through istikhara for a decision today?',
+      'gratitude_v1': 'Did you thank Allah for His blessings today?',
+      'charity_v1': 'Did you give something in charity today?',
+      'kinship_v1': 'Did you nurture your family ties today?',
+      'early_rising_v1': 'Did you make use of the early morning today?',
+      'marriage_v1': 'Did you nurture kindness in your marriage today?',
+      'salah_v1': 'Did you make time for prayer today?',
+      'forgiveness_v1': 'Did you seek Allah\'s forgiveness today?',
+      'other': 'Did you notice a source of barakah today?',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String barakahDailySource(String sourceId) {
+    String _temp0 = intl.Intl.selectLogic(sourceId, {
+      'good_intentions': 'Good intentions',
+      'piety': 'Mindfulness of Allah',
+      'trust_in_allah': 'Trust in Allah',
+      'quran': 'Quran',
+      'bismillah': 'Saying Bismillah',
+      'eating_together': 'Eating together',
+      'honesty_in_trade': 'Honest dealings',
+      'dua': 'Dua',
+      'halal_income': 'Halal income',
+      'sunnah': 'Following the Sunnah',
+      'istikhara': 'Istikhara',
+      'gratitude': 'Gratitude to Allah',
+      'charity': 'Giving charity',
+      'kinship': 'Family ties',
+      'early_rising': 'Early rising',
+      'marriage': 'Kindness in marriage',
+      'salah': 'Prayer',
+      'forgiveness': 'Seeking forgiveness',
+      'other': 'Source of barakah',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get barakahDailyYes => 'Yes';
+
+  @override
+  String get barakahDailySomewhat => 'Somewhat';
+
+  @override
+  String get barakahDailyNo => 'No';
+
+  @override
+  String get barakahDailySkip => 'Skip';
+
+  @override
+  String get barakahDailySources => 'Sources of barakah (optional)';
+
+  @override
+  String get barakahDailyNote => 'Reflection note (optional)';
+
+  @override
+  String get barakahDailySave => 'Save response';
+
+  @override
+  String get barakahDailyUpdate => 'Save changes';
+
+  @override
+  String get barakahDailySaving => 'Saving response…';
+
+  @override
+  String get barakahDailySaved => 'Response saved. You can edit it anytime.';
+
+  @override
+  String get barakahDailyFailure =>
+      'Your response could not be loaded or saved. Please try again.';
+
+  @override
+  String get barakahDailyRetry => 'Try again';
+
+  @override
+  String get barakahHistoryTitle => 'Free-form Barakah history';
 }

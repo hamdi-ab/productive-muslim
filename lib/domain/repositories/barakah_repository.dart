@@ -1,6 +1,9 @@
+import 'package:productive_muslim/domain/models/barakah_daily_response.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart';
 
 abstract class BarakahRepository {
+  Stream<BarakahDailyResponse?> watchDailyResponse(String date);
+  Future<void> saveDailyResponse(BarakahDailyResponse response);
   Stream<List<BarakahEntry>> watchEntriesForDate(String date);
   Future<List<BarakahEntry>> getEntriesForDate(String date);
   Future<List<BarakahEntry>> getEntriesForRange(

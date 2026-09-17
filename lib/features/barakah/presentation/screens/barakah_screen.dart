@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/domain/models/barakah_daily_response.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -12,7 +15,9 @@ import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class BarakahScreen extends StatefulWidget {
-  const BarakahScreen({super.key});
+  const BarakahScreen({super.key, this.date});
+
+  final String? date;
 
   @override
   State<BarakahScreen> createState() => _BarakahScreenState();
@@ -31,12 +36,14 @@ class _BarakahScreenState extends State<BarakahScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final today =
+        widget.date ?? DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return BlocProvider(
-      create: (context) =>
-          BarakahBloc(context.read<BarakahRepository>())
-            ..add(BarakahLoaded(today)),
+      key: ValueKey(today),
+      create: (context) => BarakahBloc(context.read<BarakahRepository>())
+        ..add(BarakahLoaded(today))
+        ..add(BarakahDailyResponseLoaded(today)),
       child: BlocBuilder<BarakahBloc, BarakahState>(
         builder: (context, state) {
           return Scaffold(
@@ -45,6 +52,15 @@ class _BarakahScreenState extends State<BarakahScreen> {
                 ? ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     children: [
+                      if (state.daily case final daily?) ...[
+                        _DailyPromptCard(draft: daily),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          l10n.barakahHistoryTitle,
+                          style: AppTypography.labelLarge,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
                       _buildPromptCard(context, today),
                       const SizedBox(height: 16),
                       _buildSourceChips(),
@@ -232,6 +248,162 @@ class _BarakahScreenState extends State<BarakahScreen> {
           );
         }),
       ],
+    );
+  }
+}
+
+class _DailyPromptCard extends StatefulWidget {
+  const _DailyPromptCard({required this.draft});
+
+  final BarakahDailyDraft draft;
+
+  @override
+  State<_DailyPromptCard> createState() => _DailyPromptCardState();
+}
+
+class _DailyPromptCardState extends State<_DailyPromptCard> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.draft.note);
+  }
+
+  @override
+  void didUpdateWidget(covariant _DailyPromptCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_controller.text != widget.draft.note) {
+      _controller.value = TextEditingValue(
+        text: widget.draft.note,
+        selection: TextSelection.collapsed(offset: widget.draft.note.length),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final draft = widget.draft;
+    return Card(
+      key: Key('daily-prompt-${draft.prompt.id}'),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.barakahDailyTitle, style: AppTypography.labelLarge),
+            const SizedBox(height: AppSpacing.sm),
+            Text(l10n.barakahDailyQuestion(draft.prompt.id)),
+            if (draft.loading)
+              const LinearProgressIndicator()
+            else if (draft.failure && draft.answer == null) ...[
+              Text(l10n.barakahDailyFailure),
+              TextButton(
+                onPressed: () => context.read<BarakahBloc>().add(
+                  BarakahDailyResponseLoaded(draft.date),
+                ),
+                child: Text(l10n.barakahDailyRetry),
+              ),
+            ] else ...[
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xs,
+                children: BarakahAnswer.values.map((answer) {
+                  final label = switch (answer) {
+                    BarakahAnswer.yes => l10n.barakahDailyYes,
+                    BarakahAnswer.somewhat => l10n.barakahDailySomewhat,
+                    BarakahAnswer.no => l10n.barakahDailyNo,
+                    BarakahAnswer.skip => l10n.barakahDailySkip,
+                  };
+                  return ChoiceChip(
+                    key: Key('daily-answer-${answer.name}'),
+                    label: Text(label),
+                    selected: draft.answer == answer,
+                    onSelected: draft.saving
+                        ? null
+                        : (_) => context.read<BarakahBloc>().add(
+                            BarakahAnswerSelected(answer),
+                          ),
+                  );
+                }).toList(),
+              ),
+              if (draft.allowsSources) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(l10n.barakahDailySources),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: draft.prompt.sourceIds
+                      .map(
+                        (sourceId) => FilterChip(
+                          key: Key('daily-source-$sourceId'),
+                          label: Text(l10n.barakahDailySource(sourceId)),
+                          selected: draft.sourceIds.contains(sourceId),
+                          onSelected: draft.saving
+                              ? null
+                              : (_) => context.read<BarakahBloc>().add(
+                                  BarakahSourceToggled(sourceId),
+                                ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+              if (draft.answer != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                TextField(
+                  key: const Key('daily-note'),
+                  controller: _controller,
+                  enabled: !draft.saving,
+                  decoration: InputDecoration(
+                    labelText: l10n.barakahDailyNote,
+                    border: const OutlineInputBorder(),
+                  ),
+                  maxLength: 280,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  maxLines: 2,
+                  onChanged: (note) =>
+                      context.read<BarakahBloc>().add(BarakahNoteChanged(note)),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.sm),
+              FilledButton(
+                key: const Key('daily-save'),
+                onPressed: draft.saving || draft.answer == null
+                    ? null
+                    : () => context.read<BarakahBloc>().add(
+                        const BarakahDailyResponseSaved(),
+                      ),
+                child: Text(
+                  draft.saving
+                      ? l10n.barakahDailySaving
+                      : draft.response == null
+                      ? l10n.barakahDailySave
+                      : l10n.barakahDailyUpdate,
+                ),
+              ),
+              if (draft.saved)
+                Semantics(
+                  liveRegion: true,
+                  child: Text(l10n.barakahDailySaved),
+                ),
+              if (draft.failure)
+                Semantics(
+                  liveRegion: true,
+                  child: Text(l10n.barakahDailyFailure),
+                ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

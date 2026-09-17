@@ -553,6 +553,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Good Evening'**
   String get goodEvening;
+
+  /// Heading for the daily Barakah prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Barakah reflection'**
+  String get barakahDailyTitle;
+
+  /// Daily reflection question selected by stable prompt ID
+  ///
+  /// In en, this message translates to:
+  /// **'{promptId, select, good_intentions_v1{Did you renew your intention for Allah today?} piety_v1{Did mindfulness of Allah guide your choices today?} trust_in_allah_v1{Did you put your trust in Allah while doing your part today?} quran_v1{Did you make time for the Quran today?} bismillah_v1{Did you begin your activities with Bismillah today?} eating_together_v1{Did you share a meal with others today?} honesty_in_trade_v1{Were you honest in your dealings today?} dua_v1{Did you turn to Allah in dua today?} halal_income_v1{Did you seek or use halal income today?} sunnah_v1{Did you follow a Sunnah practice today?} istikhara_v1{Did you seek Allah\'s guidance through istikhara for a decision today?} gratitude_v1{Did you thank Allah for His blessings today?} charity_v1{Did you give something in charity today?} kinship_v1{Did you nurture your family ties today?} early_rising_v1{Did you make use of the early morning today?} marriage_v1{Did you nurture kindness in your marriage today?} salah_v1{Did you make time for prayer today?} forgiveness_v1{Did you seek Allah\'s forgiveness today?} other{Did you notice a source of barakah today?}}'**
+  String barakahDailyQuestion(String promptId);
+
+  /// Source label for the daily prompt, not legacy logging
+  ///
+  /// In en, this message translates to:
+  /// **'{sourceId, select, good_intentions{Good intentions} piety{Mindfulness of Allah} trust_in_allah{Trust in Allah} quran{Quran} bismillah{Saying Bismillah} eating_together{Eating together} honesty_in_trade{Honest dealings} dua{Dua} halal_income{Halal income} sunnah{Following the Sunnah} istikhara{Istikhara} gratitude{Gratitude to Allah} charity{Giving charity} kinship{Family ties} early_rising{Early rising} marriage{Kindness in marriage} salah{Prayer} forgiveness{Seeking forgiveness} other{Source of barakah}}'**
+  String barakahDailySource(String sourceId);
+
+  /// Affirmative daily answer
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get barakahDailyYes;
+
+  /// Partial affirmative daily answer
+  ///
+  /// In en, this message translates to:
+  /// **'Somewhat'**
+  String get barakahDailySomewhat;
+
+  /// Negative daily answer
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get barakahDailyNo;
+
+  /// Skip this daily reflection
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get barakahDailySkip;
+
+  /// Source selection label, shown only for yes or somewhat
+  ///
+  /// In en, this message translates to:
+  /// **'Sources of barakah (optional)'**
+  String get barakahDailySources;
+
+  /// Daily note field label with a 280 character limit
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection note (optional)'**
+  String get barakahDailyNote;
+
+  /// Save a new daily response
+  ///
+  /// In en, this message translates to:
+  /// **'Save response'**
+  String get barakahDailySave;
+
+  /// Save edits to the existing daily response
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get barakahDailyUpdate;
+
+  /// Daily save in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Saving response…'**
+  String get barakahDailySaving;
+
+  /// Confirmation that today's response is saved and editable
+  ///
+  /// In en, this message translates to:
+  /// **'Response saved. You can edit it anytime.'**
+  String get barakahDailySaved;
+
+  /// Recoverable daily response error
+  ///
+  /// In en, this message translates to:
+  /// **'Your response could not be loaded or saved. Please try again.'**
+  String get barakahDailyFailure;
+
+  /// Reload the daily response after an error
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get barakahDailyRetry;
+
+  /// Heading above the existing free-form logging and history UI
+  ///
+  /// In en, this message translates to:
+  /// **'Free-form Barakah history'**
+  String get barakahHistoryTitle;
 }
 
 class _AppLocalizationsDelegate
