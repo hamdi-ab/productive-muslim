@@ -1,9 +1,4 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 import 'package:productive_muslim/data/local/database/tables/barakah_daily_responses.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_entries.dart';
@@ -15,6 +10,10 @@ import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
 import 'package:productive_muslim/data/local/daos/intention_dao.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
+
+import 'connection/web.dart'
+    if (dart.library.io) 'connection/native.dart'
+    as connection;
 
 part 'app_database.g.dart';
 
@@ -30,7 +29,7 @@ part 'app_database.g.dart';
   daos: [BarakahDao, HabitDao, TaskDao, IntentionDao],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(connection.connect());
 
   AppDatabase.forTesting(super.e);
 
@@ -46,12 +45,4 @@ class AppDatabase extends _$AppDatabase {
       }
     },
   );
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'productive_muslim.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
 }
