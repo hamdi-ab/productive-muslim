@@ -182,6 +182,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get barakahReminderLabel => 'Daily Barakah reminder';
+
+  @override
+  String get barakahReminderDescription =>
+      'A gentle invitation to reflect each day. Reminders arrive around your chosen local time; delivery may be delayed by your device.';
+
+  @override
+  String get barakahReminderTime => 'Reminder time';
+
+  @override
+  String get barakahReminderUnsupported =>
+      'Daily reminders are available only in the Android and iOS apps, not on web or desktop.';
+
+  @override
+  String get barakahReminderDenied =>
+      'Notifications are not allowed. Allow them in your device settings, then turn on this reminder again.';
+
+  @override
+  String get barakahReminderError =>
+      'The reminder could not be updated. Please try again.';
+
+  @override
+  String get barakahReminderPending => 'Updating reminder…';
+
+  @override
+  String get barakahReminderBody =>
+      'Take a moment to reflect on the sources of barakah in your day.';
+
+  @override
   String get theme => 'Theme';
 
   @override
