@@ -410,6 +410,54 @@ abstract class AppLocalizations {
   /// **'Notifications'**
   String get notifications;
 
+  /// No description provided for @barakahReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Barakah reminder'**
+  String get barakahReminderLabel;
+
+  /// No description provided for @barakahReminderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A gentle invitation to reflect each day. Reminders arrive around your chosen local time; delivery may be delayed by your device.'**
+  String get barakahReminderDescription;
+
+  /// No description provided for @barakahReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get barakahReminderTime;
+
+  /// No description provided for @barakahReminderUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminders are available only in the Android and iOS apps, not on web or desktop.'**
+  String get barakahReminderUnsupported;
+
+  /// No description provided for @barakahReminderDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are not allowed. Allow them in your device settings, then turn on this reminder again.'**
+  String get barakahReminderDenied;
+
+  /// No description provided for @barakahReminderError.
+  ///
+  /// In en, this message translates to:
+  /// **'The reminder could not be updated. Please try again.'**
+  String get barakahReminderError;
+
+  /// No description provided for @barakahReminderPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating reminder…'**
+  String get barakahReminderPending;
+
+  /// No description provided for @barakahReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to reflect on the sources of barakah in your day.'**
+  String get barakahReminderBody;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:

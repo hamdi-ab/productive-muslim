@@ -13,6 +13,9 @@ import 'package:productive_muslim/data/repositories/habit_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/intention_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/task_repository_impl.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
+import 'package:productive_muslim/data/services/local_barakah_reminder_scheduler.dart';
+import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
@@ -27,6 +30,17 @@ Future<void> setupDi() async {
 
   // Settings
   getIt.registerSingleton<SettingsService>(SettingsService(prefs: prefs));
+  getIt.registerLazySingleton<BarakahReminderScheduler>(
+    () =>
+        LocalBarakahReminderScheduler(onTapped: AppRouter.openBarakahReminder),
+  );
+  getIt.registerLazySingleton<BarakahReminderService>(
+    () => BarakahReminderService(
+      settings: getIt<SettingsService>(),
+      scheduler: getIt<BarakahReminderScheduler>(),
+    ),
+    dispose: (service) => service.dispose(),
+  );
 
   // Database
   final database = AppDatabase();

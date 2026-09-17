@@ -182,6 +182,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifications => 'الإخطارات';
 
   @override
+  String get barakahReminderLabel => 'تذكير يومي بالبركة';
+
+  @override
+  String get barakahReminderDescription =>
+      'دعوة لطيفة للتأمل كل يوم. يصلك التذكير قرب الوقت المحلي الذي تختاره، وقد يتأخر وصوله حسب إعدادات جهازك.';
+
+  @override
+  String get barakahReminderTime => 'وقت التذكير';
+
+  @override
+  String get barakahReminderUnsupported =>
+      'التذكيرات اليومية متاحة فقط في تطبيقي أندرويد وiOS، وليست متاحة على الويب أو سطح المكتب.';
+
+  @override
+  String get barakahReminderDenied =>
+      'الإشعارات غير مسموح بها. اسمح بها في إعدادات جهازك، ثم فعّل هذا التذكير مجددًا.';
+
+  @override
+  String get barakahReminderError =>
+      'تعذر تحديث التذكير. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get barakahReminderPending => 'جارٍ تحديث التذكير…';
+
+  @override
+  String get barakahReminderBody => 'خذ لحظة للتأمل في مصادر البركة في يومك.';
+
+  @override
   String get theme => 'المظهر';
 
   @override
