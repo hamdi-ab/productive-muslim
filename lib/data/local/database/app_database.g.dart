@@ -2702,6 +2702,473 @@ class IntentionEntriesCompanion extends UpdateCompanion<IntentionEntry> {
   }
 }
 
+class $BarakahDailyResponsesTable extends BarakahDailyResponses
+    with TableInfo<$BarakahDailyResponsesTable, BarakahDailyResponseRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BarakahDailyResponsesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _promptIdMeta = const VerificationMeta(
+    'promptId',
+  );
+  @override
+  late final GeneratedColumn<String> promptId = GeneratedColumn<String>(
+    'prompt_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _answerMeta = const VerificationMeta('answer');
+  @override
+  late final GeneratedColumn<String> answer = GeneratedColumn<String>(
+    'answer',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceIdsMeta = const VerificationMeta(
+    'sourceIds',
+  );
+  @override
+  late final GeneratedColumn<String> sourceIds = GeneratedColumn<String>(
+    'source_ids',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const CustomExpression<int>("(strftime('%s','now') * 1000)"),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    date,
+    promptId,
+    answer,
+    sourceIds,
+    note,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'barakah_daily_responses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BarakahDailyResponseRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('prompt_id')) {
+      context.handle(
+        _promptIdMeta,
+        promptId.isAcceptableOrUnknown(data['prompt_id']!, _promptIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_promptIdMeta);
+    }
+    if (data.containsKey('answer')) {
+      context.handle(
+        _answerMeta,
+        answer.isAcceptableOrUnknown(data['answer']!, _answerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_answerMeta);
+    }
+    if (data.containsKey('source_ids')) {
+      context.handle(
+        _sourceIdsMeta,
+        sourceIds.isAcceptableOrUnknown(data['source_ids']!, _sourceIdsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdsMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {date};
+  @override
+  BarakahDailyResponseRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BarakahDailyResponseRow(
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      promptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prompt_id'],
+      )!,
+      answer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}answer'],
+      )!,
+      sourceIds: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_ids'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BarakahDailyResponsesTable createAlias(String alias) {
+    return $BarakahDailyResponsesTable(attachedDatabase, alias);
+  }
+}
+
+class BarakahDailyResponseRow extends DataClass
+    implements Insertable<BarakahDailyResponseRow> {
+  final String date;
+  final String promptId;
+  final String answer;
+  final String sourceIds;
+  final String? note;
+  final int createdAt;
+  final int updatedAt;
+  const BarakahDailyResponseRow({
+    required this.date,
+    required this.promptId,
+    required this.answer,
+    required this.sourceIds,
+    this.note,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date'] = Variable<String>(date);
+    map['prompt_id'] = Variable<String>(promptId);
+    map['answer'] = Variable<String>(answer);
+    map['source_ids'] = Variable<String>(sourceIds);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  BarakahDailyResponsesCompanion toCompanion(bool nullToAbsent) {
+    return BarakahDailyResponsesCompanion(
+      date: Value(date),
+      promptId: Value(promptId),
+      answer: Value(answer),
+      sourceIds: Value(sourceIds),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BarakahDailyResponseRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BarakahDailyResponseRow(
+      date: serializer.fromJson<String>(json['date']),
+      promptId: serializer.fromJson<String>(json['promptId']),
+      answer: serializer.fromJson<String>(json['answer']),
+      sourceIds: serializer.fromJson<String>(json['sourceIds']),
+      note: serializer.fromJson<String?>(json['note']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'date': serializer.toJson<String>(date),
+      'promptId': serializer.toJson<String>(promptId),
+      'answer': serializer.toJson<String>(answer),
+      'sourceIds': serializer.toJson<String>(sourceIds),
+      'note': serializer.toJson<String?>(note),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  BarakahDailyResponseRow copyWith({
+    String? date,
+    String? promptId,
+    String? answer,
+    String? sourceIds,
+    Value<String?> note = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => BarakahDailyResponseRow(
+    date: date ?? this.date,
+    promptId: promptId ?? this.promptId,
+    answer: answer ?? this.answer,
+    sourceIds: sourceIds ?? this.sourceIds,
+    note: note.present ? note.value : this.note,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BarakahDailyResponseRow copyWithCompanion(
+    BarakahDailyResponsesCompanion data,
+  ) {
+    return BarakahDailyResponseRow(
+      date: data.date.present ? data.date.value : this.date,
+      promptId: data.promptId.present ? data.promptId.value : this.promptId,
+      answer: data.answer.present ? data.answer.value : this.answer,
+      sourceIds: data.sourceIds.present ? data.sourceIds.value : this.sourceIds,
+      note: data.note.present ? data.note.value : this.note,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BarakahDailyResponseRow(')
+          ..write('date: $date, ')
+          ..write('promptId: $promptId, ')
+          ..write('answer: $answer, ')
+          ..write('sourceIds: $sourceIds, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    date,
+    promptId,
+    answer,
+    sourceIds,
+    note,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BarakahDailyResponseRow &&
+          other.date == this.date &&
+          other.promptId == this.promptId &&
+          other.answer == this.answer &&
+          other.sourceIds == this.sourceIds &&
+          other.note == this.note &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BarakahDailyResponsesCompanion
+    extends UpdateCompanion<BarakahDailyResponseRow> {
+  final Value<String> date;
+  final Value<String> promptId;
+  final Value<String> answer;
+  final Value<String> sourceIds;
+  final Value<String?> note;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const BarakahDailyResponsesCompanion({
+    this.date = const Value.absent(),
+    this.promptId = const Value.absent(),
+    this.answer = const Value.absent(),
+    this.sourceIds = const Value.absent(),
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BarakahDailyResponsesCompanion.insert({
+    required String date,
+    required String promptId,
+    required String answer,
+    required String sourceIds,
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : date = Value(date),
+       promptId = Value(promptId),
+       answer = Value(answer),
+       sourceIds = Value(sourceIds),
+       updatedAt = Value(updatedAt);
+  static Insertable<BarakahDailyResponseRow> custom({
+    Expression<String>? date,
+    Expression<String>? promptId,
+    Expression<String>? answer,
+    Expression<String>? sourceIds,
+    Expression<String>? note,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (date != null) 'date': date,
+      if (promptId != null) 'prompt_id': promptId,
+      if (answer != null) 'answer': answer,
+      if (sourceIds != null) 'source_ids': sourceIds,
+      if (note != null) 'note': note,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BarakahDailyResponsesCompanion copyWith({
+    Value<String>? date,
+    Value<String>? promptId,
+    Value<String>? answer,
+    Value<String>? sourceIds,
+    Value<String?>? note,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BarakahDailyResponsesCompanion(
+      date: date ?? this.date,
+      promptId: promptId ?? this.promptId,
+      answer: answer ?? this.answer,
+      sourceIds: sourceIds ?? this.sourceIds,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (promptId.present) {
+      map['prompt_id'] = Variable<String>(promptId.value);
+    }
+    if (answer.present) {
+      map['answer'] = Variable<String>(answer.value);
+    }
+    if (sourceIds.present) {
+      map['source_ids'] = Variable<String>(sourceIds.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BarakahDailyResponsesCompanion(')
+          ..write('date: $date, ')
+          ..write('promptId: $promptId, ')
+          ..write('answer: $answer, ')
+          ..write('sourceIds: $sourceIds, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2712,6 +3179,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $IntentionEntriesTable intentionEntries = $IntentionEntriesTable(
     this,
   );
+  late final $BarakahDailyResponsesTable barakahDailyResponses =
+      $BarakahDailyResponsesTable(this);
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
@@ -2726,6 +3195,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     habits,
     tasks,
     intentionEntries,
+    barakahDailyResponses,
   ];
 }
 
@@ -4120,6 +4590,275 @@ typedef $$IntentionEntriesTableProcessedTableManager =
       IntentionEntry,
       PrefetchHooks Function()
     >;
+typedef $$BarakahDailyResponsesTableCreateCompanionBuilder =
+    BarakahDailyResponsesCompanion Function({
+      required String date,
+      required String promptId,
+      required String answer,
+      required String sourceIds,
+      Value<String?> note,
+      Value<int> createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BarakahDailyResponsesTableUpdateCompanionBuilder =
+    BarakahDailyResponsesCompanion Function({
+      Value<String> date,
+      Value<String> promptId,
+      Value<String> answer,
+      Value<String> sourceIds,
+      Value<String?> note,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BarakahDailyResponsesTableFilterComposer
+    extends Composer<_$AppDatabase, $BarakahDailyResponsesTable> {
+  $$BarakahDailyResponsesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get promptId => $composableBuilder(
+    column: $table.promptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get answer => $composableBuilder(
+    column: $table.answer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceIds => $composableBuilder(
+    column: $table.sourceIds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BarakahDailyResponsesTableOrderingComposer
+    extends Composer<_$AppDatabase, $BarakahDailyResponsesTable> {
+  $$BarakahDailyResponsesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get promptId => $composableBuilder(
+    column: $table.promptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get answer => $composableBuilder(
+    column: $table.answer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceIds => $composableBuilder(
+    column: $table.sourceIds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BarakahDailyResponsesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BarakahDailyResponsesTable> {
+  $$BarakahDailyResponsesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get promptId =>
+      $composableBuilder(column: $table.promptId, builder: (column) => column);
+
+  GeneratedColumn<String> get answer =>
+      $composableBuilder(column: $table.answer, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceIds =>
+      $composableBuilder(column: $table.sourceIds, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BarakahDailyResponsesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BarakahDailyResponsesTable,
+          BarakahDailyResponseRow,
+          $$BarakahDailyResponsesTableFilterComposer,
+          $$BarakahDailyResponsesTableOrderingComposer,
+          $$BarakahDailyResponsesTableAnnotationComposer,
+          $$BarakahDailyResponsesTableCreateCompanionBuilder,
+          $$BarakahDailyResponsesTableUpdateCompanionBuilder,
+          (
+            BarakahDailyResponseRow,
+            BaseReferences<
+              _$AppDatabase,
+              $BarakahDailyResponsesTable,
+              BarakahDailyResponseRow
+            >,
+          ),
+          BarakahDailyResponseRow,
+          PrefetchHooks Function()
+        > {
+  $$BarakahDailyResponsesTableTableManager(
+    _$AppDatabase db,
+    $BarakahDailyResponsesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BarakahDailyResponsesTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$BarakahDailyResponsesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$BarakahDailyResponsesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> date = const Value.absent(),
+                Value<String> promptId = const Value.absent(),
+                Value<String> answer = const Value.absent(),
+                Value<String> sourceIds = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BarakahDailyResponsesCompanion(
+                date: date,
+                promptId: promptId,
+                answer: answer,
+                sourceIds: sourceIds,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String date,
+                required String promptId,
+                required String answer,
+                required String sourceIds,
+                Value<String?> note = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BarakahDailyResponsesCompanion.insert(
+                date: date,
+                promptId: promptId,
+                answer: answer,
+                sourceIds: sourceIds,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $BarakahDailyResponsesTable,
+                    BarakahDailyResponseRow
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $BarakahDailyResponsesTable,
+                    BarakahDailyResponseRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BarakahDailyResponsesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BarakahDailyResponsesTable,
+      BarakahDailyResponseRow,
+      $$BarakahDailyResponsesTableFilterComposer,
+      $$BarakahDailyResponsesTableOrderingComposer,
+      $$BarakahDailyResponsesTableAnnotationComposer,
+      $$BarakahDailyResponsesTableCreateCompanionBuilder,
+      $$BarakahDailyResponsesTableUpdateCompanionBuilder,
+      (
+        BarakahDailyResponseRow,
+        BaseReferences<
+          _$AppDatabase,
+          $BarakahDailyResponsesTable,
+          BarakahDailyResponseRow
+        >,
+      ),
+      BarakahDailyResponseRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4134,4 +4873,6 @@ class $AppDatabaseManager {
       $$TasksTableTableManager(_db, _db.tasks);
   $$IntentionEntriesTableTableManager get intentionEntries =>
       $$IntentionEntriesTableTableManager(_db, _db.intentionEntries);
+  $$BarakahDailyResponsesTableTableManager get barakahDailyResponses =>
+      $$BarakahDailyResponsesTableTableManager(_db, _db.barakahDailyResponses);
 }

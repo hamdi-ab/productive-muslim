@@ -252,4 +252,99 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get goodEvening => 'مساء الخير';
+
+  @override
+  String get barakahDailyTitle => 'تأمل يومي في البركة';
+
+  @override
+  String barakahDailyQuestion(String promptId) {
+    String _temp0 = intl.Intl.selectLogic(promptId, {
+      'good_intentions_v1': 'هل جددت نيتك لله اليوم؟',
+      'piety_v1': 'هل راعيت تقوى الله في اختياراتك اليوم؟',
+      'trust_in_allah_v1': 'هل توكلت على الله مع الأخذ بالأسباب اليوم؟',
+      'quran_v1': 'هل خصصت وقتًا للقرآن اليوم؟',
+      'bismillah_v1': 'هل بدأت أعمالك بقول بسم الله اليوم؟',
+      'eating_together_v1': 'هل شاركت الآخرين وجبة طعام اليوم؟',
+      'honesty_in_trade_v1': 'هل تحريت الصدق في معاملاتك اليوم؟',
+      'dua_v1': 'هل توجهت إلى الله بالدعاء اليوم؟',
+      'halal_income_v1': 'هل سعيت إلى الرزق الحلال أو أنفقت منه اليوم؟',
+      'sunnah_v1': 'هل عملت بشيء من السنة اليوم؟',
+      'istikhara_v1': 'هل استخرت الله في قرار اليوم؟',
+      'gratitude_v1': 'هل شكرت الله على نعمه اليوم؟',
+      'charity_v1': 'هل تصدقت بشيء اليوم؟',
+      'kinship_v1': 'هل وصلت رحمك اليوم؟',
+      'early_rising_v1': 'هل اغتنمت وقت الصباح الباكر اليوم؟',
+      'marriage_v1': 'هل عززت المودة في حياتك الزوجية اليوم؟',
+      'salah_v1': 'هل خصصت وقتًا للصلاة اليوم؟',
+      'forgiveness_v1': 'هل استغفرت الله اليوم؟',
+      'other': 'هل لاحظت مصدرًا للبركة اليوم؟',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String barakahDailySource(String sourceId) {
+    String _temp0 = intl.Intl.selectLogic(sourceId, {
+      'good_intentions': 'النية الصالحة',
+      'piety': 'تقوى الله',
+      'trust_in_allah': 'التوكل على الله',
+      'quran': 'القرآن',
+      'bismillah': 'قول بسم الله',
+      'eating_together': 'الاجتماع على الطعام',
+      'honesty_in_trade': 'الصدق في المعاملات',
+      'dua': 'الدعاء',
+      'halal_income': 'الرزق الحلال',
+      'sunnah': 'اتباع السنة',
+      'istikhara': 'الاستخارة',
+      'gratitude': 'شكر الله',
+      'charity': 'الصدقة',
+      'kinship': 'صلة الرحم',
+      'early_rising': 'التبكير',
+      'marriage': 'المودة في الزواج',
+      'salah': 'الصلاة',
+      'forgiveness': 'الاستغفار',
+      'other': 'مصدر البركة',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get barakahDailyYes => 'نعم';
+
+  @override
+  String get barakahDailySomewhat => 'إلى حد ما';
+
+  @override
+  String get barakahDailyNo => 'لا';
+
+  @override
+  String get barakahDailySkip => 'تخطي';
+
+  @override
+  String get barakahDailySources => 'مصادر البركة (اختياري)';
+
+  @override
+  String get barakahDailyNote => 'ملاحظة للتأمل (اختياري)';
+
+  @override
+  String get barakahDailySave => 'حفظ الإجابة';
+
+  @override
+  String get barakahDailyUpdate => 'حفظ التعديلات';
+
+  @override
+  String get barakahDailySaving => 'جارٍ حفظ الإجابة…';
+
+  @override
+  String get barakahDailySaved => 'تم حفظ إجابتك. يمكنك تعديلها في أي وقت.';
+
+  @override
+  String get barakahDailyFailure =>
+      'تعذر تحميل إجابتك أو حفظها. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get barakahDailyRetry => 'المحاولة مرة أخرى';
+
+  @override
+  String get barakahHistoryTitle => 'سجل تأملات البركة الحرة';
 }
