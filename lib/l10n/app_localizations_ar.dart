@@ -374,5 +374,65 @@ class AppLocalizationsAr extends AppLocalizations {
   String get barakahDailyRetry => 'المحاولة مرة أخرى';
 
   @override
+  String get barakahWeeklyTitle => 'مراجعة التأملات الأسبوعية';
+
+  @override
+  String get barakahWeeklyPrevious => 'الأسبوع السابق';
+
+  @override
+  String get barakahWeeklyNext => 'الأسبوع التالي';
+
+  @override
+  String barakahWeeklyRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get barakahWeeklyDescription =>
+      'تصفح تأملاتك اليومية المحفوظة. تصف هذه الأعداد إجاباتك واختياراتك الشخصية، وليست مقياسًا للبركة من الله.';
+
+  @override
+  String get barakahWeeklyAnswers => 'الإجابات المحفوظة';
+
+  @override
+  String barakahWeeklyCount(String label, String count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get barakahWeeklySources => 'المصادر المختارة';
+
+  @override
+  String get barakahWeeklySourcesDescription =>
+      'عدد الأيام التي اخترت فيها كل مصدر مع إجابة نعم أو إلى حد ما، مرة واحدة لكل يوم. لا تثبت هذه الاختيارات سببًا للبركة.';
+
+  @override
+  String get barakahWeeklyNoSources =>
+      'لم تُختر مصادر مع إجابة نعم أو إلى حد ما هذا الأسبوع.';
+
+  @override
+  String get barakahWeeklyDays => 'التأملات اليومية · من الاثنين إلى الأحد';
+
+  @override
+  String get barakahWeeklyMissing => 'لا توجد إجابة محفوظة';
+
+  @override
+  String get barakahWeeklyFuture => 'يوم قادم';
+
+  @override
+  String get barakahWeeklySkipped => 'تم التخطي';
+
+  @override
+  String get barakahWeeklyNote => 'الملاحظة المحفوظة';
+
+  @override
+  String get barakahWeeklyEmpty =>
+      'لا توجد إجابات يومية محفوظة لهذا الأسبوع. ستظهر هنا التأملات اليومية التي تحفظها في شاشة البركة؛ سجل التأملات الحرة منفصل.';
+
+  @override
+  String get barakahWeeklyFailure =>
+      'تعذر تحميل تأملات هذا الأسبوع. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get barakahHistoryTitle => 'سجل تأملات البركة الحرة';
 }

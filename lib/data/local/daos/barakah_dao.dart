@@ -17,6 +17,16 @@ class BarakahDao extends DatabaseAccessor<AppDatabase> with _$BarakahDaoMixin {
     )..where((r) => r.date.equals(date))).watchSingleOrNull();
   }
 
+  Stream<List<BarakahDailyResponseRow>> watchDailyResponsesForRange(
+    String startDate,
+    String endDate,
+  ) {
+    return (select(barakahDailyResponses)
+          ..where((r) => r.date.isBetweenValues(startDate, endDate))
+          ..orderBy([(r) => OrderingTerm.asc(r.date)]))
+        .watch();
+  }
+
   Future<void> saveDailyResponse(BarakahDailyResponsesCompanion response) {
     return transaction(() async {
       final existing = await (select(

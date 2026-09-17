@@ -25,7 +25,12 @@ class BarakahRepositoryImpl implements BarakahRepository {
     prompt_model.BarakahPrompt.forDate(date);
     return _barakahDao.watchDailyResponse(date).map((row) {
       if (row == null) return null;
-      return BarakahDailyResponse(
+      return _dailyResponse(row);
+    });
+  }
+
+  BarakahDailyResponse _dailyResponse(BarakahDailyResponseRow row) =>
+      BarakahDailyResponse(
         date: row.date,
         promptId: row.promptId,
         answer: BarakahAnswer.values.byName(row.answer),
@@ -34,7 +39,20 @@ class BarakahRepositoryImpl implements BarakahRepository {
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       );
-    });
+
+  @override
+  Stream<List<BarakahDailyResponse>> watchDailyResponsesForRange(
+    String startDate,
+    String endDate,
+  ) {
+    prompt_model.BarakahPrompt.forDate(startDate);
+    prompt_model.BarakahPrompt.forDate(endDate);
+    if (startDate.compareTo(endDate) > 0) {
+      throw ArgumentError('The range end must not precede its start');
+    }
+    return _barakahDao
+        .watchDailyResponsesForRange(startDate, endDate)
+        .map((rows) => rows.map(_dailyResponse).toList());
   }
 
   @override
