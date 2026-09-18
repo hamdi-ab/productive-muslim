@@ -71,6 +71,8 @@ lib/
 │   │   ├── task.dart
 │   │   ├── habit.dart
 │   │   ├── barakah_entry.dart
+│   │   ├── barakah_daily_response.dart
+│   │   ├── barakah_weekly_review.dart
 │   │   ├── intention.dart
 │   │   └── prayer_settings.dart
 │   └── use_cases/           # optional, only for complex shared logic

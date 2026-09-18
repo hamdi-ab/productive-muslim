@@ -376,5 +376,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barakahDailyRetry => 'Try again';
 
   @override
+  String get barakahWeeklyTitle => 'Weekly reflection review';
+
+  @override
+  String get barakahWeeklyPrevious => 'Previous week';
+
+  @override
+  String get barakahWeeklyNext => 'Next week';
+
+  @override
+  String barakahWeeklyRange(String start, String end) {
+    return '$start – $end';
+  }
+
+  @override
+  String get barakahWeeklyDescription =>
+      'Browse your saved daily reflections. These counts describe your self-reported answers and selections, not a measure of divine blessing.';
+
+  @override
+  String get barakahWeeklyAnswers => 'Saved answers';
+
+  @override
+  String barakahWeeklyCount(String label, String count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get barakahWeeklySources => 'Selected sources';
+
+  @override
+  String get barakahWeeklySourcesDescription =>
+      'Days you selected each source with Yes or Somewhat, counted once per day. Selections do not establish a cause of blessing.';
+
+  @override
+  String get barakahWeeklyNoSources =>
+      'No sources selected with Yes or Somewhat this week.';
+
+  @override
+  String get barakahWeeklyDays => 'Daily reflections · Monday to Sunday';
+
+  @override
+  String get barakahWeeklyMissing => 'No saved response';
+
+  @override
+  String get barakahWeeklyFuture => 'Upcoming day';
+
+  @override
+  String get barakahWeeklySkipped => 'Skipped';
+
+  @override
+  String get barakahWeeklyNote => 'Saved note';
+
+  @override
+  String get barakahWeeklyEmpty =>
+      'No daily responses saved for this week. Daily reflections you save on the Barakah screen will appear here; free-form history is separate.';
+
+  @override
+  String get barakahWeeklyFailure =>
+      'This week\'s reflections could not be loaded. Please try again.';
+
+  @override
   String get barakahHistoryTitle => 'Free-form Barakah history';
 }

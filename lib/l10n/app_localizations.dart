@@ -692,6 +692,108 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get barakahDailyRetry;
 
+  /// No description provided for @barakahWeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly reflection review'**
+  String get barakahWeeklyTitle;
+
+  /// No description provided for @barakahWeeklyPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous week'**
+  String get barakahWeeklyPrevious;
+
+  /// No description provided for @barakahWeeklyNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get barakahWeeklyNext;
+
+  /// No description provided for @barakahWeeklyRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} – {end}'**
+  String barakahWeeklyRange(String start, String end);
+
+  /// No description provided for @barakahWeeklyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse your saved daily reflections. These counts describe your self-reported answers and selections, not a measure of divine blessing.'**
+  String get barakahWeeklyDescription;
+
+  /// No description provided for @barakahWeeklyAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved answers'**
+  String get barakahWeeklyAnswers;
+
+  /// No description provided for @barakahWeeklyCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count}'**
+  String barakahWeeklyCount(String label, String count);
+
+  /// No description provided for @barakahWeeklySources.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected sources'**
+  String get barakahWeeklySources;
+
+  /// No description provided for @barakahWeeklySourcesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Days you selected each source with Yes or Somewhat, counted once per day. Selections do not establish a cause of blessing.'**
+  String get barakahWeeklySourcesDescription;
+
+  /// No description provided for @barakahWeeklyNoSources.
+  ///
+  /// In en, this message translates to:
+  /// **'No sources selected with Yes or Somewhat this week.'**
+  String get barakahWeeklyNoSources;
+
+  /// No description provided for @barakahWeeklyDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reflections · Monday to Sunday'**
+  String get barakahWeeklyDays;
+
+  /// No description provided for @barakahWeeklyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved response'**
+  String get barakahWeeklyMissing;
+
+  /// No description provided for @barakahWeeklyFuture.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming day'**
+  String get barakahWeeklyFuture;
+
+  /// No description provided for @barakahWeeklySkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get barakahWeeklySkipped;
+
+  /// No description provided for @barakahWeeklyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved note'**
+  String get barakahWeeklyNote;
+
+  /// No description provided for @barakahWeeklyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No daily responses saved for this week. Daily reflections you save on the Barakah screen will appear here; free-form history is separate.'**
+  String get barakahWeeklyEmpty;
+
+  /// No description provided for @barakahWeeklyFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s reflections could not be loaded. Please try again.'**
+  String get barakahWeeklyFailure;
+
   /// Heading above the existing free-form logging and history UI
   ///
   /// In en, this message translates to:

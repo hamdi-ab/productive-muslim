@@ -13,6 +13,7 @@ import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
 
 class BarakahScreen extends StatefulWidget {
   const BarakahScreen({super.key, this.date});
@@ -47,7 +48,21 @@ class _BarakahScreenState extends State<BarakahScreen> {
       child: BlocBuilder<BarakahBloc, BarakahState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n!.barakah)),
+            appBar: AppBar(
+              title: Text(l10n!.barakah),
+              actions: [
+                IconButton(
+                  key: const Key('open-review'),
+                  tooltip: l10n.barakahWeeklyTitle,
+                  icon: const Icon(Icons.calendar_month_outlined),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const BarakahReviewScreen(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             body: state is Loaded
                 ? ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),
