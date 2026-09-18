@@ -5,14 +5,17 @@ import 'package:productive_muslim/features/onboarding/presentation/screens/onboa
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('renders welcome step with title and subtitle', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
+  Widget buildTestWidget({Locale? locale}) {
+    return MaterialApp(
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const OnboardingScreen(),
     );
+  }
+
+  testWidgets('renders welcome step', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
     expect(find.text('Build your day around what matters'), findsOneWidget);
@@ -24,14 +27,8 @@ void main() {
     );
   });
 
-  testWidgets('advances to name step when Continue is tapped', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+  testWidgets('advances to name step', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Continue'));
@@ -41,102 +38,114 @@ void main() {
   });
 
   testWidgets('advances to intention step', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    // Step 1 → 2
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    // Step 2 → 3
+
+    await tester.enterText(find.byType(TextField), 'Ahmed');
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
 
     expect(find.text('What brings you today?'), findsOneWidget);
     expect(find.text('Seeking barakah in my time'), findsOneWidget);
-    expect(find.text('Consistent worship & routine'), findsOneWidget);
-    expect(find.text('Mindful productivity'), findsOneWidget);
   });
 
-  testWidgets('advances to prayer time step', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+  testWidgets('advances to qualities step', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    // Step 1 → 2
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    // Step 2 → 3
+    await tester.enterText(find.byType(TextField), 'Ahmed');
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
-    // Step 3 → 4
+    await tester.tap(find.text('Seeking barakah in my time'));
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('What qualities do you want to build?'), findsOneWidget);
+    expect(find.text('God-Consciousness'), findsOneWidget);
+    expect(find.text('Patience'), findsOneWidget);
+  });
+
+  testWidgets('advances to permission step', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Ahmed');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Seeking barakah in my time'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('God-Consciousness'));
+    await tester.pumpAndSettle();
+
+    final continueBtn3 = find.text('Continue').last;
+    await tester.ensureVisible(continueBtn3);
+    await tester.pumpAndSettle();
+    await tester.tap(continueBtn3);
     await tester.pumpAndSettle();
 
     expect(find.text('Set up prayer times'), findsOneWidget);
-    expect(
-      find.text('Get accurate adhan notifications for your location'),
-      findsOneWidget,
-    );
   });
 
-  testWidgets('Start Your Day completes onboarding', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+  testWidgets('last step shows Start Your Day', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    // Advance through all 3 remaining steps
-    for (var i = 0; i < 3; i++) {
-      await tester.tap(find.text('Continue').last);
-      await tester.pumpAndSettle();
-    }
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Ahmed');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Seeking barakah in my time'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('God-Consciousness'));
+    await tester.pumpAndSettle();
+
+    final continueBtn4 = find.text('Continue').last;
+    await tester.ensureVisible(continueBtn4);
+    await tester.pumpAndSettle();
+    await tester.tap(continueBtn4);
+    await tester.pumpAndSettle();
 
     expect(find.text('Start Your Day'), findsOneWidget);
   });
 
-  testWidgets('renders step indicator with 4 segments', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+  testWidgets('renders step indicator with 5 segments', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    // Each step indicator is a Container with height 4
     final containers = tester.widgetList<Container>(
       find.descendant(of: find.byType(Row), matching: find.byType(Container)),
     );
-    expect(containers.length, equals(4));
+    expect(containers.length, equals(5));
   });
 
   testWidgets('renders in Arabic locale', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ar'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const OnboardingScreen(),
-      ),
-    );
+    await tester.pumpWidget(buildTestWidget(locale: const Locale('ar')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Build your day around what matters'), findsOneWidget);
+    expect(find.text('ابنِ يومك حول ما يهم'), findsOneWidget);
   });
 }

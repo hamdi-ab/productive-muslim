@@ -75,8 +75,127 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writeYourOwn => 'Or write your own';
 
   @override
+  String get onboardingWelcomeTitle => 'Build your day around what matters';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Prayer, tasks, habits, and intentions — together in one space';
+
+  @override
+  String get onboardingNameTitle => 'What is your name?';
+
+  @override
+  String get onboardingNameSubtitle =>
+      'We use it to personalize your experience';
+
+  @override
+  String get onboardingIntentionTitle => 'What brings you today?';
+
+  @override
+  String get onboardingIntentionSubtitle =>
+      'Choose or write your own intention';
+
+  @override
+  String get onboardingPermissionTitle => 'Set up prayer times';
+
+  @override
+  String get onboardingPermissionSubtitle =>
+      'Get accurate adhan notifications for your location';
+
+  @override
+  String get onboardingPermissionBody =>
+      'Allow location access for accurate prayer times?';
+
+  @override
+  String get onboardingPermissionGrant => 'Allow Access';
+
+  @override
+  String get onboardingPermissionGranted => 'Location access granted';
+
+  @override
+  String get onboardingPermissionDenied => 'Location access denied';
+
+  @override
+  String get onboardingPermissionDeniedBody =>
+      'We need your location for accurate prayer times. You can enable it in your device settings.';
+
+  @override
+  String get onboardingPermissionOpenSettings => 'Open Settings';
+
+  @override
+  String get onboardingPermissionRetry => 'Try Again';
+
+  @override
+  String get onboardingPermissionServiceOff => 'Location services are off';
+
+  @override
+  String get onboardingPermissionServiceOffBody =>
+      'Please enable location services on your device to get accurate prayer times.';
+
+  @override
   String get allowLocation =>
       'Allow location access for accurate prayer times?';
+
+  @override
+  String get onboardingQualitiesTitle => 'What qualities do you want to build?';
+
+  @override
+  String get onboardingQualitiesSubtitle => 'Choose up to 3 to focus on';
+
+  @override
+  String get qualityTaqwa => 'God-Consciousness';
+
+  @override
+  String get qualityTaqwaDesc => 'Mindfulness of Allah in every action';
+
+  @override
+  String get qualityIkhlas => 'Sincerity';
+
+  @override
+  String get qualityIkhlasDesc => 'Purity of intention for Allah alone';
+
+  @override
+  String get qualitySabr => 'Patience';
+
+  @override
+  String get qualitySabrDesc => 'Steadfastness through trials and delay';
+
+  @override
+  String get qualityShukr => 'Gratitude';
+
+  @override
+  String get qualityShukrDesc =>
+      'Recognizing and appreciating Allah\'s blessings';
+
+  @override
+  String get qualityTawakkul => 'Trust in Allah';
+
+  @override
+  String get qualityTawakkulDesc => 'Reliance on Allah after doing your part';
+
+  @override
+  String get qualityIhsan => 'Excellence';
+
+  @override
+  String get qualityIhsanDesc => 'Doing everything as if Allah is watching';
+
+  @override
+  String get qualityIlm => 'Knowledge';
+
+  @override
+  String get qualityIlmDesc => 'Seeking beneficial knowledge continuously';
+
+  @override
+  String get qualityDawah => 'Invitation';
+
+  @override
+  String get qualityDawahDesc => 'Calling others to Islam through character';
+
+  @override
+  String get qualityUmmah => 'Community';
+
+  @override
+  String get qualityUmmahDesc => 'Strength through brotherhood and sisterhood';
 
   @override
   String get calculationMethod => 'Calculation Method';

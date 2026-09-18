@@ -75,8 +75,124 @@ class AppLocalizationsAr extends AppLocalizations {
   String get writeYourOwn => 'أو اكتب半个تك';
 
   @override
+  String get onboardingWelcomeTitle => 'ابنِ يومك حول ما يهم';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'الصلاة، المهام، العادات، والنيات — كلها في مكان واحد';
+
+  @override
+  String get onboardingNameTitle => 'ما اسمك؟';
+
+  @override
+  String get onboardingNameSubtitle => 'نستخدمه لتخصيص تجربتك';
+
+  @override
+  String get onboardingIntentionTitle => 'ما الذي ي bringsك اليوم؟';
+
+  @override
+  String get onboardingIntentionSubtitle => 'اختر نيتك أو اكتبها بنفسك';
+
+  @override
+  String get onboardingPermissionTitle => 'إعداد مواقيت الصلاة';
+
+  @override
+  String get onboardingPermissionSubtitle =>
+      'احصل على إشعارات أذان دقيقة لموقعك';
+
+  @override
+  String get onboardingPermissionBody =>
+      'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+
+  @override
+  String get onboardingPermissionGrant => 'السماح بالوصول';
+
+  @override
+  String get onboardingPermissionGranted => 'تم السماح بالوصول للموقع';
+
+  @override
+  String get onboardingPermissionDenied => 'تم رفض الوصول للموقع';
+
+  @override
+  String get onboardingPermissionDeniedBody =>
+      'نحتاج موقعك للحصول على مواقيت صلاة دقيقة. يمكنك تفعيله في إعدادات جهازك.';
+
+  @override
+  String get onboardingPermissionOpenSettings => 'فتح الإعدادات';
+
+  @override
+  String get onboardingPermissionRetry => 'إعادة المحاولة';
+
+  @override
+  String get onboardingPermissionServiceOff => 'خدمات الموقع معطلة';
+
+  @override
+  String get onboardingPermissionServiceOffBody =>
+      'يرجى تفعيل خدمات الموقع على جهازك للحصول على مواقيت صلاة دقيقة.';
+
+  @override
   String get allowLocation =>
       'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+
+  @override
+  String get onboardingQualitiesTitle => 'ما هي الصفات التي تريد أن تبنيها؟';
+
+  @override
+  String get onboardingQualitiesSubtitle => 'اختر حتى3 للتركيز عليها';
+
+  @override
+  String get qualityTaqwa => 'تقوى الله';
+
+  @override
+  String get qualityTaqwaDesc => 'الوعي بالله في كل فعل';
+
+  @override
+  String get qualityIkhlas => 'الإخلاص';
+
+  @override
+  String get qualityIkhlasDesc => 'صفاء النية لله وحده';
+
+  @override
+  String get qualitySabr => 'الصبر';
+
+  @override
+  String get qualitySabrDesc => 'الثبات في المحن وتأخر النتائج';
+
+  @override
+  String get qualityShukr => 'الشكر';
+
+  @override
+  String get qualityShukrDesc => 'تمييز نعم الله والامتنان لها';
+
+  @override
+  String get qualityTawakkul => 'التوكل على الله';
+
+  @override
+  String get qualityTawakkulDesc => 'الاعتماد على الله بعد اخذ الاسباب';
+
+  @override
+  String get qualityIhsan => 'الإحسان';
+
+  @override
+  String get qualityIhsanDesc => 'فعل كل شيء كأن الله يراقبك';
+
+  @override
+  String get qualityIlm => 'العلم';
+
+  @override
+  String get qualityIlmDesc => 'طلب العلم النافع باستمرار';
+
+  @override
+  String get qualityDawah => 'الدعوة';
+
+  @override
+  String get qualityDawahDesc => 'دعوة الآخرين إلى الإسلام بالأخلاق';
+
+  @override
+  String get qualityUmmah => 'الأمة';
+
+  @override
+  String get qualityUmmahDesc => 'القوة من خلال الأخوة والأختية';
 
   @override
   String get calculationMethod => 'طريقة الحساب';

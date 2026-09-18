@@ -12,7 +12,9 @@ class SettingsService {
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
+  static const _selectedQualitiesKey = 'selected_qualities';
   static const _barakahReminderKey = 'barakah_reminder';
+  static const _locationPermissionKey = 'location_permission';
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);
@@ -63,4 +65,16 @@ class SettingsService {
 
   Future<void> setUserIntention(String intention) async =>
       _prefs?.setString(_userIntentionKey, intention);
+
+  List<String> get selectedQualities =>
+      _prefs?.getStringList(_selectedQualitiesKey) ?? [];
+
+  Future<void> setSelectedQualities(List<String> qualities) async =>
+      _prefs?.setStringList(_selectedQualitiesKey, qualities);
+
+  /// Location permission state: 'granted', 'denied', 'denied_forever', or null (not yet requested)
+  String? get locationPermission => _prefs?.getString(_locationPermissionKey);
+
+  Future<void> setLocationPermission(String permission) async =>
+      _prefs?.setString(_locationPermissionKey, permission);
 }
