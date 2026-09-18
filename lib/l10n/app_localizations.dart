@@ -206,6 +206,108 @@ abstract class AppLocalizations {
   /// **'Or write your own'**
   String get writeYourOwn;
 
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Build your day around what matters'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer, tasks, habits, and intentions — together in one space'**
+  String get onboardingWelcomeSubtitle;
+
+  /// No description provided for @onboardingNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your name?'**
+  String get onboardingNameTitle;
+
+  /// No description provided for @onboardingNameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We use it to personalize your experience'**
+  String get onboardingNameSubtitle;
+
+  /// No description provided for @onboardingIntentionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What brings you today?'**
+  String get onboardingIntentionTitle;
+
+  /// No description provided for @onboardingIntentionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose or write your own intention'**
+  String get onboardingIntentionSubtitle;
+
+  /// No description provided for @onboardingPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up prayer times'**
+  String get onboardingPermissionTitle;
+
+  /// No description provided for @onboardingPermissionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get accurate adhan notifications for your location'**
+  String get onboardingPermissionSubtitle;
+
+  /// No description provided for @onboardingPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow location access for accurate prayer times?'**
+  String get onboardingPermissionBody;
+
+  /// No description provided for @onboardingPermissionGrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Access'**
+  String get onboardingPermissionGrant;
+
+  /// No description provided for @onboardingPermissionGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access granted'**
+  String get onboardingPermissionGranted;
+
+  /// No description provided for @onboardingPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access denied'**
+  String get onboardingPermissionDenied;
+
+  /// No description provided for @onboardingPermissionDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We need your location for accurate prayer times. You can enable it in your device settings.'**
+  String get onboardingPermissionDeniedBody;
+
+  /// No description provided for @onboardingPermissionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get onboardingPermissionOpenSettings;
+
+  /// No description provided for @onboardingPermissionRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get onboardingPermissionRetry;
+
+  /// No description provided for @onboardingPermissionServiceOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are off'**
+  String get onboardingPermissionServiceOff;
+
+  /// No description provided for @onboardingPermissionServiceOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable location services on your device to get accurate prayer times.'**
+  String get onboardingPermissionServiceOffBody;
+
   /// No description provided for @allowLocation.
   ///
   /// In en, this message translates to:

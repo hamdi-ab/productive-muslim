@@ -75,6 +75,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writeYourOwn => 'Or write your own';
 
   @override
+  String get onboardingWelcomeTitle => 'Build your day around what matters';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Prayer, tasks, habits, and intentions — together in one space';
+
+  @override
+  String get onboardingNameTitle => 'What is your name?';
+
+  @override
+  String get onboardingNameSubtitle =>
+      'We use it to personalize your experience';
+
+  @override
+  String get onboardingIntentionTitle => 'What brings you today?';
+
+  @override
+  String get onboardingIntentionSubtitle =>
+      'Choose or write your own intention';
+
+  @override
+  String get onboardingPermissionTitle => 'Set up prayer times';
+
+  @override
+  String get onboardingPermissionSubtitle =>
+      'Get accurate adhan notifications for your location';
+
+  @override
+  String get onboardingPermissionBody =>
+      'Allow location access for accurate prayer times?';
+
+  @override
+  String get onboardingPermissionGrant => 'Allow Access';
+
+  @override
+  String get onboardingPermissionGranted => 'Location access granted';
+
+  @override
+  String get onboardingPermissionDenied => 'Location access denied';
+
+  @override
+  String get onboardingPermissionDeniedBody =>
+      'We need your location for accurate prayer times. You can enable it in your device settings.';
+
+  @override
+  String get onboardingPermissionOpenSettings => 'Open Settings';
+
+  @override
+  String get onboardingPermissionRetry => 'Try Again';
+
+  @override
+  String get onboardingPermissionServiceOff => 'Location services are off';
+
+  @override
+  String get onboardingPermissionServiceOffBody =>
+      'Please enable location services on your device to get accurate prayer times.';
+
+  @override
   String get allowLocation =>
       'Allow location access for accurate prayer times?';
 

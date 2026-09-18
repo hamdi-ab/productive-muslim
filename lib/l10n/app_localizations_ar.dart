@@ -75,6 +75,62 @@ class AppLocalizationsAr extends AppLocalizations {
   String get writeYourOwn => 'أو اكتب半个تك';
 
   @override
+  String get onboardingWelcomeTitle => 'ابنِ يومك حول ما يهم';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'الصلاة، المهام، العادات، والنيات — كلها في مكان واحد';
+
+  @override
+  String get onboardingNameTitle => 'ما اسمك؟';
+
+  @override
+  String get onboardingNameSubtitle => 'نستخدمه لتخصيص تجربتك';
+
+  @override
+  String get onboardingIntentionTitle => 'ما الذي ي bringsك اليوم؟';
+
+  @override
+  String get onboardingIntentionSubtitle => 'اختر نيتك أو اكتبها بنفسك';
+
+  @override
+  String get onboardingPermissionTitle => 'إعداد مواقيت الصلاة';
+
+  @override
+  String get onboardingPermissionSubtitle =>
+      'احصل على إشعارات أذان دقيقة لموقعك';
+
+  @override
+  String get onboardingPermissionBody =>
+      'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+
+  @override
+  String get onboardingPermissionGrant => 'السماح بالوصول';
+
+  @override
+  String get onboardingPermissionGranted => 'تم السماح بالوصول للموقع';
+
+  @override
+  String get onboardingPermissionDenied => 'تم رفض الوصول للموقع';
+
+  @override
+  String get onboardingPermissionDeniedBody =>
+      'نحتاج موقعك للحصول على مواقيت صلاة دقيقة. يمكنك تفعيله في إعدادات جهازك.';
+
+  @override
+  String get onboardingPermissionOpenSettings => 'فتح الإعدادات';
+
+  @override
+  String get onboardingPermissionRetry => 'إعادة المحاولة';
+
+  @override
+  String get onboardingPermissionServiceOff => 'خدمات الموقع معطلة';
+
+  @override
+  String get onboardingPermissionServiceOffBody =>
+      'يرجى تفعيل خدمات الموقع على جهازك للحصول على مواقيت صلاة دقيقة.';
+
+  @override
   String get allowLocation =>
       'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
 
