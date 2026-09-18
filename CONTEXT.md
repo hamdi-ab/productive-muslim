@@ -4,7 +4,7 @@ Productive Muslim — a Flutter mobile app for university students and young pro
 
 ## Core concepts
 
-- **Barakah**: divine blessing and spiritual nourishment
+- **Barakah**: divine blessing and spiritual nourishment; daily prompt-card responses and a read-only weekly review that browses saved reflections with descriptive answer/source counts (no scoring or productivity correlations)
 - **Habits**: daily routines that build the 9 essential qualities
 - **Tasks**: specific actions within a habit
 - **Intentions**: journaling daily intentions and reflections
