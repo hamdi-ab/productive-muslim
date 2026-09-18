@@ -137,6 +137,67 @@ class AppLocalizationsEn extends AppLocalizations {
       'Allow location access for accurate prayer times?';
 
   @override
+  String get onboardingQualitiesTitle => 'What qualities do you want to build?';
+
+  @override
+  String get onboardingQualitiesSubtitle => 'Choose up to 3 to focus on';
+
+  @override
+  String get qualityTaqwa => 'God-Consciousness';
+
+  @override
+  String get qualityTaqwaDesc => 'Mindfulness of Allah in every action';
+
+  @override
+  String get qualityIkhlas => 'Sincerity';
+
+  @override
+  String get qualityIkhlasDesc => 'Purity of intention for Allah alone';
+
+  @override
+  String get qualitySabr => 'Patience';
+
+  @override
+  String get qualitySabrDesc => 'Steadfastness through trials and delay';
+
+  @override
+  String get qualityShukr => 'Gratitude';
+
+  @override
+  String get qualityShukrDesc =>
+      'Recognizing and appreciating Allah\'s blessings';
+
+  @override
+  String get qualityTawakkul => 'Trust in Allah';
+
+  @override
+  String get qualityTawakkulDesc => 'Reliance on Allah after doing your part';
+
+  @override
+  String get qualityIhsan => 'Excellence';
+
+  @override
+  String get qualityIhsanDesc => 'Doing everything as if Allah is watching';
+
+  @override
+  String get qualityIlm => 'Knowledge';
+
+  @override
+  String get qualityIlmDesc => 'Seeking beneficial knowledge continuously';
+
+  @override
+  String get qualityDawah => 'Invitation';
+
+  @override
+  String get qualityDawahDesc => 'Calling others to Islam through character';
+
+  @override
+  String get qualityUmmah => 'Community';
+
+  @override
+  String get qualityUmmahDesc => 'Strength through brotherhood and sisterhood';
+
+  @override
   String get calculationMethod => 'Calculation Method';
 
   @override

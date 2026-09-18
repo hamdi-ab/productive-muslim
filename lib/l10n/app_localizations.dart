@@ -314,6 +314,126 @@ abstract class AppLocalizations {
   /// **'Allow location access for accurate prayer times?'**
   String get allowLocation;
 
+  /// No description provided for @onboardingQualitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What qualities do you want to build?'**
+  String get onboardingQualitiesTitle;
+
+  /// No description provided for @onboardingQualitiesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose up to 3 to focus on'**
+  String get onboardingQualitiesSubtitle;
+
+  /// No description provided for @qualityTaqwa.
+  ///
+  /// In en, this message translates to:
+  /// **'God-Consciousness'**
+  String get qualityTaqwa;
+
+  /// No description provided for @qualityTaqwaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mindfulness of Allah in every action'**
+  String get qualityTaqwaDesc;
+
+  /// No description provided for @qualityIkhlas.
+  ///
+  /// In en, this message translates to:
+  /// **'Sincerity'**
+  String get qualityIkhlas;
+
+  /// No description provided for @qualityIkhlasDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Purity of intention for Allah alone'**
+  String get qualityIkhlasDesc;
+
+  /// No description provided for @qualitySabr.
+  ///
+  /// In en, this message translates to:
+  /// **'Patience'**
+  String get qualitySabr;
+
+  /// No description provided for @qualitySabrDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Steadfastness through trials and delay'**
+  String get qualitySabrDesc;
+
+  /// No description provided for @qualityShukr.
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude'**
+  String get qualityShukr;
+
+  /// No description provided for @qualityShukrDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognizing and appreciating Allah\'s blessings'**
+  String get qualityShukrDesc;
+
+  /// No description provided for @qualityTawakkul.
+  ///
+  /// In en, this message translates to:
+  /// **'Trust in Allah'**
+  String get qualityTawakkul;
+
+  /// No description provided for @qualityTawakkulDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reliance on Allah after doing your part'**
+  String get qualityTawakkulDesc;
+
+  /// No description provided for @qualityIhsan.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellence'**
+  String get qualityIhsan;
+
+  /// No description provided for @qualityIhsanDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Doing everything as if Allah is watching'**
+  String get qualityIhsanDesc;
+
+  /// No description provided for @qualityIlm.
+  ///
+  /// In en, this message translates to:
+  /// **'Knowledge'**
+  String get qualityIlm;
+
+  /// No description provided for @qualityIlmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Seeking beneficial knowledge continuously'**
+  String get qualityIlmDesc;
+
+  /// No description provided for @qualityDawah.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation'**
+  String get qualityDawah;
+
+  /// No description provided for @qualityDawahDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calling others to Islam through character'**
+  String get qualityDawahDesc;
+
+  /// No description provided for @qualityUmmah.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get qualityUmmah;
+
+  /// No description provided for @qualityUmmahDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength through brotherhood and sisterhood'**
+  String get qualityUmmahDesc;
+
   /// No description provided for @calculationMethod.
   ///
   /// In en, this message translates to:

@@ -19,10 +19,51 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
   String _selectedIntention = '';
+  final List<String> _selectedQualities = [];
   final _nameController = TextEditingController();
   _PermissionState _permissionState = _PermissionState.initial;
 
   SettingsService get _settings => widget.settings ?? SettingsService.empty();
+
+  static const _maxQualities = 3;
+
+  final List<OnboardingStep> _steps = [
+    OnboardingStep(
+      titleKey: 'onboardingWelcomeTitle',
+      subtitleKey: 'onboardingWelcomeSubtitle',
+      icon: Icons.spa_outlined,
+    ),
+    OnboardingStep(
+      titleKey: 'onboardingNameTitle',
+      subtitleKey: 'onboardingNameSubtitle',
+      icon: Icons.person_outline,
+      hasInput: true,
+    ),
+    OnboardingStep(
+      titleKey: 'onboardingIntentionTitle',
+      subtitleKey: 'onboardingIntentionSubtitle',
+      icon: Icons.flag_outlined,
+      hasChips: true,
+    ),
+    OnboardingStep(
+      titleKey: 'onboardingQualitiesTitle',
+      subtitleKey: 'onboardingQualitiesSubtitle',
+      icon: Icons.star_outline,
+      hasQualities: true,
+    ),
+    OnboardingStep(
+      titleKey: 'onboardingPermissionTitle',
+      subtitleKey: 'onboardingPermissionSubtitle',
+      icon: Icons.notifications_outlined,
+      hasPermission: true,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
@@ -39,11 +80,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       await _settings.setUserIntention(_selectedIntention);
     }
 
-    if (_currentStep == _steps.length - 1) {
+    if (_currentStep == 3 && _selectedQualities.isNotEmpty) {
+      await _settings.setSelectedQualities(_selectedQualities);
+    }
+
+    if (_currentStep < _steps.length - 1) {
+      setState(() => _currentStep++);
+    } else {
       await _settings.setOnboardingCompleted();
       if (mounted) context.go('/');
-    } else {
-      setState(() => _currentStep++);
     }
   }
 
@@ -95,34 +140,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool get _canProceed {
     if (_currentStep == 1) return _nameController.text.isNotEmpty;
     if (_currentStep == 2) return _selectedIntention.isNotEmpty;
+    if (_currentStep == 3) return _selectedQualities.isNotEmpty;
     return true;
   }
 
-  List<OnboardingStep> get _steps => [
-    OnboardingStep(
-      titleKey: 'onboardingWelcomeTitle',
-      subtitleKey: 'onboardingWelcomeSubtitle',
-      icon: Icons.spa_outlined,
-    ),
-    OnboardingStep(
-      titleKey: 'onboardingNameTitle',
-      subtitleKey: 'onboardingNameSubtitle',
-      icon: Icons.person_outline,
-      hasInput: true,
-    ),
-    OnboardingStep(
-      titleKey: 'onboardingIntentionTitle',
-      subtitleKey: 'onboardingIntentionSubtitle',
-      icon: Icons.flag_outlined,
-      hasChips: true,
-    ),
-    OnboardingStep(
-      titleKey: 'onboardingPermissionTitle',
-      subtitleKey: 'onboardingPermissionSubtitle',
-      icon: Icons.notifications_outlined,
-      hasPermission: true,
-    ),
-  ];
+  void _toggleQuality(String quality) {
+    setState(() {
+      if (_selectedQualities.contains(quality)) {
+        _selectedQualities.remove(quality);
+      } else if (_selectedQualities.length < _maxQualities) {
+        _selectedQualities.add(quality);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,76 +173,74 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 48),
-                Icon(
-                  step.icon,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 32),
+          child: Column(
+            children: [
+              const SizedBox(height: 48),
+              Icon(
+                step.icon,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 32),
+              Text(
+                step.titleKey.tr(l10n),
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              if (step.subtitleKey != null)
                 Text(
-                  step.titleKey.tr(l10n),
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  step.subtitleKey!.tr(l10n),
+                  style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
-                if (step.subtitleKey != null)
-                  Text(
-                    step.subtitleKey!.tr(l10n),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                const SizedBox(height: 48),
-                Row(
-                  spacing: 8,
-                  children: List.generate(_steps.length, (i) {
-                    return Expanded(
-                      child: Container(
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: i <= _currentStep
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurfaceVariant
-                                    .withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(AppRadius.xs),
-                        ),
+              const SizedBox(height: 48),
+              Row(
+                spacing: 8,
+                children: List.generate(_steps.length, (i) {
+                  return Expanded(
+                    child: Container(
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: i <= _currentStep
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
-                    );
-                  }),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 32),
+              if (step.hasInput) _buildNameInput(),
+              if (step.hasChips) _buildIntentionChips(l10n),
+              if (step.hasQualities) _buildQualitiesSelection(),
+              if (step.hasPermission) _buildPermissionWidget(l10n),
+              const SizedBox(height: 32),
+              FilledButton(
+                onPressed: _canProceed ? _nextStep : null,
+                child: Text(
+                  _currentStep == _steps.length - 1
+                      ? l10n.startYourDay
+                      : l10n.nextStep,
                 ),
-                const SizedBox(height: 32),
-                if (step.hasInput) _buildNameInput(l10n),
-                if (step.hasChips) _buildIntentionChips(l10n),
-                if (step.hasPermission) _buildPermissionWidget(l10n),
-                const SizedBox(height: 32),
-                FilledButton(
-                  onPressed: _canProceed ? _nextStep : null,
-                  child: Text(
-                    _currentStep == _steps.length - 1
-                        ? l10n.startYourDay
-                        : l10n.nextStep,
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNameInput(AppLocalizations l10n) {
+  Widget _buildNameInput() {
     return TextField(
       controller: _nameController,
       textCapitalization: TextCapitalization.words,
       decoration: const InputDecoration(),
-      onChanged: (_) => setState(() {}),
     );
   }
 
@@ -239,12 +267,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           label: Text(l10n.mindfulProductivity),
           selected: _selectedIntention == 'productivity',
           onSelected: (selected) {
-            setState(
-              () => _selectedIntention = selected ? 'productivity' : '',
-            );
+            setState(() => _selectedIntention = selected ? 'productivity' : '');
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildQualitiesSelection() {
+    final l10n = AppLocalizations.of(context)!;
+    final qualities = [
+      (id: 'taqwa', label: l10n.qualityTaqwa, icon: Icons.mosque_outlined),
+      (id: 'ikhlas', label: l10n.qualityIkhlas, icon: Icons.favorite_outline),
+      (
+        id: 'sabr',
+        label: l10n.qualitySabr,
+        icon: Icons.hourglass_empty_outlined,
+      ),
+      (id: 'shukr', label: l10n.qualityShukr, icon: Icons.thumb_up_outlined),
+      (
+        id: 'tawakkul',
+        label: l10n.qualityTawakkul,
+        icon: Icons.shield_outlined,
+      ),
+      (id: 'ihsan', label: l10n.qualityIhsan, icon: Icons.star_outline),
+      (id: 'ilm', label: l10n.qualityIlm, icon: Icons.menu_book_outlined),
+      (id: 'dawah', label: l10n.qualityDawah, icon: Icons.campaign_outlined),
+      (id: 'ummah', label: l10n.qualityUmmah, icon: Icons.groups_outlined),
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: qualities.map((q) {
+        final selected = _selectedQualities.contains(q.id);
+        return FilterChip(
+          avatar: Icon(q.icon, size: 18),
+          label: Text(q.label),
+          selected: selected,
+          onSelected: (_) => _toggleQuality(q.id),
+        );
+      }).toList(),
     );
   }
 
@@ -406,6 +469,7 @@ class OnboardingStep {
   final IconData icon;
   final bool hasInput;
   final bool hasChips;
+  final bool hasQualities;
   final bool hasPermission;
 
   const OnboardingStep({
@@ -414,6 +478,7 @@ class OnboardingStep {
     required this.icon,
     this.hasInput = false,
     this.hasChips = false,
+    this.hasQualities = false,
     this.hasPermission = false,
   });
 }
@@ -433,6 +498,10 @@ extension _StringTr on String {
         return l10n.onboardingIntentionTitle;
       case 'onboardingIntentionSubtitle':
         return l10n.onboardingIntentionSubtitle;
+      case 'onboardingQualitiesTitle':
+        return l10n.onboardingQualitiesTitle;
+      case 'onboardingQualitiesSubtitle':
+        return l10n.onboardingQualitiesSubtitle;
       case 'onboardingPermissionTitle':
         return l10n.onboardingPermissionTitle;
       case 'onboardingPermissionSubtitle':

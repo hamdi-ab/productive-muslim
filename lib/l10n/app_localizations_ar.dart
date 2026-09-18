@@ -135,6 +135,66 @@ class AppLocalizationsAr extends AppLocalizations {
       'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
 
   @override
+  String get onboardingQualitiesTitle => 'ما هي الصفات التي تريد أن تبنيها؟';
+
+  @override
+  String get onboardingQualitiesSubtitle => 'اختر حتى3 للتركيز عليها';
+
+  @override
+  String get qualityTaqwa => 'تقوى الله';
+
+  @override
+  String get qualityTaqwaDesc => 'الوعي بالله في كل فعل';
+
+  @override
+  String get qualityIkhlas => 'الإخلاص';
+
+  @override
+  String get qualityIkhlasDesc => 'صفاء النية لله وحده';
+
+  @override
+  String get qualitySabr => 'الصبر';
+
+  @override
+  String get qualitySabrDesc => 'الثبات في المحن وتأخر النتائج';
+
+  @override
+  String get qualityShukr => 'الشكر';
+
+  @override
+  String get qualityShukrDesc => 'تمييز نعم الله والامتنان لها';
+
+  @override
+  String get qualityTawakkul => 'التوكل على الله';
+
+  @override
+  String get qualityTawakkulDesc => 'الاعتماد على الله بعد اخذ الاسباب';
+
+  @override
+  String get qualityIhsan => 'الإحسان';
+
+  @override
+  String get qualityIhsanDesc => 'فعل كل شيء كأن الله يراقبك';
+
+  @override
+  String get qualityIlm => 'العلم';
+
+  @override
+  String get qualityIlmDesc => 'طلب العلم النافع باستمرار';
+
+  @override
+  String get qualityDawah => 'الدعوة';
+
+  @override
+  String get qualityDawahDesc => 'دعوة الآخرين إلى الإسلام بالأخلاق';
+
+  @override
+  String get qualityUmmah => 'الأمة';
+
+  @override
+  String get qualityUmmahDesc => 'القوة من خلال الأخوة والأختية';
+
+  @override
   String get calculationMethod => 'طريقة الحساب';
 
   @override
