@@ -252,6 +252,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emptyTasks => 'لا توجد مهام اليوم';
 
   @override
+  String get taskStartTime => 'وقت البدء';
+
+  @override
+  String get taskEndTime => 'وقت الانتهاء';
+
+  @override
+  String get taskNotes => 'ملاحظات (اختياري)';
+
+  @override
+  String get taskRepeat => 'تكرار';
+
+  @override
+  String get taskRepeatDaily => 'يومي';
+
+  @override
+  String get taskRepeatWeekly => 'أسبوعي';
+
+  @override
+  String get taskOverdue => 'متأخرة';
+
+  @override
+  String get taskScheduled => 'مجدولة';
+
+  @override
+  String get taskNoTime => 'لم يتم تحديد الوقت';
+
+  @override
+  String get taskSwipeComplete => 'إكمال';
+
+  @override
+  String get taskSwipeDelete => 'حذف';
+
+  @override
   String get emptyHabits => 'لا توجد عادات بعد';
 
   @override

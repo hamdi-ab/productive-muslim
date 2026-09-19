@@ -255,6 +255,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyTasks => 'No tasks today';
 
   @override
+  String get taskStartTime => 'Start time';
+
+  @override
+  String get taskEndTime => 'End time';
+
+  @override
+  String get taskNotes => 'Notes (optional)';
+
+  @override
+  String get taskRepeat => 'Repeat';
+
+  @override
+  String get taskRepeatDaily => 'Daily';
+
+  @override
+  String get taskRepeatWeekly => 'Weekly';
+
+  @override
+  String get taskOverdue => 'Overdue';
+
+  @override
+  String get taskScheduled => 'Scheduled';
+
+  @override
+  String get taskNoTime => 'No time set';
+
+  @override
+  String get taskSwipeComplete => 'Complete';
+
+  @override
+  String get taskSwipeDelete => 'Delete';
+
+  @override
   String get emptyHabits => 'No habits yet';
 
   @override
