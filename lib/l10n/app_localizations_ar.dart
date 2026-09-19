@@ -584,4 +584,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get barakahHistoryTitle => 'سجل تأملات البركة الحرة';
+
+  @override
+  String get habitMarkComplete => 'تحديد كمكتمل';
+
+  @override
+  String get habitUnmark => 'إلغاء التحديد';
+
+  @override
+  String get habitAddName => 'اسم العادة';
+
+  @override
+  String get habitAddCategory => 'الفئة';
+
+  @override
+  String get habitNoCompletions => 'لا توجد إكمالات بعد';
+
+  @override
+  String get habitToday => 'اليوم';
+
+  @override
+  String get habitSwipeDelete => 'حذف';
 }

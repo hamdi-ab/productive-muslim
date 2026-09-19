@@ -7,4 +7,9 @@ abstract class HabitRepository {
   Future<int> insertHabit(Habit habit);
   Future<bool> updateHabit(Habit habit);
   Future<int> deactivateHabit(int id);
+
+  Future<void> toggleCompletion(int habitId, String date);
+  Future<bool?> getCompletion(int habitId, String date);
+  Future<Map<int, bool>> getCompletionsForDateMap(String date);
+  Future<int> getStreak(int habitId);
 }

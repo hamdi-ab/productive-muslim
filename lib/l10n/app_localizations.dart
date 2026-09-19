@@ -1087,6 +1087,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free-form Barakah history'**
   String get barakahHistoryTitle;
+
+  /// No description provided for @habitMarkComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark complete'**
+  String get habitMarkComplete;
+
+  /// No description provided for @habitUnmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmark'**
+  String get habitUnmark;
+
+  /// No description provided for @habitAddName.
+  ///
+  /// In en, this message translates to:
+  /// **'Habit name'**
+  String get habitAddName;
+
+  /// No description provided for @habitAddCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get habitAddCategory;
+
+  /// No description provided for @habitNoCompletions.
+  ///
+  /// In en, this message translates to:
+  /// **'No completions yet'**
+  String get habitNoCompletions;
+
+  /// No description provided for @habitToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get habitToday;
+
+  /// No description provided for @habitSwipeDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get habitSwipeDelete;
 }
 
 class _AppLocalizationsDelegate

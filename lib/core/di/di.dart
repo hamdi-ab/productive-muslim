@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
+import 'package:productive_muslim/data/local/daos/habit_completions_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
 import 'package:productive_muslim/data/local/daos/intention_dao.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
@@ -49,6 +50,9 @@ Future<void> setupDi() async {
   // DAOs
   getIt.registerLazySingleton<BarakahDao>(() => BarakahDao(database));
   getIt.registerLazySingleton<HabitDao>(() => HabitDao(database));
+  getIt.registerLazySingleton<HabitCompletionsDao>(
+    () => HabitCompletionsDao(database),
+  );
   getIt.registerLazySingleton<TaskDao>(() => TaskDao(database));
   getIt.registerLazySingleton<IntentionDao>(() => IntentionDao(database));
 
@@ -57,7 +61,10 @@ Future<void> setupDi() async {
     () => BarakahRepositoryImpl(barakahDao: getIt<BarakahDao>()),
   );
   getIt.registerLazySingleton<HabitRepository>(
-    () => HabitRepositoryImpl(habitDao: getIt<HabitDao>()),
+    () => HabitRepositoryImpl(
+      habitDao: getIt<HabitDao>(),
+      habitCompletionsDao: getIt<HabitCompletionsDao>(),
+    ),
   );
   getIt.registerLazySingleton<TaskRepository>(
     () => TaskRepositoryImpl(taskDao: getIt<TaskDao>()),

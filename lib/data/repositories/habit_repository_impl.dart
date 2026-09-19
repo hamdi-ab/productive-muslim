@@ -1,15 +1,21 @@
 import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/app_database.dart';
+import 'package:productive_muslim/data/local/daos/habit_completions_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
 import 'package:productive_muslim/data/mappers/habit_mapper.dart';
 import 'package:productive_muslim/domain/models/habit.dart' as habit_model;
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 
 class HabitRepositoryImpl implements HabitRepository {
-  HabitRepositoryImpl({required HabitDao habitDao}) : _habitDao = habitDao;
+  HabitRepositoryImpl({
+    required HabitDao habitDao,
+    required HabitCompletionsDao habitCompletionsDao,
+  }) : _habitDao = habitDao,
+       _completionsDao = habitCompletionsDao;
 
   final HabitDao _habitDao;
+  final HabitCompletionsDao _completionsDao;
   final _mapper = HabitMapper();
 
   @override
@@ -55,5 +61,30 @@ class HabitRepositoryImpl implements HabitRepository {
   @override
   Future<int> deactivateHabit(int id) {
     return _habitDao.deactivateHabit(id);
+  }
+
+  @override
+  Future<void> toggleCompletion(int habitId, String date) async {
+    final current = await _completionsDao.getCompletion(habitId, date);
+    if (current == true) {
+      await _completionsDao.removeCompletion(habitId, date);
+    } else {
+      await _completionsDao.logCompletion(habitId, date);
+    }
+  }
+
+  @override
+  Future<bool?> getCompletion(int habitId, String date) {
+    return _completionsDao.getCompletion(habitId, date);
+  }
+
+  @override
+  Future<Map<int, bool>> getCompletionsForDateMap(String date) {
+    return _completionsDao.getCompletionsForDateMap(date);
+  }
+
+  @override
+  Future<int> getStreak(int habitId) {
+    return _completionsDao.getStreak(habitId);
   }
 }

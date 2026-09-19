@@ -1403,6 +1403,306 @@ class HabitsCompanion extends UpdateCompanion<Habit> {
   }
 }
 
+class $HabitCompletionsTable extends HabitCompletions
+    with TableInfo<$HabitCompletionsTable, HabitCompletion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HabitCompletionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _habitIdMeta = const VerificationMeta(
+    'habitId',
+  );
+  @override
+  late final GeneratedColumn<int> habitId = GeneratedColumn<int>(
+    'habit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedMeta = const VerificationMeta(
+    'completed',
+  );
+  @override
+  late final GeneratedColumn<int> completed = GeneratedColumn<int>(
+    'completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, habitId, date, completed];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'habit_completions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HabitCompletion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('habit_id')) {
+      context.handle(
+        _habitIdMeta,
+        habitId.isAcceptableOrUnknown(data['habit_id']!, _habitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_habitIdMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('completed')) {
+      context.handle(
+        _completedMeta,
+        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {habitId, date},
+  ];
+  @override
+  HabitCompletion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HabitCompletion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      habitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}habit_id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      completed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed'],
+      )!,
+    );
+  }
+
+  @override
+  $HabitCompletionsTable createAlias(String alias) {
+    return $HabitCompletionsTable(attachedDatabase, alias);
+  }
+}
+
+class HabitCompletion extends DataClass implements Insertable<HabitCompletion> {
+  final int id;
+  final int habitId;
+  final String date;
+  final int completed;
+  const HabitCompletion({
+    required this.id,
+    required this.habitId,
+    required this.date,
+    required this.completed,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['habit_id'] = Variable<int>(habitId);
+    map['date'] = Variable<String>(date);
+    map['completed'] = Variable<int>(completed);
+    return map;
+  }
+
+  HabitCompletionsCompanion toCompanion(bool nullToAbsent) {
+    return HabitCompletionsCompanion(
+      id: Value(id),
+      habitId: Value(habitId),
+      date: Value(date),
+      completed: Value(completed),
+    );
+  }
+
+  factory HabitCompletion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HabitCompletion(
+      id: serializer.fromJson<int>(json['id']),
+      habitId: serializer.fromJson<int>(json['habitId']),
+      date: serializer.fromJson<String>(json['date']),
+      completed: serializer.fromJson<int>(json['completed']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'habitId': serializer.toJson<int>(habitId),
+      'date': serializer.toJson<String>(date),
+      'completed': serializer.toJson<int>(completed),
+    };
+  }
+
+  HabitCompletion copyWith({
+    int? id,
+    int? habitId,
+    String? date,
+    int? completed,
+  }) => HabitCompletion(
+    id: id ?? this.id,
+    habitId: habitId ?? this.habitId,
+    date: date ?? this.date,
+    completed: completed ?? this.completed,
+  );
+  HabitCompletion copyWithCompanion(HabitCompletionsCompanion data) {
+    return HabitCompletion(
+      id: data.id.present ? data.id.value : this.id,
+      habitId: data.habitId.present ? data.habitId.value : this.habitId,
+      date: data.date.present ? data.date.value : this.date,
+      completed: data.completed.present ? data.completed.value : this.completed,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HabitCompletion(')
+          ..write('id: $id, ')
+          ..write('habitId: $habitId, ')
+          ..write('date: $date, ')
+          ..write('completed: $completed')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, habitId, date, completed);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HabitCompletion &&
+          other.id == this.id &&
+          other.habitId == this.habitId &&
+          other.date == this.date &&
+          other.completed == this.completed);
+}
+
+class HabitCompletionsCompanion extends UpdateCompanion<HabitCompletion> {
+  final Value<int> id;
+  final Value<int> habitId;
+  final Value<String> date;
+  final Value<int> completed;
+  const HabitCompletionsCompanion({
+    this.id = const Value.absent(),
+    this.habitId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.completed = const Value.absent(),
+  });
+  HabitCompletionsCompanion.insert({
+    this.id = const Value.absent(),
+    required int habitId,
+    required String date,
+    this.completed = const Value.absent(),
+  }) : habitId = Value(habitId),
+       date = Value(date);
+  static Insertable<HabitCompletion> custom({
+    Expression<int>? id,
+    Expression<int>? habitId,
+    Expression<String>? date,
+    Expression<int>? completed,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (habitId != null) 'habit_id': habitId,
+      if (date != null) 'date': date,
+      if (completed != null) 'completed': completed,
+    });
+  }
+
+  HabitCompletionsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? habitId,
+    Value<String>? date,
+    Value<int>? completed,
+  }) {
+    return HabitCompletionsCompanion(
+      id: id ?? this.id,
+      habitId: habitId ?? this.habitId,
+      date: date ?? this.date,
+      completed: completed ?? this.completed,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (habitId.present) {
+      map['habit_id'] = Variable<int>(habitId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<int>(completed.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HabitCompletionsCompanion(')
+          ..write('id: $id, ')
+          ..write('habitId: $habitId, ')
+          ..write('date: $date, ')
+          ..write('completed: $completed')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -3175,6 +3475,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BarakahEntriesTable barakahEntries = $BarakahEntriesTable(this);
   late final $BarakahPromptsTable barakahPrompts = $BarakahPromptsTable(this);
   late final $HabitsTable habits = $HabitsTable(this);
+  late final $HabitCompletionsTable habitCompletions = $HabitCompletionsTable(
+    this,
+  );
   late final $TasksTable tasks = $TasksTable(this);
   late final $IntentionEntriesTable intentionEntries = $IntentionEntriesTable(
     this,
@@ -3183,6 +3486,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $BarakahDailyResponsesTable(this);
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
+  late final HabitCompletionsDao habitCompletionsDao = HabitCompletionsDao(
+    this as AppDatabase,
+  );
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
   late final IntentionDao intentionDao = IntentionDao(this as AppDatabase);
   @override
@@ -3193,6 +3499,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     barakahEntries,
     barakahPrompts,
     habits,
+    habitCompletions,
     tasks,
     intentionEntries,
     barakahDailyResponses,
@@ -3943,6 +4250,196 @@ typedef $$HabitsTableProcessedTableManager =
       $$HabitsTableUpdateCompanionBuilder,
       (Habit, BaseReferences<_$AppDatabase, $HabitsTable, Habit>),
       Habit,
+      PrefetchHooks Function()
+    >;
+typedef $$HabitCompletionsTableCreateCompanionBuilder =
+    HabitCompletionsCompanion Function({
+      Value<int> id,
+      required int habitId,
+      required String date,
+      Value<int> completed,
+    });
+typedef $$HabitCompletionsTableUpdateCompanionBuilder =
+    HabitCompletionsCompanion Function({
+      Value<int> id,
+      Value<int> habitId,
+      Value<String> date,
+      Value<int> completed,
+    });
+
+class $$HabitCompletionsTableFilterComposer
+    extends Composer<_$AppDatabase, $HabitCompletionsTable> {
+  $$HabitCompletionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get habitId => $composableBuilder(
+    column: $table.habitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HabitCompletionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $HabitCompletionsTable> {
+  $$HabitCompletionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get habitId => $composableBuilder(
+    column: $table.habitId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completed => $composableBuilder(
+    column: $table.completed,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HabitCompletionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HabitCompletionsTable> {
+  $$HabitCompletionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get habitId =>
+      $composableBuilder(column: $table.habitId, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get completed =>
+      $composableBuilder(column: $table.completed, builder: (column) => column);
+}
+
+class $$HabitCompletionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HabitCompletionsTable,
+          HabitCompletion,
+          $$HabitCompletionsTableFilterComposer,
+          $$HabitCompletionsTableOrderingComposer,
+          $$HabitCompletionsTableAnnotationComposer,
+          $$HabitCompletionsTableCreateCompanionBuilder,
+          $$HabitCompletionsTableUpdateCompanionBuilder,
+          (
+            HabitCompletion,
+            BaseReferences<
+              _$AppDatabase,
+              $HabitCompletionsTable,
+              HabitCompletion
+            >,
+          ),
+          HabitCompletion,
+          PrefetchHooks Function()
+        > {
+  $$HabitCompletionsTableTableManager(
+    _$AppDatabase db,
+    $HabitCompletionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HabitCompletionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HabitCompletionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HabitCompletionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> habitId = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<int> completed = const Value.absent(),
+              }) => HabitCompletionsCompanion(
+                id: id,
+                habitId: habitId,
+                date: date,
+                completed: completed,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int habitId,
+                required String date,
+                Value<int> completed = const Value.absent(),
+              }) => HabitCompletionsCompanion.insert(
+                id: id,
+                habitId: habitId,
+                date: date,
+                completed: completed,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HabitCompletionsTable, HabitCompletion>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $HabitCompletionsTable,
+                    HabitCompletion
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HabitCompletionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HabitCompletionsTable,
+      HabitCompletion,
+      $$HabitCompletionsTableFilterComposer,
+      $$HabitCompletionsTableOrderingComposer,
+      $$HabitCompletionsTableAnnotationComposer,
+      $$HabitCompletionsTableCreateCompanionBuilder,
+      $$HabitCompletionsTableUpdateCompanionBuilder,
+      (
+        HabitCompletion,
+        BaseReferences<_$AppDatabase, $HabitCompletionsTable, HabitCompletion>,
+      ),
+      HabitCompletion,
       PrefetchHooks Function()
     >;
 typedef $$TasksTableCreateCompanionBuilder = TasksCompanion Function({
@@ -4869,6 +5366,8 @@ class $AppDatabaseManager {
       $$BarakahPromptsTableTableManager(_db, _db.barakahPrompts);
   $$HabitsTableTableManager get habits =>
       $$HabitsTableTableManager(_db, _db.habits);
+  $$HabitCompletionsTableTableManager get habitCompletions =>
+      $$HabitCompletionsTableTableManager(_db, _db.habitCompletions);
   $$TasksTableTableManager get tasks =>
       $$TasksTableTableManager(_db, _db.tasks);
   $$IntentionEntriesTableTableManager get intentionEntries =>
