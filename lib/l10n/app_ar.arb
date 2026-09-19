@@ -190,5 +190,12 @@
   "barakahWeeklyEmpty": "لا توجد إجابات يومية محفوظة لهذا الأسبوع. ستظهر هنا التأملات اليومية التي تحفظها في شاشة البركة؛ سجل التأملات الحرة منفصل.",
   "barakahWeeklyFailure": "تعذر تحميل تأملات هذا الأسبوع. يرجى المحاولة مرة أخرى.",
   "barakahHistoryTitle": "سجل تأملات البركة الحرة",
-  "@barakahHistoryTitle": {"description": "Heading above the existing free-form logging and history UI"}
+  "@barakahHistoryTitle": {"description": "Heading above the existing free-form logging and history UI"},
+  "habitMarkComplete": "تحديد كمكتمل",
+  "habitUnmark": "إلغاء التحديد",
+  "habitAddName": "اسم العادة",
+  "habitAddCategory": "الفئة",
+  "habitNoCompletions": "لا توجد إكمالات بعد",
+  "habitToday": "اليوم",
+  "habitSwipeDelete": "حذف"
 }

@@ -10,15 +10,27 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
   HabitBloc(this._repository) : super(const Initial()) {
     on<HabitLoaded>(_onLoaded);
     on<HabitCreated>(_onCreated);
-    on<HabitToggled>(_onToggled);
+    on<HabitCompletionToggled>(_onCompletionToggled);
     on<HabitDeleted>(_onDeleted);
+  }
+
+  String _todayString() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
   Future<void> _onLoaded(HabitLoaded event, Emitter<HabitState> emit) async {
     emit(const Loading());
     try {
       final habits = await _repository.getActiveHabits();
-      emit(Loaded(habits));
+      final completions = await _repository.getCompletionsForDateMap(
+        _todayString(),
+      );
+      final streaks = <int, int>{};
+      for (final habit in habits) {
+        streaks[habit.id] = await _repository.getStreak(habit.id);
+      }
+      emit(Loaded(habits: habits, completions: completions, streaks: streaks));
     } catch (e) {
       emit(Error(e.toString()));
     }
@@ -28,17 +40,43 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
     try {
       await _repository.insertHabit(event.habit);
       final habits = await _repository.getActiveHabits();
-      emit(Loaded(habits));
+      final completions = await _repository.getCompletionsForDateMap(
+        _todayString(),
+      );
+      final streaks = <int, int>{};
+      for (final habit in habits) {
+        streaks[habit.id] = await _repository.getStreak(habit.id);
+      }
+      emit(Loaded(habits: habits, completions: completions, streaks: streaks));
     } catch (e) {
       emit(Error(e.toString()));
     }
   }
 
-  Future<void> _onToggled(HabitToggled event, Emitter<HabitState> emit) async {
-    // Toggle is handled at the completion level; this is a no-op for now
-    final current = state;
-    if (current is Loaded) {
-      emit(Loaded(current.habits));
+  Future<void> _onCompletionToggled(
+    HabitCompletionToggled event,
+    Emitter<HabitState> emit,
+  ) async {
+    try {
+      await _repository.toggleCompletion(event.habitId, _todayString());
+      final current = state;
+      if (current is Loaded) {
+        final newCompletions = Map<int, bool>.from(current.completions);
+        newCompletions[event.habitId] =
+            !(newCompletions[event.habitId] ?? false);
+        final streak = await _repository.getStreak(event.habitId);
+        final newStreaks = Map<int, int>.from(current.streaks);
+        newStreaks[event.habitId] = streak;
+        emit(
+          Loaded(
+            habits: current.habits,
+            completions: newCompletions,
+            streaks: newStreaks,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(Error(e.toString()));
     }
   }
 
@@ -50,7 +88,17 @@ class HabitBloc extends Bloc<HabitEvent, HabitState> {
         final updated = current.habits
             .where((h) => h.id != event.habitId)
             .toList();
-        emit(Loaded(updated));
+        final newCompletions = Map<int, bool>.from(current.completions)
+          ..remove(event.habitId);
+        final newStreaks = Map<int, int>.from(current.streaks)
+          ..remove(event.habitId);
+        emit(
+          Loaded(
+            habits: updated,
+            completions: newCompletions,
+            streaks: newStreaks,
+          ),
+        );
       }
     } catch (e) {
       emit(Error(e.toString()));

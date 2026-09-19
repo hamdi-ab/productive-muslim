@@ -190,5 +190,12 @@
   "barakahWeeklyEmpty": "No daily responses saved for this week. Daily reflections you save on the Barakah screen will appear here; free-form history is separate.",
   "barakahWeeklyFailure": "This week's reflections could not be loaded. Please try again.",
   "barakahHistoryTitle": "Free-form Barakah history",
-  "@barakahHistoryTitle": {"description": "Heading above the existing free-form logging and history UI"}
+  "@barakahHistoryTitle": {"description": "Heading above the existing free-form logging and history UI"},
+  "habitMarkComplete": "Mark complete",
+  "habitUnmark": "Unmark",
+  "habitAddName": "Habit name",
+  "habitAddCategory": "Category",
+  "habitNoCompletions": "No completions yet",
+  "habitToday": "Today",
+  "habitSwipeDelete": "Delete"
 }

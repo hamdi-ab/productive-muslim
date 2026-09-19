@@ -5,7 +5,7 @@ sealed class HabitEvent {
 
   factory HabitEvent.loaded() = HabitLoaded;
   factory HabitEvent.created(Habit habit) = HabitCreated;
-  factory HabitEvent.toggled(int habitId) = HabitToggled;
+  factory HabitEvent.completionToggled(int habitId) = HabitCompletionToggled;
   factory HabitEvent.deleted(int habitId) = HabitDeleted;
 }
 
@@ -18,9 +18,9 @@ class HabitCreated extends HabitEvent {
   HabitCreated(this.habit);
 }
 
-class HabitToggled extends HabitEvent {
+class HabitCompletionToggled extends HabitEvent {
   final int habitId;
-  HabitToggled(this.habitId);
+  HabitCompletionToggled(this.habitId);
 }
 
 class HabitDeleted extends HabitEvent {

@@ -219,7 +219,7 @@ return failure(_that.week);case _:
 
 class BarakahReviewLoading implements BarakahReviewState {
   const BarakahReviewLoading(this.week);
-
+  
 
 @override final  BarakahReviewWeek week;
 
@@ -287,7 +287,7 @@ as BarakahReviewWeek,
 
 class BarakahReviewLoaded implements BarakahReviewState {
   const BarakahReviewLoaded(this.week, this.review);
-
+  
 
 @override final  BarakahReviewWeek week;
  final  BarakahWeeklyReview review;
@@ -357,7 +357,7 @@ as BarakahWeeklyReview,
 
 class BarakahReviewFailure implements BarakahReviewState {
   const BarakahReviewFailure(this.week);
-
+  
 
 @override final  BarakahReviewWeek week;
 

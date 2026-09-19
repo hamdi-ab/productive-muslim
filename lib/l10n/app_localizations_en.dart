@@ -589,4 +589,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get barakahHistoryTitle => 'Free-form Barakah history';
+
+  @override
+  String get habitMarkComplete => 'Mark complete';
+
+  @override
+  String get habitUnmark => 'Unmark';
+
+  @override
+  String get habitAddName => 'Habit name';
+
+  @override
+  String get habitAddCategory => 'Category';
+
+  @override
+  String get habitNoCompletions => 'No completions yet';
+
+  @override
+  String get habitToday => 'Today';
+
+  @override
+  String get habitSwipeDelete => 'Delete';
 }
