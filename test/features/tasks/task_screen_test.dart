@@ -6,7 +6,6 @@ import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
-import 'package:productive_muslim/features/tasks/logic/task_state.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
