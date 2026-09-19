@@ -548,6 +548,72 @@ abstract class AppLocalizations {
   /// **'No tasks today'**
   String get emptyTasks;
 
+  /// No description provided for @taskStartTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Start time'**
+  String get taskStartTime;
+
+  /// No description provided for @taskEndTime.
+  ///
+  /// In en, this message translates to:
+  /// **'End time'**
+  String get taskEndTime;
+
+  /// No description provided for @taskNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get taskNotes;
+
+  /// No description provided for @taskRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get taskRepeat;
+
+  /// No description provided for @taskRepeatDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get taskRepeatDaily;
+
+  /// No description provided for @taskRepeatWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get taskRepeatWeekly;
+
+  /// No description provided for @taskOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get taskOverdue;
+
+  /// No description provided for @taskScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get taskScheduled;
+
+  /// No description provided for @taskNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'No time set'**
+  String get taskNoTime;
+
+  /// No description provided for @taskSwipeComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get taskSwipeComplete;
+
+  /// No description provided for @taskSwipeDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get taskSwipeDelete;
+
   /// No description provided for @emptyHabits.
   ///
   /// In en, this message translates to:
