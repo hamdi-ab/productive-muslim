@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
@@ -18,16 +19,23 @@ GoRouter _testRouter({required Widget child}) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => HomeScreen(
-          prayerTimeService: MockPrayerTimeService(),
-          child: child,
-        ),
+        builder: (context, state) => HomeScreen(child: child),
       ),
     ],
   );
 }
 
 void main() {
+  setUp(() {
+    GetIt.instance.registerLazySingleton<PrayerTimeService>(
+      () => MockPrayerTimeService(),
+    );
+  });
+
+  tearDown(() {
+    GetIt.instance.unregister<PrayerTimeService>();
+  });
+
   testWidgets('renders app bar with app title', (tester) async {
     final router = _testRouter(child: const Center(child: Text('Home')));
     await tester.pumpWidget(

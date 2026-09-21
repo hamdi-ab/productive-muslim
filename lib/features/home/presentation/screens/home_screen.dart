@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
-  final PrayerTimeService? prayerTimeService;
 
-  const HomeScreen({super.key, required this.child, this.prayerTimeService});
+  const HomeScreen({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,9 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: child,
-      bottomSheet: _PrayerCountdownSheet(
-        service: prayerTimeService ?? PrayerTimeService(),
+      bottomSheet: GestureDetector(
+        onTap: () => context.push('/prayer-times'),
+        child: _PrayerCountdownSheet(service: getIt<PrayerTimeService>()),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _getIndexForLocation(location),

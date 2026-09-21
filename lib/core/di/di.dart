@@ -16,6 +16,7 @@ import 'package:productive_muslim/data/repositories/task_repository_impl.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/data/services/local_barakah_reminder_scheduler.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -72,6 +73,9 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<IntentionRepository>(
     () => IntentionRepositoryImpl(intentionDao: getIt<IntentionDao>()),
   );
+
+  // Services
+  getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
 
   // Router
   getIt.registerSingleton<GoRouter>(AppRouter.router);
