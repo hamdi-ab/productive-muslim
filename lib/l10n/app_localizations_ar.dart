@@ -389,7 +389,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get isha => 'العشاء';
 
   @override
+  String get sunrise => 'الشروق';
+
+  @override
   String get adhan => 'الأذان';
+
+  @override
+  String get adhanNotificationsDescription =>
+      'احصل على إشعارات في أوقات الصلاة';
 
   @override
   String get islam => 'إسلام';

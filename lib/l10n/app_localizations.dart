@@ -806,11 +806,23 @@ abstract class AppLocalizations {
   /// **'Isha'**
   String get isha;
 
+  /// No description provided for @sunrise.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get sunrise;
+
   /// No description provided for @adhan.
   ///
   /// In en, this message translates to:
   /// **'Adhan'**
   String get adhan;
+
+  /// No description provided for @adhanNotificationsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified at prayer times'**
+  String get adhanNotificationsDescription;
 
   /// No description provided for @islam.
   ///

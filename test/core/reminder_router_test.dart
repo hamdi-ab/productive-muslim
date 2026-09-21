@@ -73,7 +73,7 @@ void main() {
       AppRouter.router.go('/settings');
       await pumpRouter(tester);
       expect(find.byType(SettingsScreen), findsOneWidget);
-      expect(find.byType(SwitchListTile), findsOneWidget);
+      expect(find.byKey(const Key('barakah_reminder_toggle')), findsOneWidget);
       AppRouter.openBarakahReminder();
       await pumpFrames(tester);
       expect(

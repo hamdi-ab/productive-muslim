@@ -72,6 +72,7 @@ class SettingsView extends StatelessWidget {
                       : null,
                 ),
                 ListTile(
+                  key: const Key('barakah_reminder_time'),
                   title: Text(l10n.barakahReminderTime),
                   subtitle: Text(time.format(context)),
                   trailing: const Icon(Icons.schedule),

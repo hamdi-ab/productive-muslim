@@ -122,7 +122,12 @@ void main() {
           .onChanged,
       isNull,
     );
-    expect(tester.widget<ListTile>(find.byType(ListTile).last).onTap, isNull);
+    expect(
+      tester
+          .widget<ListTile>(find.byKey(const Key('barakah_reminder_time')))
+          .onTap,
+      isNull,
+    );
     expect(settings.barakahReminder.enabled, isFalse);
     scheduler.permissionResult!.complete(true);
     await tester.pumpAndSettle();
@@ -188,7 +193,12 @@ void main() {
             .onChanged,
         isNull,
       );
-      expect(tester.widget<ListTile>(find.byType(ListTile).last).onTap, isNull);
+      expect(
+        tester
+            .widget<ListTile>(find.byKey(const Key('barakah_reminder_time')))
+            .onTap,
+        isNull,
+      );
       expect(scheduler.calls, isEmpty);
     },
   );
