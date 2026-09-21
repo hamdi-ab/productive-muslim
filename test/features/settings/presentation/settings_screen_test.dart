@@ -53,11 +53,15 @@ void main() {
   testWidgets('toggle enables and disables persisted reminder', (tester) async {
     await pumpScreen(tester);
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .value,
       isFalse,
     );
     expect(find.text('8:00 PM'), findsOneWidget);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(
       settings.barakahReminder.enabled,
@@ -66,10 +70,14 @@ void main() {
           'calls=${scheduler.calls}, pending=${service.status.pending}, failure=${service.status.failure}',
     );
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .value,
       isTrue,
     );
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(settings.barakahReminder.enabled, isFalse);
     expect(scheduler.calls.last, 'cancel');
@@ -103,11 +111,15 @@ void main() {
   ) async {
     scheduler.permissionResult = Completer<bool>();
     await pumpScreen(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(find.text('Updating reminder…'), findsOneWidget);
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).onChanged,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .onChanged,
       isNull,
     );
     expect(tester.widget<ListTile>(find.byType(ListTile).last).onTap, isNull);
@@ -115,7 +127,11 @@ void main() {
     scheduler.permissionResult!.complete(true);
     await tester.pumpAndSettle();
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).onChanged,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .onChanged,
       isNotNull,
     );
   });
@@ -125,19 +141,23 @@ void main() {
   ) async {
     scheduler.permitted = false;
     await pumpScreen(tester);
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(
       find.textContaining('Notifications are not allowed.'),
       findsOneWidget,
     );
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .value,
       isFalse,
     );
     scheduler.permitted = true;
     scheduler.scheduleFailed = true;
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(
       find.text('The reminder could not be updated. Please try again.'),
@@ -161,7 +181,11 @@ void main() {
         findsOneWidget,
       );
       expect(
-        tester.widget<SwitchListTile>(find.byType(SwitchListTile)).onChanged,
+        tester
+            .widget<SwitchListTile>(
+              find.byKey(const Key('barakah_reminder_toggle')),
+            )
+            .onChanged,
         isNull,
       );
       expect(tester.widget<ListTile>(find.byType(ListTile).last).onTap, isNull);
@@ -188,11 +212,11 @@ void main() {
         find.text(MaterialLocalizations.of(pickerContext).cancelButtonLabel),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
       await tester.pumpAndSettle();
       expect(find.textContaining('الإشعارات غير مسموح بها.'), findsOneWidget);
       scheduler.permitted = true;
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
       await tester.pumpAndSettle();
       expect(scheduler.contents.single.title, 'تأمل يومي في البركة');
       expect(
@@ -235,7 +259,11 @@ void main() {
       findsOneWidget,
     );
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).onChanged,
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const Key('barakah_reminder_toggle')),
+          )
+          .onChanged,
       isNotNull,
     );
     expect(tester.takeException(), isNull);
