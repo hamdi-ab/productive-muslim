@@ -15,6 +15,7 @@ class SettingsService {
   static const _selectedQualitiesKey = 'selected_qualities';
   static const _barakahReminderKey = 'barakah_reminder';
   static const _locationPermissionKey = 'location_permission';
+  static const _adhanNotificationsKey = 'adhan_notifications';
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);
@@ -77,4 +78,10 @@ class SettingsService {
 
   Future<void> setLocationPermission(String permission) async =>
       _prefs?.setString(_locationPermissionKey, permission);
+
+  bool get adhanNotificationsEnabled =>
+      _prefs?.getBool(_adhanNotificationsKey) ?? false;
+
+  Future<void> setAdhanNotificationsEnabled(bool enabled) async =>
+      _prefs?.setBool(_adhanNotificationsKey, enabled);
 }

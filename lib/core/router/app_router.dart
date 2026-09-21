@@ -13,6 +13,7 @@ import 'package:productive_muslim/features/tasks/presentation/screens/task_scree
 import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
+import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -92,6 +93,10 @@ class AppRouter {
               GoRoute(
                 path: '/settings',
                 builder: (context, state) => const SettingsScreen(),
+              ),
+              GoRoute(
+                path: '/prayer-times',
+                builder: (context, state) => const PrayerTimesScreen(),
               ),
             ],
           ),

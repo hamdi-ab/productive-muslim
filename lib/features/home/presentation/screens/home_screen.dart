@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
-  final PrayerTimeService? prayerTimeService;
 
-  const HomeScreen({super.key, required this.child, this.prayerTimeService});
+  const HomeScreen({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final location = GoRouterState.of(context).matchedLocation;
+
+    final prayerService = getIt.isRegistered<PrayerTimeService>()
+        ? getIt<PrayerTimeService>()
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,8 +30,9 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: child,
-      bottomSheet: _PrayerCountdownSheet(
-        service: prayerTimeService ?? PrayerTimeService(),
+      bottomSheet: GestureDetector(
+        onTap: () => context.push('/prayer-times'),
+        child: _PrayerCountdownSheet(service: prayerService),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _getIndexForLocation(location),
@@ -91,7 +96,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _PrayerCountdownSheet extends StatefulWidget {
-  final PrayerTimeService service;
+  final PrayerTimeService? service;
 
   const _PrayerCountdownSheet({required this.service});
 
@@ -111,7 +116,18 @@ class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
   }
 
   Future<void> _loadPrayerTimes() async {
-    final position = await widget.service.getCurrentPosition();
+    if (widget.service == null) {
+      if (mounted) {
+        setState(() {
+          _nextPrayer = '--';
+          _countdown = '--:--';
+          _loading = false;
+        });
+      }
+      return;
+    }
+
+    final position = await widget.service!.getCurrentPosition();
     if (position == null) {
       if (mounted) {
         setState(() {
@@ -123,7 +139,7 @@ class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
       return;
     }
 
-    final prayerTimes = widget.service.getPrayerTimes(position);
+    final prayerTimes = widget.service!.getPrayerTimes(position);
     if (prayerTimes == null) {
       if (mounted) {
         setState(() {
@@ -135,8 +151,8 @@ class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
       return;
     }
 
-    final nextPrayer = widget.service.getNextPrayerName(prayerTimes);
-    final timeUntil = widget.service.getTimeUntilNextPrayer(prayerTimes);
+    final nextPrayer = widget.service!.getNextPrayerName(prayerTimes);
+    final timeUntil = widget.service!.getTimeUntilNextPrayer(prayerTimes);
 
     if (mounted) {
       setState(() {

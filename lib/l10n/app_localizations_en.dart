@@ -393,7 +393,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get isha => 'Isha';
 
   @override
+  String get sunrise => 'Sunrise';
+
+  @override
   String get adhan => 'Adhan';
+
+  @override
+  String get adhanNotificationsDescription => 'Get notified at prayer times';
 
   @override
   String get islam => 'Islam';
