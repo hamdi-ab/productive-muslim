@@ -12,6 +12,7 @@ import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/logic/task_state.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/create_task_sheet.dart';
+import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -43,9 +44,11 @@ class _TaskScreenState extends State<TaskScreen> {
                       ? _EmptyState(l10n: l10n)
                       : _TaskList(tasks: state.tasks)
                 : state is Loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  )
                 : state is Error
-                ? Center(child: Text(state.message))
+                ? _ErrorState(message: state.message)
                 : const SizedBox.shrink(),
           );
         },
@@ -87,6 +90,37 @@ class _EmptyState extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  const _ErrorState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: AppColors.error),
+          const SizedBox(height: AppSpacing.md),
+          Text(message, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton(
+            onPressed: () =>
+                context.read<TaskBloc>().add(TaskLoaded(_todayStr())),
+            child: Text(l10n.retry),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _todayStr() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 }
 
@@ -159,12 +193,7 @@ class _TaskTile extends StatelessWidget {
   final Task task;
   const _TaskTile({required this.task});
 
-  static const _lifeAreaColors = {
-    'islam': AppColors.primary,
-    'family': Color(0xFFE67E22),
-    'work': Color(0xFF3498DB),
-    'personal_dev': Color(0xFF9B59B6),
-  };
+  static const _lifeAreaColors = AppLifeArea.all;
 
   @override
   Widget build(BuildContext context) {

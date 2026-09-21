@@ -196,6 +196,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('العادات'), findsOneWidget);
-    expect(find.textContaining('3'), findsOneWidget);
+    expect(find.text('🔥 3'), findsOneWidget);
   });
 }

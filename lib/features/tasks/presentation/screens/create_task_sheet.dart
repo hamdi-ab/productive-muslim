@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_radius.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
@@ -213,10 +214,10 @@ class _LifeAreaSelector extends StatelessWidget {
   const _LifeAreaSelector({required this.selected, required this.onChanged});
 
   static const _areas = [
-    ('islam', AppColors.primary),
-    ('family', Color(0xFFE67E22)),
-    ('work', Color(0xFF3498DB)),
-    ('personal_dev', Color(0xFF9B59B6)),
+    ('islam', AppLifeArea.islam),
+    ('family', AppLifeArea.family),
+    ('work', AppLifeArea.work),
+    ('personal_dev', AppLifeArea.personalDev),
   ];
 
   @override
