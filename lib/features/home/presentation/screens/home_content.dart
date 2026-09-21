@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -31,11 +33,22 @@ class HomeContent extends StatelessWidget {
 
   Widget _buildGreeting(AppLocalizations l10n) {
     final hour = DateTime.now().hour;
-    final greeting = hour < 12
-        ? l10n.goodMorning
-        : hour < 17
-        ? l10n.goodAfternoon
-        : l10n.goodEvening;
+    String greeting;
+    if (hour < 12) {
+      greeting = l10n.goodMorning;
+    } else if (hour < 17) {
+      greeting = l10n.goodAfternoon;
+    } else {
+      greeting = l10n.goodEvening;
+    }
+
+    try {
+      final name = getIt<SettingsService>().userName;
+      if (name != null && name.isNotEmpty) {
+        greeting = l10n.homeGreeting(name);
+      }
+    } catch (_) {}
+
     return Text(greeting, style: AppTypography.headlineMedium);
   }
 
