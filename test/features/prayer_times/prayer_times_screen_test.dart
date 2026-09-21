@@ -65,7 +65,7 @@ void main() {
     );
   }
 
-  PrayerTimes _createPrayerTimes() {
+  PrayerTimes createPrayerTimes() {
     final params = CalculationMethodParameters.muslimWorldLeague();
     return PrayerTimes(
       date: DateTime.now(),
@@ -102,7 +102,7 @@ void main() {
       headingAccuracy: 0,
     );
     mockService.setPosition(position);
-    mockService.setPrayerTimes(_createPrayerTimes());
+    mockService.setPrayerTimes(createPrayerTimes());
 
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
@@ -129,7 +129,7 @@ void main() {
       headingAccuracy: 0,
     );
     mockService.setPosition(position);
-    mockService.setPrayerTimes(_createPrayerTimes());
+    mockService.setPrayerTimes(createPrayerTimes());
 
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
