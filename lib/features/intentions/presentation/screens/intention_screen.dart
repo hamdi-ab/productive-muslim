@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -21,6 +22,13 @@ class IntentionScreen extends StatefulWidget {
 class _IntentionScreenState extends State<IntentionScreen> {
   final _titleController = TextEditingController();
   final _reflectionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _reflectionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +57,11 @@ class _IntentionScreenState extends State<IntentionScreen> {
                     ],
                   )
                 : state is IntentionLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  )
                 : state is IntentionError
-                ? Center(child: Text(state.message))
+                ? _ErrorState(message: state.message)
                 : const Center(child: SizedBox.shrink()),
           );
         },
@@ -91,21 +101,28 @@ class _IntentionScreenState extends State<IntentionScreen> {
   }
 
   Widget _buildIntentionTile(BuildContext context, IntentionEntry entry) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: IconButton(
         icon: Icon(
           entry.completed ? Icons.check_circle : Icons.check_circle_outline,
           color: entry.completed ? AppColors.success : null,
         ),
-        onPressed: () =>
-            context.read<IntentionBloc>().add(IntentionToggled(entry)),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          context.read<IntentionBloc>().add(IntentionToggled(entry));
+        },
+        tooltip: entry.completed ? l10n.habitUnmark : l10n.habitMarkComplete,
       ),
       title: Text(entry.title),
       subtitle: entry.statement != null ? Text(entry.statement!) : null,
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, size: 20),
-        onPressed: () =>
-            context.read<IntentionBloc>().add(IntentionDeleted(entry.id)),
+        onPressed: () {
+          HapticFeedback.mediumImpact();
+          context.read<IntentionBloc>().add(IntentionDeleted(entry.id));
+        },
+        tooltip: l10n.delete,
       ),
     );
   }
@@ -139,7 +156,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _reflectionController,
-              decoration: const InputDecoration(),
+              decoration: const InputDecoration(hintText: 'Your reflection...'),
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -177,7 +194,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(),
+              decoration: const InputDecoration(hintText: 'Intention title'),
             ),
           ],
         ),
@@ -207,5 +224,37 @@ class _IntentionScreenState extends State<IntentionScreen> {
         ],
       ),
     );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  const _ErrorState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: AppColors.error),
+          const SizedBox(height: AppSpacing.md),
+          Text(message, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton(
+            onPressed: () => context.read<IntentionBloc>().add(
+              IntentionEntriesLoaded(_todayStr()),
+            ),
+            child: Text(l10n.retry),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _todayStr() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 }

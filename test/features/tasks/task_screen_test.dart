@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
-import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
-import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -68,9 +67,11 @@ class FakeTaskRepository implements TaskRepository {
 
 void main() {
   late FakeTaskRepository repo;
+  late String today;
 
   setUp(() {
     repo = FakeTaskRepository();
+    today = DateFormat('yyyy-MM-dd').format(DateTime.now());
   });
 
   Widget buildScreen() {
@@ -79,12 +80,7 @@ void main() {
       supportedLocales: AppLocalizations.supportedLocales,
       home: RepositoryProvider<TaskRepository>(
         create: (_) => repo,
-        child: BlocProvider(
-          create: (ctx) =>
-              TaskBloc(ctx.read<TaskRepository>())
-                ..add(TaskLoaded('2026-09-19')),
-          child: const TaskScreen(),
-        ),
+        child: const TaskScreen(),
       ),
     );
   }
@@ -104,7 +100,7 @@ void main() {
         lifeArea: 'islam',
         startMinutes: 360,
         endMinutes: 420,
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -123,7 +119,7 @@ void main() {
         lifeArea: 'islam',
         startMinutes: 360,
         endMinutes: 420,
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -140,7 +136,7 @@ void main() {
         id: 1,
         title: 'Quick task',
         lifeArea: 'work',
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -157,7 +153,7 @@ void main() {
         id: 1,
         title: 'Work task',
         lifeArea: 'work',
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -177,7 +173,7 @@ void main() {
         lifeArea: 'islam',
         startMinutes: 540,
         endMinutes: 600,
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -205,7 +201,7 @@ void main() {
         id: 1,
         title: 'Test task',
         lifeArea: 'islam',
-        date: '2026-09-19',
+        date: today,
         createdAt: 0,
       ),
     ]);
@@ -223,13 +219,7 @@ void main() {
 
   testWidgets('renders in Arabic locale', (tester) async {
     repo.setTasks([
-      Task(
-        id: 1,
-        title: 'Fajr',
-        lifeArea: 'islam',
-        date: '2026-09-19',
-        createdAt: 0,
-      ),
+      Task(id: 1, title: 'Fajr', lifeArea: 'islam', date: today, createdAt: 0),
     ]);
 
     await tester.pumpWidget(
@@ -239,12 +229,7 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: RepositoryProvider<TaskRepository>(
           create: (_) => repo,
-          child: BlocProvider(
-            create: (ctx) =>
-                TaskBloc(ctx.read<TaskRepository>())
-                  ..add(TaskLoaded('2026-09-19')),
-            child: const TaskScreen(),
-          ),
+          child: const TaskScreen(),
         ),
       ),
     );

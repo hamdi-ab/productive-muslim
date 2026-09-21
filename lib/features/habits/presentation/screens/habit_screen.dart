@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:productive_muslim/core/constants/app_life_areas.dart';
+import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
@@ -29,9 +32,11 @@ class HabitScreen extends StatelessWidget {
                       ? _EmptyState(l10n: l10n)
                       : _HabitList(state: state, l10n: l10n)
                 : state is Loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  )
                 : state is Error
-                ? Center(child: Text(state.message))
+                ? _ErrorState(message: state.message)
                 : const Center(child: SizedBox.shrink()),
             floatingActionButton: FloatingActionButton(
               onPressed: () => _showCreateSheet(context),
@@ -71,10 +76,35 @@ class _EmptyState extends StatelessWidget {
             size: 64,
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
           Text(
             l10n.emptyHabits,
             style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  const _ErrorState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: AppColors.error),
+          const SizedBox(height: AppSpacing.md),
+          Text(message, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton(
+            onPressed: () => context.read<HabitBloc>().add(const HabitLoaded()),
+            child: Text(l10n.retry),
           ),
         ],
       ),
@@ -94,19 +124,7 @@ class _HabitList extends StatelessWidget {
       grouped.putIfAbsent(habit.category, () => []).add(habit);
     }
 
-    final categoryLabels = {
-      'islam': l10n.islam,
-      'family': l10n.family,
-      'work': l10n.work,
-      'personal_dev': l10n.personalDev,
-    };
-
-    final categoryColors = {
-      'islam': const Color(0xFF2E7D4F),
-      'family': const Color(0xFFE67E22),
-      'work': const Color(0xFF3498DB),
-      'personal_dev': const Color(0xFF9B59B6),
-    };
+    final categoryColors = AppLifeArea.all;
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 88),
@@ -115,7 +133,7 @@ class _HabitList extends StatelessWidget {
         const Divider(height: 1),
         for (final entry in grouped.entries) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 Container(
@@ -126,9 +144,9 @@ class _HabitList extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
-                  categoryLabels[entry.key] ?? entry.key,
+                  AppLifeArea.labels[entry.key] ?? entry.key,
                   style: Theme.of(context).textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
@@ -232,23 +250,20 @@ class _HabitTile extends StatelessWidget {
     required this.streak,
   });
 
-  static const _categoryColors = {
-    'islam': Color(0xFF2E7D4F),
-    'family': Color(0xFFE67E22),
-    'work': Color(0xFF3498DB),
-    'personal_dev': Color(0xFF9B59B6),
-  };
+  static const _categoryColors = AppLifeArea.all;
 
   @override
   Widget build(BuildContext context) {
-    final color = _categoryColors[habit.category] ?? Colors.grey;
+    final color =
+        _categoryColors[habit.category] ??
+        Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Dismissible(
       key: ValueKey('habit_${habit.id}'),
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
+        padding: const EdgeInsets.only(right: AppSpacing.lg),
         color: Theme.of(context).colorScheme.error,
         child: Icon(
           Icons.delete_outline,
@@ -268,7 +283,10 @@ class _HabitTile extends StatelessWidget {
                 child: Text(l10n.cancel),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  Navigator.pop(ctx, true);
+                },
                 child: Text(l10n.delete),
               ),
             ],
