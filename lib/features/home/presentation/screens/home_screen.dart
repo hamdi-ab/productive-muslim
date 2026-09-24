@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
-import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -77,6 +76,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          _PrayerHeaderChip(service: prayerService),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.go('/settings'),
@@ -84,25 +84,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 110),
-              child: child,
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 80,
-            child: GestureDetector(
-              onTap: () => context.push('/prayer-times'),
-              child: _PrayerCountdownSheet(service: prayerService),
-            ),
-          ),
-        ],
-      ),
+      body: Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
       bottomNavigationBar: FloatingGlassNavBar(
         currentIndex: currentIndex,
         onTap: (index) => _navigateToIndex(context, index),
@@ -143,16 +125,16 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _PrayerCountdownSheet extends StatefulWidget {
+class _PrayerHeaderChip extends StatefulWidget {
   final PrayerTimeService? service;
 
-  const _PrayerCountdownSheet({required this.service});
+  const _PrayerHeaderChip({required this.service});
 
   @override
-  State<_PrayerCountdownSheet> createState() => _PrayerCountdownSheetState();
+  State<_PrayerHeaderChip> createState() => _PrayerHeaderChipState();
 }
 
-class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
+class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   String _nextPrayer = '';
   String _countdown = '';
   bool _loading = true;
@@ -225,67 +207,49 @@ class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        borderRadius: 20,
-        blur: 15,
-        color: isDark
-            ? AppColors.darkSurface.withValues(alpha: 0.9)
-            : Colors.white.withValues(alpha: 0.9),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.access_time_rounded,
-                size: 18,
+    return Tooltip(
+      message: l10n.nextPrayer,
+      child: InkWell(
+        onTap: () => context.push('/prayer-times'),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.secondary.withValues(alpha: isDark ? 0.2 : 0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.secondary.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.access_time_filled_rounded,
+                size: 15,
                 color: AppColors.secondary,
               ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.nextPrayer,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.textSecondary,
-              ),
-            ),
-            const Spacer(),
-            if (_loading)
-              const SizedBox(
-                width: 14,
-                height: 14,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            else
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '$_nextPrayer in $_countdown',
-                  style: const TextStyle(
+              const SizedBox(width: 6),
+              if (_loading)
+                const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Text(
+                  '$_nextPrayer $_countdown',
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

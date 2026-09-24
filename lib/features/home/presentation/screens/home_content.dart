@@ -9,6 +9,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/task.dart';
@@ -31,6 +32,8 @@ class HomeContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeroBanner(context, l10n, displayDate),
+          const SizedBox(height: AppSpacing.md),
+          const _HomePrayerCard(),
           const SizedBox(height: AppSpacing.lg),
           _buildDailyProgressSection(context, today, l10n),
           const SizedBox(height: AppSpacing.lg),
@@ -445,6 +448,161 @@ class HomeContent extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HomePrayerCard extends StatefulWidget {
+  const _HomePrayerCard();
+
+  @override
+  State<_HomePrayerCard> createState() => _HomePrayerCardState();
+}
+
+class _HomePrayerCardState extends State<_HomePrayerCard> {
+  String _nextPrayer = '--';
+  String _countdown = '--:--';
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrayerTimes();
+  }
+
+  Future<void> _loadPrayerTimes() async {
+    try {
+      if (!getIt.isRegistered<PrayerTimeService>()) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+
+      final service = getIt<PrayerTimeService>();
+      final position = await service.getCurrentPosition();
+      if (position == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+
+      final prayerTimes = service.getPrayerTimes(position);
+      if (prayerTimes == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+
+      final nextPrayer = service.getNextPrayerName(prayerTimes);
+      final timeUntil = service.getTimeUntilNextPrayer(prayerTimes);
+
+      if (mounted) {
+        setState(() {
+          _nextPrayer = nextPrayer ?? '--';
+          _countdown = timeUntil != null ? _formatDuration(timeUntil) : '--:--';
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    }
+    return '${minutes}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: () => context.push('/prayer-times'),
+      borderRadius: BorderRadius.circular(24),
+      child: GlassContainer(
+        padding: const EdgeInsets.all(18),
+        borderRadius: 24,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.mosque_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.nextPrayer,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  if (_loading)
+                    const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    Text(
+                      '$_nextPrayer in $_countdown',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.secondary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    l10n.prayerTimes,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 16,
+                    color: AppColors.secondary,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
