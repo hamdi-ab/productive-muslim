@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
@@ -174,66 +175,115 @@ class _WeekHeader extends StatelessWidget {
     final now = DateTime.now();
     final weekday = now.weekday;
     final startOfWeek = now.subtract(Duration(days: weekday - 1));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.habitToday,
-            style: Theme.of(context).textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: List.generate(7, (i) {
-              final day = startOfWeek.add(Duration(days: i));
-              final isToday =
-                  day.day == now.day &&
-                  day.month == now.month &&
-                  day.year == now.year;
-
-              return Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      dayLabels[i],
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      padding: const EdgeInsets.all(16),
+      child: GlassContainer(
+        padding: const EdgeInsets.all(16),
+        borderRadius: 24,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.habitToday,
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.local_fire_department_rounded,
+                        size: 14,
+                        color: AppColors.secondary,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: isToday
-                            ? Theme.of(context).colorScheme.primary
-                            : null,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${day.day}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: isToday
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isToday
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      SizedBox(width: 4),
+                      Text(
+                        'Weekly Track',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            }),
-          ),
-        ],
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: List.generate(7, (i) {
+                final day = startOfWeek.add(Duration(days: i));
+                final isToday =
+                    day.day == now.day &&
+                    day.month == now.month &&
+                    day.year == now.year;
+
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        dayLabels[i],
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isToday
+                              ? AppColors.primary
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: isToday
+                              ? AppColors.primary
+                              : (isDark
+                                    ? AppColors.darkSurfaceSubtle
+                                    : AppColors.surfaceSubtle),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${day.day}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isToday
+                                ? Colors.white
+                                : (isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary),
+                            fontWeight: isToday
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -254,17 +304,20 @@ class _HabitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        _categoryColors[habit.category] ??
-        Theme.of(context).colorScheme.onSurfaceVariant;
+    final color = _categoryColors[habit.category] ?? AppColors.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Dismissible(
       key: ValueKey('habit_${habit.id}'),
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.only(right: AppSpacing.lg),
-        color: Theme.of(context).colorScheme.error,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.error,
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Icon(
           Icons.delete_outline,
           color: Theme.of(context).colorScheme.onError,
@@ -296,47 +349,94 @@ class _HabitTile extends StatelessWidget {
       onDismissed: (_) {
         context.read<HabitBloc>().add(HabitDeleted(habit.id));
       },
-      child: ListTile(
-        leading: GestureDetector(
-          key: Key('habit_checkbox_${habit.id}'),
-          onTap: () {
-            HapticFeedback.lightImpact();
-            context.read<HabitBloc>().add(HabitCompletionToggled(habit.id));
-          },
-          child: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: completed ? color : null,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: completed
-                    ? color
-                    : Theme.of(context).colorScheme.outline,
-                width: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: GlassContainer(
+          padding: const EdgeInsets.all(14),
+          borderRadius: 20,
+          color: isDark
+              ? AppColors.darkSurface.withValues(alpha: 0.8)
+              : Colors.white.withValues(alpha: 0.8),
+          child: Row(
+            children: [
+              GestureDetector(
+                key: Key('habit_checkbox_${habit.id}'),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  context.read<HabitBloc>().add(
+                    HabitCompletionToggled(habit.id),
+                  );
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: completed ? color : Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: completed
+                          ? color
+                          : (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textDisabled),
+                      width: 2,
+                    ),
+                  ),
+                  child: completed
+                      ? const Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
               ),
-            ),
-            child: completed
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
-                : null,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  habit.name,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    decoration: completed ? TextDecoration.lineThrough : null,
+                    color: completed
+                        ? (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textDisabled)
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary),
+                  ),
+                ),
+              ),
+              if (streak > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 12)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$streak',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
-        title: Text(
-          habit.name,
-          style: TextStyle(
-            decoration: completed ? TextDecoration.lineThrough : null,
-            color: completed
-                ? Theme.of(context).colorScheme.onSurfaceVariant
-                : null,
-          ),
-        ),
-        trailing: streak > 0
-            ? Text(
-                '\u{1F525} $streak',
-                style: Theme.of(context).textTheme.bodySmall
-                    ?.copyWith(fontWeight: FontWeight.w600),
-              )
-            : null,
       ),
     );
   }

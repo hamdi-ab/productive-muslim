@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import 'package:productive_muslim/core/constants/app_radius.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
@@ -199,6 +199,7 @@ class _TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final color = _lifeAreaColors[task.lifeArea] ?? AppColors.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final timeLabel = task.startMinutes != null && task.endMinutes != null
         ? '${_formatMinutes(task.startMinutes!)} – ${_formatMinutes(task.endMinutes!)}'
@@ -213,17 +214,27 @@ class _TaskTile extends StatelessWidget {
           : DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xs,
+        ),
         padding: const EdgeInsets.only(right: AppSpacing.lg),
         decoration: BoxDecoration(
           color: AppColors.success,
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.check, color: Colors.white),
+            const Icon(Icons.check_rounded, color: Colors.white),
             const SizedBox(width: AppSpacing.sm),
-            Text(l10n.taskSwipeComplete, style: TextStyle(color: Colors.white)),
+            Text(
+              l10n.taskSwipeComplete,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -237,75 +248,103 @@ class _TaskTile extends StatelessWidget {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.xs,
         ),
-        child: Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+        child: GlassContainer(
+          padding: const EdgeInsets.all(16),
+          borderRadius: 20,
+          color: isDark
+              ? AppColors.darkSurface.withValues(alpha: 0.8)
+              : Colors.white.withValues(alpha: 0.8),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.title,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          decoration: task.completed
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: task.completed ? AppColors.textDisabled : null,
-                        ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.title,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        decoration: task.completed
+                            ? TextDecoration.lineThrough
+                            : null,
+                        fontWeight: FontWeight.w600,
+                        color: task.completed
+                            ? (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textDisabled)
+                            : null,
                       ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Row(
-                        children: [
-                          Text(
-                            areaLabel,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(color: color),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
                           ),
-                          if (timeLabel != null) ...[
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              timeLabel,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(color: AppColors.textSecondary),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            areaLabel,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: color,
                             ),
-                          ],
+                          ),
+                        ),
+                        if (timeLabel != null) ...[
+                          const SizedBox(width: AppSpacing.sm),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.schedule_rounded,
+                                size: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                timeLabel,
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    task.completed
-                        ? Icons.check_circle
-                        : Icons.check_circle_outline,
-                    color: task.completed ? AppColors.success : null,
-                  ),
-                  onPressed: () {
-                    context.read<TaskBloc>().add(TaskToggled(task.id));
-                    HapticFeedback.lightImpact();
-                  },
+              ),
+              IconButton(
+                icon: Icon(
+                  task.completed
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: task.completed
+                      ? AppColors.success
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary),
+                  size: 24,
                 ),
-              ],
-            ),
+                onPressed: () {
+                  context.read<TaskBloc>().add(TaskToggled(task.id));
+                  HapticFeedback.lightImpact();
+                },
+              ),
+            ],
           ),
         ),
       ),
