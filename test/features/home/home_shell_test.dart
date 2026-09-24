@@ -70,7 +70,7 @@ void main() {
     expect(find.byIcon(Icons.menu_book_outlined), findsOneWidget);
   });
 
-  testWidgets('renders prayer countdown sheet at bottom', (tester) async {
+  testWidgets('renders prayer header chip in app bar', (tester) async {
     final router = _testRouter(child: const Center(child: Text('Home')));
     await tester.pumpWidget(
       MaterialApp.router(
@@ -81,7 +81,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Next Prayer'), findsOneWidget);
+    expect(find.byTooltip('Next Prayer'), findsOneWidget);
   });
 
   testWidgets('settings button is rendered', (tester) async {

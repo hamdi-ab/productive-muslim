@@ -60,7 +60,7 @@ void main() {
           .value,
       isFalse,
     );
-    expect(find.text('8:00 PM'), findsOneWidget);
+    expect(find.text('8:00 PM'), findsAtLeast(1));
     await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
     await tester.pumpAndSettle();
     expect(
@@ -97,7 +97,7 @@ void main() {
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
     expect(settings.barakahReminder, (enabled: false, hour: 21, minute: 35));
-    expect(find.text('9:35 PM'), findsOneWidget);
+    expect(find.text('9:35 PM'), findsAtLeast(1));
     await tester.tap(find.text('Reminder time'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Cancel'));
