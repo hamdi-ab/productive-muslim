@@ -57,10 +57,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
+        titleSpacing: 12,
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
@@ -68,13 +70,19 @@ class HomeScreen extends StatelessWidget {
               child: const Icon(
                 Icons.nights_stay_rounded,
                 color: AppColors.primary,
-                size: 20,
+                size: 18,
               ),
             ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.appTitle,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                l10n.appTitle,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
             ),
           ],
         ),
@@ -84,7 +92,7 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.go('/settings'),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
       ),
       body: Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
@@ -259,14 +267,17 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else
-                Text(
-                  '$_nextPrayer $_countdown',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
+                Flexible(
+                  child: Text(
+                    '$_nextPrayer $_countdown',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
                   ),
                 ),
             ],
