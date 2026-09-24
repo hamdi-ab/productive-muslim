@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,9 +14,11 @@ import 'domain/repositories/task_repository.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
-  DevicePreview.enable();
+  WidgetsFlutterBinding.ensureInitialized();
   await setupDi();
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(enabled: !kReleaseMode, builder: (context) => const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +43,8 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         title: 'Productive Muslim',
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
