@@ -18,13 +18,16 @@ class PrayerTimesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (_) =>
           PrayerTimesBloc(getIt<PrayerTimeService>())
             ..add(const PrayerTimesLoaded()),
       child: Scaffold(
-        appBar: AppBar(title: Text(l10n.prayerTimes)),
+        appBar: hasParentScaffold
+            ? null
+            : AppBar(title: Text(l10n.prayerTimes)),
         body: BlocBuilder<PrayerTimesBloc, PrayerTimesState>(
           builder: (context, state) {
             return switch (state) {

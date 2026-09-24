@@ -46,8 +46,9 @@ class SettingsView extends StatelessWidget {
       title: l10n.barakahDailyTitle,
       body: l10n.barakahReminderBody,
     );
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
+      appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.settings)),
       body: SafeArea(
         child: BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, state) {

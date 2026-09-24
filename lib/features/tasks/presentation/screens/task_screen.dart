@@ -27,6 +27,7 @@ class _TaskScreenState extends State<TaskScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (context) =>
@@ -34,7 +35,7 @@ class _TaskScreenState extends State<TaskScreen> {
       child: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n.tasks)),
+            appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.tasks)),
             floatingActionButton: FloatingActionButton(
               onPressed: () => _showCreateSheet(context, today),
               child: const Icon(Icons.add),

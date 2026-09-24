@@ -45,24 +45,27 @@ class _BarakahScreenState extends State<BarakahScreen> {
       create: (context) => BarakahBloc(context.read<BarakahRepository>())
         ..add(BarakahLoaded(today))
         ..add(BarakahDailyResponseLoaded(today)),
-      child: BlocBuilder<BarakahBloc, BarakahState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
+          final hasParentScaffold = Scaffold.maybeOf(context) != null;
           return Scaffold(
-            appBar: AppBar(
-              title: Text(l10n!.barakah),
-              actions: [
-                IconButton(
-                  key: const Key('open-review'),
-                  tooltip: l10n.barakahWeeklyTitle,
-                  icon: const Icon(Icons.calendar_month_outlined),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const BarakahReviewScreen(),
-                    ),
+            appBar: hasParentScaffold
+                ? null
+                : AppBar(
+                    title: Text(l10n!.barakah),
+                    actions: [
+                      IconButton(
+                        key: const Key('open-review'),
+                        tooltip: l10n.barakahWeeklyTitle,
+                        icon: const Icon(Icons.calendar_month_outlined),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const BarakahReviewScreen(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
             body: state is Loaded
                 ? ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),

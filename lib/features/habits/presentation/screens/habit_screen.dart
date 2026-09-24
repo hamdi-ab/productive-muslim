@@ -20,6 +20,7 @@ class HabitScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (context) =>
@@ -27,7 +28,7 @@ class HabitScreen extends StatelessWidget {
       child: BlocBuilder<HabitBloc, HabitState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n.habits)),
+            appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.habits)),
             body: state is Loaded
                 ? state.habits.isEmpty
                       ? _EmptyState(l10n: l10n)

@@ -106,11 +106,19 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           _PrayerHeaderChip(service: prayerService),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.settings,
-            onPressed: () => context.go('/settings'),
-          ),
+          if (location == '/barakah')
+            IconButton(
+              key: const Key('open-review'),
+              tooltip: l10n.barakahWeeklyTitle,
+              icon: const Icon(Icons.calendar_month_outlined),
+              onPressed: () => context.push('/barakah/review'),
+            ),
+          if (location != '/settings')
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: l10n.settings,
+              onPressed: () => context.go('/settings'),
+            ),
           const SizedBox(width: 4),
         ],
       ),
