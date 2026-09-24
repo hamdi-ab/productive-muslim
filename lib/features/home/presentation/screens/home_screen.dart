@@ -53,34 +53,38 @@ class HomeScreen extends StatelessWidget {
     ];
 
     final currentIndex = _getIndexForLocation(location);
+    final headerInfo = _getHeaderInfo(location, l10n);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        titleSpacing: 12,
+        scrolledUnderElevation: 2,
+        titleSpacing: 16,
+        backgroundColor: isDark
+            ? AppColors.darkSurface.withValues(alpha: 0.85)
+            : Colors.white.withValues(alpha: 0.85),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.nights_stay_rounded,
-                color: AppColors.primary,
-                size: 18,
-              ),
+              child: Icon(headerInfo.icon, color: AppColors.primary, size: 18),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
-                l10n.appTitle,
+                headerInfo.title,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
+                  letterSpacing: -0.2,
                 ),
               ),
             ),
@@ -90,6 +94,7 @@ class HomeScreen extends StatelessWidget {
           _PrayerHeaderChip(service: prayerService),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.settings,
             onPressed: () => context.go('/settings'),
           ),
           const SizedBox(width: 4),
@@ -102,6 +107,25 @@ class HomeScreen extends StatelessWidget {
         items: navItems,
       ),
     );
+  }
+
+  static ({String title, IconData icon}) _getHeaderInfo(
+    String location,
+    AppLocalizations l10n,
+  ) {
+    return switch (location) {
+      '/' => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
+      '/tasks' => (title: l10n.tasks, icon: Icons.task_alt_rounded),
+      '/habits' => (
+        title: l10n.habits,
+        icon: Icons.published_with_changes_rounded,
+      ),
+      '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
+      '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
+      '/settings' => (title: l10n.settings, icon: Icons.settings_rounded),
+      '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
+      _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
+    };
   }
 
   static int _getIndexForLocation(String location) {
