@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -464,11 +467,19 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
   String _nextPrayer = '--';
   String _countdown = '--:--';
   bool _loading = true;
+  Timer? _timer;
+  PrayerTimes? _cachedPrayerTimes;
 
   @override
   void initState() {
     super.initState();
     _loadPrayerTimes();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadPrayerTimes() async {
@@ -485,34 +496,50 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
         return;
       }
 
-      final prayerTimes = service.getPrayerTimes(position);
-      if (prayerTimes == null) {
-        if (mounted) setState(() => _loading = false);
-        return;
-      }
-
-      final nextPrayer = service.getNextPrayerName(prayerTimes);
-      final timeUntil = service.getTimeUntilNextPrayer(prayerTimes);
-
-      if (mounted) {
-        setState(() {
-          _nextPrayer = nextPrayer ?? '--';
-          _countdown = timeUntil != null ? _formatDuration(timeUntil) : '--:--';
-          _loading = false;
-        });
-      }
+      _cachedPrayerTimes = service.getPrayerTimes(position);
+      _updatePrayerCountdown();
+      _startTimer();
     } catch (_) {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _updatePrayerCountdown();
+    });
+  }
+
+  void _updatePrayerCountdown() {
+    if (_cachedPrayerTimes == null ||
+        !getIt.isRegistered<PrayerTimeService>()) {
+      return;
+    }
+
+    final service = getIt<PrayerTimeService>();
+    final nextPrayer = service.getNextPrayerName(_cachedPrayerTimes!);
+    final timeUntil = service.getTimeUntilNextPrayer(_cachedPrayerTimes!);
+
+    if (mounted) {
+      setState(() {
+        _nextPrayer = nextPrayer ?? '--';
+        _countdown = timeUntil != null ? _formatDuration(timeUntil) : '--:--';
+        _loading = false;
+      });
     }
   }
 
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
     if (hours > 0) {
       return '${hours}h ${minutes}m';
+    } else if (minutes >= 10) {
+      return '${minutes}m';
     }
-    return '${minutes}m';
+    return '${minutes}m ${seconds}s';
   }
 
   @override

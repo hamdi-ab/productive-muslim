@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -138,11 +141,19 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   String _nextPrayer = '';
   String _countdown = '';
   bool _loading = true;
+  Timer? _timer;
+  PrayerTimes? _cachedPrayerTimes;
 
   @override
   void initState() {
     super.initState();
     _loadPrayerTimes();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadPrayerTimes() async {
@@ -169,20 +180,27 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
       return;
     }
 
-    final prayerTimes = widget.service!.getPrayerTimes(position);
-    if (prayerTimes == null) {
-      if (mounted) {
-        setState(() {
-          _nextPrayer = '--';
-          _countdown = '--:--';
-          _loading = false;
-        });
-      }
+    _cachedPrayerTimes = widget.service!.getPrayerTimes(position);
+    _updatePrayerCountdown();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _updatePrayerCountdown();
+    });
+  }
+
+  void _updatePrayerCountdown() {
+    if (_cachedPrayerTimes == null || widget.service == null) {
       return;
     }
 
-    final nextPrayer = widget.service!.getNextPrayerName(prayerTimes);
-    final timeUntil = widget.service!.getTimeUntilNextPrayer(prayerTimes);
+    final nextPrayer = widget.service!.getNextPrayerName(_cachedPrayerTimes!);
+    final timeUntil = widget.service!.getTimeUntilNextPrayer(
+      _cachedPrayerTimes!,
+    );
 
     if (mounted) {
       setState(() {
@@ -196,10 +214,13 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
     if (hours > 0) {
       return '${hours}h ${minutes}m';
+    } else if (minutes >= 10) {
+      return '${minutes}m';
     }
-    return '${minutes}m';
+    return '${minutes}m ${seconds}s';
   }
 
   @override
