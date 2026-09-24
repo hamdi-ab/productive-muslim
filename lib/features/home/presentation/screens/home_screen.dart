@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -19,46 +22,91 @@ class HomeScreen extends StatelessWidget {
         ? getIt<PrayerTimeService>()
         : null;
 
+    final navItems = [
+      FloatingNavItem(
+        icon: Icons.grid_view_outlined,
+        activeIcon: Icons.grid_view_rounded,
+        label: l10n.home,
+      ),
+      FloatingNavItem(
+        icon: Icons.task_alt_outlined,
+        activeIcon: Icons.task_alt_rounded,
+        label: l10n.tasks,
+      ),
+      FloatingNavItem(
+        icon: Icons.published_with_changes_outlined,
+        activeIcon: Icons.published_with_changes_rounded,
+        label: l10n.habits,
+      ),
+      FloatingNavItem(
+        icon: Icons.auto_awesome_outlined,
+        activeIcon: Icons.auto_awesome_rounded,
+        label: l10n.barakah,
+      ),
+      FloatingNavItem(
+        icon: Icons.menu_book_outlined,
+        activeIcon: Icons.menu_book_rounded,
+        label: l10n.journal,
+      ),
+    ];
+
+    final currentIndex = _getIndexForLocation(location);
+
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.nights_stay_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              l10n.appTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.go('/settings'),
           ),
+          const SizedBox(width: 8),
         ],
       ),
-      body: child,
-      bottomSheet: GestureDetector(
-        onTap: () => context.push('/prayer-times'),
-        child: _PrayerCountdownSheet(service: prayerService),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 110),
+              child: child,
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 80,
+            child: GestureDetector(
+              onTap: () => context.push('/prayer-times'),
+              child: _PrayerCountdownSheet(service: prayerService),
+            ),
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _getIndexForLocation(location),
+      bottomNavigationBar: FloatingGlassNavBar(
+        currentIndex: currentIndex,
         onTap: (index) => _navigateToIndex(context, index),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            label: l10n.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.check_circle_outlined),
-            label: l10n.tasks,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.repeat_outlined),
-            label: l10n.habits,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.spa_outlined),
-            label: l10n.barakah,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.book_outlined),
-            label: l10n.journal,
-          ),
-        ],
+        items: navItems,
       ),
     );
   }
@@ -175,28 +223,70 @@ class _PrayerCountdownSheetState extends State<_PrayerCountdownSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
-      ),
-      child: Row(
-        spacing: 12,
-        children: [
-          const Icon(Icons.access_time_outlined, size: 20),
-          Text(l10n.nextPrayer),
-          const Spacer(),
-          if (_loading)
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else
-            Text('$_nextPrayer in $_countdown'),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: GlassContainer(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        borderRadius: 20,
+        blur: 15,
+        color: isDark
+            ? AppColors.darkSurface.withValues(alpha: 0.9)
+            : Colors.white.withValues(alpha: 0.9),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.secondary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.access_time_rounded,
+                size: 18,
+                color: AppColors.secondary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              l10n.nextPrayer,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const Spacer(),
+            if (_loading)
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$_nextPrayer in $_countdown',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
