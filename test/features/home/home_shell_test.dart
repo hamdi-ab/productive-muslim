@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -61,11 +62,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Home'), findsNWidgets(2)); // label + child
-    expect(find.text('Tasks'), findsOneWidget);
-    expect(find.text('Habits'), findsOneWidget);
-    expect(find.text('Barakah'), findsOneWidget);
-    expect(find.text('Journal'), findsOneWidget);
+    expect(find.byType(FloatingGlassNavBar), findsOneWidget);
+    expect(find.byIcon(Icons.grid_view_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.task_alt_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.published_with_changes_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.auto_awesome_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.menu_book_outlined), findsOneWidget);
   });
 
   testWidgets('renders prayer countdown sheet at bottom', (tester) async {

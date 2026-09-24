@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:productive_muslim/core/constants/app_spacing.dart';
-import 'package:productive_muslim/core/constants/app_radius.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -17,6 +17,7 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  late final PageController _pageController;
   int _currentStep = 0;
   String _selectedIntention = '';
   final List<String> _selectedQualities = [];
@@ -28,33 +29,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   static const _maxQualities = 3;
 
   final List<OnboardingStep> _steps = [
-    OnboardingStep(
+    const OnboardingStep(
       titleKey: 'onboardingWelcomeTitle',
       subtitleKey: 'onboardingWelcomeSubtitle',
-      icon: Icons.spa_outlined,
+      icon: Icons.nights_stay_rounded,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       titleKey: 'onboardingNameTitle',
       subtitleKey: 'onboardingNameSubtitle',
-      icon: Icons.person_outline,
+      icon: Icons.person_rounded,
       hasInput: true,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       titleKey: 'onboardingIntentionTitle',
       subtitleKey: 'onboardingIntentionSubtitle',
-      icon: Icons.flag_outlined,
+      icon: Icons.flag_rounded,
       hasChips: true,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       titleKey: 'onboardingQualitiesTitle',
       subtitleKey: 'onboardingQualitiesSubtitle',
-      icon: Icons.star_outline,
+      icon: Icons.star_rounded,
       hasQualities: true,
     ),
-    OnboardingStep(
+    const OnboardingStep(
       titleKey: 'onboardingPermissionTitle',
       subtitleKey: 'onboardingPermissionSubtitle',
-      icon: Icons.notifications_outlined,
+      icon: Icons.location_on_rounded,
       hasPermission: true,
     ),
   ];
@@ -62,11 +63,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     _nameController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
+    _pageController.dispose();
     _nameController.dispose();
     super.dispose();
   }
@@ -85,7 +88,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     if (_currentStep < _steps.length - 1) {
-      setState(() => _currentStep++);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic,
+      );
     } else {
       await _settings.setOnboardingCompleted();
       if (mounted) context.go('/');
@@ -94,7 +100,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _previousStep() {
     if (_currentStep > 0) {
-      setState(() => _currentStep--);
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic,
+      );
     }
   }
 
@@ -138,7 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   bool get _canProceed {
-    if (_currentStep == 1) return _nameController.text.isNotEmpty;
+    if (_currentStep == 1) return _nameController.text.trim().isNotEmpty;
     if (_currentStep == 2) return _selectedIntention.isNotEmpty;
     if (_currentStep == 3) return _selectedQualities.isNotEmpty;
     return true;
@@ -157,124 +166,314 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final step = _steps[_currentStep];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: _currentStep > 0
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: _previousStep,
               )
             : null,
         actions: [
-          TextButton(onPressed: _skip, child: Text(l10n.skip)),
+          TextButton(
+            onPressed: _skip,
+            child: Text(
+              l10n.skip,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
           const SizedBox(width: 8),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            children: [
-              const SizedBox(height: 48),
-              Icon(
-                step.icon,
-                size: 80,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 32),
-              Text(
-                step.titleKey.tr(l10n),
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              if (step.subtitleKey != null)
-                Text(
-                  step.subtitleKey!.tr(l10n),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+      body: Stack(
+        children: [
+          // Subtle background gradient decorative circles
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(
+                  alpha: isDark ? 0.15 : 0.08,
                 ),
-              const SizedBox(height: 48),
-              Row(
-                spacing: 8,
-                children: List.generate(_steps.length, (i) {
-                  return Expanded(
-                    child: Container(
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: i <= _currentStep
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(AppRadius.xs),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -80,
+            left: -80,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondary.withValues(
+                  alpha: isDark ? 0.12 : 0.06,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                // Step Progress Indicator
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: List.generate(_steps.length, (i) {
+                      final isActive = i <= _currentStep;
+                      final isCurrent = i == _currentStep;
+                      return Expanded(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          height: isCurrent ? 6 : 4,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? AppColors.primary
+                                : (isDark
+                                      ? AppColors.darkSurfaceSubtle
+                                      : AppColors.surfaceSubtle),
+                            borderRadius: BorderRadius.circular(3),
+                            boxShadow: isCurrent
+                                ? [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // PageView content
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() => _currentStep = index);
+                    },
+                    itemCount: _steps.length,
+                    itemBuilder: (context, index) {
+                      final step = _steps[index];
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 32),
+                            // Hero Icon Badge with glowing effect
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                gradient: AppColors.primaryGradient,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.35,
+                                    ),
+                                    blurRadius: 24,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                step.icon,
+                                size: 48,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            Text(
+                              step.titleKey.tr(l10n),
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                height: 1.25,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 12),
+                            if (step.subtitleKey != null)
+                              Text(
+                                step.subtitleKey!.tr(l10n),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
+                                  height: 1.45,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            const SizedBox(height: 36),
+                            if (step.hasInput) _buildNameInput(isDark),
+                            if (step.hasChips)
+                              _buildIntentionChips(l10n, isDark),
+                            if (step.hasQualities)
+                              _buildQualitiesSelection(isDark),
+                            if (step.hasPermission)
+                              _buildPermissionWidget(l10n, isDark),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                // Bottom Button Action Area
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 4,
+                        shadowColor: AppColors.primary.withValues(alpha: 0.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: _canProceed ? _nextStep : null,
+                      child: Text(
+                        _currentStep == _steps.length - 1
+                            ? l10n.startYourDay
+                            : l10n.nextStep,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
+                        ),
                       ),
                     ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 32),
-              if (step.hasInput) _buildNameInput(),
-              if (step.hasChips) _buildIntentionChips(l10n),
-              if (step.hasQualities) _buildQualitiesSelection(),
-              if (step.hasPermission) _buildPermissionWidget(l10n),
-              const SizedBox(height: 32),
-              FilledButton(
-                onPressed: _canProceed ? _nextStep : null,
-                child: Text(
-                  _currentStep == _steps.length - 1
-                      ? l10n.startYourDay
-                      : l10n.nextStep,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameInput(bool isDark) {
+    return GlassContainer(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      borderRadius: 20,
+      child: TextField(
+        controller: _nameController,
+        textCapitalization: TextCapitalization.words,
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+        decoration: InputDecoration(
+          hintText: 'Enter your name...',
+          hintStyle: TextStyle(
+            color: isDark
+                ? AppColors.darkTextSecondary.withValues(alpha: 0.7)
+                : AppColors.textSecondary.withValues(alpha: 0.7),
+          ),
+          border: InputBorder.none,
+          icon: const Icon(
+            Icons.edit_rounded,
+            color: AppColors.primary,
+            size: 24,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNameInput() {
-    return TextField(
-      controller: _nameController,
-      textCapitalization: TextCapitalization.words,
-      decoration: const InputDecoration(),
-    );
-  }
+  Widget _buildIntentionChips(AppLocalizations l10n, bool isDark) {
+    final intentions = [
+      ('barakah', l10n.seekingBarakah, Icons.auto_awesome_rounded),
+      ('worship', l10n.consistentWorship, Icons.mosque_rounded),
+      ('productivity', l10n.mindfulProductivity, Icons.bolt_rounded),
+    ];
 
-  Widget _buildIntentionChips(AppLocalizations l10n) {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        FilterChip(
-          label: Text(l10n.seekingBarakah),
-          selected: _selectedIntention == 'barakah',
-          onSelected: (selected) {
-            setState(() => _selectedIntention = selected ? 'barakah' : '');
-          },
-        ),
-        FilterChip(
-          label: Text(l10n.consistentWorship),
-          selected: _selectedIntention == 'worship',
-          onSelected: (selected) {
-            setState(() => _selectedIntention = selected ? 'worship' : '');
-          },
-        ),
-        FilterChip(
-          label: Text(l10n.mindfulProductivity),
-          selected: _selectedIntention == 'productivity',
-          onSelected: (selected) {
-            setState(() => _selectedIntention = selected ? 'productivity' : '');
-          },
-        ),
-      ],
+      spacing: 12,
+      runSpacing: 12,
+      alignment: WrapAlignment.center,
+      children: intentions.map((item) {
+        final selected = _selectedIntention == item.$1;
+        return InkWell(
+          onTap: () =>
+              setState(() => _selectedIntention = selected ? '' : item.$1),
+          borderRadius: BorderRadius.circular(20),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: selected
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : (isDark
+                        ? AppColors.darkSurfaceSubtle
+                        : AppColors.surfaceSubtle),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: selected ? AppColors.primary : Colors.transparent,
+                width: 2,
+              ),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  item.$3,
+                  size: 20,
+                  color: selected ? AppColors.primary : AppColors.textSecondary,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  item.$2,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                    color: selected
+                        ? AppColors.primary
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _buildQualitiesSelection() {
+  Widget _buildQualitiesSelection(bool isDark) {
     final l10n = AppLocalizations.of(context)!;
     final qualities = [
       (id: 'taqwa', label: l10n.qualityTaqwa, icon: Icons.mosque_outlined),
@@ -297,160 +496,142 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ];
 
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 10,
+      runSpacing: 10,
+      alignment: WrapAlignment.center,
       children: qualities.map((q) {
         final selected = _selectedQualities.contains(q.id);
-        return FilterChip(
-          avatar: Icon(q.icon, size: 18),
-          label: Text(q.label),
-          selected: selected,
-          onSelected: (_) => _toggleQuality(q.id),
+        return InkWell(
+          onTap: () => _toggleQuality(q.id),
+          borderRadius: BorderRadius.circular(16),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: selected
+                  ? AppColors.secondary.withValues(alpha: 0.2)
+                  : (isDark
+                        ? AppColors.darkSurfaceSubtle
+                        : AppColors.surfaceSubtle),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: selected ? AppColors.secondary : Colors.transparent,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  q.icon,
+                  size: 18,
+                  color: selected
+                      ? AppColors.secondary
+                      : AppColors.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  q.label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                    color: selected
+                        ? AppColors.secondary
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       }).toList(),
     );
   }
 
-  Widget _buildPermissionWidget(AppLocalizations l10n) {
-    switch (_permissionState) {
-      case _PermissionState.initial:
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.onboardingPermissionBody,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                FilledButton.tonal(
-                  onPressed: _requestLocationPermission,
-                  child: Text(l10n.onboardingPermissionGrant),
-                ),
-              ],
+  Widget _buildPermissionWidget(AppLocalizations l10n, bool isDark) {
+    return GlassContainer(
+      padding: const EdgeInsets.all(24),
+      borderRadius: 24,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _permissionState == _PermissionState.granted
+                  ? Icons.check_circle_rounded
+                  : Icons.location_on_rounded,
+              size: 40,
+              color: _permissionState == _PermissionState.granted
+                  ? AppColors.secondary
+                  : AppColors.primary,
             ),
           ),
-        );
-
-      case _PermissionState.requesting:
-        return const Card(
-          child: Padding(
-            padding: EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                SizedBox(height: 48),
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-              ],
-            ),
+          const SizedBox(height: 16),
+          Text(
+            _permissionState == _PermissionState.granted
+                ? l10n.onboardingPermissionGranted
+                : l10n.onboardingPermissionBody,
+            style: const TextStyle(fontSize: 14, height: 1.45),
+            textAlign: TextAlign.center,
           ),
-        );
-
-      case _PermissionState.granted:
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
+          const SizedBox(height: 20),
+          if (_permissionState == _PermissionState.requesting)
+            const CircularProgressIndicator()
+          else if (_permissionState == _PermissionState.granted)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.primary,
+                const Icon(
+                  Icons.check_circle,
+                  color: AppColors.secondary,
+                  size: 20,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(width: 8),
                 Text(
                   l10n.onboardingPermissionGranted,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
+            )
+          else if (_permissionState == _PermissionState.deniedForever ||
+              _permissionState == _PermissionState.serviceOff)
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: _openSettings,
+              icon: const Icon(Icons.settings_rounded, size: 18),
+              label: Text(l10n.onboardingPermissionOpenSettings),
+            )
+          else
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: _requestLocationPermission,
+              icon: const Icon(Icons.check_circle_rounded, size: 18),
+              label: Text(l10n.onboardingPermissionGrant),
             ),
-          ),
-        );
-
-      case _PermissionState.denied:
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                const Icon(Icons.location_off_outlined, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.onboardingPermissionDeniedBody,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 8,
-                  children: [
-                    FilledButton.tonal(
-                      onPressed: _requestLocationPermission,
-                      child: Text(l10n.onboardingPermissionRetry),
-                    ),
-                    FilledButton.tonal(
-                      onPressed: _openSettings,
-                      child: Text(l10n.onboardingPermissionOpenSettings),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-
-      case _PermissionState.deniedForever:
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                const Icon(Icons.block_outlined, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.onboardingPermissionDeniedBody,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                FilledButton.tonal(
-                  onPressed: _openSettings,
-                  child: Text(l10n.onboardingPermissionOpenSettings),
-                ),
-              ],
-            ),
-          ),
-        );
-
-      case _PermissionState.serviceOff:
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              children: [
-                const Icon(Icons.location_disabled_outlined, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.onboardingPermissionServiceOffBody,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                FilledButton.tonal(
-                  onPressed: _openSettings,
-                  child: Text(l10n.onboardingPermissionOpenSettings),
-                ),
-              ],
-            ),
-          ),
-        );
-    }
+        ],
+      ),
+    );
   }
 }
 
