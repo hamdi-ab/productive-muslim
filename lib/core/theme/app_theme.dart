@@ -19,13 +19,23 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: AppColors.background,
     textTheme: AppTypography.toTextTheme(),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: false,
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: AppColors.surface,
+    ),
     useMaterial3: true,
   );
 
   static final darkTheme = ThemeData(
     brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
-      primary: AppColors.primary,
+      primary: AppColors.primaryLight,
       onPrimary: Colors.black87,
       secondary: AppColors.secondary,
       onSecondary: Colors.black87,
@@ -35,6 +45,16 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
     textTheme: AppTypography.toTextTheme(),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: false,
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: AppColors.darkSurface,
+    ),
     useMaterial3: true,
   );
 }
