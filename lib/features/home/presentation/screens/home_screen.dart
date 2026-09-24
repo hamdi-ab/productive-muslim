@@ -56,11 +56,25 @@ class HomeScreen extends StatelessWidget {
     final headerInfo = _getHeaderInfo(location, l10n);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final isSubPage = location == '/settings' || location == '/prayer-times';
+
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
         scrolledUnderElevation: 2,
-        titleSpacing: 16,
+        titleSpacing: isSubPage ? 0 : 16,
+        leading: isSubPage
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+              )
+            : null,
         backgroundColor: isDark
             ? AppColors.darkSurface.withValues(alpha: 0.85)
             : Colors.white.withValues(alpha: 0.85),
