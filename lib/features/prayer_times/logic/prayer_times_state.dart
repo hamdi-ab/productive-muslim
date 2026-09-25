@@ -9,6 +9,7 @@ sealed class PrayerTimesState {
     required PrayerTimes prayerTimes,
     required String nextPrayer,
     required Duration timeUntilNextPrayer,
+    String? locationName,
   }) = PrayerTimesData;
   const factory PrayerTimesState.locationRequired() =
       PrayerTimesLocationRequired;
@@ -27,11 +28,13 @@ class PrayerTimesData extends PrayerTimesState {
   final PrayerTimes prayerTimes;
   final String nextPrayer;
   final Duration timeUntilNextPrayer;
+  final String? locationName;
 
   const PrayerTimesData({
     required this.prayerTimes,
     required this.nextPrayer,
     required this.timeUntilNextPrayer,
+    this.locationName,
   });
 }
 

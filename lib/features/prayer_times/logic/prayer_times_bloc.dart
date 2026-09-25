@@ -31,12 +31,14 @@ class PrayerTimesBloc extends Bloc<PrayerTimesEvent, PrayerTimesState> {
 
     final nextPrayer = _service.getNextPrayerName(prayerTimes) ?? '--';
     final timeUntil = _service.getTimeUntilNextPrayer(prayerTimes);
+    final locationName = _service.getLocationName(position);
 
     emit(
       PrayerTimesData(
         prayerTimes: prayerTimes,
         nextPrayer: nextPrayer,
         timeUntilNextPrayer: timeUntil ?? Duration.zero,
+        locationName: locationName,
       ),
     );
   }

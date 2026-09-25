@@ -466,6 +466,7 @@ class _HomePrayerCard extends StatefulWidget {
 class _HomePrayerCardState extends State<_HomePrayerCard> {
   String _nextPrayer = '--';
   String _countdown = '--:--';
+  String? _locationName;
   bool _loading = true;
   Timer? _timer;
   PrayerTimes? _cachedPrayerTimes;
@@ -498,6 +499,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       }
 
       _cachedPrayerTimes = service.getPrayerTimes(position);
+      _locationName = service.getLocationName(position);
       _updatePrayerCountdown();
       _startTimer();
     } catch (_) {
@@ -535,12 +537,11 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
+    final sStr = seconds.toString().padLeft(2, '0');
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else if (minutes >= 10) {
-      return '${minutes}m';
+      return '${hours}h ${minutes}m ${sStr}s';
     }
-    return '${minutes}m ${seconds}s';
+    return '${minutes}m ${sStr}s';
   }
 
   @override
@@ -574,7 +575,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.nextPrayer,
+                    '${l10n.nextPrayer}${_locationName != null ? ' • 📍 $_locationName' : ''}',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

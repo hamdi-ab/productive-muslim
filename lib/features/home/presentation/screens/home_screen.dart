@@ -194,6 +194,7 @@ class _PrayerHeaderChip extends StatefulWidget {
 class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   String _nextPrayer = '';
   String _countdown = '';
+  String? _locationName;
   bool _loading = true;
   Timer? _timer;
   PrayerTimes? _cachedPrayerTimes;
@@ -234,6 +235,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     }
 
     _cachedPrayerTimes = widget.service!.getPrayerTimes(position);
+    _locationName = widget.service!.getLocationName(position);
     _updatePrayerCountdown();
     _startTimer();
   }
@@ -268,12 +270,11 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
+    final sStr = seconds.toString().padLeft(2, '0');
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else if (minutes >= 10) {
-      return '${minutes}m';
+      return '${hours}h ${minutes}m ${sStr}s';
     }
-    return '${minutes}m ${seconds}s';
+    return '${minutes}m ${sStr}s';
   }
 
   @override
@@ -282,7 +283,8 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Tooltip(
-      message: l10n.nextPrayer,
+      message:
+          '${l10n.nextPrayer}${_locationName != null ? ' • 📍 $_locationName' : ''}',
       child: InkWell(
         onTap: () => context.push('/prayer-times'),
         borderRadius: BorderRadius.circular(20),
