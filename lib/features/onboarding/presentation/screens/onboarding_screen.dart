@@ -169,7 +169,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
