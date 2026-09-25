@@ -181,14 +181,20 @@ void main() {
       final homeSemantics = tester.getSemantics(find.bySemanticsLabel('Home'));
       expect(homeSemantics.label, 'Home');
       expect(homeSemantics.flagsCollection.isButton, isTrue);
-      expect(homeSemantics.flagsCollection.isSelected.toString(), 'Tristate.isTrue');
+      expect(
+        homeSemantics.flagsCollection.isSelected.toString(),
+        'Tristate.isTrue',
+      );
 
       final tasksSemantics = tester.getSemantics(
         find.bySemanticsLabel('Tasks'),
       );
       expect(tasksSemantics.label, 'Tasks');
       expect(tasksSemantics.flagsCollection.isButton, isTrue);
-      expect(tasksSemantics.flagsCollection.isSelected.toString(), isNot('Tristate.isTrue'));
+      expect(
+        tasksSemantics.flagsCollection.isSelected.toString(),
+        isNot('Tristate.isTrue'),
+      );
     });
   });
 
