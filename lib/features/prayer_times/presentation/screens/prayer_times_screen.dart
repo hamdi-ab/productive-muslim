@@ -172,7 +172,9 @@ class _PrayerTile extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isNext
-                    ? AppColors.secondary.withValues(alpha: 0.2)
+                    ? (isDark
+                          ? AppColors.secondary.withValues(alpha: 0.2)
+                          : AppColors.primary.withValues(alpha: 0.12))
                     : (isDark
                           ? AppColors.darkSurfaceSubtle
                           : AppColors.surfaceSubtle),
@@ -182,7 +184,7 @@ class _PrayerTile extends StatelessWidget {
                 Icons.access_time_rounded,
                 size: 18,
                 color: isNext
-                    ? AppColors.secondary
+                    ? (isDark ? AppColors.secondary : AppColors.primary)
                     : (isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.textSecondary),

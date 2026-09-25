@@ -291,20 +291,24 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withValues(alpha: isDark ? 0.2 : 0.15),
+            color: isDark
+                ? AppColors.secondary.withValues(alpha: 0.2)
+                : AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.secondary.withValues(alpha: 0.4),
+              color: isDark
+                  ? AppColors.secondary.withValues(alpha: 0.4)
+                  : AppColors.primary.withValues(alpha: 0.25),
               width: 1,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.access_time_filled_rounded,
                 size: 15,
-                color: AppColors.secondary,
+                color: isDark ? AppColors.secondary : AppColors.primary,
               ),
               const SizedBox(width: 6),
               if (_loading)
@@ -324,6 +328,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
                       color: isDark
                           ? AppColors.darkTextPrimary
                           : AppColors.textPrimary,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ),

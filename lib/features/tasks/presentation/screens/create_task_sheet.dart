@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
@@ -322,8 +323,10 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      onSelected: (selected) =>
-                          setState(() => _repeatDaily = selected),
+                      onSelected: (selected) {
+                        HapticFeedback.selectionClick();
+                        setState(() => _repeatDaily = selected);
+                      },
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     FilterChip(
@@ -341,8 +344,10 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      onSelected: (selected) =>
-                          setState(() => _repeatWeekly = selected),
+                      onSelected: (selected) {
+                        HapticFeedback.selectionClick();
+                        setState(() => _repeatWeekly = selected);
+                      },
                     ),
                   ],
                 ),
@@ -458,7 +463,10 @@ class _LifeAreaSelector extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          onSelected: (_) => onChanged(area.$1),
+          onSelected: (_) {
+            HapticFeedback.selectionClick();
+            onChanged(area.$1);
+          },
         );
       }).toList(),
     );

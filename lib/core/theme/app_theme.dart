@@ -26,7 +26,10 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.borderLight, width: 1),
+      ),
       color: AppColors.surface,
     ),
     useMaterial3: true,
@@ -52,7 +55,10 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.borderDark, width: 1),
+      ),
       color: AppColors.darkSurface,
     ),
     useMaterial3: true,

@@ -212,23 +212,29 @@ class _WeekHeader extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    color:
+                        (isDark ? AppColors.secondary : AppColors.secondaryDark)
+                            .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.local_fire_department_rounded,
                         size: 14,
-                        color: AppColors.secondary,
+                        color: isDark
+                            ? AppColors.secondary
+                            : AppColors.secondaryDark,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         l10n.weeklyTrack,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                          color: isDark
+                              ? AppColors.secondary
+                              : AppColors.secondaryDark,
                         ),
                       ),
                     ],
@@ -440,8 +446,31 @@ class _HabitTile extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    color:
+                        (isDark ? AppColors.secondary : AppColors.secondaryDark)
+                            .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color:
+                          (isDark
+                                  ? AppColors.secondary
+                                  : AppColors.secondaryDark)
+                              .withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                    boxShadow: streak >= 7
+                        ? [
+                            BoxShadow(
+                              color:
+                                  (isDark
+                                          ? AppColors.secondary
+                                          : AppColors.secondaryDark)
+                                      .withValues(alpha: 0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Row(
                     children: [
@@ -449,10 +478,12 @@ class _HabitTile extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '$streak',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
+                          color: isDark
+                              ? AppColors.secondary
+                              : AppColors.secondaryDark,
                         ),
                       ),
                     ],

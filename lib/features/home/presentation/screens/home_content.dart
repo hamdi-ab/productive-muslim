@@ -687,6 +687,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
+                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
                         ),
                       ],
