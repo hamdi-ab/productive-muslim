@@ -43,8 +43,8 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
   Future<void> _pickTime({required bool isStart}) async {
     final initial = isStart
-        ? (_startTime ??= const TimeOfDay(hour: 9, minute: 0))
-        : (_endTime ??= const TimeOfDay(hour: 10, minute: 0));
+        ? (_startTime ?? const TimeOfDay(hour: 9, minute: 0))
+        : (_endTime ?? const TimeOfDay(hour: 10, minute: 0));
 
     final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked != null) {

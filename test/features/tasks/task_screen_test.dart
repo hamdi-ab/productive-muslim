@@ -237,4 +237,23 @@ void main() {
 
     expect(find.text('Fajr'), findsOneWidget);
   });
+
+  testWidgets('dismissing time picker leaves time unset', (tester) async {
+    await tester.pumpWidget(buildScreen());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    // Tap Start time button
+    await tester.tap(find.text('Start time'));
+    await tester.pumpAndSettle();
+
+    // Cancel time picker dialog
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    // Start time label should still be present, not a formatted time
+    expect(find.text('Start time'), findsOneWidget);
+  });
 }
