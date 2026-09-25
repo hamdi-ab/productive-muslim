@@ -1,5 +1,6 @@
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class PrayerTimeService {
   Future<Position?> getCurrentPosition() async {
@@ -69,5 +70,25 @@ class PrayerTimeService {
 
     final tomorrowFajr = prayerTimes.fajr.add(const Duration(days: 1));
     return tomorrowFajr.difference(now);
+  }
+
+  String getLocationName(Position? position) {
+    try {
+      final name = tz.local.name;
+      if (name.contains('/')) {
+        final city = name.split('/').last.replaceAll('_', ' ');
+        if (city.isNotEmpty && city.toUpperCase() != 'UTC') {
+          return city;
+        }
+      }
+    } catch (_) {}
+
+    if (position != null) {
+      final lat = position.latitude.toStringAsFixed(2);
+      final lon = position.longitude.toStringAsFixed(2);
+      return '$lat°, $lon°';
+    }
+
+    return 'Local';
   }
 }

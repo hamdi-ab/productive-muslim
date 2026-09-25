@@ -62,7 +62,11 @@ class _TaskScreenState extends State<TaskScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => CreateTaskSheet(date: today),
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider.value(
+        value: context.read<TaskBloc>(),
+        child: CreateTaskSheet(date: today),
+      ),
     );
   }
 }

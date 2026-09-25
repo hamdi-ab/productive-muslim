@@ -34,10 +34,15 @@ class PrayerTimesScreen extends StatelessWidget {
               PrayerTimesInitial() || PrayerTimesLoading() => const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
-              PrayerTimesData(:final prayerTimes, :final nextPrayer) =>
+              PrayerTimesData(
+                :final prayerTimes,
+                :final nextPrayer,
+                :final locationName,
+              ) =>
                 _PrayerTimesList(
                   prayerTimes: prayerTimes,
                   nextPrayer: nextPrayer,
+                  locationName: locationName,
                 ),
               PrayerTimesLocationRequired() => _LocationRequired(l10n: l10n),
               PrayerTimesError(:final message) => _ErrorState(message: message),
@@ -52,12 +57,18 @@ class PrayerTimesScreen extends StatelessWidget {
 class _PrayerTimesList extends StatelessWidget {
   final dynamic prayerTimes;
   final String nextPrayer;
+  final String? locationName;
 
-  const _PrayerTimesList({required this.prayerTimes, required this.nextPrayer});
+  const _PrayerTimesList({
+    required this.prayerTimes,
+    required this.nextPrayer,
+    this.locationName,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final timeFormat = DateFormat.jm();
 
     final entries = [
@@ -69,19 +80,56 @@ class _PrayerTimesList extends StatelessWidget {
       ('Isha', l10n.isha, prayerTimes.isha as DateTime),
     ];
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      itemCount: entries.length,
-      itemBuilder: (context, index) {
-        final (key, name, time) = entries[index];
-        final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
+    final hasLocation = locationName != null && locationName!.isNotEmpty;
 
-        return _PrayerTile(
-          name: name,
-          time: timeFormat.format(time),
-          isNext: isNext,
-        );
-      },
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          itemCount: entries.length + (hasLocation ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (hasLocation && index == 0) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.xs,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      locationName!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final entryIndex = hasLocation ? index - 1 : index;
+            final (key, name, time) = entries[entryIndex];
+            final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
+
+            return _PrayerTile(
+              name: name,
+              time: timeFormat.format(time),
+              isNext: isNext,
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -129,7 +177,9 @@ class _PrayerTile extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: isNext
-                    ? AppColors.secondary.withValues(alpha: 0.2)
+                    ? (isDark
+                          ? AppColors.secondary.withValues(alpha: 0.2)
+                          : AppColors.primary.withValues(alpha: 0.12))
                     : (isDark
                           ? AppColors.darkSurfaceSubtle
                           : AppColors.surfaceSubtle),
@@ -139,7 +189,7 @@ class _PrayerTile extends StatelessWidget {
                 Icons.access_time_rounded,
                 size: 18,
                 color: isNext
-                    ? AppColors.secondary
+                    ? (isDark ? AppColors.secondary : AppColors.primary)
                     : (isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.textSecondary),

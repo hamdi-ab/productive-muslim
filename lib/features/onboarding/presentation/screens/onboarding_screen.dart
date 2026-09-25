@@ -169,7 +169,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -193,32 +193,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Stack(
         children: [
           // Subtle background gradient decorative circles
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withValues(
-                  alpha: isDark ? 0.15 : 0.08,
+          IgnorePointer(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -100,
+                  right: -100,
+                  child: Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withValues(
+                        alpha: isDark ? 0.15 : 0.08,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -80,
-            left: -80,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.secondary.withValues(
-                  alpha: isDark ? 0.12 : 0.06,
+                Positioned(
+                  bottom: -80,
+                  left: -80,
+                  child: Container(
+                    width: 250,
+                    height: 250,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.secondary.withValues(
+                        alpha: isDark ? 0.12 : 0.06,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
           SafeArea(
@@ -509,13 +515,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: selected
-                  ? AppColors.secondary.withValues(alpha: 0.2)
+                  ? (isDark
+                        ? AppColors.secondary.withValues(alpha: 0.2)
+                        : AppColors.primary.withValues(alpha: 0.12))
                   : (isDark
                         ? AppColors.darkSurfaceSubtle
                         : AppColors.surfaceSubtle),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: selected ? AppColors.secondary : Colors.transparent,
+                color: selected
+                    ? (isDark ? AppColors.secondary : AppColors.primary)
+                    : Colors.transparent,
                 width: 1.5,
               ),
             ),
@@ -526,7 +536,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   q.icon,
                   size: 18,
                   color: selected
-                      ? AppColors.secondary
+                      ? (isDark ? AppColors.secondary : AppColors.primary)
                       : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 8),
@@ -536,7 +546,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     fontSize: 14,
                     fontWeight: selected ? FontWeight.bold : FontWeight.w500,
                     color: selected
-                        ? AppColors.secondary
+                        ? (isDark ? AppColors.secondary : AppColors.primary)
                         : (isDark
                               ? AppColors.darkTextPrimary
                               : AppColors.textPrimary),
@@ -568,7 +578,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   : Icons.location_on_rounded,
               size: 40,
               color: _permissionState == _PermissionState.granted
-                  ? AppColors.secondary
+                  ? (isDark ? AppColors.secondary : AppColors.primary)
                   : AppColors.primary,
             ),
           ),
@@ -587,16 +597,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.check_circle,
-                  color: AppColors.secondary,
+                  color: isDark ? AppColors.secondary : AppColors.primary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   l10n.onboardingPermissionGranted,
-                  style: const TextStyle(
-                    color: AppColors.secondary,
+                  style: TextStyle(
+                    color: isDark ? AppColors.secondary : AppColors.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

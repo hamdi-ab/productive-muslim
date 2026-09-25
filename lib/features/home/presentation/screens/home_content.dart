@@ -31,19 +31,24 @@ class HomeContent extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeroBanner(context, l10n, displayDate),
-          const SizedBox(height: AppSpacing.md),
-          const _HomePrayerCard(),
-          const SizedBox(height: AppSpacing.lg),
-          _buildDailyProgressSection(context, today, l10n),
-          const SizedBox(height: AppSpacing.lg),
-          _buildQualitiesCarousel(context),
-          const SizedBox(height: AppSpacing.lg),
-          _buildTodayTaskOverview(context, today, l10n),
-        ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeroBanner(context, l10n, displayDate),
+              const SizedBox(height: AppSpacing.md),
+              const _HomePrayerCard(),
+              const SizedBox(height: AppSpacing.lg),
+              _buildDailyProgressSection(context, today, l10n),
+              const SizedBox(height: AppSpacing.lg),
+              _buildQualitiesCarousel(context),
+              const SizedBox(height: AppSpacing.lg),
+              _buildTodayTaskOverview(context, today, l10n),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -466,6 +471,7 @@ class _HomePrayerCard extends StatefulWidget {
 class _HomePrayerCardState extends State<_HomePrayerCard> {
   String _nextPrayer = '--';
   String _countdown = '--:--';
+  String? _locationName;
   bool _loading = true;
   Timer? _timer;
   PrayerTimes? _cachedPrayerTimes;
@@ -498,6 +504,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       }
 
       _cachedPrayerTimes = service.getPrayerTimes(position);
+      _locationName = service.getLocationName(position);
       _updatePrayerCountdown();
       _startTimer();
     } catch (_) {
@@ -535,12 +542,11 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
+    final sStr = seconds.toString().padLeft(2, '0');
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else if (minutes >= 10) {
-      return '${minutes}m';
+      return '${hours}h ${minutes}m ${sStr}s';
     }
-    return '${minutes}m ${seconds}s';
+    return '${minutes}m ${sStr}s';
   }
 
   @override
@@ -552,82 +558,148 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       onTap: () => context.push('/prayer-times'),
       borderRadius: BorderRadius.circular(24),
       child: GlassContainer(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         borderRadius: 24,
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.mosque_rounded,
-                color: AppColors.primary,
-                size: 22,
-              ),
+            // Header row: Icon, Next Prayer & Location, and Action pill
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.mosque_rounded,
+                    color: AppColors.primary,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.nextPrayer,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                      if (_locationName != null && _locationName!.isNotEmpty)
+                        Text(
+                          '📍 $_locationName',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary.withValues(
+                                    alpha: 0.8,
+                                  )
+                                : AppColors.textSecondary.withValues(
+                                    alpha: 0.8,
+                                  ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.prayerTimes,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color: AppColors.secondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            const SizedBox(height: 12),
+            // Body row: Localized prayer name and countdown badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (_loading)
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                else ...[
                   Text(
-                    l10n.nextPrayer,
+                    _getLocalizedPrayerName(_nextPrayer, l10n),
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                       color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  if (_loading)
-                    const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  else
-                    Text(
-                      '${_getLocalizedPrayerName(_nextPrayer, l10n)} in $_countdown',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        width: 1,
                       ),
                     ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    l10n.prayerTimes,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _countdown,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    size: 16,
-                    color: AppColors.secondary,
-                  ),
                 ],
-              ),
+              ],
             ),
           ],
         ),

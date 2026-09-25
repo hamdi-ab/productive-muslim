@@ -9,6 +9,9 @@ class AppColors {
   static const Color primaryDark = Color(0xFF082E23); // Dark Forest
   static const Color secondary = Color(0xFFD4AF37); // Warm Gold
   static const Color secondaryLight = Color(0xFFF59E0B); // Amber Gold
+  static const Color secondaryDark = Color(
+    0xFF92600E,
+  ); // Deep Warm Amber (WCAG AA Compliant on Light surfaces)
 
   // Surfaces
   static const Color background = Color(0xFFF8FAF9); // Soft Porcelain Light
@@ -22,7 +25,7 @@ class AppColors {
 
   // Text Colors
   static const Color textPrimary = Color(0xFF111827);
-  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textSecondary = Color(0xFF4B5563);
   static const Color textDisabled = Color(0xFF9CA3AF);
 
   static const Color darkTextPrimary = Color(0xFFF9FAFB);
@@ -53,10 +56,15 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
+  // Borders
+  static const Color borderLight = Color(0xFFE5E7EB);
+  static const Color borderDark = Color(0xFF1E3A2F);
+
   // Glassmorphic Colors
-  static Color glassBackgroundLight = Colors.white.withValues(alpha: 0.75);
+  static Color glassBackgroundLight = Colors.white.withValues(alpha: 0.88);
   static Color glassBackgroundDark = const Color(0xFF13221C)
-      .withValues(alpha: 0.75);
-  static Color glassBorderLight = Colors.white.withValues(alpha: 0.5);
+      .withValues(alpha: 0.85);
+  static Color glassBorderLight = const Color(0xFF0F4C3A)
+      .withValues(alpha: 0.08);
   static Color glassBorderDark = Colors.white.withValues(alpha: 0.12);
 }
