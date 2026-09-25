@@ -50,7 +50,7 @@ dependencies:
   permission_handler: ^13.0.2
 
   # Development device preview
-  device_preview: ^3.0.0
+  device_preview: ^1.2.0
 
   cupertino_icons: ^1.0.9
 

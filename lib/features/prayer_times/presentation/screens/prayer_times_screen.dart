@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/features/prayer_times/logic/prayer_times_bloc.dart';
 import 'package:productive_muslim/features/prayer_times/logic/prayer_times_event.dart';
@@ -17,13 +18,16 @@ class PrayerTimesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (_) =>
           PrayerTimesBloc(getIt<PrayerTimeService>())
             ..add(const PrayerTimesLoaded()),
       child: Scaffold(
-        appBar: AppBar(title: Text(l10n.prayerTimes)),
+        appBar: hasParentScaffold
+            ? null
+            : AppBar(title: Text(l10n.prayerTimes)),
         body: BlocBuilder<PrayerTimesBloc, PrayerTimesState>(
           builder: (context, state) {
             return switch (state) {
@@ -57,20 +61,20 @@ class _PrayerTimesList extends StatelessWidget {
     final timeFormat = DateFormat.jm();
 
     final entries = [
-      (l10n.fajr, prayerTimes.fajr as DateTime),
-      (l10n.sunrise, prayerTimes.sunrise as DateTime),
-      (l10n.dhuhr, prayerTimes.dhuhr as DateTime),
-      (l10n.asr, prayerTimes.asr as DateTime),
-      (l10n.maghrib, prayerTimes.maghrib as DateTime),
-      (l10n.isha, prayerTimes.isha as DateTime),
+      ('Fajr', l10n.fajr, prayerTimes.fajr as DateTime),
+      ('Sunrise', l10n.sunrise, prayerTimes.sunrise as DateTime),
+      ('Dhuhr', l10n.dhuhr, prayerTimes.dhuhr as DateTime),
+      ('Asr', l10n.asr, prayerTimes.asr as DateTime),
+      ('Maghrib', l10n.maghrib, prayerTimes.maghrib as DateTime),
+      ('Isha', l10n.isha, prayerTimes.isha as DateTime),
     ];
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       itemCount: entries.length,
       itemBuilder: (context, index) {
-        final (name, time) = entries[index];
-        final isNext = name.toLowerCase() == nextPrayer.toLowerCase();
+        final (key, name, time) = entries[index];
+        final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
 
         return _PrayerTile(
           name: name,
@@ -95,53 +99,101 @@ class _PrayerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.xs,
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.lg,
-      ),
-      decoration: BoxDecoration(
+      child: GlassContainer(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md + 2,
+        ),
+        borderRadius: 20,
+        blur: 15,
         color: isNext
-            ? AppColors.primary.withValues(alpha: 0.08)
-            : Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: isNext
-            ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
+            ? (isDark
+                  ? AppColors.primaryLight.withValues(alpha: 0.15)
+                  : AppColors.primary.withValues(alpha: 0.12))
+            : (isDark
+                  ? AppColors.darkSurface.withValues(alpha: 0.7)
+                  : Colors.white.withValues(alpha: 0.7)),
+        borderColor: isNext
+            ? (isDark ? AppColors.primaryLight : AppColors.primary)
             : null,
-      ),
-      child: Row(
-        children: [
-          if (isNext)
+        child: Row(
+          children: [
             Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.only(right: AppSpacing.sm),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isNext
+                    ? AppColors.secondary.withValues(alpha: 0.2)
+                    : (isDark
+                          ? AppColors.darkSurfaceSubtle
+                          : AppColors.surfaceSubtle),
                 shape: BoxShape.circle,
               ),
-            ),
-          Expanded(
-            child: Text(
-              name,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: isNext ? FontWeight.w600 : FontWeight.normal,
-                color: isNext ? AppColors.primary : null,
+              child: Icon(
+                Icons.access_time_rounded,
+                size: 18,
+                color: isNext
+                    ? AppColors.secondary
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary),
               ),
             ),
-          ),
-          Text(
-            time,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: isNext ? FontWeight.w600 : FontWeight.w400,
-              color: isNext ? AppColors.primary : AppColors.textSecondary,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isNext ? FontWeight.bold : FontWeight.w500,
+                  color: isNext
+                      ? (isDark ? AppColors.primaryLight : AppColors.primary)
+                      : (isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary),
+                ),
+              ),
             ),
-          ),
-        ],
+            if (isNext)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'NEXT',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            Text(
+              time,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isNext ? FontWeight.bold : FontWeight.w600,
+                color: isNext
+                    ? (isDark ? AppColors.primaryLight : AppColors.primary)
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

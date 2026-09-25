@@ -1141,6 +1141,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get habitSwipeDelete;
+
+  /// No description provided for @enterYourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name...'**
+  String get enterYourName;
+
+  /// No description provided for @weeklyTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Track'**
+  String get weeklyTrack;
+
+  /// No description provided for @reflectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reflection...'**
+  String get reflectionHint;
+
+  /// No description provided for @intentionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Intention title'**
+  String get intentionTitle;
 }
 
 class _AppLocalizationsDelegate

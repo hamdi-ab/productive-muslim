@@ -67,6 +67,7 @@ class PrayerTimeService {
       return prayerTimes.isha.difference(now);
     }
 
-    return null;
+    final tomorrowFajr = prayerTimes.fajr.add(const Duration(days: 1));
+    return tomorrowFajr.difference(now);
   }
 }

@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -57,8 +58,9 @@ void main() {
     GetIt.instance.unregister<PrayerTimeService>();
   });
 
-  Widget buildScreen() {
+  Widget buildScreen({String language = 'en'}) {
     return MaterialApp(
+      locale: Locale(language),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const PrayerTimesScreen(),
@@ -134,7 +136,29 @@ void main() {
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
 
-    // The next prayer should have a green dot indicator
-    expect(find.byType(Container), findsWidgets);
+    expect(find.byType(GlassContainer), findsWidgets);
+  });
+
+  testWidgets('highlights next prayer in Arabic locale', (tester) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(createPrayerTimes());
+
+    await tester.pumpWidget(buildScreen(language: 'ar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('الفجر'), findsOneWidget);
+    expect(find.byType(GlassContainer), findsWidgets);
   });
 }

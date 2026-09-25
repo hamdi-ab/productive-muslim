@@ -36,7 +36,6 @@ class _BarakahScreenState extends State<BarakahScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final today =
         widget.date ?? DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -45,53 +44,61 @@ class _BarakahScreenState extends State<BarakahScreen> {
       create: (context) => BarakahBloc(context.read<BarakahRepository>())
         ..add(BarakahLoaded(today))
         ..add(BarakahDailyResponseLoaded(today)),
-      child: BlocBuilder<BarakahBloc, BarakahState>(
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(l10n!.barakah),
-              actions: [
-                IconButton(
-                  key: const Key('open-review'),
-                  tooltip: l10n.barakahWeeklyTitle,
-                  icon: const Icon(Icons.calendar_month_outlined),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const BarakahReviewScreen(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            body: state is Loaded
-                ? ListView(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    children: [
-                      if (state.daily case final daily?) ...[
-                        _DailyPromptCard(draft: daily),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          l10n.barakahHistoryTitle,
-                          style: AppTypography.labelLarge,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                      ],
-                      _buildPromptCard(context, today),
-                      const SizedBox(height: 16),
-                      _buildSourceChips(),
-                      const SizedBox(height: 16),
-                      _buildNoteInput(),
-                      const SizedBox(height: 16),
-                      _buildLogButton(context, today),
-                      const SizedBox(height: 32),
-                      _buildHistory(context, state.entries),
-                    ],
-                  )
-                : state is Loading
-                ? const Center(child: CircularProgressIndicator())
-                : state is Error
-                ? Center(child: Text(state.message))
-                : const Center(child: SizedBox.shrink()),
+      child: Builder(
+        builder: (context) {
+          final hasParentScaffold = Scaffold.maybeOf(context) != null;
+          return BlocBuilder<BarakahBloc, BarakahState>(
+            builder: (context, state) {
+              final l10n = AppLocalizations.of(context)!;
+              return Scaffold(
+                appBar: hasParentScaffold
+                    ? null
+                    : AppBar(
+                        title: Text(l10n.barakah),
+                        actions: [
+                          IconButton(
+                            key: const Key('open-review'),
+                            tooltip: l10n.barakahWeeklyTitle,
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const BarakahReviewScreen(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                body: state is Loaded
+                    ? ListView(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        children: [
+                          if (state.daily case final daily?) ...[
+                            _DailyPromptCard(draft: daily),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              l10n.barakahHistoryTitle,
+                              style: AppTypography.labelLarge,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                          ],
+                          _buildPromptCard(context, today),
+                          const SizedBox(height: 16),
+                          _buildSourceChips(),
+                          const SizedBox(height: 16),
+                          _buildNoteInput(),
+                          const SizedBox(height: 16),
+                          _buildLogButton(context, today),
+                          const SizedBox(height: 32),
+                          _buildHistory(context, state.entries),
+                        ],
+                      )
+                    : state is Loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : state is Error
+                    ? Center(child: Text(state.message))
+                    : const Center(child: SizedBox.shrink()),
+              );
+            },
           );
         },
       ),

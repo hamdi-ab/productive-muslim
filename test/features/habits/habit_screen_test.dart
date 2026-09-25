@@ -114,7 +114,12 @@ void main() {
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
 
-    expect(find.text('\u{1F525} 7'), findsOneWidget);
+    final streakBadge = find.byKey(const Key('habit_streak_1'));
+    expect(streakBadge, findsOneWidget);
+    expect(
+      find.descendant(of: streakBadge, matching: find.text('7')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('shows life area color indicator', (tester) async {
@@ -196,6 +201,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('العادات'), findsOneWidget);
-    expect(find.text('🔥 3'), findsOneWidget);
+    final streakBadge = find.byKey(const Key('habit_streak_1'));
+    expect(streakBadge, findsOneWidget);
+    expect(
+      find.descendant(of: streakBadge, matching: find.text('3')),
+      findsOneWidget,
+    );
   });
 }

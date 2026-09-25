@@ -616,4 +616,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get habitSwipeDelete => 'Delete';
+
+  @override
+  String get enterYourName => 'Enter your name...';
+
+  @override
+  String get weeklyTrack => 'Weekly Track';
+
+  @override
+  String get reflectionHint => 'Your reflection...';
+
+  @override
+  String get intentionTitle => 'Intention title';
 }

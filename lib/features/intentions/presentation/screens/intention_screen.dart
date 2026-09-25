@@ -34,6 +34,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (context) =>
@@ -42,7 +43,9 @@ class _IntentionScreenState extends State<IntentionScreen> {
       child: BlocBuilder<IntentionBloc, IntentionState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n.journal)),
+            appBar: hasParentScaffold
+                ? null
+                : AppBar(title: Text(l10n.journal)),
             floatingActionButton: FloatingActionButton(
               onPressed: () => _showAddDialog(context, today),
               child: const Icon(Icons.add),
@@ -156,7 +159,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _reflectionController,
-              decoration: const InputDecoration(hintText: 'Your reflection...'),
+              decoration: InputDecoration(hintText: l10n.reflectionHint),
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -194,7 +197,9 @@ class _IntentionScreenState extends State<IntentionScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(hintText: 'Intention title'),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.intentionTitle,
+              ),
             ),
           ],
         ),

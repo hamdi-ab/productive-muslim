@@ -209,12 +209,12 @@ void main() {
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+    expect(find.byIcon(Icons.radio_button_unchecked_rounded), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.check_circle_outline));
+    await tester.tap(find.byIcon(Icons.radio_button_unchecked_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
   });
 
   testWidgets('renders in Arabic locale', (tester) async {

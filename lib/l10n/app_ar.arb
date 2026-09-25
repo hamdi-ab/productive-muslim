@@ -199,5 +199,9 @@
   "habitAddCategory": "الفئة",
   "habitNoCompletions": "لا توجد إكمالات بعد",
   "habitToday": "اليوم",
-  "habitSwipeDelete": "حذف"
+  "habitSwipeDelete": "حذف",
+  "enterYourName": "أدخل اسمك...",
+  "weeklyTrack": "المتابعة الأسبوعية",
+  "reflectionHint": "تأملك...",
+  "intentionTitle": "عنوان النية"
 }

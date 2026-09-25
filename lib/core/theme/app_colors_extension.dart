@@ -3,32 +3,60 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Branding
-  static const Color primary = Color(0xFF2E7D4F);
-  static const Color secondary = Color(0xFFD4AF37);
+  // Branding Primary & Secondary
+  static const Color primary = Color(0xFF0F4C3A); // Deep Emerald
+  static const Color primaryLight = Color(0xFF10B981); // Bright Mint
+  static const Color primaryDark = Color(0xFF082E23); // Dark Forest
+  static const Color secondary = Color(0xFFD4AF37); // Warm Gold
+  static const Color secondaryLight = Color(0xFFF59E0B); // Amber Gold
 
   // Surfaces
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFF5F5F5);
+  static const Color background = Color(0xFFF8FAF9); // Soft Porcelain Light
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceSubtle = Color(0xFFF0F4F2);
 
-  // Text
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textDisabled = Color(0xFFBDBDBD);
+  // Dark Theme Colors
+  static const Color darkBackground = Color(0xFF0B1512); // Midnight Forest
+  static const Color darkSurface = Color(0xFF13221C); // Deep Emerald Surface
+  static const Color darkSurfaceSubtle = Color(0xFF1B2D26);
 
-  // States
-  static const Color error = Color(0xFFD32F2F);
-  static const Color success = Color(0xFF388E3C);
+  // Text Colors
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textDisabled = Color(0xFF9CA3AF);
 
-  // Light theme overrides
-  static const lightBackground = Color(0xFFFFFFFF);
-  static const lightSurface = Color(0xFFF5F5F5);
-  static const lightTextPrimary = Color(0xFF212121);
-  static const lightTextSecondary = Color(0xFF757575);
+  static const Color darkTextPrimary = Color(0xFFF9FAFB);
+  static const Color darkTextSecondary = Color(0xFF9CA3AF);
 
-  // Dark theme overrides
-  static const darkBackground = Color(0xFF121212);
-  static const darkSurface = Color(0xFF1E1E1E);
-  static const darkTextPrimary = Color(0xFFFFFFFF);
-  static const darkTextSecondary = Color(0xFFB0B0B0);
+  // States & Accents
+  static const Color error = Color(0xFFEF4444);
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color info = Color(0xFF3B82F6);
+
+  // Gradients
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFF0F4C3A), Color(0xFF10B981)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient goldGradient = LinearGradient(
+    colors: [Color(0xFFD4AF37), Color(0xFFF59E0B)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient darkCardGradient = LinearGradient(
+    colors: [Color(0xFF13221C), Color(0xFF1B2D26)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Glassmorphic Colors
+  static Color glassBackgroundLight = Colors.white.withValues(alpha: 0.75);
+  static Color glassBackgroundDark = const Color(0xFF13221C)
+      .withValues(alpha: 0.75);
+  static Color glassBorderLight = Colors.white.withValues(alpha: 0.5);
+  static Color glassBorderDark = Colors.white.withValues(alpha: 0.12);
 }
