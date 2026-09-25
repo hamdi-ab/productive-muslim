@@ -31,19 +31,24 @@ class HomeContent extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeroBanner(context, l10n, displayDate),
-          const SizedBox(height: AppSpacing.md),
-          const _HomePrayerCard(),
-          const SizedBox(height: AppSpacing.lg),
-          _buildDailyProgressSection(context, today, l10n),
-          const SizedBox(height: AppSpacing.lg),
-          _buildQualitiesCarousel(context),
-          const SizedBox(height: AppSpacing.lg),
-          _buildTodayTaskOverview(context, today, l10n),
-        ],
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeroBanner(context, l10n, displayDate),
+              const SizedBox(height: AppSpacing.md),
+              const _HomePrayerCard(),
+              const SizedBox(height: AppSpacing.lg),
+              _buildDailyProgressSection(context, today, l10n),
+              const SizedBox(height: AppSpacing.lg),
+              _buildQualitiesCarousel(context),
+              const SizedBox(height: AppSpacing.lg),
+              _buildTodayTaskOverview(context, today, l10n),
+            ],
+          ),
+        ),
       ),
     );
   }

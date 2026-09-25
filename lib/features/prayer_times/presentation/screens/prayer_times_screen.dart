@@ -82,49 +82,54 @@ class _PrayerTimesList extends StatelessWidget {
 
     final hasLocation = locationName != null && locationName!.isNotEmpty;
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      itemCount: entries.length + (hasLocation ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (hasLocation && index == 0) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.xs,
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.location_on_rounded,
-                  size: 16,
-                  color: AppColors.primary,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          itemCount: entries.length + (hasLocation ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (hasLocation && index == 0) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.xs,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  locationName!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary,
-                  ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      locationName!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        }
+              );
+            }
 
-        final entryIndex = hasLocation ? index - 1 : index;
-        final (key, name, time) = entries[entryIndex];
-        final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
+            final entryIndex = hasLocation ? index - 1 : index;
+            final (key, name, time) = entries[entryIndex];
+            final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
 
-        return _PrayerTile(
-          name: name,
-          time: timeFormat.format(time),
-          isNext: isNext,
-        );
-      },
+            return _PrayerTile(
+              name: name,
+              time: timeFormat.format(time),
+              isNext: isNext,
+            );
+          },
+        ),
+      ),
     );
   }
 }
