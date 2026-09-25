@@ -60,19 +60,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get yourName => 'اسمك';
 
   @override
-  String get introduction => 'ما الذي ي bringingك اليوم؟';
+  String get introduction => 'ما الذي أتى بك اليوم؟';
 
   @override
-  String get seekingBarakah => 'أبحث عن بارة في وقتي';
+  String get seekingBarakah => 'أبحث عن البركة في وقتي';
 
   @override
   String get consistentWorship => 'عبادة مستمرة وروتين';
 
   @override
-  String get mindfulProductivity => 'كفاءة واعية';
+  String get mindfulProductivity => 'إنتاجية واعية';
 
   @override
-  String get writeYourOwn => 'أو اكتب半个تك';
+  String get writeYourOwn => 'أو اكتب نيتك بنفسك';
 
   @override
   String get onboardingWelcomeTitle => 'ابنِ يومك حول ما يهم';
@@ -88,7 +88,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingNameSubtitle => 'نستخدمه لتخصيص تجربتك';
 
   @override
-  String get onboardingIntentionTitle => 'ما الذي ي bringsك اليوم؟';
+  String get onboardingIntentionTitle => 'ما الذي أتى بك اليوم؟';
 
   @override
   String get onboardingIntentionSubtitle => 'اختر نيتك أو اكتبها بنفسك';
@@ -102,7 +102,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingPermissionBody =>
-      'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+      'السماح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
 
   @override
   String get onboardingPermissionGrant => 'السماح بالوصول';
@@ -132,13 +132,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get allowLocation =>
-      'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+      'السماح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
 
   @override
   String get onboardingQualitiesTitle => 'ما هي الصفات التي تريد أن تبنيها؟';
 
   @override
-  String get onboardingQualitiesSubtitle => 'اختر حتى3 للتركيز عليها';
+  String get onboardingQualitiesSubtitle => 'اختر حتى 3 للتركيز عليها';
 
   @override
   String get qualityTaqwa => 'تقوى الله';
@@ -168,7 +168,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qualityTawakkul => 'التوكل على الله';
 
   @override
-  String get qualityTawakkulDesc => 'الاعتماد على الله بعد اخذ الاسباب';
+  String get qualityTawakkulDesc => 'الاعتماد على الله بعد الأخذ بالأسباب';
 
   @override
   String get qualityIhsan => 'الإحسان';
@@ -192,7 +192,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qualityUmmah => 'الأمة';
 
   @override
-  String get qualityUmmahDesc => 'القوة من خلال الأخوة والأختية';
+  String get qualityUmmahDesc => 'القوة من خلال التآخي والترابط';
 
   @override
   String get calculationMethod => 'طريقة الحساب';
@@ -216,7 +216,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get newTask => 'مهمة جديدة';
 
   @override
-  String get newHabit => 'عادت جديدة';
+  String get newHabit => 'عادة جديدة';
 
   @override
   String get save => 'حفظ';
@@ -234,7 +234,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get done => 'تم';
 
   @override
-  String get skip => ' Amber';
+  String get skip => 'تخطي';
 
   @override
   String get remindMeLater => 'ذكرني لاحقاً';
@@ -246,7 +246,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get retry => 'أعد المحاولة';
 
   @override
-  String get loading => 'Loading...';
+  String get loading => 'جارٍ التحميل...';
 
   @override
   String get emptyTasks => 'لا توجد مهام اليوم';
@@ -291,16 +291,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emptyIntentions => 'لا توجد نيات بعد';
 
   @override
-  String get emptyBarakah => 'لا توجد إدخلات برة بعد';
+  String get emptyBarakah => 'لا توجد مدخلات بركة بعد';
 
   @override
   String get active => 'نشيط';
 
   @override
-  String get reflected => 'تم التفكير';
+  String get reflected => 'تم التأمل';
 
   @override
-  String get archived => 'أرشيف';
+  String get archived => 'مؤرشف';
 
   @override
   String streak(Object count) {
@@ -308,7 +308,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get nextPrayer => 'الصلوة القادمة';
+  String get nextPrayer => 'الصلاة القادمة';
 
   @override
   String inTime(Object time) {
@@ -319,7 +319,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get today => 'اليوم';
 
   @override
-  String get week => 'أسبوع';
+  String get week => 'الأسبوع';
 
   @override
   String get all => 'الكل';
@@ -328,7 +328,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings => 'الإعدادات';
 
   @override
-  String get notifications => 'الإخطارات';
+  String get notifications => 'الإشعارات';
 
   @override
   String get barakahReminderLabel => 'تذكير يومي بالبركة';
@@ -399,16 +399,16 @@ class AppLocalizationsAr extends AppLocalizations {
       'احصل على إشعارات في أوقات الصلاة';
 
   @override
-  String get islam => 'إسلام';
+  String get islam => 'الإسلام';
 
   @override
-  String get family => 'أسماء';
+  String get family => 'العائلة';
 
   @override
-  String get work => 'عمل';
+  String get work => 'العمل';
 
   @override
-  String get personalDev => 'تطور شخصي';
+  String get personalDev => 'التطوير الشخصي';
 
   @override
   String get todayIntentions => 'نيات اليوم';
@@ -605,7 +605,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get habitAddCategory => 'الفئة';
 
   @override
-  String get habitNoCompletions => 'لا توجد إكمالات بعد';
+  String get habitNoCompletions => 'لم تكتمل بعد';
 
   @override
   String get habitToday => 'اليوم';
