@@ -73,6 +73,11 @@ class PrayerTimeService {
   }
 
   String getLocationName(Position? position) {
+    if (position != null) {
+      final lat = position.latitude.toStringAsFixed(2);
+      final lon = position.longitude.toStringAsFixed(2);
+      return '$lat°, $lon°';
+    }
     try {
       final name = tz.local.name;
       if (name.contains('/')) {
@@ -80,11 +85,6 @@ class PrayerTimeService {
         if (city.isNotEmpty && city.toUpperCase() != 'UTC') {
           return city;
         }
-      }
-      if (position != null) {
-        final lat = position.latitude.toStringAsFixed(2);
-        final lon = position.longitude.toStringAsFixed(2);
-        return '$lat°, $lon°';
       }
     } catch (_) {}
     return 'Local';
