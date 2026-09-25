@@ -159,7 +159,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _reflectionController,
-              decoration: const InputDecoration(hintText: 'Your reflection...'),
+              decoration: InputDecoration(hintText: l10n.reflectionHint),
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -197,7 +197,9 @@ class _IntentionScreenState extends State<IntentionScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(hintText: 'Intention title'),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.intentionTitle,
+              ),
             ),
           ],
         ),

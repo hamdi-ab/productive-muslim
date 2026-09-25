@@ -49,51 +49,57 @@ class FloatingGlassNavBar extends StatelessWidget {
             final isSelected = index == currentIndex;
             final item = items[index];
 
-            return GestureDetector(
-              onTap: () => onTap(index),
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOutCubic,
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSelected ? 14 : 10,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? (isDark
-                            ? AppColors.primaryLight.withValues(alpha: 0.2)
-                            : AppColors.primary.withValues(alpha: 0.12))
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isSelected ? item.activeIcon : item.icon,
-                      size: 22,
-                      color: isSelected
-                          ? (isDark
-                                ? AppColors.primaryLight
-                                : AppColors.primary)
-                          : (isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary),
-                    ),
-                    if (isSelected) ...[
-                      const SizedBox(width: 8),
-                      Text(
-                        item.label,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.primaryLight
-                              : AppColors.primary,
-                        ),
+            return Semantics(
+              label: item.label,
+              button: true,
+              selected: isSelected,
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: () => onTap(index),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSelected ? 14 : 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark
+                              ? AppColors.primaryLight.withValues(alpha: 0.2)
+                              : AppColors.primary.withValues(alpha: 0.12))
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected ? item.activeIcon : item.icon,
+                        size: 22,
+                        color: isSelected
+                            ? (isDark
+                                  ? AppColors.primaryLight
+                                  : AppColors.primary)
+                            : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary),
                       ),
+                      if (isSelected) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          item.label,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.primaryLight
+                                : AppColors.primary,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             );

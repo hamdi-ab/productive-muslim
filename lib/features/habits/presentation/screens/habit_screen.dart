@@ -148,7 +148,7 @@ class _HabitList extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  AppLifeArea.labels[entry.key] ?? entry.key,
+                  _getLocalizedCategoryName(entry.key, l10n),
                   style: Theme.of(context).textTheme.titleSmall
                       ?.copyWith(fontWeight: FontWeight.w600),
                 ),
@@ -164,6 +164,16 @@ class _HabitList extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  String _getLocalizedCategoryName(String key, AppLocalizations l10n) {
+    return switch (key) {
+      'islam' => l10n.islam,
+      'family' => l10n.family,
+      'work' => l10n.work,
+      'personal_dev' => l10n.personalDev,
+      _ => AppLifeArea.labels[key] ?? key,
+    };
   }
 }
 
@@ -205,17 +215,17 @@ class _WeekHeader extends StatelessWidget {
                     color: AppColors.secondary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.local_fire_department_rounded,
                         size: 14,
                         color: AppColors.secondary,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
-                        'Weekly Track',
-                        style: TextStyle(
+                        l10n.weeklyTrack,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: AppColors.secondary,
@@ -360,39 +370,51 @@ class _HabitTile extends StatelessWidget {
               : Colors.white.withValues(alpha: 0.8),
           child: Row(
             children: [
-              GestureDetector(
-                key: Key('habit_checkbox_${habit.id}'),
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  context.read<HabitBloc>().add(
-                    HabitCompletionToggled(habit.id),
-                  );
-                },
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: completed ? color : Colors.transparent,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: completed
-                          ? color
-                          : (isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textDisabled),
-                      width: 2,
+              Semantics(
+                label: habit.name,
+                checked: completed,
+                button: true,
+                child: GestureDetector(
+                  key: Key('habit_checkbox_${habit.id}'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.read<HabitBloc>().add(
+                      HabitCompletionToggled(habit.id),
+                    );
+                  },
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: completed ? color : Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: completed
+                                ? color
+                                : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textDisabled),
+                            width: 2,
+                          ),
+                        ),
+                        child: completed
+                            ? const Icon(
+                                Icons.check_rounded,
+                                size: 18,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
                     ),
                   ),
-                  child: completed
-                      ? const Icon(
-                          Icons.check_rounded,
-                          size: 18,
-                          color: Colors.white,
-                        )
-                      : null,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   habit.name,
@@ -412,6 +434,7 @@ class _HabitTile extends StatelessWidget {
               ),
               if (streak > 0)
                 Container(
+                  key: Key('habit_streak_${habit.id}'),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 4,

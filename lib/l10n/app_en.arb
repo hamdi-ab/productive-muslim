@@ -199,5 +199,9 @@
   "habitAddCategory": "Category",
   "habitNoCompletions": "No completions yet",
   "habitToday": "Today",
-  "habitSwipeDelete": "Delete"
+  "habitSwipeDelete": "Delete",
+  "enterYourName": "Enter your name...",
+  "weeklyTrack": "Weekly Track",
+  "reflectionHint": "Your reflection...",
+  "intentionTitle": "Intention title"
 }

@@ -40,10 +40,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       await _repository.toggleTask(event.taskId);
       final current = state;
       if (current is Loaded) {
-        final toggledTask = current.tasks.firstWhere(
-          (t) => t.id == event.taskId,
-          orElse: () => current.tasks.first,
-        );
+        Task? toggledTask;
+        for (final t in current.tasks) {
+          if (t.id == event.taskId) {
+            toggledTask = t;
+            break;
+          }
+        }
         final updated = current.tasks
             .map(
               (t) => t.id == event.taskId
@@ -54,7 +57,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(Loaded(updated));
 
         // Auto-create next occurrence for recurring tasks
-        if (!toggledTask.completed &&
+        if (toggledTask != null &&
+            !toggledTask.completed &&
             (toggledTask.repeatDaily || toggledTask.repeatWeekly)) {
           await _createNextOccurrence(toggledTask);
         }
@@ -69,9 +73,17 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     DateTime nextDate;
 
     if (task.repeatDaily) {
-      nextDate = currentDate.add(const Duration(days: 1));
+      nextDate = DateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day + 1,
+      );
     } else if (task.repeatWeekly) {
-      nextDate = currentDate.add(const Duration(days: 7));
+      nextDate = DateTime(
+        currentDate.year,
+        currentDate.month,
+        currentDate.day + 7,
+      );
     } else {
       return;
     }

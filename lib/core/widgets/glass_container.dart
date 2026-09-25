@@ -44,32 +44,36 @@ class GlassContainer extends StatelessWidget {
         borderColor ??
         (isDark ? AppColors.glassBorderDark : AppColors.glassBorderLight);
 
-    Widget content = ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: Container(
-          width: width,
-          height: height,
-          padding: padding,
-          decoration: BoxDecoration(
-            color: effectiveColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: effectiveBorderColor, width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: (isDark ? Colors.black : Colors.black12).withValues(
-                  alpha: 0.08,
-                ),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+    final containerWidget = Container(
+      width: width,
+      height: height,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: effectiveColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: effectiveBorderColor, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? Colors.black : Colors.black12).withValues(
+              alpha: 0.08,
+            ),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
-          child: child,
-        ),
+        ],
       ),
+      child: child,
     );
+
+    Widget content = blur > 0
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(borderRadius),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+              child: containerWidget,
+            ),
+          )
+        : containerWidget;
 
     if (margin != EdgeInsets.zero) {
       content = Padding(padding: margin, child: content);

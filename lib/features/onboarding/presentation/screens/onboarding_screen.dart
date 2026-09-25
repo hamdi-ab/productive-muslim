@@ -325,7 +325,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 textAlign: TextAlign.center,
                               ),
                             const SizedBox(height: 36),
-                            if (step.hasInput) _buildNameInput(isDark),
+                            if (step.hasInput) _buildNameInput(l10n, isDark),
                             if (step.hasChips)
                               _buildIntentionChips(l10n, isDark),
                             if (step.hasQualities)
@@ -377,7 +377,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildNameInput(bool isDark) {
+  Widget _buildNameInput(AppLocalizations l10n, bool isDark) {
     return GlassContainer(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       borderRadius: 20,
@@ -386,7 +386,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         textCapitalization: TextCapitalization.words,
         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
-          hintText: 'Enter your name...',
+          hintText: l10n.enterYourName,
           hintStyle: TextStyle(
             color: isDark
                 ? AppColors.darkTextSecondary.withValues(alpha: 0.7)

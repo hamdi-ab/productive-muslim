@@ -223,14 +223,13 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     }
 
     final position = await widget.service!.getCurrentPosition();
+    if (!mounted) return;
     if (position == null) {
-      if (mounted) {
-        setState(() {
-          _nextPrayer = '--';
-          _countdown = '--:--';
-          _loading = false;
-        });
-      }
+      setState(() {
+        _nextPrayer = '--';
+        _countdown = '--:--';
+        _loading = false;
+      });
       return;
     }
 
@@ -315,7 +314,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
               else
                 Flexible(
                   child: Text(
-                    '$_nextPrayer $_countdown',
+                    '${_getLocalizedPrayerName(_nextPrayer, l10n)} $_countdown',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
@@ -332,4 +331,16 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
       ),
     );
   }
+}
+
+String _getLocalizedPrayerName(String key, AppLocalizations l10n) {
+  return switch (key.toLowerCase()) {
+    'fajr' => l10n.fajr,
+    'sunrise' => l10n.sunrise,
+    'dhuhr' => l10n.dhuhr,
+    'asr' => l10n.asr,
+    'maghrib' => l10n.maghrib,
+    'isha' => l10n.isha,
+    _ => key,
+  };
 }

@@ -491,8 +491,9 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
 
       final service = getIt<PrayerTimeService>();
       final position = await service.getCurrentPosition();
+      if (!mounted) return;
       if (position == null) {
-        if (mounted) setState(() => _loading = false);
+        setState(() => _loading = false);
         return;
       }
 
@@ -591,7 +592,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                     )
                   else
                     Text(
-                      '$_nextPrayer in $_countdown',
+                      '${_getLocalizedPrayerName(_nextPrayer, l10n)} in $_countdown',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -633,4 +634,16 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       ),
     );
   }
+}
+
+String _getLocalizedPrayerName(String key, AppLocalizations l10n) {
+  return switch (key.toLowerCase()) {
+    'fajr' => l10n.fajr,
+    'sunrise' => l10n.sunrise,
+    'dhuhr' => l10n.dhuhr,
+    'asr' => l10n.asr,
+    'maghrib' => l10n.maghrib,
+    'isha' => l10n.isha,
+    _ => key,
+  };
 }

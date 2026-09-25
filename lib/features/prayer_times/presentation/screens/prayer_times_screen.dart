@@ -61,20 +61,20 @@ class _PrayerTimesList extends StatelessWidget {
     final timeFormat = DateFormat.jm();
 
     final entries = [
-      (l10n.fajr, prayerTimes.fajr as DateTime),
-      (l10n.sunrise, prayerTimes.sunrise as DateTime),
-      (l10n.dhuhr, prayerTimes.dhuhr as DateTime),
-      (l10n.asr, prayerTimes.asr as DateTime),
-      (l10n.maghrib, prayerTimes.maghrib as DateTime),
-      (l10n.isha, prayerTimes.isha as DateTime),
+      ('Fajr', l10n.fajr, prayerTimes.fajr as DateTime),
+      ('Sunrise', l10n.sunrise, prayerTimes.sunrise as DateTime),
+      ('Dhuhr', l10n.dhuhr, prayerTimes.dhuhr as DateTime),
+      ('Asr', l10n.asr, prayerTimes.asr as DateTime),
+      ('Maghrib', l10n.maghrib, prayerTimes.maghrib as DateTime),
+      ('Isha', l10n.isha, prayerTimes.isha as DateTime),
     ];
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       itemCount: entries.length,
       itemBuilder: (context, index) {
-        final (name, time) = entries[index];
-        final isNext = name.toLowerCase() == nextPrayer.toLowerCase();
+        final (key, name, time) = entries[index];
+        final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
 
         return _PrayerTile(
           name: name,

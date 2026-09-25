@@ -612,4 +612,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get habitSwipeDelete => 'حذف';
+
+  @override
+  String get enterYourName => 'أدخل اسمك...';
+
+  @override
+  String get weeklyTrack => 'المتابعة الأسبوعية';
+
+  @override
+  String get reflectionHint => 'تأملك...';
+
+  @override
+  String get intentionTitle => 'عنوان النية';
 }
