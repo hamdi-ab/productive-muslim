@@ -18,6 +18,7 @@ import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/data/services/local_barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
+import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -79,6 +80,12 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
   getIt.registerLazySingleton<AdhanNotificationService>(
     () => AdhanNotificationService(),
+  );
+  getIt.registerLazySingleton<AdhkarService>(
+    () => AdhkarService(
+      prayerTimeService: getIt<PrayerTimeService>(),
+      settingsService: getIt<SettingsService>(),
+    ),
   );
 
   // Router

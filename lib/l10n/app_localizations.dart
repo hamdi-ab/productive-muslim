@@ -1477,6 +1477,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Islamic Foundation'**
   String get qualityDetailsContext;
+
+  /// No description provided for @adhkarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Adhkar & Remembrances'**
+  String get adhkarTitle;
+
+  /// No description provided for @adhkarMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Adhkar'**
+  String get adhkarMorning;
+
+  /// No description provided for @adhkarEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Adhkar'**
+  String get adhkarEvening;
+
+  /// No description provided for @adhkarWaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Waking Up Du\'as'**
+  String get adhkarWaking;
+
+  /// No description provided for @adhkarSleeping.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedtime Adhkar'**
+  String get adhkarSleeping;
+
+  /// No description provided for @adhkarPostPrayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Salah Adhkar'**
+  String get adhkarPostPrayer;
+
+  /// No description provided for @adhkarDailySunnah.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Sunnah Remembrances'**
+  String get adhkarDailySunnah;
+
+  /// No description provided for @adhkarTapToCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap anywhere to count'**
+  String get adhkarTapToCount;
+
+  /// No description provided for @adhkarCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed! Alhamdulillah'**
+  String get adhkarCompleted;
+
+  /// No description provided for @adhkarCompletedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'May Allah accept your remembrance and fill your day with Barakah.'**
+  String get adhkarCompletedMsg;
+
+  /// No description provided for @adhkarVirtue.
+  ///
+  /// In en, this message translates to:
+  /// **'Hadith & Spiritual Virtue'**
+  String get adhkarVirtue;
+
+  /// No description provided for @adhkarNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Dhikr'**
+  String get adhkarNext;
+
+  /// No description provided for @adhkarPrev.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get adhkarPrev;
+
+  /// No description provided for @adhkarReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Count'**
+  String get adhkarReset;
+
+  /// No description provided for @adhkarTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Transliteration'**
+  String get adhkarTransliteration;
+
+  /// No description provided for @adhkarTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get adhkarTranslation;
+
+  /// No description provided for @adhkarPillMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Adhkar • Light & Protection'**
+  String get adhkarPillMorning;
+
+  /// No description provided for @adhkarPillEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Adhkar • Evening Shield'**
+  String get adhkarPillEvening;
+
+  /// No description provided for @adhkarPillSleeping.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedtime Adhkar • Guard your night'**
+  String get adhkarPillSleeping;
+
+  /// No description provided for @adhkarPillPostPrayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Salah Adhkar • 33x Tasbih'**
+  String get adhkarPillPostPrayer;
 }
 
 class _AppLocalizationsDelegate

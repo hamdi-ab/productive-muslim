@@ -798,4 +798,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qualityDetailsContext => 'Islamic Foundation';
+
+  @override
+  String get adhkarTitle => 'Daily Adhkar & Remembrances';
+
+  @override
+  String get adhkarMorning => 'Morning Adhkar';
+
+  @override
+  String get adhkarEvening => 'Evening Adhkar';
+
+  @override
+  String get adhkarWaking => 'Waking Up Du\'as';
+
+  @override
+  String get adhkarSleeping => 'Bedtime Adhkar';
+
+  @override
+  String get adhkarPostPrayer => 'Post-Salah Adhkar';
+
+  @override
+  String get adhkarDailySunnah => 'Daily Sunnah Remembrances';
+
+  @override
+  String get adhkarTapToCount => 'Tap anywhere to count';
+
+  @override
+  String get adhkarCompleted => 'Completed! Alhamdulillah';
+
+  @override
+  String get adhkarCompletedMsg =>
+      'May Allah accept your remembrance and fill your day with Barakah.';
+
+  @override
+  String get adhkarVirtue => 'Hadith & Spiritual Virtue';
+
+  @override
+  String get adhkarNext => 'Next Dhikr';
+
+  @override
+  String get adhkarPrev => 'Previous';
+
+  @override
+  String get adhkarReset => 'Reset Count';
+
+  @override
+  String get adhkarTransliteration => 'Transliteration';
+
+  @override
+  String get adhkarTranslation => 'Translation';
+
+  @override
+  String get adhkarPillMorning => 'Morning Adhkar • Light & Protection';
+
+  @override
+  String get adhkarPillEvening => 'Evening Adhkar • Evening Shield';
+
+  @override
+  String get adhkarPillSleeping => 'Bedtime Adhkar • Guard your night';
+
+  @override
+  String get adhkarPillPostPrayer => 'Post-Salah Adhkar • 33x Tasbih';
 }

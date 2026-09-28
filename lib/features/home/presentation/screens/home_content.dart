@@ -18,6 +18,7 @@ import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_adhkar_pill.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeContent extends StatelessWidget {
@@ -38,6 +39,8 @@ class HomeContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeroBanner(context, l10n, displayDate),
+              const SizedBox(height: AppSpacing.md),
+              const HomeAdhkarPill(),
               const SizedBox(height: AppSpacing.md),
               const _HomePrayerCard(),
               const SizedBox(height: AppSpacing.lg),

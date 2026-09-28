@@ -13,10 +13,12 @@ import 'package:productive_muslim/features/tasks/presentation/screens/task_scree
 import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
 import 'package:productive_muslim/domain/models/task.dart';
+import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -110,6 +112,14 @@ class AppRouter {
               GoRoute(
                 path: '/energy',
                 builder: (context, state) => const EnergyScreen(),
+              ),
+              GoRoute(
+                path: '/adhkar',
+                builder: (context, state) => AdhkarScreen(
+                  initialCategory: state.extra is DhikrCategory
+                      ? state.extra as DhikrCategory
+                      : DhikrCategory.morning,
+                ),
               ),
             ],
           ),
