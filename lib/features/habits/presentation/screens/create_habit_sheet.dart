@@ -16,14 +16,17 @@ class CreateHabitSheet extends StatefulWidget {
 
 class _CreateHabitSheetState extends State<CreateHabitSheet> {
   final _nameController = TextEditingController();
-  String _category = 'islam';
+  String _category = 'spiritual';
   bool _canSave = false;
 
   static const _categories = [
+    ('spiritual', AppLifeArea.spiritual),
+    ('physical', AppLifeArea.physical),
+    ('social', AppLifeArea.social),
+    ('personal_dev', AppLifeArea.personalDev),
     ('islam', AppLifeArea.islam),
     ('family', AppLifeArea.family),
     ('work', AppLifeArea.work),
-    ('personal_dev', AppLifeArea.personalDev),
   ];
 
   @override
@@ -61,6 +64,19 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final categoryLabels = {
+      'spiritual': l10n.sphereSpiritual,
+      'physical': l10n.spherePhysical,
+      'social': l10n.sphereSocial,
+      'personal_dev': l10n.personalDev,
+      'islam': l10n.islam,
+      'family': l10n.family,
+      'work': l10n.work,
+    };
+
+    // Show primary 3 spheres + personal_dev first
+    final primaryCategories = _categories.take(4);
+
     return Padding(
       padding: EdgeInsets.fromLTRB(
         24,
@@ -95,14 +111,13 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _categories.map((entry) {
+            children: primaryCategories.map((entry) {
               final (key, color) = entry;
-              final categoryLabels = {
-                'islam': l10n.islam,
-                'family': l10n.family,
-                'work': l10n.work,
-                'personal_dev': l10n.personalDev,
-              };
+              final isSelected =
+                  _category == key ||
+                  (_category == 'islam' && key == 'spiritual') ||
+                  (_category == 'family' && key == 'social') ||
+                  (_category == 'work' && key == 'social');
               return FilterChip(
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -119,7 +134,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                     Text(categoryLabels[key] ?? key),
                   ],
                 ),
-                selected: _category == key,
+                selected: isSelected,
                 onSelected: (_) => setState(() => _category = key),
               );
             }).toList(),

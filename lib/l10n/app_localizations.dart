@@ -1165,6 +1165,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Intention title'**
   String get intentionTitle;
+
+  /// No description provided for @sphereSpiritual.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Sphere'**
+  String get sphereSpiritual;
+
+  /// No description provided for @spherePhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical Sphere'**
+  String get spherePhysical;
+
+  /// No description provided for @sphereSocial.
+  ///
+  /// In en, this message translates to:
+  /// **'Social Sphere'**
+  String get sphereSocial;
+
+  /// No description provided for @sphereSpiritualDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Salah, Quran, Dhikr, Fasting, and Islamic learning'**
+  String get sphereSpiritualDesc;
+
+  /// No description provided for @spherePhysicalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep, Qaylulah, nutrition, fitness, and vitality'**
+  String get spherePhysicalDesc;
+
+  /// No description provided for @sphereSocialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Family, marriage, work excellence, and Ummah'**
+  String get sphereSocialDesc;
+
+  /// No description provided for @prayerSlot.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Window'**
+  String get prayerSlot;
+
+  /// No description provided for @prayerSlotNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Specific time only'**
+  String get prayerSlotNone;
+
+  /// No description provided for @slotEarlyMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Fajr Barakah Hour'**
+  String get slotEarlyMorning;
+
+  /// No description provided for @slotEarlyMorningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Early morning golden hours for high focus'**
+  String get slotEarlyMorningDesc;
+
+  /// No description provided for @slotDuha.
+  ///
+  /// In en, this message translates to:
+  /// **'Mid-Morning (Duha)'**
+  String get slotDuha;
+
+  /// No description provided for @slotDuhaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Forenoon prime work and study block'**
+  String get slotDuhaDesc;
+
+  /// No description provided for @slotDhuhr.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Dhuhr'**
+  String get slotDhuhr;
+
+  /// No description provided for @slotDhuhrDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Early afternoon block following Dhuhr prayer'**
+  String get slotDhuhrDesc;
+
+  /// No description provided for @slotAsr.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Asr'**
+  String get slotAsr;
+
+  /// No description provided for @slotAsrDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Late afternoon reflection or physical activity block'**
+  String get slotAsrDesc;
+
+  /// No description provided for @slotMaghrib.
+  ///
+  /// In en, this message translates to:
+  /// **'Between Maghrib & Isha'**
+  String get slotMaghrib;
+
+  /// No description provided for @slotMaghribDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Family time, Quran reading, and light tasks'**
+  String get slotMaghribDesc;
+
+  /// No description provided for @slotIsha.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Isha / Evening'**
+  String get slotIsha;
+
+  /// No description provided for @slotIshaDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Night routine, reflection, and early sleep'**
+  String get slotIshaDesc;
+
+  /// No description provided for @focus.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Mode'**
+  String get focus;
+
+  /// No description provided for @focusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Khushu\' Focus Session'**
+  String get focusTitle;
+
+  /// No description provided for @focusSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work with presence, intention, and divine blessing'**
+  String get focusSubtitle;
+
+  /// No description provided for @focusNiyyahPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Bismillah — Renew your intention for Allah before starting'**
+  String get focusNiyyahPrompt;
+
+  /// No description provided for @focusDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Rabbi zidni \'ilman (My Lord, increase me in knowledge)'**
+  String get focusDua;
+
+  /// No description provided for @focusStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Focus'**
+  String get focusStart;
+
+  /// No description provided for @focusPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get focusPause;
+
+  /// No description provided for @focusResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get focusResume;
+
+  /// No description provided for @focusReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get focusReset;
+
+  /// No description provided for @focusComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Session Complete! Alhamdulillah'**
+  String get focusComplete;
+
+  /// No description provided for @focusCompleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'May Allah put Barakah in your efforts and accept your work.'**
+  String get focusCompleteMessage;
+
+  /// No description provided for @focusTotalMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Focus: {minutes} mins'**
+  String focusTotalMinutes(int minutes);
+
+  /// No description provided for @focusSelectTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a task to focus on (optional)'**
+  String get focusSelectTask;
+
+  /// No description provided for @focusPreset15.
+  ///
+  /// In en, this message translates to:
+  /// **'15 min (Sprint)'**
+  String get focusPreset15;
+
+  /// No description provided for @focusPreset25.
+  ///
+  /// In en, this message translates to:
+  /// **'25 min (Barakah block)'**
+  String get focusPreset25;
+
+  /// No description provided for @focusPreset45.
+  ///
+  /// In en, this message translates to:
+  /// **'45 min (Deep work)'**
+  String get focusPreset45;
+
+  /// No description provided for @focusPreset60.
+  ///
+  /// In en, this message translates to:
+  /// **'60 min (Mastery)'**
+  String get focusPreset60;
+
+  /// No description provided for @energyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Energy & Sunnah Routine'**
+  String get energyTitle;
+
+  /// No description provided for @energySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your spiritual, physical, and mental vitality'**
+  String get energySubtitle;
+
+  /// No description provided for @qaylulah.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Qaylulah'**
+  String get qaylulah;
+
+  /// No description provided for @qaylulahDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A 20-min midday Sunnah power nap to recharge your afternoon'**
+  String get qaylulahDesc;
+
+  /// No description provided for @qaylulahStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Qaylulah Nap'**
+  String get qaylulahStart;
+
+  /// No description provided for @qaylulahWakingDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Alhamdulillahil-ladhi ahyana ba\'da ma amatana wa ilayhin-nushur'**
+  String get qaylulahWakingDua;
+
+  /// No description provided for @sunnahFasting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Fasting'**
+  String get sunnahFasting;
+
+  /// No description provided for @sunnahFastingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mondays, Thursdays, and the White Days (13th, 14th, 15th)'**
+  String get sunnahFastingDesc;
+
+  /// No description provided for @sunnahFastingIntention.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast for Allah today'**
+  String get sunnahFastingIntention;
+
+  /// No description provided for @energyPhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical Vitality'**
+  String get energyPhysical;
+
+  /// No description provided for @energySpiritual.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual State'**
+  String get energySpiritual;
+
+  /// No description provided for @energyMental.
+  ///
+  /// In en, this message translates to:
+  /// **'Mental Focus'**
+  String get energyMental;
+
+  /// No description provided for @energySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy check-in updated'**
+  String get energySaved;
+
+  /// No description provided for @qualityDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical Action'**
+  String get qualityDetailsAction;
+
+  /// No description provided for @qualityDetailsContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Islamic Foundation'**
+  String get qualityDetailsContext;
 }
 
 class _AppLocalizationsDelegate

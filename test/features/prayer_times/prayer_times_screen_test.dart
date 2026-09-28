@@ -20,7 +20,8 @@ class MockPrayerTimeService extends PrayerTimeService {
   Future<Position?> getCurrentPosition() async => _position;
 
   @override
-  PrayerTimes? getPrayerTimes(Position position) => _prayerTimes;
+  PrayerTimes? getPrayerTimes(Position position, {DateTime? date}) =>
+      _prayerTimes;
 
   @override
   String? getNextPrayerName(PrayerTimes prayerTimes) {

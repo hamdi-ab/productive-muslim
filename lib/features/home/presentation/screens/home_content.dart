@@ -43,7 +43,9 @@ class HomeContent extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               _buildDailyProgressSection(context, today, l10n),
               const SizedBox(height: AppSpacing.lg),
-              _buildQualitiesCarousel(context),
+              _buildProductivityToolkit(context, l10n),
+              const SizedBox(height: AppSpacing.lg),
+              _buildQualitiesCarousel(context, l10n),
               const SizedBox(height: AppSpacing.lg),
               _buildTodayTaskOverview(context, today, l10n),
             ],
@@ -274,34 +276,206 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildQualitiesCarousel(BuildContext context) {
+  Widget _buildProductivityToolkit(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    return Row(
+      children: [
+        // Focus Mode Card
+        Expanded(
+          child: InkWell(
+            onTap: () => context.push('/focus'),
+            borderRadius: BorderRadius.circular(20),
+            child: GlassContainer(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.timer_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.focus,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Khushu\' Timer',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        // Energy & Routine Card
+        Expanded(
+          child: InkWell(
+            onTap: () => context.push('/energy'),
+            borderRadius: BorderRadius.circular(20),
+            child: GlassContainer(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.bolt_rounded,
+                          color: AppColors.secondary,
+                          size: 20,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 16,
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Sunnah Routine',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Energy & Fasting',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQualitiesCarousel(BuildContext context, AppLocalizations l10n) {
     final qualities = [
-      {
-        'name': 'Ihsan',
-        'icon': Icons.star_rounded,
-        'color': AppColors.secondary,
-      },
-      {
-        'name': 'Tawakkul',
-        'icon': Icons.shield_rounded,
-        'color': AppColors.primary,
-      },
-      {
-        'name': 'Discipline',
-        'icon': Icons.fitness_center_rounded,
-        'color': Colors.blue,
-      },
-      {'name': 'Energy', 'icon': Icons.bolt_rounded, 'color': Colors.orange},
-      {
-        'name': 'Intentionality',
-        'icon': Icons.psychology_rounded,
-        'color': Colors.purple,
-      },
-      {
-        'name': 'Gratitude',
-        'icon': Icons.favorite_rounded,
-        'color': Colors.pink,
-      },
+      (
+        id: 'taqwa',
+        name: l10n.qualityTaqwa,
+        desc: l10n.qualityTaqwaDesc,
+        icon: Icons.mosque_rounded,
+        color: AppColors.primary,
+        context: '"And whoever fears Allah - He will make for him a way out and provide for him from where he does not expect." (Quran 65:2-3)',
+        action: 'Pause before your next major task and ensure your intention and methods are pleasing to Allah.',
+      ),
+      (
+        id: 'ikhlas',
+        name: l10n.qualityIkhlas,
+        desc: l10n.qualityIkhlasDesc,
+        icon: Icons.favorite_rounded,
+        color: Colors.pink,
+        context: '"Actions are judged by intentions." (Sahih Bukhari)',
+        action: 'Renew your Niyyah: dedicate this day’s study, work, or service purely for Allah’s pleasure.',
+      ),
+      (
+        id: 'sabr',
+        name: l10n.qualitySabr,
+        desc: l10n.qualitySabrDesc,
+        icon: Icons.hourglass_bottom_rounded,
+        color: Colors.orange,
+        context: '"Indeed, Allah is with the patient." (Quran 2:153)',
+        action: 'Stay steadfast through challenging work blocks and resist the urge to get distracted.',
+      ),
+      (
+        id: 'shukr',
+        name: l10n.qualityShukr,
+        desc: l10n.qualityShukrDesc,
+        icon: Icons.thumb_up_rounded,
+        color: Colors.teal,
+        context:
+            '"If you are grateful, I will surely increase you." (Quran 14:7)',
+        action: 'Say Alhamdulillah after completing each task and express gratitude for your energy and faculties.',
+      ),
+      (
+        id: 'tawakkul',
+        name: l10n.qualityTawakkul,
+        desc: l10n.qualityTawakkulDesc,
+        icon: Icons.shield_rounded,
+        color: Colors.indigo,
+        context: '"Tie your camel, and then put your trust in Allah." (Sunan at-Tirmidhi)',
+        action: 'Plan and execute with full effort, then let go of anxiety by entrusting the results to Allah.',
+      ),
+      (
+        id: 'ihsan',
+        name: l10n.qualityIhsan,
+        desc: l10n.qualityIhsanDesc,
+        icon: Icons.star_rounded,
+        color: AppColors.secondary,
+        context: '"Allah loves that when one of you does a job, he does it with excellence (Itqan)." (Al-Bayhaqi)',
+        action: 'Review your current task and apply extra polish and craftsmanship before sending it.',
+      ),
+      (
+        id: 'ilm',
+        name: l10n.qualityIlm,
+        desc: l10n.qualityIlmDesc,
+        icon: Icons.menu_book_rounded,
+        color: Colors.blue,
+        context: '"Say: My Lord, increase me in knowledge." (Quran 20:114)',
+        action: 'Dedicate 20 minutes today to reading beneficial knowledge (Quran, study, skill development).',
+      ),
+      (
+        id: 'dawah',
+        name: l10n.qualityDawah,
+        desc: l10n.qualityDawahDesc,
+        icon: Icons.campaign_rounded,
+        color: Colors.amber,
+        context: '"Invite to the way of your Lord with wisdom and good instruction." (Quran 16:125)',
+        action: 'Lead by example in the workplace or university with honesty, punctuality, and good character.',
+      ),
+      (
+        id: 'ummah',
+        name: l10n.qualityUmmah,
+        desc: l10n.qualityUmmahDesc,
+        icon: Icons.groups_rounded,
+        color: Colors.purple,
+        context: '"The believers in their mutual kindness and compassion are like one body." (Sahih Muslim)',
+        action: 'Check in on family, help a colleague, or do an act of service for the community today.',
+      ),
     ];
 
     return Column(
@@ -322,12 +496,12 @@ class HomeContent extends StatelessWidget {
             itemCount: qualities.length,
             itemBuilder: (context, index) {
               final q = qualities[index];
-              final qColor = q['color'] as Color;
+              final qColor = q.color;
 
               return Padding(
                 padding: const EdgeInsets.only(right: 10),
                 child: InkWell(
-                  onTap: () => context.go('/barakah'),
+                  onTap: () => _showQualityDetails(context, q, l10n),
                   borderRadius: BorderRadius.circular(24),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -341,10 +515,10 @@ class HomeContent extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(q['icon'] as IconData, size: 18, color: qColor),
+                        Icon(q.icon, size: 18, color: qColor),
                         const SizedBox(width: 8),
                         Text(
-                          q['name'] as String,
+                          q.name,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -360,6 +534,154 @@ class HomeContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showQualityDetails(
+    BuildContext context,
+    ({
+      String id,
+      String name,
+      String desc,
+      IconData icon,
+      Color color,
+      String context,
+      String action,
+    })
+    quality,
+    AppLocalizations l10n,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: quality.color.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(quality.icon, color: quality.color, size: 28),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          quality.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          quality.desc,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Islamic Foundation
+              Text(
+                l10n.qualityDetailsContext,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  quality.context,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Practical Action
+              Text(
+                l10n.qualityDetailsAction,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  color: AppColors.secondary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  quality.action,
+                  style: const TextStyle(fontSize: 13, height: 1.4),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l10n.done),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

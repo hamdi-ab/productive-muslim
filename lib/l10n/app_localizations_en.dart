@@ -628,4 +628,174 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get intentionTitle => 'Intention title';
+
+  @override
+  String get sphereSpiritual => 'Spiritual Sphere';
+
+  @override
+  String get spherePhysical => 'Physical Sphere';
+
+  @override
+  String get sphereSocial => 'Social Sphere';
+
+  @override
+  String get sphereSpiritualDesc =>
+      'Salah, Quran, Dhikr, Fasting, and Islamic learning';
+
+  @override
+  String get spherePhysicalDesc =>
+      'Sleep, Qaylulah, nutrition, fitness, and vitality';
+
+  @override
+  String get sphereSocialDesc => 'Family, marriage, work excellence, and Ummah';
+
+  @override
+  String get prayerSlot => 'Prayer Window';
+
+  @override
+  String get prayerSlotNone => 'Specific time only';
+
+  @override
+  String get slotEarlyMorning => 'Post-Fajr Barakah Hour';
+
+  @override
+  String get slotEarlyMorningDesc =>
+      'Early morning golden hours for high focus';
+
+  @override
+  String get slotDuha => 'Mid-Morning (Duha)';
+
+  @override
+  String get slotDuhaDesc => 'Forenoon prime work and study block';
+
+  @override
+  String get slotDhuhr => 'Post-Dhuhr';
+
+  @override
+  String get slotDhuhrDesc => 'Early afternoon block following Dhuhr prayer';
+
+  @override
+  String get slotAsr => 'Post-Asr';
+
+  @override
+  String get slotAsrDesc =>
+      'Late afternoon reflection or physical activity block';
+
+  @override
+  String get slotMaghrib => 'Between Maghrib & Isha';
+
+  @override
+  String get slotMaghribDesc => 'Family time, Quran reading, and light tasks';
+
+  @override
+  String get slotIsha => 'Post-Isha / Evening';
+
+  @override
+  String get slotIshaDesc => 'Night routine, reflection, and early sleep';
+
+  @override
+  String get focus => 'Focus Mode';
+
+  @override
+  String get focusTitle => 'Khushu\' Focus Session';
+
+  @override
+  String get focusSubtitle =>
+      'Work with presence, intention, and divine blessing';
+
+  @override
+  String get focusNiyyahPrompt =>
+      'Bismillah — Renew your intention for Allah before starting';
+
+  @override
+  String get focusDua =>
+      'Rabbi zidni \'ilman (My Lord, increase me in knowledge)';
+
+  @override
+  String get focusStart => 'Start Focus';
+
+  @override
+  String get focusPause => 'Pause';
+
+  @override
+  String get focusResume => 'Resume';
+
+  @override
+  String get focusReset => 'Reset';
+
+  @override
+  String get focusComplete => 'Focus Session Complete! Alhamdulillah';
+
+  @override
+  String get focusCompleteMessage =>
+      'May Allah put Barakah in your efforts and accept your work.';
+
+  @override
+  String focusTotalMinutes(int minutes) {
+    return 'Total Focus: $minutes mins';
+  }
+
+  @override
+  String get focusSelectTask => 'Select a task to focus on (optional)';
+
+  @override
+  String get focusPreset15 => '15 min (Sprint)';
+
+  @override
+  String get focusPreset25 => '25 min (Barakah block)';
+
+  @override
+  String get focusPreset45 => '45 min (Deep work)';
+
+  @override
+  String get focusPreset60 => '60 min (Mastery)';
+
+  @override
+  String get energyTitle => 'Daily Energy & Sunnah Routine';
+
+  @override
+  String get energySubtitle =>
+      'Manage your spiritual, physical, and mental vitality';
+
+  @override
+  String get qaylulah => 'Sunnah Qaylulah';
+
+  @override
+  String get qaylulahDesc =>
+      'A 20-min midday Sunnah power nap to recharge your afternoon';
+
+  @override
+  String get qaylulahStart => 'Start Qaylulah Nap';
+
+  @override
+  String get qaylulahWakingDua =>
+      'Alhamdulillahil-ladhi ahyana ba\'da ma amatana wa ilayhin-nushur';
+
+  @override
+  String get sunnahFasting => 'Sunnah Fasting';
+
+  @override
+  String get sunnahFastingDesc =>
+      'Mondays, Thursdays, and the White Days (13th, 14th, 15th)';
+
+  @override
+  String get sunnahFastingIntention => 'Fast for Allah today';
+
+  @override
+  String get energyPhysical => 'Physical Vitality';
+
+  @override
+  String get energySpiritual => 'Spiritual State';
+
+  @override
+  String get energyMental => 'Mental Focus';
+
+  @override
+  String get energySaved => 'Energy check-in updated';
+
+  @override
+  String get qualityDetailsAction => 'Practical Action';
+
+  @override
+  String get qualityDetailsContext => 'Islamic Foundation';
 }
