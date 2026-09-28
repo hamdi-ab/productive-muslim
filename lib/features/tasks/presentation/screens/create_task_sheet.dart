@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
+import 'package:productive_muslim/core/constants/app_prayer_slots.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
@@ -21,9 +24,10 @@ class CreateTaskSheet extends StatefulWidget {
 class _CreateTaskSheetState extends State<CreateTaskSheet> {
   final _titleController = TextEditingController();
   final _notesController = TextEditingController();
-  String _lifeArea = 'islam';
+  String _lifeArea = 'spiritual';
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+  String? _selectedPrayerSlot;
   bool _repeatDaily = false;
   bool _repeatWeekly = false;
 
@@ -49,6 +53,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
     final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked != null) {
       setState(() {
+        _selectedPrayerSlot = null;
         if (isStart) {
           _startTime = picked;
           // Auto-set end time to start + 1 hour if not set
@@ -63,8 +68,38 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
     }
   }
 
+  void _selectPrayerSlot(BarakahSlot slot) async {
+    HapticFeedback.selectionClick();
+    int startMins = slot.defaultStartMinutes;
+    int endMins = slot.defaultEndMinutes;
+
+    try {
+      if (getIt.isRegistered<PrayerTimeService>()) {
+        final prayerService = getIt<PrayerTimeService>();
+        final pos = await prayerService.getCurrentPosition();
+        if (pos != null) {
+          final pt = prayerService.getPrayerTimes(pos);
+          final calculated = prayerService.getSlotMinutes(slot.id, pt);
+          startMins = calculated.startMinutes;
+          endMins = calculated.endMinutes;
+        }
+      }
+    } catch (_) {}
+
+    if (!mounted) return;
+    setState(() {
+      _selectedPrayerSlot = slot.id;
+      _startTime = TimeOfDay(
+        hour: (startMins ~/ 60) % 24,
+        minute: startMins % 60,
+      );
+      _endTime = TimeOfDay(hour: (endMins ~/ 60) % 24, minute: endMins % 60);
+    });
+  }
+
   void _clearTime() {
     setState(() {
+      _selectedPrayerSlot = null;
       _startTime = null;
       _endTime = null;
     });
@@ -179,7 +214,6 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             backgroundColor: isDark
                                 ? AppColors.darkSurfaceSubtle
                                 : AppColors.surfaceSubtle,
-                            padding: const EdgeInsets.all(8),
                           ),
                         ),
                       ],
@@ -233,7 +267,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
-                    // Life Area Section
+                    // Life Area / 3 Spheres Section
                     Text(
                       l10n.lifeArea,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -247,6 +281,57 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                     _LifeAreaSelector(
                       selected: _lifeArea,
                       onChanged: (area) => setState(() => _lifeArea = area),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // Prayer-Anchored Barakah Window Section
+                    Text(
+                      l10n.prayerSlot,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: BarakahSlot.all.map((slot) {
+                          final isSelected = _selectedPrayerSlot == slot.id;
+                          final label = switch (slot.id) {
+                            'early_morning' => l10n.slotEarlyMorning,
+                            'duha' => l10n.slotDuha,
+                            'dhuhr' => l10n.slotDhuhr,
+                            'asr' => l10n.slotAsr,
+                            'maghrib' => l10n.slotMaghrib,
+                            'isha' => l10n.slotIsha,
+                            _ => slot.id,
+                          };
+
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              avatar: Icon(
+                                slot.icon,
+                                size: 16,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.textSecondary),
+                              ),
+                              label: Text(label),
+                              selected: isSelected,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onSelected: (_) => _selectPrayerSlot(slot),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
@@ -442,27 +527,40 @@ class _LifeAreaSelector extends StatelessWidget {
   const _LifeAreaSelector({required this.selected, required this.onChanged});
 
   static const _areas = [
+    ('spiritual', AppLifeArea.spiritual),
+    ('physical', AppLifeArea.physical),
+    ('social', AppLifeArea.social),
+    ('personal_dev', AppLifeArea.personalDev),
     ('islam', AppLifeArea.islam),
     ('family', AppLifeArea.family),
     ('work', AppLifeArea.work),
-    ('personal_dev', AppLifeArea.personalDev),
   ];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final labels = {
+      'spiritual': l10n.sphereSpiritual,
+      'physical': l10n.spherePhysical,
+      'social': l10n.sphereSocial,
+      'personal_dev': l10n.personalDev,
       'islam': l10n.islam,
       'family': l10n.family,
       'work': l10n.work,
-      'personal_dev': l10n.personalDev,
     };
+
+    // Show primary 3 spheres + personal_dev first
+    final displayAreas = _areas.take(4);
 
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
-      children: _areas.map((area) {
-        final isSelected = selected == area.$1;
+      children: displayAreas.map((area) {
+        final isSelected =
+            selected == area.$1 ||
+            (selected == 'islam' && area.$1 == 'spiritual') ||
+            (selected == 'family' && area.$1 == 'social') ||
+            (selected == 'work' && area.$1 == 'social');
         return FilterChip(
           avatar: Container(
             width: 10,

@@ -16,6 +16,8 @@ class SettingsService {
   static const _barakahReminderKey = 'barakah_reminder';
   static const _locationPermissionKey = 'location_permission';
   static const _adhanNotificationsKey = 'adhan_notifications';
+  static const _totalFocusMinutesKey = 'total_focus_minutes';
+  static const _sunnahFastingTargetKey = 'sunnah_fasting_target';
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);
@@ -84,4 +86,46 @@ class SettingsService {
 
   Future<void> setAdhanNotificationsEnabled(bool enabled) async =>
       _prefs?.setBool(_adhanNotificationsKey, enabled);
+
+  int get totalFocusMinutes => _prefs?.getInt(_totalFocusMinutesKey) ?? 0;
+
+  Future<void> addFocusMinutes(int minutes) async {
+    final current = totalFocusMinutes;
+    await _prefs?.setInt(_totalFocusMinutesKey, current + minutes);
+  }
+
+  bool isSunnahFastingTarget(String date) {
+    final list = _prefs?.getStringList(_sunnahFastingTargetKey) ?? [];
+    return list.contains(date);
+  }
+
+  Future<void> toggleSunnahFastingTarget(String date) async {
+    final list = List<String>.from(
+      _prefs?.getStringList(_sunnahFastingTargetKey) ?? [],
+    );
+    if (list.contains(date)) {
+      list.remove(date);
+    } else {
+      list.add(date);
+    }
+    await _prefs?.setStringList(_sunnahFastingTargetKey, list);
+  }
+
+  ({int physical, int spiritual, int mental}) getDailyEnergy(String date) {
+    final p = _prefs?.getInt('energy_p_$date') ?? 3;
+    final s = _prefs?.getInt('energy_s_$date') ?? 3;
+    final m = _prefs?.getInt('energy_m_$date') ?? 3;
+    return (physical: p, spiritual: s, mental: m);
+  }
+
+  Future<void> setDailyEnergy({
+    required String date,
+    required int physical,
+    required int spiritual,
+    required int mental,
+  }) async {
+    await _prefs?.setInt('energy_p_$date', physical);
+    await _prefs?.setInt('energy_s_$date', spiritual);
+    await _prefs?.setInt('energy_m_$date', mental);
+  }
 }

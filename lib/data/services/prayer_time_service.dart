@@ -26,12 +26,12 @@ class PrayerTimeService {
     }
   }
 
-  PrayerTimes? getPrayerTimes(Position position) {
+  PrayerTimes? getPrayerTimes(Position position, {DateTime? date}) {
     final coordinates = Coordinates(position.latitude, position.longitude);
     final params = CalculationMethodParameters.muslimWorldLeague();
 
     return PrayerTimes(
-      date: DateTime.now(),
+      date: date ?? DateTime.now(),
       coordinates: coordinates,
       calculationParameters: params,
     );
@@ -90,5 +90,69 @@ class PrayerTimeService {
     }
 
     return 'Local';
+  }
+
+  ({int startMinutes, int endMinutes}) getSlotMinutes(
+    String slotId,
+    PrayerTimes? prayerTimes,
+  ) {
+    if (prayerTimes != null) {
+      int toMins(DateTime dt) => dt.hour * 60 + dt.minute;
+
+      switch (slotId) {
+        case 'early_morning':
+          return (
+            startMinutes: toMins(prayerTimes.fajr),
+            endMinutes: toMins(prayerTimes.sunrise),
+          );
+        case 'duha':
+          return (
+            startMinutes: toMins(
+              prayerTimes.sunrise.add(const Duration(minutes: 20)),
+            ),
+            endMinutes: toMins(prayerTimes.dhuhr),
+          );
+        case 'dhuhr':
+          return (
+            startMinutes: toMins(prayerTimes.dhuhr),
+            endMinutes: toMins(prayerTimes.asr),
+          );
+        case 'asr':
+          return (
+            startMinutes: toMins(prayerTimes.asr),
+            endMinutes: toMins(prayerTimes.maghrib),
+          );
+        case 'maghrib':
+          return (
+            startMinutes: toMins(prayerTimes.maghrib),
+            endMinutes: toMins(prayerTimes.isha),
+          );
+        case 'isha':
+          return (
+            startMinutes: toMins(prayerTimes.isha),
+            endMinutes: toMins(
+              prayerTimes.isha.add(const Duration(minutes: 90)),
+            ),
+          );
+      }
+    }
+
+    // Default fallback approximations
+    switch (slotId) {
+      case 'early_morning':
+        return (startMinutes: 330, endMinutes: 420); // 5:30 - 7:00
+      case 'duha':
+        return (startMinutes: 540, endMinutes: 690); // 9:00 - 11:30
+      case 'dhuhr':
+        return (startMinutes: 780, endMinutes: 900); // 13:00 - 15:00
+      case 'asr':
+        return (startMinutes: 990, endMinutes: 1080); // 16:30 - 18:00
+      case 'maghrib':
+        return (startMinutes: 1110, endMinutes: 1185); // 18:30 - 19:45
+      case 'isha':
+        return (startMinutes: 1230, endMinutes: 1320); // 20:30 - 22:00
+      default:
+        return (startMinutes: 540, endMinutes: 600);
+    }
   }
 }

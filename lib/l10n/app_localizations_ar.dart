@@ -624,4 +624,166 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get intentionTitle => 'عنوان النية';
+
+  @override
+  String get sphereSpiritual => 'المجال الروحي';
+
+  @override
+  String get spherePhysical => 'المجال الجسدي';
+
+  @override
+  String get sphereSocial => 'المجال الاجتماعي';
+
+  @override
+  String get sphereSpiritualDesc =>
+      'الصلاة، القرآن، الأذكار، الصيام، والعلم الشرعي';
+
+  @override
+  String get spherePhysicalDesc => 'النوم، القيلولة، التغذية، اللياقة، والنشاط';
+
+  @override
+  String get sphereSocialDesc => 'الأسرة، الزواج، الإتقان المهني، وخدمة الأمة';
+
+  @override
+  String get prayerSlot => 'نافذة الصلاة';
+
+  @override
+  String get prayerSlotNone => 'وقت محدد فقط';
+
+  @override
+  String get slotEarlyMorning => 'ساعة البركة (بعد الفجر)';
+
+  @override
+  String get slotEarlyMorningDesc =>
+      'ساعات الصباح الأولى الذهبية للتركيز العالي';
+
+  @override
+  String get slotDuha => 'الضحى (وسط الصباح)';
+
+  @override
+  String get slotDuhaDesc => 'فترة العمل والدراسة الرئيسية قبل الظهر';
+
+  @override
+  String get slotDhuhr => 'بعد الظهر';
+
+  @override
+  String get slotDhuhrDesc => 'فترة بداية الظهيرة بعد صلاة الظهر';
+
+  @override
+  String get slotAsr => 'بعد العصر';
+
+  @override
+  String get slotAsrDesc => 'فترة أواخر المساء للتأمل أو النشاط البدني';
+
+  @override
+  String get slotMaghrib => 'بين المغرب والعشاء';
+
+  @override
+  String get slotMaghribDesc => 'وقت العائلة وقراءة القرآن والمهام الخفيفة';
+
+  @override
+  String get slotIsha => 'بعد العشاء / المساء';
+
+  @override
+  String get slotIshaDesc => 'روتين الليل، المحاسبة، والنوم المبكر';
+
+  @override
+  String get focus => 'جلسة التركيز';
+
+  @override
+  String get focusTitle => 'جلسة تركيز وخشوع';
+
+  @override
+  String get focusSubtitle => 'اعمل بحضور قلب ونيّة خالصة وبركة إلهية';
+
+  @override
+  String get focusNiyyahPrompt => 'بسم الله — جدد نيتك لله تعالى قبل البدء';
+
+  @override
+  String get focusDua => 'رَّبِّ زِدْنِي عِلْمًا';
+
+  @override
+  String get focusStart => 'ابدأ التركيز';
+
+  @override
+  String get focusPause => 'إيقاف مؤقت';
+
+  @override
+  String get focusResume => 'استئناف';
+
+  @override
+  String get focusReset => 'إعادة ضبط';
+
+  @override
+  String get focusComplete => 'تمت جلسة التركيز! الحمد لله';
+
+  @override
+  String get focusCompleteMessage => 'بارك الله في جهدك وتقبل عملك ونفع بك.';
+
+  @override
+  String focusTotalMinutes(int minutes) {
+    return 'إجمالي التركيز: $minutes دقيقة';
+  }
+
+  @override
+  String get focusSelectTask => 'اختر مهمة للتركيز عليها (اختياري)';
+
+  @override
+  String get focusPreset15 => '15 دقيقة (سريعة)';
+
+  @override
+  String get focusPreset25 => '25 دقيقة (كتلة بركة)';
+
+  @override
+  String get focusPreset45 => '45 دقيقة (عمل عميق)';
+
+  @override
+  String get focusPreset60 => '60 دقيقة (إتقان)';
+
+  @override
+  String get energyTitle => 'طاقة اليوم وروتين السنة';
+
+  @override
+  String get energySubtitle => 'وازن بين طاقتك الروحية والجسدية والذهنية';
+
+  @override
+  String get qaylulah => 'القيلولة النبوية';
+
+  @override
+  String get qaylulahDesc =>
+      'قيلولة الظهيرة النبوية (20 دقيقة) لتجديد نشاط المساء';
+
+  @override
+  String get qaylulahStart => 'ابدأ القيلولة';
+
+  @override
+  String get qaylulahWakingDua =>
+      'الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور';
+
+  @override
+  String get sunnahFasting => 'صيام التطوع';
+
+  @override
+  String get sunnahFastingDesc => 'الإثنين والخميس والأيام البيض (13، 14، 15)';
+
+  @override
+  String get sunnahFastingIntention => 'أصوم اليوم تقرباً لله';
+
+  @override
+  String get energyPhysical => 'الطاقة الجسدية';
+
+  @override
+  String get energySpiritual => 'الحالة الروحية';
+
+  @override
+  String get energyMental => 'التركيز الذهني';
+
+  @override
+  String get energySaved => 'تم تحديث تقييم الطاقة';
+
+  @override
+  String get qualityDetailsAction => 'التطبيق العملي';
+
+  @override
+  String get qualityDetailsContext => 'الأصل والأساس الشرعي';
 }

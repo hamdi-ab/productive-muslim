@@ -56,7 +56,11 @@ class HomeScreen extends StatelessWidget {
     final headerInfo = _getHeaderInfo(location, l10n);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isSubPage = location == '/settings' || location == '/prayer-times';
+    final isSubPage =
+        location == '/settings' ||
+        location == '/prayer-times' ||
+        location == '/focus' ||
+        location == '/energy';
 
     return Scaffold(
       extendBody: true,
@@ -146,6 +150,8 @@ class HomeScreen extends StatelessWidget {
       '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
       '/settings' => (title: l10n.settings, icon: Icons.settings_rounded),
       '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
+      '/focus' => (title: l10n.focusTitle, icon: Icons.timer_rounded),
+      '/energy' => (title: l10n.energyTitle, icon: Icons.bolt_rounded),
       _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
     };
   }

@@ -168,6 +168,9 @@ class _HabitList extends StatelessWidget {
 
   String _getLocalizedCategoryName(String key, AppLocalizations l10n) {
     return switch (key) {
+      'spiritual' => l10n.sphereSpiritual,
+      'physical' => l10n.spherePhysical,
+      'social' => l10n.sphereSocial,
       'islam' => l10n.islam,
       'family' => l10n.family,
       'work' => l10n.work,

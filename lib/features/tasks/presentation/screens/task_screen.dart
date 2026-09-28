@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
@@ -333,6 +334,15 @@ class _TaskTile extends StatelessWidget {
                 ),
               ),
               IconButton(
+                tooltip: 'Focus on task',
+                icon: const Icon(
+                  Icons.timer_outlined,
+                  size: 20,
+                  color: AppColors.primary,
+                ),
+                onPressed: () => context.push('/focus'),
+              ),
+              IconButton(
                 icon: Icon(
                   task.completed
                       ? Icons.check_circle_rounded
@@ -364,6 +374,9 @@ class _TaskTile extends StatelessWidget {
 
   static String _areaLabel(AppLocalizations l10n, String area) {
     return switch (area) {
+      'spiritual' => l10n.sphereSpiritual,
+      'physical' => l10n.spherePhysical,
+      'social' => l10n.sphereSocial,
       'islam' => l10n.islam,
       'family' => l10n.family,
       'work' => l10n.work,
