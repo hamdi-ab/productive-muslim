@@ -340,7 +340,7 @@ class _TaskTile extends StatelessWidget {
                   size: 20,
                   color: AppColors.primary,
                 ),
-                onPressed: () => context.push('/focus'),
+                onPressed: () => context.push('/focus', extra: task),
               ),
               IconButton(
                 icon: Icon(

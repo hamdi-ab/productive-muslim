@@ -97,7 +97,10 @@ class PrayerTimeService {
     PrayerTimes? prayerTimes,
   ) {
     if (prayerTimes != null) {
-      int toMins(DateTime dt) => dt.hour * 60 + dt.minute;
+      int toMins(DateTime dt) {
+        final local = dt.toLocal();
+        return local.hour * 60 + local.minute;
+      }
 
       switch (slotId) {
         case 'early_morning':

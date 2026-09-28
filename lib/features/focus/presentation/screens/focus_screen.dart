@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
@@ -31,6 +30,7 @@ class _FocusScreenState extends State<FocusScreen> {
   bool _isRunning = false;
   Timer? _timer;
   Task? _selectedTask;
+  Stream<List<Task>>? _tasksStream;
 
   final _presets = [15, 25, 45, 60];
 
@@ -39,6 +39,13 @@ class _FocusScreenState extends State<FocusScreen> {
     super.initState();
     _selectedTask = widget.initialTask;
     _secondsRemaining = _selectedDurationMinutes * 60;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+    _tasksStream ??= context.read<TaskRepository>().watchTasksForDate(today);
   }
 
   @override
@@ -183,8 +190,6 @@ class _FocusScreenState extends State<FocusScreen> {
         return 0;
       }
     }();
-
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return Scaffold(
       appBar: AppBar(
@@ -378,12 +383,20 @@ class _FocusScreenState extends State<FocusScreen> {
 
                 // Task link card (Stream from TaskRepository)
                 StreamBuilder<List<Task>>(
-                  stream: context.read<TaskRepository>().watchTasksForDate(
-                    today,
-                  ),
+                  stream: _tasksStream,
                   builder: (context, snapshot) {
                     final tasks = snapshot.data ?? [];
                     if (tasks.isEmpty) return const SizedBox.shrink();
+
+                    Task? matchedTask;
+                    if (_selectedTask != null) {
+                      for (final task in tasks) {
+                        if (task.id == _selectedTask?.id) {
+                          matchedTask = task;
+                          break;
+                        }
+                      }
+                    }
 
                     return GlassContainer(
                       padding: const EdgeInsets.all(16),
@@ -410,7 +423,7 @@ class _FocusScreenState extends State<FocusScreen> {
                           ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<Task?>(
-                            initialValue: _selectedTask,
+                            initialValue: matchedTask,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,

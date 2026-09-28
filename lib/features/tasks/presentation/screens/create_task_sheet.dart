@@ -78,7 +78,11 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
         final prayerService = getIt<PrayerTimeService>();
         final pos = await prayerService.getCurrentPosition();
         if (pos != null) {
-          final pt = prayerService.getPrayerTimes(pos);
+          DateTime? taskDate;
+          try {
+            taskDate = DateTime.parse(widget.date);
+          } catch (_) {}
+          final pt = prayerService.getPrayerTimes(pos, date: taskDate);
           final calculated = prayerService.getSlotMinutes(slot.id, pt);
           startMins = calculated.startMinutes;
           endMins = calculated.endMinutes;

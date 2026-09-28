@@ -79,6 +79,7 @@ class _EnergyScreenState extends State<EnergyScreen> {
     HapticFeedback.lightImpact();
     final settings = _getSettings();
     await settings.toggleSunnahFastingTarget(_today);
+    if (!mounted) return;
     setState(() => _isFasting = !_isFasting);
   }
 
