@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/models/barakah_analytics_summary.dart';
 import 'package:productive_muslim/domain/models/barakah_daily_response.dart';
 import 'package:productive_muslim/domain/models/barakah_weekly_review.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_state.dart';
+import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_analytics_cards.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class BarakahReviewScreen extends StatelessWidget {
@@ -106,6 +110,7 @@ class _ReviewView extends StatelessWidget {
                   BarakahReviewLoaded(:final review) => _ReviewContent(
                     key: ValueKey(state.week.startDate),
                     review: review,
+                    week: state.week,
                   ),
                 },
               ),
@@ -134,14 +139,31 @@ String _answerLabel(AppLocalizations l10n, BarakahAnswer answer) =>
     };
 
 class _ReviewContent extends StatelessWidget {
-  const _ReviewContent({super.key, required this.review});
+  const _ReviewContent({super.key, required this.review, required this.week});
 
   final BarakahWeeklyReview review;
+  final BarakahReviewWeek week;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final sources = review.sourceCounts;
+
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+
+    final analytics = BarakahWeeklyAnalytics.calculate(
+      review: review,
+      week: week,
+      getEnergy: (date) =>
+          settings?.getDailyEnergy(date) ??
+          (physical: 3, spiritual: 3, mental: 3),
+      getDhikr: (date) => settings?.getCompletedDhikrIds(date) ?? [],
+      isFasting: (date) => settings?.isSunnahFastingTarget(date) ?? false,
+      languageCode: Localizations.localeOf(context).languageCode,
+    );
+
     return ListView(
       key: const Key('review-list'),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -175,6 +197,12 @@ class _ReviewContent extends StatelessWidget {
             ),
             key: Key('review-source-${entry.key}'),
           ),
+        const SizedBox(height: AppSpacing.lg),
+        BarakahConsistencyMatrixCard(analytics: analytics),
+        const SizedBox(height: AppSpacing.md),
+        EnergyTriadBreakdownCard(analytics: analytics),
+        const SizedBox(height: AppSpacing.md),
+        BarakahCoachingInsightsCard(analytics: analytics),
         const SizedBox(height: AppSpacing.lg),
         Text(l10n.barakahWeeklyDays, style: AppTypography.labelLarge),
         for (final day in review.days) _ReviewDay(day: day),
