@@ -1657,6 +1657,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunnah'**
   String get adhkarTabSunnah;
+
+  /// No description provided for @smartNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Adhkar & Sunnah Reminders'**
+  String get smartNotificationsTitle;
+
+  /// No description provided for @smartNotificationsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic reminders anchored to solar prayer times and Sunnah schedules.'**
+  String get smartNotificationsDesc;
+
+  /// No description provided for @settingMorningAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Adhkar (Post-Fajr)'**
+  String get settingMorningAdhkar;
+
+  /// No description provided for @settingMorningAdhkarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Timed 15 min after Fajr during your morning Barakah window.'**
+  String get settingMorningAdhkarDesc;
+
+  /// No description provided for @settingEveningAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Adhkar (Post-Asr)'**
+  String get settingEveningAdhkar;
+
+  /// No description provided for @settingEveningAdhkarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortify your soul with evening remembrances before sunset.'**
+  String get settingEveningAdhkarDesc;
+
+  /// No description provided for @settingBedtimeAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedtime Adhkar & Wind-down'**
+  String get settingBedtimeAdhkar;
+
+  /// No description provided for @settingBedtimeAdhkarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminds you before sleep to recite Surat Al-Ikhlas, Falaq, Nas.'**
+  String get settingBedtimeAdhkarDesc;
+
+  /// No description provided for @settingBedtimeTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Bedtime'**
+  String get settingBedtimeTime;
+
+  /// No description provided for @settingSunnahFasting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Fasting Reminders'**
+  String get settingSunnahFasting;
+
+  /// No description provided for @settingSunnahFastingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nudge on Sunday & Wednesday evenings to intend Mon/Thu fasting.'**
+  String get settingSunnahFastingDesc;
+
+  /// No description provided for @settingQaylulah.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Qaylulah Midday Nap'**
+  String get settingQaylulah;
+
+  /// No description provided for @settingQaylulahDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle reminder 30 min before Dhuhr for a 20-min recharge.'**
+  String get settingQaylulahDesc;
 }
 
 class _AppLocalizationsDelegate

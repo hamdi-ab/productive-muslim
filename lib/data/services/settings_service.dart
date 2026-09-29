@@ -148,4 +148,50 @@ class SettingsService {
 
   Future<void> setAdhkarHapticsEnabled(bool enabled) async =>
       _prefs?.setBool('adhkar_haptics_enabled', enabled);
+
+  // Smart Reminders & Notifications
+  bool get morningAdhkarNotificationEnabled =>
+      _prefs?.getBool('notif_morning_adhkar') ?? true;
+
+  Future<void> setMorningAdhkarNotificationEnabled(bool enabled) async =>
+      _prefs?.setBool('notif_morning_adhkar', enabled);
+
+  bool get eveningAdhkarNotificationEnabled =>
+      _prefs?.getBool('notif_evening_adhkar') ?? true;
+
+  Future<void> setEveningAdhkarNotificationEnabled(bool enabled) async =>
+      _prefs?.setBool('notif_evening_adhkar', enabled);
+
+  bool get sleepingAdhkarNotificationEnabled =>
+      _prefs?.getBool('notif_sleeping_adhkar') ?? true;
+
+  Future<void> setSleepingAdhkarNotificationEnabled(bool enabled) async =>
+      _prefs?.setBool('notif_sleeping_adhkar', enabled);
+
+  bool get sunnahFastingNotificationEnabled =>
+      _prefs?.getBool('notif_sunnah_fasting') ?? true;
+
+  Future<void> setSunnahFastingNotificationEnabled(bool enabled) async =>
+      _prefs?.setBool('notif_sunnah_fasting', enabled);
+
+  bool get qaylulahNotificationEnabled =>
+      _prefs?.getBool('notif_qaylulah') ?? false;
+
+  Future<void> setQaylulahNotificationEnabled(bool enabled) async =>
+      _prefs?.setBool('notif_qaylulah', enabled);
+
+  int get bedtimeReminderHour => _prefs?.getInt('bedtime_reminder_hour') ?? 22;
+
+  int get bedtimeReminderMinute =>
+      _prefs?.getInt('bedtime_reminder_minute') ?? 30;
+
+  Future<void> setBedtimeReminderTime({
+    required int hour,
+    required int minute,
+  }) async {
+    RangeError.checkValueInInterval(hour, 0, 23, 'hour');
+    RangeError.checkValueInInterval(minute, 0, 59, 'minute');
+    await _prefs?.setInt('bedtime_reminder_hour', hour);
+    await _prefs?.setInt('bedtime_reminder_minute', minute);
+  }
 }

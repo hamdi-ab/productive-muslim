@@ -879,4 +879,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarTabSunnah => 'السنة';
+
+  @override
+  String get smartNotificationsTitle => 'تذكيرات الأذكار والسنن الذكية';
+
+  @override
+  String get smartNotificationsDesc =>
+      'تنبيهات تلقائية تتغير بدقة بحسب مواقيت الصلاة وأوقات السنة النبوية.';
+
+  @override
+  String get settingMorningAdhkar => 'أذكار الصباح (بعد الفجر)';
+
+  @override
+  String get settingMorningAdhkarDesc =>
+      'تنبيه لطيف بعد الفجر بـ 15 دقيقة في ساعة البركة الصباحية.';
+
+  @override
+  String get settingEveningAdhkar => 'أذكار المساء (بعد العصر)';
+
+  @override
+  String get settingEveningAdhkarDesc =>
+      'حصن نفسك بأذكار المساء المأثورة قبل غروب الشمس.';
+
+  @override
+  String get settingBedtimeAdhkar => 'أذكار النوم والورد الليلي';
+
+  @override
+  String get settingBedtimeAdhkarDesc =>
+      'تذكير بقراءة المعوذات والإخلاص ودعاء النوم قبل النوم.';
+
+  @override
+  String get settingBedtimeTime => 'موعد النوم المعتاد';
+
+  @override
+  String get settingSunnahFasting => 'تذكير صيام الاثنين والخميس';
+
+  @override
+  String get settingSunnahFastingDesc =>
+      'تنبيه مساء الأحد والأربعاء لعقد النية لصيام السنة.';
+
+  @override
+  String get settingQaylulah => 'تذكير قيلولة السنة';
+
+  @override
+  String get settingQaylulahDesc =>
+      'تنبيه اختياري قبل صلاة الظهر بـ 30 دقيقة لاستعادة النشاط.';
 }

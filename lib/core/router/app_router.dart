@@ -30,6 +30,14 @@ class AppRouter {
     router.go('/barakah');
   }
 
+  static void handleNotificationPayload(String payload) {
+    if (payload == '/barakah') {
+      openBarakahReminder();
+    } else if (payload.isNotEmpty) {
+      router.go(payload);
+    }
+  }
+
   static bool _isOnboardingDone() {
     try {
       return getIt<SettingsService>().onboardingCompleted;
@@ -115,11 +123,21 @@ class AppRouter {
               ),
               GoRoute(
                 path: '/adhkar',
-                builder: (context, state) => AdhkarScreen(
-                  initialCategory: state.extra is DhikrCategory
-                      ? state.extra as DhikrCategory
-                      : DhikrCategory.morning,
-                ),
+                builder: (context, state) {
+                  DhikrCategory category = DhikrCategory.morning;
+                  if (state.extra is DhikrCategory) {
+                    category = state.extra as DhikrCategory;
+                  } else {
+                    final queryCat = state.uri.queryParameters['category'];
+                    if (queryCat != null) {
+                      category = DhikrCategory.values.firstWhere(
+                        (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
+                        orElse: () => DhikrCategory.morning,
+                      );
+                    }
+                  }
+                  return AdhkarScreen(initialCategory: category);
+                },
               ),
             ],
           ),

@@ -292,5 +292,18 @@
   "adhkarTabWaking": "الاستيقاظ",
   "adhkarTabBedtime": "النوم",
   "adhkarTabPostSalah": "بعد الصلاة",
-  "adhkarTabSunnah": "السنة"
+  "adhkarTabSunnah": "السنة",
+  "smartNotificationsTitle": "تذكيرات الأذكار والسنن الذكية",
+  "smartNotificationsDesc": "تنبيهات تلقائية تتغير بدقة بحسب مواقيت الصلاة وأوقات السنة النبوية.",
+  "settingMorningAdhkar": "أذكار الصباح (بعد الفجر)",
+  "settingMorningAdhkarDesc": "تنبيه لطيف بعد الفجر بـ 15 دقيقة في ساعة البركة الصباحية.",
+  "settingEveningAdhkar": "أذكار المساء (بعد العصر)",
+  "settingEveningAdhkarDesc": "حصن نفسك بأذكار المساء المأثورة قبل غروب الشمس.",
+  "settingBedtimeAdhkar": "أذكار النوم والورد الليلي",
+  "settingBedtimeAdhkarDesc": "تذكير بقراءة المعوذات والإخلاص ودعاء النوم قبل النوم.",
+  "settingBedtimeTime": "موعد النوم المعتاد",
+  "settingSunnahFasting": "تذكير صيام الاثنين والخميس",
+  "settingSunnahFastingDesc": "تنبيه مساء الأحد والأربعاء لعقد النية لصيام السنة.",
+  "settingQaylulah": "تذكير قيلولة السنة",
+  "settingQaylulahDesc": "تنبيه اختياري قبل صلاة الظهر بـ 30 دقيقة لاستعادة النشاط."
 }

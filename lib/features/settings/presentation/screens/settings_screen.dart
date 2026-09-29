@@ -12,6 +12,7 @@ import 'package:productive_muslim/domain/models/barakah_reminder.dart';
 import 'package:productive_muslim/features/settings/logic/settings_bloc.dart';
 import 'package:productive_muslim/features/settings/logic/settings_event.dart';
 import 'package:productive_muslim/features/settings/logic/settings_state.dart';
+import 'package:productive_muslim/features/settings/presentation/widgets/smart_reminders_settings_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -179,7 +180,28 @@ class SettingsView extends StatelessWidget {
                   ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Section 2: Adhan & Prayer Notifications
+                // Section 2: Smart Adhkar & Sunnah Reminders
+                _SectionTitle(
+                  icon: Icons.wb_twilight_rounded,
+                  title: l10n.smartNotificationsTitle,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark
+                      ? AppColors.darkSurfaceSubtle
+                      : AppColors.surfaceSubtle,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: SmartRemindersSettingsCard(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 3: Adhan & Prayer Notifications
                 _SectionTitle(
                   icon: Icons.notifications_active_rounded,
                   title: l10n.notifications,
