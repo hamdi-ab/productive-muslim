@@ -256,5 +256,41 @@
   "energyMental": "Mental Focus",
   "energySaved": "Energy check-in updated",
   "qualityDetailsAction": "Practical Action",
-  "qualityDetailsContext": "Islamic Foundation"
+  "qualityDetailsContext": "Islamic Foundation",
+  "adhkarTitle": "Daily Adhkar & Remembrances",
+  "adhkarMorning": "Morning Adhkar",
+  "adhkarEvening": "Evening Adhkar",
+  "adhkarWaking": "Waking Up Du'as",
+  "adhkarSleeping": "Bedtime Adhkar",
+  "adhkarPostPrayer": "Post-Salah Adhkar",
+  "adhkarDailySunnah": "Daily Sunnah Remembrances",
+  "adhkarTapToCount": "Tap anywhere to count",
+  "adhkarCompleted": "Completed! Alhamdulillah",
+  "adhkarCompletedMsg": "May Allah accept your remembrance and fill your day with Barakah.",
+  "adhkarVirtue": "Hadith & Spiritual Virtue",
+  "adhkarNext": "Next Dhikr",
+  "adhkarPrev": "Previous",
+  "adhkarReset": "Reset Count",
+  "adhkarTransliteration": "Transliteration",
+  "adhkarPillMorning": "Morning Adhkar • Light & Protection",
+  "adhkarPillEvening": "Evening Adhkar • Evening Shield",
+  "adhkarPillSleeping": "Bedtime Adhkar • Guard your night",
+  "adhkarPillPostPrayer": "Post-Salah Adhkar • 33x Tasbih",
+  "adhkarProgress": "{completed} / {total} completed",
+  "@adhkarProgress": {
+    "placeholders": {
+      "completed": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "adhkarEmptyState": "No remembrances in this category yet.",
+  "adhkarActionRecite": "Recite",
+  "adhkarActionReview": "Review",
+  "adhkarPillTapPrompt": "Tap to recite • 1-tap haptic counter",
+  "adhkarTabMorning": "Morning",
+  "adhkarTabEvening": "Evening",
+  "adhkarTabWaking": "Waking",
+  "adhkarTabBedtime": "Bedtime",
+  "adhkarTabPostSalah": "Post-Salah",
+  "adhkarTabSunnah": "Sunnah"
 }

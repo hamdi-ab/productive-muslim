@@ -128,4 +128,24 @@ class SettingsService {
     await _prefs?.setInt('energy_s_$date', spiritual);
     await _prefs?.setInt('energy_m_$date', mental);
   }
+
+  List<String> getCompletedDhikrIds(String date) {
+    return _prefs?.getStringList('adhkar_done_$date') ?? [];
+  }
+
+  Future<void> addCompletedDhikr(String date, String dhikrId) async {
+    final list = List<String>.from(
+      _prefs?.getStringList('adhkar_done_$date') ?? [],
+    );
+    if (!list.contains(dhikrId)) {
+      list.add(dhikrId);
+      await _prefs?.setStringList('adhkar_done_$date', list);
+    }
+  }
+
+  bool get adhkarHapticsEnabled =>
+      _prefs?.getBool('adhkar_haptics_enabled') ?? true;
+
+  Future<void> setAdhkarHapticsEnabled(bool enabled) async =>
+      _prefs?.setBool('adhkar_haptics_enabled', enabled);
 }

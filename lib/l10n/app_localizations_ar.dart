@@ -786,4 +786,97 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qualityDetailsContext => 'الأصل والأساس الشرعي';
+
+  @override
+  String get adhkarTitle => 'الأذكار والأدعية اليومية';
+
+  @override
+  String get adhkarMorning => 'أذكار الصباح';
+
+  @override
+  String get adhkarEvening => 'أذكار المساء';
+
+  @override
+  String get adhkarWaking => 'أذكار الاستيقاظ';
+
+  @override
+  String get adhkarSleeping => 'أذكار النوم';
+
+  @override
+  String get adhkarPostPrayer => 'أذكار بعد الصلاة';
+
+  @override
+  String get adhkarDailySunnah => 'أدعية وأذكار السنة اليومية';
+
+  @override
+  String get adhkarTapToCount => 'المس أي مكان للشاشة للتسبيح';
+
+  @override
+  String get adhkarCompleted => 'تم بحمد الله!';
+
+  @override
+  String get adhkarCompletedMsg =>
+      'تقبل الله ذكرك وطاعتك وجعل يومك عامراً بالبركة.';
+
+  @override
+  String get adhkarVirtue => 'الفضل والحديث النبوي';
+
+  @override
+  String get adhkarNext => 'الذكر التالي';
+
+  @override
+  String get adhkarPrev => 'السابق';
+
+  @override
+  String get adhkarReset => 'إعادة العد';
+
+  @override
+  String get adhkarTransliteration => 'النطق بالحروف اللاتينية';
+
+  @override
+  String get adhkarPillMorning => 'أذكار الصباح • نور وحفظ';
+
+  @override
+  String get adhkarPillEvening => 'أذكار المساء • حصن المسلم';
+
+  @override
+  String get adhkarPillSleeping => 'أذكار النوم • حرز ليلتك';
+
+  @override
+  String get adhkarPillPostPrayer => 'أذكار ما بعد الصلاة • تسبيح';
+
+  @override
+  String adhkarProgress(int completed, int total) {
+    return 'تم $completed من أصل $total';
+  }
+
+  @override
+  String get adhkarEmptyState => 'لا توجد أذكار في هذا القسم حالياً.';
+
+  @override
+  String get adhkarActionRecite => 'تسبيح';
+
+  @override
+  String get adhkarActionReview => 'مراجعة';
+
+  @override
+  String get adhkarPillTapPrompt => 'المس للبدء • عدّاد لمسي ذكي';
+
+  @override
+  String get adhkarTabMorning => 'الصباح';
+
+  @override
+  String get adhkarTabEvening => 'المساء';
+
+  @override
+  String get adhkarTabWaking => 'الاستيقاظ';
+
+  @override
+  String get adhkarTabBedtime => 'النوم';
+
+  @override
+  String get adhkarTabPostSalah => 'بعد الصلاة';
+
+  @override
+  String get adhkarTabSunnah => 'السنة';
 }
