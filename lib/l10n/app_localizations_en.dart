@@ -1006,4 +1006,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String solarCurrentWindow(String slot) {
     return 'Active Window: $slot';
   }
+
+  @override
+  String solarNext(String prayer) {
+    return 'Next: $prayer';
+  }
+
+  @override
+  String get slotTahajjud => 'Tahajjud / Pre-Fajr';
+
+  @override
+  String get slotNight => 'Night / Qiyam';
 }

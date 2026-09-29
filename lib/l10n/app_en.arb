@@ -354,5 +354,13 @@
     "placeholders": {
       "slot": {"type": "String"}
     }
-  }
+  },
+  "solarNext": "Next: {prayer}",
+  "@solarNext": {
+    "placeholders": {
+      "prayer": {"type": "String"}
+    }
+  },
+  "slotTahajjud": "Tahajjud / Pre-Fajr",
+  "slotNight": "Night / Qiyam"
 }

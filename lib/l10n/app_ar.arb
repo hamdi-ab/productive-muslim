@@ -324,5 +324,8 @@
   "qiblaFacingKaaba": "أنت باتجاه القبلة تماماً",
   "qiblaCalibrate": "معايرة البوصلة: حرك الجهاز بشكل رقم 8 بعيداً عن المعادن والمجالات المغناطيسية.",
   "solarDialTitle": "مسار الشمس ومواقيت الصلاة",
-  "solarCurrentWindow": "النافذة الحالية: {slot}"
+  "solarCurrentWindow": "النافذة الحالية: {slot}",
+  "solarNext": "التالي: {prayer}",
+  "slotTahajjud": "التهجد / السحر",
+  "slotNight": "الليل / قيام الليل"
 }

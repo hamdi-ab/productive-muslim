@@ -1849,6 +1849,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active Window: {slot}'**
   String solarCurrentWindow(String slot);
+
+  /// No description provided for @solarNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {prayer}'**
+  String solarNext(String prayer);
+
+  /// No description provided for @slotTahajjud.
+  ///
+  /// In en, this message translates to:
+  /// **'Tahajjud / Pre-Fajr'**
+  String get slotTahajjud;
+
+  /// No description provided for @slotNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Night / Qiyam'**
+  String get slotNight;
 }
 
 class _AppLocalizationsDelegate

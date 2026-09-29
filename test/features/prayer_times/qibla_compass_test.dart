@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
@@ -74,5 +76,35 @@ void main() {
       expect(find.textContaining('عن الشمال'), findsOneWidget);
       expect(find.textContaining('كم إلى الكعبة المشرفة'), findsOneWidget);
     });
+
+    testWidgets(
+      'updates live heading and aligns with Kaaba via headingStream',
+      (tester) async {
+        final headingController = StreamController<double>.broadcast();
+        final service = QiblaService();
+        final bearing = service.getQiblaBearing(30.0444, 31.2357);
+
+        await tester.pumpWidget(
+          buildWidget(
+            child: QiblaCompassView(
+              latitude: 30.0444,
+              longitude: 31.2357,
+              initialHeading: 0.0,
+              headingStream: headingController.stream,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('You are facing the Kaaba'), findsNothing);
+
+        // Emit aligned heading
+        headingController.add(bearing);
+        await tester.pumpAndSettle();
+
+        expect(find.text('You are facing the Kaaba'), findsOneWidget);
+        await headingController.close();
+      },
+    );
   });
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-class SolarPrayerDial extends StatelessWidget {
+class SolarPrayerDial extends StatefulWidget {
   const SolarPrayerDial({
     super.key,
     required this.prayerTimes,
@@ -18,47 +19,86 @@ class SolarPrayerDial extends StatelessWidget {
   final String nextPrayer;
 
   @override
+  State<SolarPrayerDial> createState() => _SolarPrayerDialState();
+}
+
+class _SolarPrayerDialState extends State<SolarPrayerDial> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _localizePrayerName(String prayer, AppLocalizations l10n) {
+    return switch (prayer.toLowerCase()) {
+      'fajr' => l10n.fajr,
+      'sunrise' => l10n.sunrise,
+      'dhuhr' => l10n.dhuhr,
+      'asr' => l10n.asr,
+      'maghrib' => l10n.maghrib,
+      'isha' => l10n.isha,
+      _ => prayer,
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
 
-    final fajr = prayerTimes.fajr as DateTime;
-    final sunrise = prayerTimes.sunrise as DateTime;
-    final dhuhr = prayerTimes.dhuhr as DateTime;
-    final asr = prayerTimes.asr as DateTime;
-    final maghrib = prayerTimes.maghrib as DateTime;
-    final isha = prayerTimes.isha as DateTime;
+    final fajr = (widget.prayerTimes.fajr as DateTime).toLocal();
+    final sunrise = (widget.prayerTimes.sunrise as DateTime).toLocal();
+    final dhuhr = (widget.prayerTimes.dhuhr as DateTime).toLocal();
+    final asr = (widget.prayerTimes.asr as DateTime).toLocal();
+    final maghrib = (widget.prayerTimes.maghrib as DateTime).toLocal();
+    final isha = (widget.prayerTimes.isha as DateTime).toLocal();
 
     final nowMins = now.hour * 60 + now.minute;
     final fajrMins = fajr.hour * 60 + fajr.minute;
     final ishaMins = isha.hour * 60 + isha.minute;
 
     double progress = 0.0;
-    if (nowMins >= fajrMins && nowMins <= ishaMins) {
+    if (nowMins >= fajrMins && nowMins <= ishaMins && ishaMins > fajrMins) {
       progress = (nowMins - fajrMins) / (ishaMins - fajrMins);
     } else if (nowMins > ishaMins) {
-      progress = 1.0;
+      final nightDuration = (24 * 60 - ishaMins) + fajrMins;
+      final nightElapsed = nowMins - ishaMins;
+      progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 1.0;
     } else {
-      progress = 0.0;
+      final nightDuration = (24 * 60 - ishaMins) + fajrMins;
+      final nightElapsed = (24 * 60 - ishaMins) + nowMins;
+      progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 0.0;
     }
 
-    String currentSlotName = 'Night / Qiyam';
+    String currentSlotName = l10n.slotNight;
     if (now.isBefore(fajr)) {
-      currentSlotName = 'Pre-Fajr / Tahajjud';
+      currentSlotName = l10n.slotTahajjud;
     } else if (now.isBefore(sunrise)) {
-      currentSlotName = l10n.fajr;
+      currentSlotName = l10n.slotEarlyMorning;
     } else if (now.isBefore(dhuhr)) {
-      currentSlotName = 'Duha / Morning Barakah';
+      currentSlotName = l10n.slotDuha;
     } else if (now.isBefore(asr)) {
-      currentSlotName = l10n.dhuhr;
+      currentSlotName = l10n.slotDhuhr;
     } else if (now.isBefore(maghrib)) {
-      currentSlotName = l10n.asr;
+      currentSlotName = l10n.slotAsr;
     } else if (now.isBefore(isha)) {
-      currentSlotName = l10n.maghrib;
+      currentSlotName = l10n.slotMaghrib;
     } else {
-      currentSlotName = l10n.isha;
+      currentSlotName = l10n.slotNight;
     }
+
+    final localizedNext = _localizePrayerName(widget.nextPrayer, l10n);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -154,7 +194,7 @@ class SolarPrayerDial extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Next: $nextPrayer',
+                        l10n.solarNext(localizedNext),
                         style: TextStyle(
                           fontSize: 12,
                           color: isDark ? Colors.white60 : Colors.black54,
@@ -182,7 +222,7 @@ class _SolarArcPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height * 0.9);
-    final radius = size.width * 0.42;
+    final radius = math.min(size.width * 0.42, size.height * 0.85);
 
     const startAngle = math.pi;
     const sweepAngle = math.pi;

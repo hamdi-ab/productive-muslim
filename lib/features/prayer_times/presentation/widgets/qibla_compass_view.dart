@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class QiblaCompassView extends StatefulWidget {
     this.longitude,
     this.qiblaService,
     this.initialHeading = 0.0,
+    this.headingStream,
   });
 
   final Position? position;
@@ -31,6 +33,7 @@ class QiblaCompassView extends StatefulWidget {
   final double? longitude;
   final QiblaService? qiblaService;
   final double initialHeading;
+  final Stream<double>? headingStream;
 
   @override
   State<QiblaCompassView> createState() => _QiblaCompassViewState();
@@ -39,12 +42,28 @@ class QiblaCompassView extends StatefulWidget {
 class _QiblaCompassViewState extends State<QiblaCompassView> {
   late final QiblaService _qiblaService;
   late double _heading;
+  StreamSubscription<double>? _headingSubscription;
 
   @override
   void initState() {
     super.initState();
     _qiblaService = widget.qiblaService ?? QiblaService();
     _heading = widget.initialHeading;
+    if (widget.headingStream != null) {
+      _headingSubscription = widget.headingStream!.listen((newHeading) {
+        if (mounted) {
+          setState(() {
+            _heading = newHeading;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _headingSubscription?.cancel();
+    super.dispose();
   }
 
   @override
