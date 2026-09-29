@@ -972,4 +972,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get barakahAnalyticsCoachingTitle => 'Spiritual Growth Insights';
+
+  @override
+  String get qiblaTitle => 'Qibla Compass';
+
+  @override
+  String get qiblaTabTimes => 'Prayer Times';
+
+  @override
+  String get qiblaTabCompass => 'Qibla Direction';
+
+  @override
+  String qiblaBearing(String degrees) {
+    return '$degrees° from North';
+  }
+
+  @override
+  String qiblaDistance(String distance) {
+    return '$distance km to Kaaba, Makkah';
+  }
+
+  @override
+  String get qiblaFacingKaaba => 'You are facing the Kaaba';
+
+  @override
+  String get qiblaCalibrate =>
+      'Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.';
+
+  @override
+  String get solarDialTitle => 'Solar Prayer Arc';
+
+  @override
+  String solarCurrentWindow(String slot) {
+    return 'Active Window: $slot';
+  }
+
+  @override
+  String solarNext(String prayer) {
+    return 'Next: $prayer';
+  }
+
+  @override
+  String get slotTahajjud => 'Tahajjud / Pre-Fajr';
+
+  @override
+  String get slotNight => 'Night / Qiyam';
 }

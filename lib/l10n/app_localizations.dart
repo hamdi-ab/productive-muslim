@@ -1795,6 +1795,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spiritual Growth Insights'**
   String get barakahAnalyticsCoachingTitle;
+
+  /// No description provided for @qiblaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla Compass'**
+  String get qiblaTitle;
+
+  /// No description provided for @qiblaTabTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Times'**
+  String get qiblaTabTimes;
+
+  /// No description provided for @qiblaTabCompass.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla Direction'**
+  String get qiblaTabCompass;
+
+  /// No description provided for @qiblaBearing.
+  ///
+  /// In en, this message translates to:
+  /// **'{degrees}° from North'**
+  String qiblaBearing(String degrees);
+
+  /// No description provided for @qiblaDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km to Kaaba, Makkah'**
+  String qiblaDistance(String distance);
+
+  /// No description provided for @qiblaFacingKaaba.
+  ///
+  /// In en, this message translates to:
+  /// **'You are facing the Kaaba'**
+  String get qiblaFacingKaaba;
+
+  /// No description provided for @qiblaCalibrate.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.'**
+  String get qiblaCalibrate;
+
+  /// No description provided for @solarDialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar Prayer Arc'**
+  String get solarDialTitle;
+
+  /// No description provided for @solarCurrentWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Window: {slot}'**
+  String solarCurrentWindow(String slot);
+
+  /// No description provided for @solarNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {prayer}'**
+  String solarNext(String prayer);
+
+  /// No description provided for @slotTahajjud.
+  ///
+  /// In en, this message translates to:
+  /// **'Tahajjud / Pre-Fajr'**
+  String get slotTahajjud;
+
+  /// No description provided for @slotNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Night / Qiyam'**
+  String get slotNight;
 }
 
 class _AppLocalizationsDelegate

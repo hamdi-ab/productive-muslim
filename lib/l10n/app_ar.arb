@@ -315,5 +315,17 @@
   "barakahAnalyticsActiveDays": "{count} / 7 أيام نشطة",
   "barakahAnalyticsTotalDhikr": "تم إنجاز {count} ذكراً",
   "barakahAnalyticsFastingDays": "{count} أيام صيام سنة",
-  "barakahAnalyticsCoachingTitle": "إرشادات النمو الروحي والإنتاجي"
+  "barakahAnalyticsCoachingTitle": "إرشادات النمو الروحي والإنتاجي",
+  "qiblaTitle": "بوصلة القبلة",
+  "qiblaTabTimes": "مواقيت الصلاة",
+  "qiblaTabCompass": "اتجاه القبلة",
+  "qiblaBearing": "{degrees}° عن الشمال",
+  "qiblaDistance": "{distance} كم إلى الكعبة المشرفة",
+  "qiblaFacingKaaba": "أنت باتجاه القبلة تماماً",
+  "qiblaCalibrate": "معايرة البوصلة: حرك الجهاز بشكل رقم 8 بعيداً عن المعادن والمجالات المغناطيسية.",
+  "solarDialTitle": "مسار الشمس ومواقيت الصلاة",
+  "solarCurrentWindow": "النافذة الحالية: {slot}",
+  "solarNext": "التالي: {prayer}",
+  "slotTahajjud": "التهجد / السحر",
+  "slotNight": "الليل / قيام الليل"
 }

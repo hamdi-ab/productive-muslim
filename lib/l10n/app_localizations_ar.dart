@@ -960,4 +960,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get barakahAnalyticsCoachingTitle => 'إرشادات النمو الروحي والإنتاجي';
+
+  @override
+  String get qiblaTitle => 'بوصلة القبلة';
+
+  @override
+  String get qiblaTabTimes => 'مواقيت الصلاة';
+
+  @override
+  String get qiblaTabCompass => 'اتجاه القبلة';
+
+  @override
+  String qiblaBearing(String degrees) {
+    return '$degrees° عن الشمال';
+  }
+
+  @override
+  String qiblaDistance(String distance) {
+    return '$distance كم إلى الكعبة المشرفة';
+  }
+
+  @override
+  String get qiblaFacingKaaba => 'أنت باتجاه القبلة تماماً';
+
+  @override
+  String get qiblaCalibrate =>
+      'معايرة البوصلة: حرك الجهاز بشكل رقم 8 بعيداً عن المعادن والمجالات المغناطيسية.';
+
+  @override
+  String get solarDialTitle => 'مسار الشمس ومواقيت الصلاة';
+
+  @override
+  String solarCurrentWindow(String slot) {
+    return 'النافذة الحالية: $slot';
+  }
+
+  @override
+  String solarNext(String prayer) {
+    return 'التالي: $prayer';
+  }
+
+  @override
+  String get slotTahajjud => 'التهجد / السحر';
+
+  @override
+  String get slotNight => 'الليل / قيام الليل';
 }
