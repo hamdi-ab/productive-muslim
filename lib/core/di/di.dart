@@ -89,8 +89,12 @@ Future<void> setupDi() async {
     ),
   );
   getIt.registerLazySingleton<PrayerNotificationScheduler>(
-    () =>
-        PrayerNotificationScheduler(settingsService: getIt<SettingsService>()),
+    () => PrayerNotificationScheduler(
+      settingsService: getIt<SettingsService>(),
+      plugin: LocalNotificationPluginAdapter(
+        onNotificationTapped: AppRouter.handleNotificationPayload,
+      ),
+    ),
   );
 
   // Router

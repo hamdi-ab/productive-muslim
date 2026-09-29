@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
+import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/models/barakah_reminder.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -52,6 +55,31 @@ class _BarakahReminderLifecycleState extends State<BarakahReminderLifecycle>
         ),
       ),
     );
+
+    if (getIt.isRegistered<PrayerNotificationScheduler>()) {
+      final scheduler = getIt<PrayerNotificationScheduler>();
+      final prayerService = getIt.isRegistered<PrayerTimeService>()
+          ? getIt<PrayerTimeService>()
+          : null;
+      unawaited(() async {
+        final position = await prayerService?.getCurrentPosition();
+        final now = DateTime.now();
+        final times = position != null
+            ? prayerService?.getPrayerTimes(position, date: now)
+            : null;
+        final tomorrowTimes = position != null
+            ? prayerService?.getPrayerTimes(
+                position,
+                date: now.add(const Duration(days: 1)),
+              )
+            : null;
+        await scheduler.rescheduleAll(
+          prayerTimes: times,
+          tomorrowPrayerTimes: tomorrowTimes,
+          locale: _locale?.languageCode,
+        );
+      }());
+    }
   }
 
   @override

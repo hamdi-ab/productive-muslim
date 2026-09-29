@@ -8,7 +8,11 @@ import 'package:timezone/timezone.dart' as tz;
 /// Adapter interface to decouple FlutterLocalNotificationsPlugin for testing.
 abstract class NotificationPluginAdapter {
   bool get supported;
-  Future<void> initialize();
+  Future<void> initialize({
+    void Function(String payload)? onNotificationTapped,
+  });
+  Future<bool> requestPermission();
+  Future<bool> hasPermission();
   Future<void> cancel(int id);
   Future<void> zonedSchedule({
     required int id,
@@ -18,15 +22,20 @@ abstract class NotificationPluginAdapter {
     required String payload,
     required String channelId,
     required String channelName,
+    bool matchTimeOnly,
   });
 }
 
 class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
   final FlutterLocalNotificationsPlugin _plugin;
+  final void Function(String payload)? onNotificationTapped;
   bool _initialized = false;
+  bool _launchChecked = false;
 
-  LocalNotificationPluginAdapter({FlutterLocalNotificationsPlugin? plugin})
-    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  LocalNotificationPluginAdapter({
+    FlutterLocalNotificationsPlugin? plugin,
+    this.onNotificationTapped,
+  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   @override
   bool get supported =>
@@ -35,22 +44,84 @@ class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
           defaultTargetPlatform == TargetPlatform.iOS);
 
   @override
-  Future<void> initialize() async {
-    if (!supported || _initialized) return;
+  Future<void> initialize({
+    void Function(String payload)? onNotificationTapped,
+  }) async {
+    if (!supported) return;
+    final callback = onNotificationTapped ?? this.onNotificationTapped;
 
-    await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_barakah_reminder'),
-        iOS: DarwinInitializationSettings(
-          requestAlertPermission: false,
-          requestBadgePermission: false,
-          requestSoundPermission: false,
+    if (!_initialized) {
+      await _plugin.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('ic_barakah_reminder'),
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
         ),
-      ),
-    );
+        onDidReceiveNotificationResponse: (response) {
+          final payload = response.payload;
+          if (payload != null && callback != null) {
+            callback(payload);
+          }
+        },
+      );
 
-    tz_data.initializeTimeZones();
-    _initialized = true;
+      tz_data.initializeTimeZones();
+      _initialized = true;
+    }
+
+    if (!_launchChecked) {
+      _launchChecked = true;
+      final details = await _plugin.getNotificationAppLaunchDetails();
+      if (details?.didNotificationLaunchApp == true) {
+        final payload = details?.notificationResponse?.payload;
+        if (payload != null && callback != null) {
+          callback(payload);
+        }
+      }
+    }
+  }
+
+  @override
+  Future<bool> requestPermission() async {
+    if (!supported) return false;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final androidPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      return await androidPlugin?.requestNotificationsPermission() ?? false;
+    }
+    final iosPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    return await iosPlugin?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        ) ??
+        false;
+  }
+
+  @override
+  Future<bool> hasPermission() async {
+    if (!supported) return false;
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final androidPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      return await androidPlugin?.areNotificationsEnabled() ?? false;
+    }
+    final iosPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    final perms = await iosPlugin?.checkPermissions();
+    return perms?.isEnabled == true && perms?.isAlertEnabled == true;
   }
 
   @override
@@ -68,6 +139,7 @@ class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
     required String payload,
     required String channelId,
     required String channelName,
+    bool matchTimeOnly = false,
   }) async {
     if (!supported) return;
 
@@ -92,7 +164,8 @@ class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
         ),
       ),
       payload: payload,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      matchDateTimeComponents: matchTimeOnly ? DateTimeComponents.time : null,
     );
   }
 }
@@ -110,6 +183,7 @@ class PrayerNotificationScheduler {
 
   final SettingsService _settingsService;
   final NotificationPluginAdapter _plugin;
+  bool _initialized = false;
 
   PrayerNotificationScheduler({
     required SettingsService settingsService,
@@ -117,8 +191,21 @@ class PrayerNotificationScheduler {
   }) : _settingsService = settingsService,
        _plugin = plugin ?? LocalNotificationPluginAdapter();
 
-  Future<void> initialize() async {
-    await _plugin.initialize();
+  NotificationPluginAdapter get plugin => _plugin;
+
+  Future<void> initialize({
+    void Function(String payload)? onNotificationTapped,
+  }) async {
+    await _plugin.initialize(onNotificationTapped: onNotificationTapped);
+    _initialized = true;
+  }
+
+  Future<bool> requestPermission() async {
+    return await _plugin.requestPermission();
+  }
+
+  Future<bool> hasPermission() async {
+    return await _plugin.hasPermission();
   }
 
   DateTime calculateNextFastingReminder({DateTime? now}) {
@@ -146,8 +233,18 @@ class PrayerNotificationScheduler {
     return current.add(const Duration(days: 1));
   }
 
-  Future<void> rescheduleAll({DateTime? now, PrayerTimes? prayerTimes}) async {
+  Future<void> rescheduleAll({
+    DateTime? now,
+    PrayerTimes? prayerTimes,
+    PrayerTimes? tomorrowPrayerTimes,
+    String? locale,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+
     final currentTime = now ?? DateTime.now();
+    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
     // 1. Morning Adhkar (Fajr + 15 min or 6:00 AM fallback)
     if (_settingsService.morningAdhkarNotificationEnabled) {
@@ -164,17 +261,27 @@ class PrayerNotificationScheduler {
         );
       }
       if (morningTarget.isBefore(currentTime)) {
-        morningTarget = morningTarget.add(const Duration(days: 1));
+        if (tomorrowPrayerTimes != null) {
+          morningTarget = tomorrowPrayerTimes.fajr.add(
+            const Duration(minutes: 15),
+          );
+        } else {
+          morningTarget = morningTarget.add(const Duration(days: 1));
+        }
       }
 
       await _plugin.zonedSchedule(
         id: idMorningAdhkar,
-        title: '🌅 Morning Adhkar • Light & Protection',
-        body: 'Start your day with divine remembrance and barakah.',
+        title: isAr
+            ? '🌅 أذكار الصباح • نور وحفظ'
+            : '🌅 Morning Adhkar • Light & Protection',
+        body: isAr
+            ? 'ابدأ يومك بذكر الله وحصن نفسك بالبركة.'
+            : 'Start your day with divine remembrance and barakah.',
         scheduledDate: morningTarget,
         payload: '/adhkar?category=morning',
         channelId: channelAdhkar,
-        channelName: 'Daily Adhkar Reminders',
+        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
       );
     } else {
       await _plugin.cancel(idMorningAdhkar);
@@ -195,17 +302,27 @@ class PrayerNotificationScheduler {
         );
       }
       if (eveningTarget.isBefore(currentTime)) {
-        eveningTarget = eveningTarget.add(const Duration(days: 1));
+        if (tomorrowPrayerTimes != null) {
+          eveningTarget = tomorrowPrayerTimes.asr.add(
+            const Duration(minutes: 10),
+          );
+        } else {
+          eveningTarget = eveningTarget.add(const Duration(days: 1));
+        }
       }
 
       await _plugin.zonedSchedule(
         id: idEveningAdhkar,
-        title: '🌆 Evening Adhkar • Evening Shield',
-        body: 'Fortify your evening with authentic remembrance before sunset.',
+        title: isAr
+            ? '🌆 أذكار المساء • حصن المسلم'
+            : '🌆 Evening Adhkar • Evening Shield',
+        body: isAr
+            ? 'حصّن مسائك بالأذكار المأثورة قبل غروب الشمس.'
+            : 'Fortify your evening with authentic remembrance before sunset.',
         scheduledDate: eveningTarget,
         payload: '/adhkar?category=evening',
         channelId: channelAdhkar,
-        channelName: 'Daily Adhkar Reminders',
+        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
       );
     } else {
       await _plugin.cancel(idEveningAdhkar);
@@ -228,12 +345,15 @@ class PrayerNotificationScheduler {
 
       await _plugin.zonedSchedule(
         id: idSleepingAdhkar,
-        title: '🌙 Bedtime Adhkar & Sunnah',
-        body: 'Wind down with Ayat al-Kursi, Surat Al-Ikhlas, and bedtime supplication.',
+        title: isAr
+            ? '🌙 أذكار النوم وسنن ما قبل النوم'
+            : '🌙 Bedtime Adhkar & Sunnah',
+        body: isAr ? 'اختم يومك بآية الكرسي والمعوذات ودعاء النوم المأثور.' : 'Wind down with Ayat al-Kursi, Surat Al-Ikhlas, and bedtime supplication.',
         scheduledDate: bedtimeTarget,
         payload: '/adhkar?category=sleeping',
         channelId: channelAdhkar,
-        channelName: 'Daily Adhkar Reminders',
+        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
+        matchTimeOnly: true,
       );
     } else {
       await _plugin.cancel(idSleepingAdhkar);
@@ -243,17 +363,19 @@ class PrayerNotificationScheduler {
     if (_settingsService.sunnahFastingNotificationEnabled) {
       final nextFasting = calculateNextFastingReminder(now: currentTime);
       final isSunday = nextFasting.weekday == DateTime.sunday;
-      final targetFastDay = isSunday ? 'Monday' : 'Thursday';
+      final targetFastDayEn = isSunday ? 'Monday' : 'Thursday';
+      final targetFastDayAr = isSunday ? 'الإثنين' : 'الخميس';
 
       await _plugin.zonedSchedule(
         id: idSunnahFasting,
-        title: '🥣 Sunnah Fasting Reminder',
-        body:
-            'Tomorrow is $targetFastDay. Set your intention tonight for immense Barakah.',
+        title: isAr ? '🥣 تذكير صيام السنة' : '🥣 Sunnah Fasting Reminder',
+        body: isAr
+            ? 'غداً هو يوم $targetFastDayAr. اعقد النية الليلة لنيل الأجر والبركة.'
+            : 'Tomorrow is $targetFastDayEn. Set your intention tonight for immense Barakah.',
         scheduledDate: nextFasting,
         payload: '/energy',
         channelId: channelSunnah,
-        channelName: 'Sunnah Routine Reminders',
+        channelName: isAr ? 'سنن يومية' : 'Sunnah Routine Reminders',
       );
     } else {
       await _plugin.cancel(idSunnahFasting);
@@ -276,17 +398,23 @@ class PrayerNotificationScheduler {
         );
       }
       if (qaylulahTarget.isBefore(currentTime)) {
-        qaylulahTarget = qaylulahTarget.add(const Duration(days: 1));
+        if (tomorrowPrayerTimes != null) {
+          qaylulahTarget = tomorrowPrayerTimes.dhuhr.subtract(
+            const Duration(minutes: 30),
+          );
+        } else {
+          qaylulahTarget = qaylulahTarget.add(const Duration(days: 1));
+        }
       }
 
       await _plugin.zonedSchedule(
         id: idQaylulah,
-        title: '😴 Sunnah Qaylulah Nap',
-        body: 'Recharge your physical and mental focus with a 20-min Sunnah power nap.',
+        title: isAr ? '😴 سنة القيلولة' : '😴 Sunnah Qaylulah Nap',
+        body: isAr ? 'جدد نشاطك البدني والذهني بقيلولة السنة القصيرة.' : 'Recharge your physical and mental focus with a 20-min Sunnah power nap.',
         scheduledDate: qaylulahTarget,
         payload: '/energy',
         channelId: channelSunnah,
-        channelName: 'Sunnah Routine Reminders',
+        channelName: isAr ? 'سنن يومية' : 'Sunnah Routine Reminders',
       );
     } else {
       await _plugin.cancel(idQaylulah);

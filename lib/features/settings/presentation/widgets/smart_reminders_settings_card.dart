@@ -60,17 +60,32 @@ class _SmartRemindersSettingsCardState
         : null;
 
     final position = await prayerService?.getCurrentPosition();
+    if (!mounted) return;
+
+    final now = DateTime.now();
     final times = position != null
-        ? prayerService?.getPrayerTimes(position)
+        ? prayerService?.getPrayerTimes(position, date: now)
+        : null;
+    final tomorrowTimes = position != null
+        ? prayerService?.getPrayerTimes(
+            position,
+            date: now.add(const Duration(days: 1)),
+          )
         : null;
 
-    await scheduler.rescheduleAll(prayerTimes: times);
+    final locale = Localizations.localeOf(context).languageCode;
+    await scheduler.rescheduleAll(
+      prayerTimes: times,
+      tomorrowPrayerTimes: tomorrowTimes,
+      locale: locale,
+    );
   }
 
   Future<void> _toggleMorning(bool value) async {
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setMorningAdhkarNotificationEnabled(value);
     }
+    if (!mounted) return;
     setState(() => _morning = value);
     await _reschedule();
   }
@@ -79,6 +94,7 @@ class _SmartRemindersSettingsCardState
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setEveningAdhkarNotificationEnabled(value);
     }
+    if (!mounted) return;
     setState(() => _evening = value);
     await _reschedule();
   }
@@ -89,6 +105,7 @@ class _SmartRemindersSettingsCardState
         value,
       );
     }
+    if (!mounted) return;
     setState(() => _sleeping = value);
     await _reschedule();
   }
@@ -97,6 +114,7 @@ class _SmartRemindersSettingsCardState
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setSunnahFastingNotificationEnabled(value);
     }
+    if (!mounted) return;
     setState(() => _fasting = value);
     await _reschedule();
   }
@@ -105,6 +123,7 @@ class _SmartRemindersSettingsCardState
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setQaylulahNotificationEnabled(value);
     }
+    if (!mounted) return;
     setState(() => _qaylulah = value);
     await _reschedule();
   }
@@ -114,6 +133,7 @@ class _SmartRemindersSettingsCardState
       context: context,
       initialTime: TimeOfDay(hour: _bedtimeHour, minute: _bedtimeMinute),
     );
+    if (!mounted) return;
     if (selected != null) {
       if (getIt.isRegistered<SettingsService>()) {
         await getIt<SettingsService>().setBedtimeReminderTime(
@@ -121,6 +141,7 @@ class _SmartRemindersSettingsCardState
           minute: selected.minute,
         );
       }
+      if (!mounted) return;
       setState(() {
         _bedtimeHour = selected.hour;
         _bedtimeMinute = selected.minute;

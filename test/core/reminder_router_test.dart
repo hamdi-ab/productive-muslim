@@ -106,4 +106,26 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets(
+    'handleNotificationPayload navigates to smart reminder destinations',
+    (tester) async {
+      await settings.setOnboardingCompleted();
+      await pumpRouter(tester);
+
+      AppRouter.handleNotificationPayload('/adhkar?category=morning');
+      await pumpFrames(tester);
+      expect(
+        AppRouter.router.routeInformationProvider.value.uri.toString(),
+        '/adhkar?category=morning',
+      );
+
+      AppRouter.handleNotificationPayload('/energy');
+      await pumpFrames(tester);
+      expect(
+        AppRouter.router.routeInformationProvider.value.uri.path,
+        '/energy',
+      );
+    },
+  );
 }
