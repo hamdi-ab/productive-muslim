@@ -1735,6 +1735,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gentle reminder 30 min before Dhuhr for a 20-min recharge.'**
   String get settingQaylulahDesc;
+
+  /// No description provided for @barakahAnalyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Growth & Analytics'**
+  String get barakahAnalyticsTitle;
+
+  /// No description provided for @barakahAnalyticsConsistency.
+  ///
+  /// In en, this message translates to:
+  /// **'7-Day Barakah Matrix'**
+  String get barakahAnalyticsConsistency;
+
+  /// No description provided for @barakahAnalyticsEnergyTriad.
+  ///
+  /// In en, this message translates to:
+  /// **'Holistic Energy Triad'**
+  String get barakahAnalyticsEnergyTriad;
+
+  /// No description provided for @barakahAnalyticsSpiritual.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual'**
+  String get barakahAnalyticsSpiritual;
+
+  /// No description provided for @barakahAnalyticsPhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical'**
+  String get barakahAnalyticsPhysical;
+
+  /// No description provided for @barakahAnalyticsMental.
+  ///
+  /// In en, this message translates to:
+  /// **'Mental'**
+  String get barakahAnalyticsMental;
+
+  /// No description provided for @barakahAnalyticsActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} / 7 Active Days'**
+  String barakahAnalyticsActiveDays(int count);
+
+  /// No description provided for @barakahAnalyticsTotalDhikr.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Adhkar Completed'**
+  String barakahAnalyticsTotalDhikr(int count);
+
+  /// No description provided for @barakahAnalyticsFastingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Fasting Days'**
+  String barakahAnalyticsFastingDays(int count);
+
+  /// No description provided for @barakahAnalyticsCoachingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Growth Insights'**
+  String get barakahAnalyticsCoachingTitle;
 }
 
 class _AppLocalizationsDelegate

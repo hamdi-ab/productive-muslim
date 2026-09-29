@@ -936,4 +936,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingQaylulahDesc =>
       'Gentle reminder 30 min before Dhuhr for a 20-min recharge.';
+
+  @override
+  String get barakahAnalyticsTitle => 'Weekly Growth & Analytics';
+
+  @override
+  String get barakahAnalyticsConsistency => '7-Day Barakah Matrix';
+
+  @override
+  String get barakahAnalyticsEnergyTriad => 'Holistic Energy Triad';
+
+  @override
+  String get barakahAnalyticsSpiritual => 'Spiritual';
+
+  @override
+  String get barakahAnalyticsPhysical => 'Physical';
+
+  @override
+  String get barakahAnalyticsMental => 'Mental';
+
+  @override
+  String barakahAnalyticsActiveDays(int count) {
+    return '$count / 7 Active Days';
+  }
+
+  @override
+  String barakahAnalyticsTotalDhikr(int count) {
+    return '$count Adhkar Completed';
+  }
+
+  @override
+  String barakahAnalyticsFastingDays(int count) {
+    return '$count Fasting Days';
+  }
+
+  @override
+  String get barakahAnalyticsCoachingTitle => 'Spiritual Growth Insights';
 }

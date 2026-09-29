@@ -305,5 +305,15 @@
   "settingSunnahFasting": "تذكير صيام الاثنين والخميس",
   "settingSunnahFastingDesc": "تنبيه مساء الأحد والأربعاء لعقد النية لصيام السنة.",
   "settingQaylulah": "تذكير قيلولة السنة",
-  "settingQaylulahDesc": "تنبيه اختياري قبل صلاة الظهر بـ 30 دقيقة لاستعادة النشاط."
+  "settingQaylulahDesc": "تنبيه اختياري قبل صلاة الظهر بـ 30 دقيقة لاستعادة النشاط.",
+  "barakahAnalyticsTitle": "تحليلات ونمو البركة الأسبوعي",
+  "barakahAnalyticsConsistency": "مصفوفة البركة للأسبوع",
+  "barakahAnalyticsEnergyTriad": "ثلاثية الطاقة المتكاملة",
+  "barakahAnalyticsSpiritual": "الروحية",
+  "barakahAnalyticsPhysical": "البدنية",
+  "barakahAnalyticsMental": "الذهنية",
+  "barakahAnalyticsActiveDays": "{count} / 7 أيام نشطة",
+  "barakahAnalyticsTotalDhikr": "تم إنجاز {count} ذكراً",
+  "barakahAnalyticsFastingDays": "{count} أيام صيام سنة",
+  "barakahAnalyticsCoachingTitle": "إرشادات النمو الروحي والإنتاجي"
 }

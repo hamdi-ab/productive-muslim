@@ -924,4 +924,40 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settingQaylulahDesc =>
       'تنبيه اختياري قبل صلاة الظهر بـ 30 دقيقة لاستعادة النشاط.';
+
+  @override
+  String get barakahAnalyticsTitle => 'تحليلات ونمو البركة الأسبوعي';
+
+  @override
+  String get barakahAnalyticsConsistency => 'مصفوفة البركة للأسبوع';
+
+  @override
+  String get barakahAnalyticsEnergyTriad => 'ثلاثية الطاقة المتكاملة';
+
+  @override
+  String get barakahAnalyticsSpiritual => 'الروحية';
+
+  @override
+  String get barakahAnalyticsPhysical => 'البدنية';
+
+  @override
+  String get barakahAnalyticsMental => 'الذهنية';
+
+  @override
+  String barakahAnalyticsActiveDays(int count) {
+    return '$count / 7 أيام نشطة';
+  }
+
+  @override
+  String barakahAnalyticsTotalDhikr(int count) {
+    return 'تم إنجاز $count ذكراً';
+  }
+
+  @override
+  String barakahAnalyticsFastingDays(int count) {
+    return '$count أيام صيام سنة';
+  }
+
+  @override
+  String get barakahAnalyticsCoachingTitle => 'إرشادات النمو الروحي والإنتاجي';
 }

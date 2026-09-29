@@ -305,5 +305,30 @@
   "settingSunnahFasting": "Sunnah Fasting Reminders",
   "settingSunnahFastingDesc": "Nudge on Sunday & Wednesday evenings to intend Mon/Thu fasting.",
   "settingQaylulah": "Sunnah Qaylulah Midday Nap",
-  "settingQaylulahDesc": "Gentle reminder 30 min before Dhuhr for a 20-min recharge."
+  "settingQaylulahDesc": "Gentle reminder 30 min before Dhuhr for a 20-min recharge.",
+  "barakahAnalyticsTitle": "Weekly Growth & Analytics",
+  "barakahAnalyticsConsistency": "7-Day Barakah Matrix",
+  "barakahAnalyticsEnergyTriad": "Holistic Energy Triad",
+  "barakahAnalyticsSpiritual": "Spiritual",
+  "barakahAnalyticsPhysical": "Physical",
+  "barakahAnalyticsMental": "Mental",
+  "barakahAnalyticsActiveDays": "{count} / 7 Active Days",
+  "@barakahAnalyticsActiveDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "barakahAnalyticsTotalDhikr": "{count} Adhkar Completed",
+  "@barakahAnalyticsTotalDhikr": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "barakahAnalyticsFastingDays": "{count} Fasting Days",
+  "@barakahAnalyticsFastingDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "barakahAnalyticsCoachingTitle": "Spiritual Growth Insights"
 }
