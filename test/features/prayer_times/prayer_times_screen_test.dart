@@ -110,8 +110,13 @@ void main() {
     await tester.pumpWidget(buildScreen());
     await tester.pumpAndSettle();
 
-    expect(find.text('Prayer Times'), findsOneWidget);
+    expect(find.text('Prayer Times'), findsWidgets);
     expect(find.text('Fajr'), findsOneWidget);
+    expect(find.text('Sunrise'), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+
     expect(find.text('Dhuhr'), findsOneWidget);
     expect(find.text('Asr'), findsOneWidget);
     expect(find.text('Maghrib'), findsOneWidget);
@@ -138,6 +143,32 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(GlassContainer), findsWidgets);
+  });
+
+  testWidgets('switches to Qibla Direction tab', (tester) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(createPrayerTimes());
+
+    await tester.pumpWidget(buildScreen());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Qibla Direction'), findsOneWidget);
+    await tester.tap(find.text('Qibla Direction'));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.mosque_rounded), findsOneWidget);
   });
 
   testWidgets('highlights next prayer in Arabic locale', (tester) async {

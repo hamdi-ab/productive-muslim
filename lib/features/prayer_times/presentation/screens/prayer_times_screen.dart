@@ -12,6 +12,9 @@ import 'package:productive_muslim/features/prayer_times/logic/prayer_times_event
 import 'package:productive_muslim/features/prayer_times/logic/prayer_times_state.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+import 'package:productive_muslim/features/prayer_times/presentation/widgets/qibla_compass_view.dart';
+import 'package:productive_muslim/features/prayer_times/presentation/widgets/solar_prayer_dial.dart';
+
 class PrayerTimesScreen extends StatelessWidget {
   const PrayerTimesScreen({super.key});
 
@@ -39,7 +42,7 @@ class PrayerTimesScreen extends StatelessWidget {
                 :final nextPrayer,
                 :final locationName,
               ) =>
-                _PrayerTimesList(
+                _PrayerTimesTabs(
                   prayerTimes: prayerTimes,
                   nextPrayer: nextPrayer,
                   locationName: locationName,
@@ -49,6 +52,87 @@ class PrayerTimesScreen extends StatelessWidget {
             };
           },
         ),
+      ),
+    );
+  }
+}
+
+class _PrayerTimesTabs extends StatelessWidget {
+  final dynamic prayerTimes;
+  final String nextPrayer;
+  final String? locationName;
+
+  const _PrayerTimesTabs({
+    required this.prayerTimes,
+    required this.nextPrayer,
+    this.locationName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xs,
+            ),
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.black.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+                labelStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+                tabs: [
+                  Tab(
+                    icon: const Icon(Icons.access_time_rounded, size: 16),
+                    text: l10n.qiblaTabTimes,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.explore_rounded, size: 16),
+                    text: l10n.qiblaTabCompass,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _PrayerTimesList(
+                  prayerTimes: prayerTimes,
+                  nextPrayer: nextPrayer,
+                  locationName: locationName,
+                ),
+                QiblaCompassView(
+                  latitude: prayerTimes.coordinates.latitude as double,
+                  longitude: prayerTimes.coordinates.longitude as double,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -85,12 +169,11 @@ class _PrayerTimesList extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          itemCount: entries.length + (hasLocation ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (hasLocation && index == 0) {
-              return Padding(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          children: [
+            if (hasLocation)
+              Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.xs,
@@ -115,19 +198,19 @@ class _PrayerTimesList extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            SolarPrayerDial(prayerTimes: prayerTimes, nextPrayer: nextPrayer),
+            const SizedBox(height: AppSpacing.sm),
+            ...entries.map((entry) {
+              final (key, name, time) = entry;
+              final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
+              return _PrayerTile(
+                name: name,
+                time: timeFormat.format(time),
+                isNext: isNext,
               );
-            }
-
-            final entryIndex = hasLocation ? index - 1 : index;
-            final (key, name, time) = entries[entryIndex];
-            final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
-
-            return _PrayerTile(
-              name: name,
-              time: timeFormat.format(time),
-              isNext: isNext,
-            );
-          },
+            }),
+          ],
         ),
       ),
     );

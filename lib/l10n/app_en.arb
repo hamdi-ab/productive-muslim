@@ -330,5 +330,29 @@
       "count": {"type": "int"}
     }
   },
-  "barakahAnalyticsCoachingTitle": "Spiritual Growth Insights"
+  "barakahAnalyticsCoachingTitle": "Spiritual Growth Insights",
+  "qiblaTitle": "Qibla Compass",
+  "qiblaTabTimes": "Prayer Times",
+  "qiblaTabCompass": "Qibla Direction",
+  "qiblaBearing": "{degrees}° from North",
+  "@qiblaBearing": {
+    "placeholders": {
+      "degrees": {"type": "String"}
+    }
+  },
+  "qiblaDistance": "{distance} km to Kaaba, Makkah",
+  "@qiblaDistance": {
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "qiblaFacingKaaba": "You are facing the Kaaba",
+  "qiblaCalibrate": "Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.",
+  "solarDialTitle": "Solar Prayer Arc",
+  "solarCurrentWindow": "Active Window: {slot}",
+  "@solarCurrentWindow": {
+    "placeholders": {
+      "slot": {"type": "String"}
+    }
+  }
 }
