@@ -23,6 +23,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   final Map<String, int> _counts = {};
+  int _categoryVersion = 0;
 
   @override
   void initState() {
@@ -46,13 +47,14 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     setState(() {
       _selectedCategory = category;
       _currentPageIndex = 0;
+      _categoryVersion++;
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
     }
   }
 
-  void _incrementCount(DhikrItem item) {
+  Future<void> _incrementCount(DhikrItem item) async {
     final current = _counts[item.id] ?? 0;
     if (current >= item.targetCount) return;
 
@@ -66,14 +68,17 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       // Record completion
       try {
         if (getIt.isRegistered<AdhkarService>()) {
-          getIt<AdhkarService>().recordDhikrCompletion(dhikrId: item.id);
+          await getIt<AdhkarService>().recordDhikrCompletion(dhikrId: item.id);
         }
       } catch (_) {}
 
-      // Auto advance to next card after brief delay if not last
+      // Auto advance to next card after brief delay if not last and category hasn't changed
+      final scheduledVersion = _categoryVersion;
       if (_currentPageIndex < _currentItems.length - 1) {
         Future.delayed(const Duration(milliseconds: 600), () {
-          if (mounted && _pageController.hasClients) {
+          if (mounted &&
+              _pageController.hasClients &&
+              _categoryVersion == scheduledVersion) {
             _pageController.nextPage(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
@@ -96,17 +101,17 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   String _getCategoryLabel(DhikrCategory category, AppLocalizations l10n) {
     switch (category) {
       case DhikrCategory.morning:
-        return 'Morning';
+        return l10n.adhkarTabMorning;
       case DhikrCategory.evening:
-        return 'Evening';
+        return l10n.adhkarTabEvening;
       case DhikrCategory.wakingUp:
-        return 'Waking';
+        return l10n.adhkarTabWaking;
       case DhikrCategory.sleeping:
-        return 'Bedtime';
+        return l10n.adhkarTabBedtime;
       case DhikrCategory.postPrayer:
-        return 'Post-Salah';
+        return l10n.adhkarTabPostSalah;
       case DhikrCategory.dailySunnah:
-        return 'Daily Sunnah';
+        return l10n.adhkarTabSunnah;
     }
   }
 
@@ -166,7 +171,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
             // Card Carousel Viewport
             Expanded(
               child: items.isEmpty
-                  ? Center(child: Text(l10n.emptyHabits))
+                  ? Center(child: Text(l10n.adhkarEmptyState))
                   : PageView.builder(
                       controller: _pageController,
                       itemCount: items.length,

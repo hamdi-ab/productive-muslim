@@ -1,3 +1,4 @@
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
@@ -10,9 +11,16 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Ambient contextual pill on the Home Screen that highlights
 /// the active Dhikr / Du'a based on current solar / prayer context.
-class HomeAdhkarPill extends StatelessWidget {
-  const HomeAdhkarPill({super.key});
+class HomeAdhkarPill extends StatefulWidget {
+  final PrayerTimes? prayerTimes;
 
+  const HomeAdhkarPill({super.key, this.prayerTimes});
+
+  @override
+  State<HomeAdhkarPill> createState() => _HomeAdhkarPillState();
+}
+
+class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
   IconData _getCategoryIcon(DhikrCategory category) {
     switch (category) {
       case DhikrCategory.morning:
@@ -64,6 +72,13 @@ class HomeAdhkarPill extends StatelessWidget {
     }
   }
 
+  Future<void> _handleTap(DhikrCategory activeCategory) async {
+    await context.push('/adhkar', extra: activeCategory);
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -75,7 +90,10 @@ class HomeAdhkarPill extends StatelessWidget {
 
     if (getIt.isRegistered<AdhkarService>()) {
       final adhkarService = getIt<AdhkarService>();
-      activeCategory = adhkarService.getCurrentContextCategory(now: now);
+      activeCategory = adhkarService.getCurrentContextCategory(
+        now: now,
+        prayerTimes: widget.prayerTimes,
+      );
       completedCount = adhkarService.getCompletedCountForCategory(
         activeCategory,
       );
@@ -88,7 +106,7 @@ class HomeAdhkarPill extends StatelessWidget {
     final isAllDone = totalCount > 0 && completedCount >= totalCount;
 
     return InkWell(
-      onTap: () => context.push('/adhkar', extra: activeCategory),
+      onTap: () => _handleTap(activeCategory),
       borderRadius: BorderRadius.circular(20),
       child: GlassContainer(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -136,8 +154,8 @@ class HomeAdhkarPill extends StatelessWidget {
                     isAllDone
                         ? l10n.adhkarCompleted
                         : (completedCount > 0
-                              ? '$completedCount / $totalCount completed'
-                              : 'Tap to recite • 1-tap haptic counter'),
+                              ? l10n.adhkarProgress(completedCount, totalCount)
+                              : l10n.adhkarPillTapPrompt),
                     style: TextStyle(
                       fontSize: 12,
                       color: isAllDone
@@ -162,7 +180,9 @@ class HomeAdhkarPill extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isAllDone ? 'Review' : 'Recite',
+                    isAllDone
+                        ? l10n.adhkarActionReview
+                        : l10n.adhkarActionRecite,
                     style: TextStyle(
                       color: accentColor,
                       fontSize: 12,

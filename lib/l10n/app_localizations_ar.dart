@@ -834,9 +834,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarTransliteration => 'النطق بالحروف اللاتينية';
 
   @override
-  String get adhkarTranslation => 'الترجمة';
-
-  @override
   String get adhkarPillMorning => 'أذكار الصباح • نور وحفظ';
 
   @override
@@ -847,4 +844,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarPillPostPrayer => 'أذكار ما بعد الصلاة • تسبيح';
+
+  @override
+  String adhkarProgress(int completed, int total) {
+    return 'تم $completed من أصل $total';
+  }
+
+  @override
+  String get adhkarEmptyState => 'لا توجد أذكار في هذا القسم حالياً.';
+
+  @override
+  String get adhkarActionRecite => 'تسبيح';
+
+  @override
+  String get adhkarActionReview => 'مراجعة';
+
+  @override
+  String get adhkarPillTapPrompt => 'المس للبدء • عدّاد لمسي ذكي';
+
+  @override
+  String get adhkarTabMorning => 'الصباح';
+
+  @override
+  String get adhkarTabEvening => 'المساء';
+
+  @override
+  String get adhkarTabWaking => 'الاستيقاظ';
+
+  @override
+  String get adhkarTabBedtime => 'النوم';
+
+  @override
+  String get adhkarTabPostSalah => 'بعد الصلاة';
+
+  @override
+  String get adhkarTabSunnah => 'السنة';
 }

@@ -272,9 +272,25 @@
   "adhkarPrev": "Previous",
   "adhkarReset": "Reset Count",
   "adhkarTransliteration": "Transliteration",
-  "adhkarTranslation": "Translation",
   "adhkarPillMorning": "Morning Adhkar • Light & Protection",
   "adhkarPillEvening": "Evening Adhkar • Evening Shield",
   "adhkarPillSleeping": "Bedtime Adhkar • Guard your night",
-  "adhkarPillPostPrayer": "Post-Salah Adhkar • 33x Tasbih"
+  "adhkarPillPostPrayer": "Post-Salah Adhkar • 33x Tasbih",
+  "adhkarProgress": "{completed} / {total} completed",
+  "@adhkarProgress": {
+    "placeholders": {
+      "completed": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "adhkarEmptyState": "No remembrances in this category yet.",
+  "adhkarActionRecite": "Recite",
+  "adhkarActionReview": "Review",
+  "adhkarPillTapPrompt": "Tap to recite • 1-tap haptic counter",
+  "adhkarTabMorning": "Morning",
+  "adhkarTabEvening": "Evening",
+  "adhkarTabWaking": "Waking",
+  "adhkarTabBedtime": "Bedtime",
+  "adhkarTabPostSalah": "Post-Salah",
+  "adhkarTabSunnah": "Sunnah"
 }

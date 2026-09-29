@@ -846,9 +846,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhkarTransliteration => 'Transliteration';
 
   @override
-  String get adhkarTranslation => 'Translation';
-
-  @override
   String get adhkarPillMorning => 'Morning Adhkar • Light & Protection';
 
   @override
@@ -859,4 +856,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarPillPostPrayer => 'Post-Salah Adhkar • 33x Tasbih';
+
+  @override
+  String adhkarProgress(int completed, int total) {
+    return '$completed / $total completed';
+  }
+
+  @override
+  String get adhkarEmptyState => 'No remembrances in this category yet.';
+
+  @override
+  String get adhkarActionRecite => 'Recite';
+
+  @override
+  String get adhkarActionReview => 'Review';
+
+  @override
+  String get adhkarPillTapPrompt => 'Tap to recite • 1-tap haptic counter';
+
+  @override
+  String get adhkarTabMorning => 'Morning';
+
+  @override
+  String get adhkarTabEvening => 'Evening';
+
+  @override
+  String get adhkarTabWaking => 'Waking';
+
+  @override
+  String get adhkarTabBedtime => 'Bedtime';
+
+  @override
+  String get adhkarTabPostSalah => 'Post-Salah';
+
+  @override
+  String get adhkarTabSunnah => 'Sunnah';
 }

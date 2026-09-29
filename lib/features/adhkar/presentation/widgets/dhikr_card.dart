@@ -26,7 +26,15 @@ class DhikrCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final isCompleted = count >= item.targetCount;
+
+    final displayTitle = isArabic && item.titleAr.isNotEmpty
+        ? item.titleAr
+        : item.titleEn;
+    final displayTranslation = isArabic && item.translationAr.isNotEmpty
+        ? item.translationAr
+        : item.translationEn;
 
     return GlassContainer(
       borderRadius: 24,
@@ -46,7 +54,7 @@ class DhikrCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          item.titleEn,
+                          displayTitle,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -98,8 +106,8 @@ class DhikrCard extends StatelessWidget {
 
                   const SizedBox(height: AppSpacing.md),
 
-                  // Transliteration Toggle / View
-                  if (item.transliteration.isNotEmpty) ...[
+                  // Transliteration Toggle / View (Shown in non-Arabic or when available)
+                  if (!isArabic && item.transliteration.isNotEmpty) ...[
                     Text(
                       item.transliteration,
                       textAlign: TextAlign.center,
@@ -115,14 +123,15 @@ class DhikrCard extends StatelessWidget {
                   ],
 
                   // English / Localized Translation
-                  Text(
-                    item.translationEn,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark ? Colors.white70 : Colors.black87,
+                  if (!isArabic || item.translationAr != item.arabic)
+                    Text(
+                      displayTranslation,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
                     ),
-                  ),
 
                   const SizedBox(height: AppSpacing.md),
 

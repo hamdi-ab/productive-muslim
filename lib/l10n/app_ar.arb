@@ -272,9 +272,25 @@
   "adhkarPrev": "السابق",
   "adhkarReset": "إعادة العد",
   "adhkarTransliteration": "النطق بالحروف اللاتينية",
-  "adhkarTranslation": "الترجمة",
   "adhkarPillMorning": "أذكار الصباح • نور وحفظ",
   "adhkarPillEvening": "أذكار المساء • حصن المسلم",
   "adhkarPillSleeping": "أذكار النوم • حرز ليلتك",
-  "adhkarPillPostPrayer": "أذكار ما بعد الصلاة • تسبيح"
+  "adhkarPillPostPrayer": "أذكار ما بعد الصلاة • تسبيح",
+  "adhkarProgress": "تم {completed} من أصل {total}",
+  "@adhkarProgress": {
+    "placeholders": {
+      "completed": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "adhkarEmptyState": "لا توجد أذكار في هذا القسم حالياً.",
+  "adhkarActionRecite": "تسبيح",
+  "adhkarActionReview": "مراجعة",
+  "adhkarPillTapPrompt": "المس للبدء • عدّاد لمسي ذكي",
+  "adhkarTabMorning": "الصباح",
+  "adhkarTabEvening": "المساء",
+  "adhkarTabWaking": "الاستيقاظ",
+  "adhkarTabBedtime": "النوم",
+  "adhkarTabPostSalah": "بعد الصلاة",
+  "adhkarTabSunnah": "السنة"
 }

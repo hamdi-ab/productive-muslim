@@ -1568,12 +1568,6 @@ abstract class AppLocalizations {
   /// **'Transliteration'**
   String get adhkarTransliteration;
 
-  /// No description provided for @adhkarTranslation.
-  ///
-  /// In en, this message translates to:
-  /// **'Translation'**
-  String get adhkarTranslation;
-
   /// No description provided for @adhkarPillMorning.
   ///
   /// In en, this message translates to:
@@ -1597,6 +1591,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Post-Salah Adhkar • 33x Tasbih'**
   String get adhkarPillPostPrayer;
+
+  /// No description provided for @adhkarProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} / {total} completed'**
+  String adhkarProgress(int completed, int total);
+
+  /// No description provided for @adhkarEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No remembrances in this category yet.'**
+  String get adhkarEmptyState;
+
+  /// No description provided for @adhkarActionRecite.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite'**
+  String get adhkarActionRecite;
+
+  /// No description provided for @adhkarActionReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get adhkarActionReview;
+
+  /// No description provided for @adhkarPillTapPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to recite • 1-tap haptic counter'**
+  String get adhkarPillTapPrompt;
+
+  /// No description provided for @adhkarTabMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get adhkarTabMorning;
+
+  /// No description provided for @adhkarTabEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get adhkarTabEvening;
+
+  /// No description provided for @adhkarTabWaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Waking'**
+  String get adhkarTabWaking;
+
+  /// No description provided for @adhkarTabBedtime.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedtime'**
+  String get adhkarTabBedtime;
+
+  /// No description provided for @adhkarTabPostSalah.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-Salah'**
+  String get adhkarTabPostSalah;
+
+  /// No description provided for @adhkarTabSunnah.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah'**
+  String get adhkarTabSunnah;
 }
 
 class _AppLocalizationsDelegate

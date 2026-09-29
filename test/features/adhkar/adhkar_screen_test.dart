@@ -73,6 +73,7 @@ void main() {
 
       // After 600ms + animation, auto-advances to card 2
       await tester.pumpAndSettle();
+      expect(getIt<AdhkarService>().isDhikrCompleted('wake_up_1'), isTrue);
       expect(find.text('2 / 2'), findsOneWidget);
       expect(find.text('Affirmation of Tawheed upon Waking'), findsOneWidget);
     },
