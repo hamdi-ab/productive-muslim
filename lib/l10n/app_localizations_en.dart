@@ -891,4 +891,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarTabSunnah => 'Sunnah';
+
+  @override
+  String get smartNotificationsTitle => 'Smart Adhkar & Sunnah Reminders';
+
+  @override
+  String get smartNotificationsDesc =>
+      'Dynamic reminders anchored to solar prayer times and Sunnah schedules.';
+
+  @override
+  String get settingMorningAdhkar => 'Morning Adhkar (Post-Fajr)';
+
+  @override
+  String get settingMorningAdhkarDesc =>
+      'Timed 15 min after Fajr during your morning Barakah window.';
+
+  @override
+  String get settingEveningAdhkar => 'Evening Adhkar (Post-Asr)';
+
+  @override
+  String get settingEveningAdhkarDesc =>
+      'Fortify your soul with evening remembrances before sunset.';
+
+  @override
+  String get settingBedtimeAdhkar => 'Bedtime Adhkar & Wind-down';
+
+  @override
+  String get settingBedtimeAdhkarDesc =>
+      'Reminds you before sleep to recite Surat Al-Ikhlas, Falaq, Nas.';
+
+  @override
+  String get settingBedtimeTime => 'Target Bedtime';
+
+  @override
+  String get settingSunnahFasting => 'Sunnah Fasting Reminders';
+
+  @override
+  String get settingSunnahFastingDesc =>
+      'Nudge on Sunday & Wednesday evenings to intend Mon/Thu fasting.';
+
+  @override
+  String get settingQaylulah => 'Sunnah Qaylulah Midday Nap';
+
+  @override
+  String get settingQaylulahDesc =>
+      'Gentle reminder 30 min before Dhuhr for a 20-min recharge.';
 }

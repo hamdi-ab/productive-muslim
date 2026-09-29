@@ -292,5 +292,18 @@
   "adhkarTabWaking": "Waking",
   "adhkarTabBedtime": "Bedtime",
   "adhkarTabPostSalah": "Post-Salah",
-  "adhkarTabSunnah": "Sunnah"
+  "adhkarTabSunnah": "Sunnah",
+  "smartNotificationsTitle": "Smart Adhkar & Sunnah Reminders",
+  "smartNotificationsDesc": "Dynamic reminders anchored to solar prayer times and Sunnah schedules.",
+  "settingMorningAdhkar": "Morning Adhkar (Post-Fajr)",
+  "settingMorningAdhkarDesc": "Timed 15 min after Fajr during your morning Barakah window.",
+  "settingEveningAdhkar": "Evening Adhkar (Post-Asr)",
+  "settingEveningAdhkarDesc": "Fortify your soul with evening remembrances before sunset.",
+  "settingBedtimeAdhkar": "Bedtime Adhkar & Wind-down",
+  "settingBedtimeAdhkarDesc": "Reminds you before sleep to recite Surat Al-Ikhlas, Falaq, Nas.",
+  "settingBedtimeTime": "Target Bedtime",
+  "settingSunnahFasting": "Sunnah Fasting Reminders",
+  "settingSunnahFastingDesc": "Nudge on Sunday & Wednesday evenings to intend Mon/Thu fasting.",
+  "settingQaylulah": "Sunnah Qaylulah Midday Nap",
+  "settingQaylulahDesc": "Gentle reminder 30 min before Dhuhr for a 20-min recharge."
 }
