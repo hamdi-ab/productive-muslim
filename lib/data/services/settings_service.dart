@@ -206,6 +206,22 @@ class SettingsService {
 
   Future<void> importSettings(Map<String, dynamic> settings) async {
     if (_prefs == null) return;
+
+    // Validate all values first — reject unsupported types (null, maps, etc.)
+    // so an invalid payload leaves prefs untouched.
+    for (final entry in settings.entries) {
+      final val = entry.value;
+      if (val == null ||
+          val is Map ||
+          (val is! bool &&
+              val is! int &&
+              val is! double &&
+              val is! String &&
+              val is! List)) {
+        return;
+      }
+    }
+
     await _prefs.clear();
     for (final entry in settings.entries) {
       final val = entry.value;

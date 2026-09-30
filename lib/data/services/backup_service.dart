@@ -152,14 +152,17 @@ class BackupService {
           for (final r in responses) {
             await _db.into(_db.barakahDailyResponses).insert(r);
           }
-        });
 
-        if (_settingsService != null && settingsMap != null) {
-          await _settingsService.importSettings(settingsMap);
-        }
+          // Import settings inside the transaction so any failure rolls back
+          // the database changes together with the settings write.
+          if (_settingsService != null && settingsMap != null) {
+            await _settingsService.importSettings(settingsMap);
+          }
+        });
 
         return true;
       } catch (e) {
+        // Restore prior settings if the transaction threw
         if (_settingsService != null && previousSettings != null) {
           await _settingsService.importSettings(previousSettings);
         }

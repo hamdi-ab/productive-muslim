@@ -219,10 +219,9 @@ class _ReviewContent extends StatelessWidget {
                     .length;
                 final isFasting = settingsService.isSunnahFastingTarget(key);
                 final energy = settingsService.getDailyEnergy(key);
-                final score =
-                    dhikrCount +
-                    (isFasting ? 3 : 0) +
-                    (energy.physical > 0 ? 1 : 0);
+                // Only add the energy point when a real saved record exists.
+                final energyPoint = energy.physical > 0 ? 1 : 0;
+                final score = dhikrCount + (isFasting ? 3 : 0) + energyPoint;
                 if (score > 0) {
                   activityMap[key] = score;
                 }
@@ -230,12 +229,12 @@ class _ReviewContent extends StatelessWidget {
             }
             for (final d in analytics.dailySnapshots) {
               final key = BarakahReviewWeek.dateKey(d.date);
-              final current = activityMap[key] ?? 0;
-              final reviewScore =
+              final reviewContrib =
                   (d.barakahAnswer != null ? 2 : 0) +
                   d.completedDhikrCount +
                   (d.fastedSunnah ? 3 : 0);
-              activityMap[key] = current > reviewScore ? current : reviewScore;
+              // Additive merge: both sources contribute.
+              activityMap[key] = (activityMap[key] ?? 0) + reviewContrib;
             }
             return BarakahHeatmapCard(
               activityByDate: activityMap,
