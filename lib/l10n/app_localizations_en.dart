@@ -1017,4 +1017,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get slotNight => 'Night / Qiyam';
+
+  @override
+  String get widgetAppTitle => 'Productive Muslim';
+
+  @override
+  String get widgetNextPrayerLabel => 'Next Prayer';
+
+  @override
+  String widgetDhikrCount(int count) {
+    return 'Dhikr: $count completed';
+  }
 }

@@ -1867,6 +1867,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Night / Qiyam'**
   String get slotNight;
+
+  /// No description provided for @widgetAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Productive Muslim'**
+  String get widgetAppTitle;
+
+  /// No description provided for @widgetNextPrayerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Prayer'**
+  String get widgetNextPrayerLabel;
+
+  /// No description provided for @widgetDhikrCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikr: {count} completed'**
+  String widgetDhikrCount(int count);
 }
 
 class _AppLocalizationsDelegate

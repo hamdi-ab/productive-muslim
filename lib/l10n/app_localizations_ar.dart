@@ -1005,4 +1005,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get slotNight => 'الليل / قيام الليل';
+
+  @override
+  String get widgetAppTitle => 'المسلم المنتج';
+
+  @override
+  String get widgetNextPrayerLabel => 'الصلاة القادمة';
+
+  @override
+  String widgetDhikrCount(int count) {
+    return 'الأذكار: $count منجزة';
+  }
 }

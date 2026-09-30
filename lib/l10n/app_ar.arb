@@ -327,5 +327,8 @@
   "solarCurrentWindow": "النافذة الحالية: {slot}",
   "solarNext": "التالي: {prayer}",
   "slotTahajjud": "التهجد / السحر",
-  "slotNight": "الليل / قيام الليل"
+  "slotNight": "الليل / قيام الليل",
+  "widgetAppTitle": "المسلم المنتج",
+  "widgetNextPrayerLabel": "الصلاة القادمة",
+  "widgetDhikrCount": "الأذكار: {count} منجزة"
 }
