@@ -1207,7 +1207,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String heatmapScoreLabel(int count) {
-    return '$count actions logged';
+    return 'Activity score: $count';
   }
 
   @override
@@ -1225,6 +1225,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupExportSuccess => 'Backup JSON copied to clipboard!';
+
+  @override
+  String get backupExportError => 'Failed to export backup. Please try again.';
 
   @override
   String get backupImportSuccess => 'Data successfully restored!';

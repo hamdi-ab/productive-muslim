@@ -53,7 +53,11 @@ class BarakahHeatmapCard extends StatelessWidget {
     // 12 weeks = 84 days total
     const totalWeeks = 12;
     const totalDays = totalWeeks * 7;
-    final startMonday = endSunday.subtract(const Duration(days: totalDays - 1));
+    final startMonday = DateTime(
+      endSunday.year,
+      endSunday.month,
+      endSunday.day - (totalDays - 1),
+    );
 
     int activeDays = 0;
     final List<List<DateTime>> weeks = [];
@@ -61,7 +65,11 @@ class BarakahHeatmapCard extends StatelessWidget {
     for (int w = 0; w < totalWeeks; w++) {
       final List<DateTime> weekDays = [];
       for (int d = 0; d < 7; d++) {
-        final date = startMonday.add(Duration(days: (w * 7) + d));
+        final date = DateTime(
+          startMonday.year,
+          startMonday.month,
+          startMonday.day + (w * 7) + d,
+        );
         weekDays.add(date);
         final dateKey = _formatDateKey(date);
         final score = activityByDate[dateKey] ?? 0;

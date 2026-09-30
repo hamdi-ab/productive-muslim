@@ -69,8 +69,8 @@ void main() {
       final data = payload['data'] as Map<String, dynamic>;
       expect((data['tasks'] as List).length, equals(1));
       expect((data['habits'] as List).length, equals(1));
-      expect(data['settings']['morningAdhkar'], isTrue);
-      expect(data['settings']['eveningAdhkar'], isFalse);
+      expect(data['settings']['notif_morning_adhkar'], isTrue);
+      expect(data['settings']['notif_evening_adhkar'], isFalse);
 
       final jsonStr = await backupService.exportBackupToJson();
       expect(jsonStr, isNotEmpty);
@@ -78,6 +78,20 @@ void main() {
     });
 
     test('importBackupFromJson restores tables and settings cleanly in a transaction', () async {
+      await settingsService.addCompletedDhikr('2026-09-30', 'ayat_alkursi');
+      await settingsService.setDailyEnergy(
+        date: '2026-09-30',
+        physical: 4,
+        spiritual: 5,
+        mental: 4,
+      );
+
+      final exported = await backupService.exportBackupToJson();
+      expect(exported, contains('ayat_alkursi'));
+
+      // Mutate local state
+      await settingsService.setBedtimeReminderTime(hour: 21, minute: 0);
+
       final sampleBackup = jsonEncode({
         'version': 1,
         'app': 'Productive Muslim',
@@ -107,7 +121,9 @@ void main() {
               'createdAt': 0,
             },
           ],
-          'habitCompletions': [],
+          'habitCompletions': [
+            {'id': 1, 'habitId': 201, 'date': '2026-09-30', 'completed': 1},
+          ],
           'intentions': [
             {
               'id': 301,
@@ -119,14 +135,36 @@ void main() {
               'createdAt': 0,
             },
           ],
-          'barakahEntries': [],
-          'barakahDailyResponses': [],
+          'barakahEntries': [
+            {
+              'id': 401,
+              'date': '2026-09-30',
+              'sourceIds': '["quran"]',
+              'promptId': 'p1',
+              'intensity': 5,
+              'note': 'Blessed day',
+              'skipped': 0,
+              'createdAt': 0,
+            },
+          ],
+          'barakahDailyResponses': [
+            {
+              'date': '2026-09-30',
+              'promptId': 'q1',
+              'answer': 'yes',
+              'sourceIds': '["s1"]',
+              'note': 'SubhanAllah',
+              'createdAt': 0,
+              'updatedAt': 0,
+            },
+          ],
           'settings': {
-            'morningAdhkar': true,
-            'eveningAdhkar': true,
-            'sunnahFasting': false,
-            'bedtimeHour': 23,
-            'bedtimeMinute': 15,
+            'notif_morning_adhkar': true,
+            'notif_evening_adhkar': true,
+            'notif_sunnah_fasting': false,
+            'bedtime_reminder_hour': 23,
+            'bedtime_reminder_minute': 15,
+            'adhkar_done_2026-09-30': ['morning_1', 'morning_2'],
           },
         },
       });
@@ -142,24 +180,95 @@ void main() {
       expect(habits.length, equals(1));
       expect(habits.first.name, equals('Tahajjud Prayer'));
 
+      final completions = await db.select(db.habitCompletions).get();
+      expect(completions.length, equals(1));
+
       final intentions = await db.select(db.intentionEntries).get();
       expect(intentions.length, equals(1));
       expect(intentions.first.title, contains('Barakah'));
+
+      final barakah = await db.select(db.barakahEntries).get();
+      expect(barakah.length, equals(1));
+
+      final responses = await db.select(db.barakahDailyResponses).get();
+      expect(responses.length, equals(1));
 
       expect(settingsService.eveningAdhkarNotificationEnabled, isTrue);
       expect(settingsService.sunnahFastingNotificationEnabled, isFalse);
       expect(settingsService.bedtimeReminderHour, equals(23));
       expect(settingsService.bedtimeReminderMinute, equals(15));
+      expect(
+        settingsService.getCompletedDhikrIds('2026-09-30'),
+        equals(['morning_1', 'morning_2']),
+      );
     });
 
-    test('importBackupFromJson safely returns false on invalid payload without corrupting data', () async {
-      final invalidJson = '{"version": 2, "corrupted": true}';
-      final success = await backupService.importBackupFromJson(invalidJson);
-      expect(success, isFalse);
+    test('importBackupFromJson safely returns false on invalid payload without corrupting seeded data', () async {
+      // Seed existing data
+      await db
+          .into(db.tasks)
+          .insert(
+            Task(
+              id: 1,
+              title: 'Initial Seed Task',
+              lifeArea: 'Work',
+              date: '2026-09-30',
+              repeatDaily: 0,
+              repeatWeekly: 0,
+              completed: 0,
+              createdAt: 0,
+              active: 1,
+            ),
+          );
+      await settingsService.setBedtimeReminderTime(hour: 22, minute: 30);
 
-      final badSyntax = '{invalid json syntax';
-      final badSuccess = await backupService.importBackupFromJson(badSyntax);
-      expect(badSuccess, isFalse);
+      // Payload with missing tables
+      final missingTableJson = '{"version": 1, "data": {"tasks": []}}';
+      expect(
+        await backupService.importBackupFromJson(missingTableJson),
+        isFalse,
+      );
+
+      // Payload with non-map elements
+      final nonMapJson = jsonEncode({
+        'version': 1,
+        'data': {
+          'tasks': ['invalid_string'],
+          'habits': [],
+          'habitCompletions': [],
+          'intentions': [],
+          'barakahEntries': [],
+          'barakahDailyResponses': [],
+        },
+      });
+      expect(await backupService.importBackupFromJson(nonMapJson), isFalse);
+
+      // Payload with invalid bedtime settings
+      final invalidBedtimeJson = jsonEncode({
+        'version': 1,
+        'data': {
+          'tasks': [],
+          'habits': [],
+          'habitCompletions': [],
+          'intentions': [],
+          'barakahEntries': [],
+          'barakahDailyResponses': [],
+          'settings': {
+            'bedtime_reminder_hour': 99, // Invalid
+          },
+        },
+      });
+      expect(
+        await backupService.importBackupFromJson(invalidBedtimeJson),
+        isFalse,
+      );
+
+      // Verify original seeded data is completely intact
+      final tasks = await db.select(db.tasks).get();
+      expect(tasks.length, equals(1));
+      expect(tasks.first.title, equals('Initial Seed Task'));
+      expect(settingsService.bedtimeReminderHour, equals(22));
+      expect(settingsService.bedtimeReminderMinute, equals(30));
     });
   });
 }

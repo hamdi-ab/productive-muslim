@@ -346,17 +346,29 @@ class _BackupRestoreCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     if (!getIt.isRegistered<BackupService>()) return;
 
-    final jsonStr = await getIt<BackupService>().exportBackupToJson();
-    await Clipboard.setData(ClipboardData(text: jsonStr));
+    try {
+      final jsonStr = await getIt<BackupService>().exportBackupToJson();
+      await Clipboard.setData(ClipboardData(text: jsonStr));
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.backupExportSuccess),
-          backgroundColor: AppColors.primary,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.backupExportSuccess),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.backupExportError),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 

@@ -1195,7 +1195,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String heatmapScoreLabel(int count) {
-    return 'تم تسجيل $count أعمال';
+    return 'نقاط النشاط: $count';
   }
 
   @override
@@ -1214,6 +1214,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get backupExportSuccess =>
       'تم نسخ بيانات النسخة الاحتياطية إلى الحافظة!';
+
+  @override
+  String get backupExportError =>
+      'فشل تصدير النسخة الاحتياطية، يرجى إعادة المحاولة.';
 
   @override
   String get backupImportSuccess => 'تمت استعادة البيانات بنجاح!';

@@ -25,21 +25,8 @@ class BackupService {
         .select(_db.barakahDailyResponses)
         .get();
 
-    final settingsMap = _settingsService != null
-        ? {
-            'morningAdhkar': _settingsService.morningAdhkarNotificationEnabled,
-            'eveningAdhkar': _settingsService.eveningAdhkarNotificationEnabled,
-            'sleepingAdhkar':
-                _settingsService.sleepingAdhkarNotificationEnabled,
-            'sunnahFasting': _settingsService.sunnahFastingNotificationEnabled,
-            'qaylulah': _settingsService.qaylulahNotificationEnabled,
-            'bedtimeHour': _settingsService.bedtimeReminderHour,
-            'bedtimeMinute': _settingsService.bedtimeReminderMinute,
-            'userName': _settingsService.userName,
-            'userIntention': _settingsService.userIntention,
-            'onboardingCompleted': _settingsService.onboardingCompleted,
-          }
-        : <String, dynamic>{};
+    final settingsMap =
+        _settingsService?.exportSettings() ?? <String, dynamic>{};
 
     return {
       'version': 1,
@@ -76,122 +63,108 @@ class BackupService {
 
       final data = decoded['data'] as Map<String, dynamic>;
 
-      await _db.transaction(() async {
-        // Clear existing tables
-        await _db.delete(_db.tasks).go();
-        await _db.delete(_db.habits).go();
-        await _db.delete(_db.habitCompletions).go();
-        await _db.delete(_db.intentionEntries).go();
-        await _db.delete(_db.barakahEntries).go();
-        await _db.delete(_db.barakahDailyResponses).go();
+      const requiredTables = [
+        'tasks',
+        'habits',
+        'habitCompletions',
+        'intentions',
+        'barakahEntries',
+        'barakahDailyResponses',
+      ];
 
-        // Restore Tasks
-        if (data['tasks'] is List) {
-          for (final item in data['tasks']) {
-            if (item is Map<String, dynamic>) {
-              await _db.into(_db.tasks).insert(Task.fromJson(item));
-            }
-          }
-        }
-
-        // Restore Habits
-        if (data['habits'] is List) {
-          for (final item in data['habits']) {
-            if (item is Map<String, dynamic>) {
-              await _db.into(_db.habits).insert(Habit.fromJson(item));
-            }
-          }
-        }
-
-        // Restore Habit Completions
-        if (data['habitCompletions'] is List) {
-          for (final item in data['habitCompletions']) {
-            if (item is Map<String, dynamic>) {
-              await _db
-                  .into(_db.habitCompletions)
-                  .insert(HabitCompletion.fromJson(item));
-            }
-          }
-        }
-
-        // Restore Intentions
-        if (data['intentions'] is List) {
-          for (final item in data['intentions']) {
-            if (item is Map<String, dynamic>) {
-              await _db
-                  .into(_db.intentionEntries)
-                  .insert(IntentionEntry.fromJson(item));
-            }
-          }
-        }
-
-        // Restore Barakah Entries
-        if (data['barakahEntries'] is List) {
-          for (final item in data['barakahEntries']) {
-            if (item is Map<String, dynamic>) {
-              await _db
-                  .into(_db.barakahEntries)
-                  .insert(BarakahEntry.fromJson(item));
-            }
-          }
-        }
-
-        // Restore Daily Responses
-        if (data['barakahDailyResponses'] is List) {
-          for (final item in data['barakahDailyResponses']) {
-            if (item is Map<String, dynamic>) {
-              await _db
-                  .into(_db.barakahDailyResponses)
-                  .insert(BarakahDailyResponseRow.fromJson(item));
-            }
-          }
-        }
-      });
-
-      // Restore Settings if provided
-      if (_settingsService != null &&
-          data['settings'] is Map<String, dynamic>) {
-        final s = data['settings'] as Map<String, dynamic>;
-        if (s['morningAdhkar'] is bool) {
-          await _settingsService.setMorningAdhkarNotificationEnabled(
-            s['morningAdhkar'] as bool,
-          );
-        }
-        if (s['eveningAdhkar'] is bool) {
-          await _settingsService.setEveningAdhkarNotificationEnabled(
-            s['eveningAdhkar'] as bool,
-          );
-        }
-        if (s['sleepingAdhkar'] is bool) {
-          await _settingsService.setSleepingAdhkarNotificationEnabled(
-            s['sleepingAdhkar'] as bool,
-          );
-        }
-        if (s['sunnahFasting'] is bool) {
-          await _settingsService.setSunnahFastingNotificationEnabled(
-            s['sunnahFasting'] as bool,
-          );
-        }
-        if (s['qaylulah'] is bool) {
-          await _settingsService.setQaylulahNotificationEnabled(
-            s['qaylulah'] as bool,
-          );
-        }
-        if (s['bedtimeHour'] is int && s['bedtimeMinute'] is int) {
-          await _settingsService.setBedtimeReminderTime(
-            hour: s['bedtimeHour'] as int,
-            minute: s['bedtimeMinute'] as int,
-          );
-        }
-        if (s['userName'] is String) {
-          await _settingsService.setUserName(s['userName'] as String);
-        }
-        if (s['userIntention'] is String) {
-          await _settingsService.setUserIntention(s['userIntention'] as String);
+      for (final table in requiredTables) {
+        final list = data[table];
+        if (list is! List) return false;
+        for (final item in list) {
+          if (item is! Map<String, dynamic>) return false;
         }
       }
 
-      return true;
+      if (data.containsKey('settings') &&
+          data['settings'] is! Map<String, dynamic>) {
+        return false;
+      }
+
+      // Pre-parse all entities before mutating database or preferences
+      final tasks = (data['tasks'] as List)
+          .map((i) => Task.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final habits = (data['habits'] as List)
+          .map((i) => Habit.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final completions = (data['habitCompletions'] as List)
+          .map((i) => HabitCompletion.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final intentions = (data['intentions'] as List)
+          .map((i) => IntentionEntry.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final barakah = (data['barakahEntries'] as List)
+          .map((i) => BarakahEntry.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final responses = (data['barakahDailyResponses'] as List)
+          .map(
+            (i) => BarakahDailyResponseRow.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+
+      final settingsMap = data['settings'] as Map<String, dynamic>?;
+
+      // Validate bedtime hour/minute in settings if present
+      if (settingsMap != null) {
+        if (settingsMap.containsKey('bedtime_reminder_hour')) {
+          final h = settingsMap['bedtime_reminder_hour'];
+          if (h is! int || h < 0 || h > 23) return false;
+        }
+        if (settingsMap.containsKey('bedtime_reminder_minute')) {
+          final m = settingsMap['bedtime_reminder_minute'];
+          if (m is! int || m < 0 || m > 59) return false;
+        }
+      }
+
+      // Snapshot prior settings in case restore fails
+      final previousSettings = _settingsService?.exportSettings();
+
+      try {
+        await _db.transaction(() async {
+          // Clear existing tables
+          await _db.delete(_db.tasks).go();
+          await _db.delete(_db.habits).go();
+          await _db.delete(_db.habitCompletions).go();
+          await _db.delete(_db.intentionEntries).go();
+          await _db.delete(_db.barakahEntries).go();
+          await _db.delete(_db.barakahDailyResponses).go();
+
+          for (final t in tasks) {
+            await _db.into(_db.tasks).insert(t);
+          }
+          for (final h in habits) {
+            await _db.into(_db.habits).insert(h);
+          }
+          for (final c in completions) {
+            await _db.into(_db.habitCompletions).insert(c);
+          }
+          for (final i in intentions) {
+            await _db.into(_db.intentionEntries).insert(i);
+          }
+          for (final b in barakah) {
+            await _db.into(_db.barakahEntries).insert(b);
+          }
+          for (final r in responses) {
+            await _db.into(_db.barakahDailyResponses).insert(r);
+          }
+        });
+
+        if (_settingsService != null && settingsMap != null) {
+          await _settingsService.importSettings(settingsMap);
+        }
+
+        return true;
+      } catch (e) {
+        if (_settingsService != null && previousSettings != null) {
+          await _settingsService.importSettings(previousSettings);
+        }
+        rethrow;
+      }
     } catch (e, stack) {
       debugPrint('Backup restore failed: $e\n$stack');
       return false;

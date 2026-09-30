@@ -465,7 +465,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "{count} actions logged",
+  "heatmapScoreLabel": "Activity score: {count}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}
@@ -476,6 +476,7 @@
   "backupExportBtn": "Export Backup (JSON)",
   "backupImportBtn": "Restore from JSON",
   "backupExportSuccess": "Backup JSON copied to clipboard!",
+  "backupExportError": "Failed to export backup. Please try again.",
   "backupImportSuccess": "Data successfully restored!",
   "backupImportError": "Invalid backup JSON payload. Please check and try again.",
   "backupConfirmTitle": "Restore Data",

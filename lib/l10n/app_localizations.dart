@@ -2195,7 +2195,7 @@ abstract class AppLocalizations {
   /// No description provided for @heatmapScoreLabel.
   ///
   /// In en, this message translates to:
-  /// **'{count} actions logged'**
+  /// **'Activity score: {count}'**
   String heatmapScoreLabel(int count);
 
   /// No description provided for @backupRestoreTitle.
@@ -2227,6 +2227,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backup JSON copied to clipboard!'**
   String get backupExportSuccess;
+
+  /// No description provided for @backupExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export backup. Please try again.'**
+  String get backupExportError;
 
   /// No description provided for @backupImportSuccess.
   ///

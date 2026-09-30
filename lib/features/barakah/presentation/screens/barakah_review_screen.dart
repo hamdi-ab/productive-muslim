@@ -201,15 +201,47 @@ class _ReviewContent extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         BarakahConsistencyMatrixCard(analytics: analytics),
         const SizedBox(height: AppSpacing.md),
-        BarakahHeatmapCard(
-          activityByDate: {
-            for (final d in analytics.dailySnapshots)
-              BarakahReviewWeek.dateKey(d.date):
+        Builder(
+          builder: (context) {
+            final cutoff = analytics.week.today.isBefore(analytics.week.end)
+                ? analytics.week.today
+                : analytics.week.end;
+            final settingsService = getIt.isRegistered<SettingsService>()
+                ? getIt<SettingsService>()
+                : null;
+            final activityMap = <String, int>{};
+            if (settingsService != null) {
+              for (var i = 0; i < 84; i++) {
+                final d = DateTime(cutoff.year, cutoff.month, cutoff.day - i);
+                final key = BarakahReviewWeek.dateKey(d);
+                final dhikrCount = settingsService
+                    .getCompletedDhikrIds(key)
+                    .length;
+                final isFasting = settingsService.isSunnahFastingTarget(key);
+                final energy = settingsService.getDailyEnergy(key);
+                final score =
+                    dhikrCount +
+                    (isFasting ? 3 : 0) +
+                    (energy.physical > 0 ? 1 : 0);
+                if (score > 0) {
+                  activityMap[key] = score;
+                }
+              }
+            }
+            for (final d in analytics.dailySnapshots) {
+              final key = BarakahReviewWeek.dateKey(d.date);
+              final current = activityMap[key] ?? 0;
+              final reviewScore =
                   (d.barakahAnswer != null ? 2 : 0) +
                   d.completedDhikrCount +
-                  (d.fastedSunnah ? 3 : 0),
+                  (d.fastedSunnah ? 3 : 0);
+              activityMap[key] = current > reviewScore ? current : reviewScore;
+            }
+            return BarakahHeatmapCard(
+              activityByDate: activityMap,
+              referenceDate: cutoff,
+            );
           },
-          referenceDate: analytics.week.start,
         ),
         const SizedBox(height: AppSpacing.md),
         EnergyTriadBreakdownCard(analytics: analytics),

@@ -405,7 +405,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "تم تسجيل {count} أعمال",
+  "heatmapScoreLabel": "نقاط النشاط: {count}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}
@@ -416,6 +416,7 @@
   "backupExportBtn": "تصدير النسخة الاحتياطية (JSON)",
   "backupImportBtn": "استعادة من ملف JSON",
   "backupExportSuccess": "تم نسخ بيانات النسخة الاحتياطية إلى الحافظة!",
+  "backupExportError": "فشل تصدير النسخة الاحتياطية، يرجى إعادة المحاولة.",
   "backupImportSuccess": "تمت استعادة البيانات بنجاح!",
   "backupImportError": "بيانات النسخة الاحتياطية غير صالحة، يرجى التحقق وإعادة المحاولة.",
   "backupConfirmTitle": "استعادة البيانات",
