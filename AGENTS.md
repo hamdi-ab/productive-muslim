@@ -54,6 +54,15 @@ Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-huma
 
 Single-context repo — one `CONTEXT.md` + `docs/adr/` at the root. See `docs/agents/domain.md`.
 
+### Knowledge graph & token efficiency (Graphify)
+
+This repository maintains a pre-indexed knowledge graph at `graphify-out/` to eliminate context bloat and prevent token waste:
+
+- **Targeted Lookups**: Before reading or scanning large directories or multiple files, use `graphify explain "<Symbol>"` to inspect a class/function's exact inbound/outbound calls, references, and inheritance in a compact format.
+- **Path Discovery**: Use `graphify path "<Source>" "<Target>"` to trace call chains across clean architecture layers.
+- **Architectural Queries**: Use `graphify query "<Question>"` for scoped subgraphs on architectural workflows.
+- **Keep Graph Fresh**: Always run `graphify update .` after creating or modifying Dart files in a session (fast AST-only index, zero API cost).
+
 ## Testing
 
 ```bash
