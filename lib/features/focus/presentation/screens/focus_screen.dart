@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
@@ -33,6 +34,7 @@ class _FocusScreenState extends State<FocusScreen> {
   Task? _selectedTask;
   Stream<List<Task>>? _tasksStream;
   String _nextPrayerName = 'Fajr';
+  DateTime? _nextPrayerTime;
   Duration? _timeUntilNextPrayer;
 
   final _presets = [15, 25, 45, 60];
@@ -54,16 +56,37 @@ class _FocusScreenState extends State<FocusScreen> {
         final pt = service.getPrayerTimes(position);
         if (pt != null) {
           final next = service.getNextPrayerName(pt) ?? 'Fajr';
+          final nextTime = service.getNextPrayerTime(pt);
           final until = service.getTimeUntilNextPrayer(pt);
           if (mounted) {
             setState(() {
               _nextPrayerName = next;
+              _nextPrayerTime = nextTime;
               _timeUntilNextPrayer = until;
             });
           }
         }
       }
     } catch (_) {}
+  }
+
+  String _getLocalizedPrayerName(String prayerName, AppLocalizations l10n) {
+    switch (prayerName.toLowerCase()) {
+      case 'fajr':
+        return l10n.fajr;
+      case 'sunrise':
+        return l10n.sunrise;
+      case 'dhuhr':
+        return l10n.dhuhr;
+      case 'asr':
+        return l10n.asr;
+      case 'maghrib':
+        return l10n.maghrib;
+      case 'isha':
+        return l10n.isha;
+      default:
+        return prayerName;
+    }
   }
 
   @override
@@ -100,7 +123,12 @@ class _FocusScreenState extends State<FocusScreen> {
     setState(() => _isRunning = true);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
-        setState(() => _secondsRemaining--);
+        setState(() {
+          _secondsRemaining--;
+          if (_nextPrayerTime != null) {
+            _timeUntilNextPrayer = _nextPrayerTime!.difference(DateTime.now());
+          }
+        });
       } else {
         _timer?.cancel();
         setState(() => _isRunning = false);
@@ -232,12 +260,16 @@ class _FocusScreenState extends State<FocusScreen> {
                       ),
                       onPressed: () async {
                         try {
-                          await context.read<TaskRepository>().updateTask(
-                            taskToComplete.copyWith(completed: true),
-                          );
-                          setDialogState(() {
-                            taskMarkedDone = true;
-                          });
+                          final success = await context
+                              .read<TaskRepository>()
+                              .updateTask(
+                                taskToComplete.copyWith(completed: true),
+                              );
+                          if (success) {
+                            setDialogState(() {
+                              taskMarkedDone = true;
+                            });
+                          }
                         } catch (_) {}
                       },
                     ),
@@ -245,6 +277,19 @@ class _FocusScreenState extends State<FocusScreen> {
               ],
             ),
             actions: [
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.favorite_rounded,
+                  size: 18,
+                  color: AppColors.secondary,
+                ),
+                label: Text(l10n.barakah),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  _resetTimer();
+                  GoRouter.of(context).go('/barakah');
+                },
+              ),
               FilledButton(
                 onPressed: () {
                   Navigator.of(ctx).pop();
@@ -376,7 +421,7 @@ class _FocusScreenState extends State<FocusScreen> {
                 if (!_isRunning &&
                     _timeUntilNextPrayer != null &&
                     _selectedDurationMinutes * 60 >
-                        _timeUntilNextPrayer!.inSeconds) ...[
+                        _timeUntilNextPrayer!.inSeconds - (5 * 60)) ...[
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -411,12 +456,12 @@ class _FocusScreenState extends State<FocusScreen> {
                         const SizedBox(height: 6),
                         Text(
                           l10n.focusPrayerOverlap(
-                            _nextPrayerName,
+                            _getLocalizedPrayerName(_nextPrayerName, l10n),
                             _timeUntilNextPrayer!.inMinutes,
                           ),
                           style: const TextStyle(fontSize: 12),
                         ),
-                        if (_timeUntilNextPrayer!.inMinutes >= 5) ...[
+                        if (_timeUntilNextPrayer!.inMinutes >= 10) ...[
                           const SizedBox(height: 10),
                           ActionChip(
                             avatar: const Icon(
@@ -426,11 +471,11 @@ class _FocusScreenState extends State<FocusScreen> {
                             ),
                             label: Text(
                               l10n.focusPrayerSuggestion(
-                                (_timeUntilNextPrayer!.inMinutes - 2).clamp(
+                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
                                   5,
                                   60,
                                 ),
-                                _nextPrayerName,
+                                _getLocalizedPrayerName(_nextPrayerName, l10n),
                               ),
                               style: const TextStyle(
                                 fontSize: 11,
@@ -439,7 +484,7 @@ class _FocusScreenState extends State<FocusScreen> {
                             ),
                             onPressed: () {
                               _selectPreset(
-                                (_timeUntilNextPrayer!.inMinutes - 2).clamp(
+                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
                                   5,
                                   60,
                                 ),
