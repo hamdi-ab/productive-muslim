@@ -1364,6 +1364,42 @@ abstract class AppLocalizations {
   /// **'Select a task to focus on (optional)'**
   String get focusSelectTask;
 
+  /// No description provided for @focusPrayerWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Approaching'**
+  String get focusPrayerWarningTitle;
+
+  /// No description provided for @focusPrayerOverlap.
+  ///
+  /// In en, this message translates to:
+  /// **'Next prayer ({prayerName}) is in {minutes}m. Your session will overlap with Salah.'**
+  String focusPrayerOverlap(String prayerName, int minutes);
+
+  /// No description provided for @focusPrayerSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Set {minutes} min session to finish before {prayerName}'**
+  String focusPrayerSuggestion(int minutes, String prayerName);
+
+  /// No description provided for @focusMarkTaskComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark linked task as completed'**
+  String get focusMarkTaskComplete;
+
+  /// No description provided for @focusTaskCompletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Task completed! 🎉'**
+  String get focusTaskCompletedSuccess;
+
+  /// No description provided for @focusWindDownWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Salah in {minutes}m • Wind down your session'**
+  String focusWindDownWarning(int minutes);
+
   /// No description provided for @focusPreset15.
   ///
   /// In en, this message translates to:

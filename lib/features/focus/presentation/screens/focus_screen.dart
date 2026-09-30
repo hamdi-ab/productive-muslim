@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
@@ -10,6 +11,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
@@ -31,6 +33,9 @@ class _FocusScreenState extends State<FocusScreen> {
   Timer? _timer;
   Task? _selectedTask;
   Stream<List<Task>>? _tasksStream;
+  String _nextPrayerName = 'Fajr';
+  DateTime? _nextPrayerTime;
+  Duration? _timeUntilNextPrayer;
 
   final _presets = [15, 25, 45, 60];
 
@@ -39,6 +44,49 @@ class _FocusScreenState extends State<FocusScreen> {
     super.initState();
     _selectedTask = widget.initialTask;
     _secondsRemaining = _selectedDurationMinutes * 60;
+    _loadPrayerTimes();
+  }
+
+  Future<void> _loadPrayerTimes() async {
+    if (!getIt.isRegistered<PrayerTimeService>()) return;
+    try {
+      final service = getIt<PrayerTimeService>();
+      final position = await service.getCurrentPosition();
+      if (position != null) {
+        final pt = service.getPrayerTimes(position);
+        if (pt != null) {
+          final next = service.getNextPrayerName(pt) ?? 'Fajr';
+          final nextTime = service.getNextPrayerTime(pt);
+          final until = service.getTimeUntilNextPrayer(pt);
+          if (mounted) {
+            setState(() {
+              _nextPrayerName = next;
+              _nextPrayerTime = nextTime;
+              _timeUntilNextPrayer = until;
+            });
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  String _getLocalizedPrayerName(String prayerName, AppLocalizations l10n) {
+    switch (prayerName.toLowerCase()) {
+      case 'fajr':
+        return l10n.fajr;
+      case 'sunrise':
+        return l10n.sunrise;
+      case 'dhuhr':
+        return l10n.dhuhr;
+      case 'asr':
+        return l10n.asr;
+      case 'maghrib':
+        return l10n.maghrib;
+      case 'isha':
+        return l10n.isha;
+      default:
+        return prayerName;
+    }
   }
 
   @override
@@ -75,7 +123,12 @@ class _FocusScreenState extends State<FocusScreen> {
     setState(() => _isRunning = true);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
-        setState(() => _secondsRemaining--);
+        setState(() {
+          _secondsRemaining--;
+          if (_nextPrayerTime != null) {
+            _timeUntilNextPrayer = _nextPrayerTime!.difference(DateTime.now());
+          }
+        });
       } else {
         _timer?.cancel();
         setState(() => _isRunning = false);
@@ -107,63 +160,146 @@ class _FocusScreenState extends State<FocusScreen> {
 
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
+    bool taskMarkedDone = false;
+    final taskToComplete = _selectedTask;
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            const Icon(Icons.auto_awesome_rounded, color: AppColors.secondary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                l10n.focusComplete,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.focusCompleteMessage),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.timer_rounded, color: AppColors.primary),
-                  const SizedBox(width: 8),
-                  Text(
-                    '+$_selectedDurationMinutes min focus added',
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.secondary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.focusComplete,
                     style: const TextStyle(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _resetTimer();
-            },
-            child: Text(l10n.done),
-          ),
-        ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.focusCompleteMessage),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.timer_rounded, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        '+$_selectedDurationMinutes min focus added',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (taskToComplete != null && !taskToComplete.completed) ...[
+                  const SizedBox(height: 14),
+                  if (taskMarkedDone)
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: Color(0xFF10B981),
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.focusTaskCompletedSuccess,
+                              style: const TextStyle(
+                                color: Color(0xFF10B981),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.check_circle_outline_rounded),
+                      label: Text(l10n.focusMarkTaskComplete),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        try {
+                          final success = await context
+                              .read<TaskRepository>()
+                              .updateTask(
+                                taskToComplete.copyWith(completed: true),
+                              );
+                          if (success) {
+                            setDialogState(() {
+                              taskMarkedDone = true;
+                            });
+                          }
+                        } catch (_) {}
+                      },
+                    ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.favorite_rounded,
+                  size: 18,
+                  color: AppColors.secondary,
+                ),
+                label: Text(l10n.barakah),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  _resetTimer();
+                  GoRouter.of(context).go('/barakah');
+                },
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  _resetTimer();
+                },
+                child: Text(l10n.done),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -279,7 +415,129 @@ class _FocusScreenState extends State<FocusScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.md),
+
+                // Prayer Collision Warning Card (when preparing session)
+                if (!_isRunning &&
+                    _timeUntilNextPrayer != null &&
+                    _selectedDurationMinutes * 60 >
+                        _timeUntilNextPrayer!.inSeconds - (5 * 60)) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Color(0xFFF59E0B),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.focusPrayerWarningTitle,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFF59E0B),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.focusPrayerOverlap(
+                            _getLocalizedPrayerName(_nextPrayerName, l10n),
+                            _timeUntilNextPrayer!.inMinutes,
+                          ),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        if (_timeUntilNextPrayer!.inMinutes >= 10) ...[
+                          const SizedBox(height: 10),
+                          ActionChip(
+                            avatar: const Icon(
+                              Icons.timer_outlined,
+                              size: 14,
+                              color: Color(0xFFF59E0B),
+                            ),
+                            label: Text(
+                              l10n.focusPrayerSuggestion(
+                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
+                                  5,
+                                  60,
+                                ),
+                                _getLocalizedPrayerName(_nextPrayerName, l10n),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onPressed: () {
+                              _selectPreset(
+                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
+                                  5,
+                                  60,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                ],
+
+                // Wind-Down Indicator (when running and prayer is near)
+                if (_isRunning &&
+                    _timeUntilNextPrayer != null &&
+                    _timeUntilNextPrayer!.inMinutes <= 10) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.access_time_filled_rounded,
+                          color: Color(0xFFF59E0B),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.focusWindDownWarning(
+                            _timeUntilNextPrayer!.inMinutes,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFF59E0B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 // Timer Dial
                 Center(
