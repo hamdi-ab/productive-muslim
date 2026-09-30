@@ -162,9 +162,14 @@ class BackupService {
 
         return true;
       } catch (e) {
-        // Restore prior settings if the transaction threw
+        // Restore prior settings, but don't let a restore failure replace
+        // the original transaction error.
         if (_settingsService != null && previousSettings != null) {
-          await _settingsService.importSettings(previousSettings);
+          try {
+            await _settingsService.importSettings(previousSettings);
+          } catch (restoreError) {
+            debugPrint('Backup settings restore failed: $restoreError');
+          }
         }
         rethrow;
       }

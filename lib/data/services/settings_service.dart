@@ -207,8 +207,9 @@ class SettingsService {
   Future<void> importSettings(Map<String, dynamic> settings) async {
     if (_prefs == null) return;
 
-    // Validate all values first — reject unsupported types (null, maps, etc.)
-    // so an invalid payload leaves prefs untouched.
+    // Validate all values first — throw on unsupported types (null, maps,
+    // etc.) so BackupService can detect failure inside the transaction and
+    // roll back the database changes together with the settings write.
     for (final entry in settings.entries) {
       final val = entry.value;
       if (val == null ||
@@ -218,7 +219,10 @@ class SettingsService {
               val is! double &&
               val is! String &&
               val is! List)) {
-        return;
+        throw ArgumentError(
+          'importSettings: unsupported value type for key "${entry.key}": '
+          '${val.runtimeType}',
+        );
       }
     }
 

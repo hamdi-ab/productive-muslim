@@ -229,12 +229,12 @@ class _ReviewContent extends StatelessWidget {
             }
             for (final d in analytics.dailySnapshots) {
               final key = BarakahReviewWeek.dateKey(d.date);
-              final reviewContrib =
-                  (d.barakahAnswer != null ? 2 : 0) +
-                  d.completedDhikrCount +
-                  (d.fastedSunnah ? 3 : 0);
-              // Additive merge: both sources contribute.
-              activityMap[key] = (activityMap[key] ?? 0) + reviewContrib;
+              // Dhikr and fasting are already counted via SettingsService above;
+              // add only the daily-review bonus so we don't double-count.
+              final reviewBonus = d.barakahAnswer != null ? 2 : 0;
+              if (reviewBonus > 0) {
+                activityMap[key] = (activityMap[key] ?? 0) + reviewBonus;
+              }
             }
             return BarakahHeatmapCard(
               activityByDate: activityMap,
