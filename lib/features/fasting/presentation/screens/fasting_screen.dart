@@ -32,8 +32,7 @@ class _FastingScreenState extends State<FastingScreen> {
       final settings = getIt<SettingsService>();
       final now = DateTime.now();
       int count = 0;
-      final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-      for (int d = 1; d <= daysInMonth; d++) {
+      for (int d = 1; d <= now.day; d++) {
         final dateStr = DateFormat('yyyy-MM-dd')
             .format(DateTime(now.year, now.month, d));
         if (settings.isSunnahFastingTarget(dateStr)) {
@@ -177,13 +176,14 @@ class _FastingScreenState extends State<FastingScreen> {
                 // 3. Hijri Monthly Calendar Grid
                 HijriCalendarView(
                   onDateSelected: (_) => _calculateFastingStats(),
+                  onTargetToggled: _calculateFastingStats,
                 ),
 
                 const SizedBox(height: AppSpacing.lg),
 
                 // 4. Sunnah Fasting Guidelines & Etiquette
                 Text(
-                  'Sunnah Fasting Guidelines',
+                  l10n.fastingGuidelinesTitle,
                   style: Theme.of(context).textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -195,22 +195,22 @@ class _FastingScreenState extends State<FastingScreen> {
                     children: [
                       _buildTipItem(
                         icon: Icons.nightlight_round,
-                        title: 'Do Not Skip Suhoor',
-                        body: 'The Prophet (ﷺ) said: "Take Suhoor, for in Suhoor there is Barakah (blessing)." (Bukhari)',
+                        title: l10n.suhoorSunnahTitle,
+                        body: l10n.suhoorSunnahDesc,
                         isDark: isDark,
                       ),
                       const SizedBox(height: 12),
                       _buildTipItem(
                         icon: Icons.water_drop_rounded,
-                        title: 'Optimal Hydration',
-                        body: 'Drink ample water between Iftar and Suhoor to maintain high energy and mental focus during fasting hours.',
+                        title: l10n.hydrationTitle,
+                        body: l10n.hydrationDesc,
                         isDark: isDark,
                       ),
                       const SizedBox(height: 12),
                       _buildTipItem(
                         icon: Icons.access_time_filled_rounded,
-                        title: 'Hasten to Break the Fast',
-                        body: 'Break your fast promptly at Maghrib with dates and water, following the Sunnah for maximum reward.',
+                        title: l10n.breakPromptTitle,
+                        body: l10n.breakPromptDesc,
                         isDark: isDark,
                       ),
                     ],

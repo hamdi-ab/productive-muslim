@@ -1127,4 +1127,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fastingVirtueDesc =>
       'Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).';
+
+  @override
+  String get fastingGuidelinesTitle => 'Sunnah Fasting Guidelines';
+
+  @override
+  String get suhoorSunnahTitle => 'Do Not Skip Suhoor';
+
+  @override
+  String get suhoorSunnahDesc =>
+      'The Prophet (ﷺ) said: \"Take Suhoor, for in Suhoor there is Barakah (blessing).\" (Bukhari)';
+
+  @override
+  String get hydrationTitle => 'Optimal Hydration';
+
+  @override
+  String get hydrationDesc =>
+      'Drink ample water between Iftar and Suhoor to maintain high energy and mental focus.';
+
+  @override
+  String get breakPromptTitle => 'Hasten to Break the Fast';
+
+  @override
+  String get breakPromptDesc =>
+      'Break your fast promptly at Maghrib with dates and water, following the Sunnah.';
+
+  @override
+  String get whiteDayBadge => 'White Day';
+
+  @override
+  String get prevMonthTooltip => 'Previous Month';
+
+  @override
+  String get nextMonthTooltip => 'Next Month';
+
+  @override
+  String get todayTooltip => 'Today';
+
+  @override
+  String get suhoorWindow => 'Suhoor Window';
+
+  @override
+  String get fastInProgress => 'Fast in Progress';
+
+  @override
+  String get iftarCompleted => 'Iftar Completed';
+
+  @override
+  String get sunnahBadge => 'Sunnah';
+
+  @override
+  String get copyDuaTooltip => 'Copy Du\'a';
+
+  @override
+  String get duaCopiedMessage => 'Du\'a copied to clipboard';
+
+  @override
+  String get iftarHadithRef => 'Sunan Abi Dawud (2357) — Sahih';
 }

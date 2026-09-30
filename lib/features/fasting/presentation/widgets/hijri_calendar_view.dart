@@ -11,8 +11,13 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HijriCalendarView extends StatefulWidget {
   final ValueChanged<DateTime>? onDateSelected;
+  final VoidCallback? onTargetToggled;
 
-  const HijriCalendarView({super.key, this.onDateSelected});
+  const HijriCalendarView({
+    super.key,
+    this.onDateSelected,
+    this.onTargetToggled,
+  });
 
   @override
   State<HijriCalendarView> createState() => _HijriCalendarViewState();
@@ -118,28 +123,97 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                             color: AppColors.secondary.withValues(alpha: 0.5),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.brightness_2_rounded,
                               size: 14,
                               color: Colors.amber,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
-                              'White Day',
-                              style: TextStyle(
+                              l10n.whiteDayBadge,
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
+                      )
+                    else if (info.isArafah)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary.withValues(alpha: 0.25),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.secondary.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: const Text(
+                          'Arafah',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    else if (info.isAshura)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'Ashura',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 18),
-                if (info.isSunnahFastingDay)
+                if (info.isProhibited)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            isArabic
+                                ? 'يحرم الصيام في يوم العيد وأيام التشريق'
+                                : 'Fasting is prohibited on Eid & Tashriq days',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (info.isSunnahFastingDay)
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -156,9 +230,15 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            info.isWhiteDay
-                                ? l10n.whiteDaysDesc
-                                : l10n.mondayThursdaySunnah,
+                            info.isArafah
+                                ? (isArabic ? 'صيام يوم عرفة' : 'Day of Arafah')
+                                : (info.isAshura
+                                      ? (isArabic
+                                            ? 'صيام يوم عاشوراء'
+                                            : 'Day of Ashura')
+                                      : (info.isWhiteDay
+                                            ? l10n.whiteDaysDesc
+                                            : l10n.mondayThursdaySunnah)),
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -170,51 +250,57 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                     ),
                   ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton.icon(
-                        icon: Icon(
-                          isFasting
-                              ? Icons.check_circle_rounded
-                              : Icons.water_drop_outlined,
-                        ),
-                        label: Text(
-                          isFasting
-                              ? l10n.fastingTodayActive
-                              : l10n.fastingIntendAction,
-                        ),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: isFasting
-                              ? AppColors.secondary
-                              : AppColors.primary,
-                          foregroundColor: isFasting
-                              ? Colors.black87
-                              : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                if (!info.isProhibited)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          icon: Icon(
+                            isFasting
+                                ? Icons.check_circle_rounded
+                                : Icons.water_drop_outlined,
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          label: Text(
+                            isFasting
+                                ? l10n.fastingTodayActive
+                                : l10n.fastingIntendAction,
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: isFasting
+                                ? AppColors.secondary
+                                : AppColors.primary,
+                            foregroundColor: isFasting
+                                ? Colors.black87
+                                : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () async {
+                            HapticFeedback.mediumImpact();
+                            await settings.toggleSunnahFastingTarget(dateStr);
+                            if (ctx.mounted) {
+                              setSheetState(() => isFasting = !isFasting);
+                            }
+                            if (mounted) {
+                              setState(() {});
+                            }
+                            widget.onTargetToggled?.call();
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(l10n.fastingLoggedSuccess),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          },
                         ),
-                        onPressed: () async {
-                          HapticFeedback.mediumImpact();
-                          await settings.toggleSunnahFastingTarget(dateStr);
-                          setSheetState(() => isFasting = !isFasting);
-                          setState(() {});
-                          if (ctx.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.fastingLoggedSuccess),
-                                duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
-                        },
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
           );
@@ -301,17 +387,17 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
               IconButton(
                 icon: const Icon(Icons.chevron_left_rounded),
                 onPressed: _prevMonth,
-                tooltip: 'Previous Month',
+                tooltip: l10n.prevMonthTooltip,
               ),
               IconButton(
                 icon: const Icon(Icons.today_rounded, size: 20),
                 onPressed: _goToToday,
-                tooltip: 'Today',
+                tooltip: l10n.todayTooltip,
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right_rounded),
                 onPressed: _nextMonth,
-                tooltip: 'Next Month',
+                tooltip: l10n.nextMonthTooltip,
               ),
             ],
           ),

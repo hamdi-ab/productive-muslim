@@ -27,7 +27,7 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
   DateTime? _fajrTime;
   DateTime? _maghribTime;
   bool _isFasting = false;
-  late final String _today;
+  late String _today;
 
   @override
   void initState() {
@@ -37,7 +37,14 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
     _loadPrayerTimes();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) {
-        setState(() => _now = DateTime.now());
+        final now = DateTime.now();
+        final currentToday = DateFormat('yyyy-MM-dd').format(now);
+        if (currentToday != _today) {
+          _today = currentToday;
+          _loadFastingStatus();
+          _loadPrayerTimes();
+        }
+        setState(() => _now = now);
       }
     });
   }
@@ -123,18 +130,22 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
 
     String countdownLabel = '';
     String countdownTime = '--:--:--';
+    String timelineStatus = l10n.suhoorWindow;
 
     if (isBeforeFajr) {
       final remaining = _fajrTime!.difference(_now);
       countdownLabel = l10n.fastingCountdownSuhoor(_formatDuration(remaining));
       countdownTime = _formatDuration(remaining);
+      timelineStatus = l10n.suhoorWindow;
     } else if (isDuringFast) {
       final remaining = _maghribTime!.difference(_now);
       countdownLabel = l10n.fastingCountdownIftar(_formatDuration(remaining));
       countdownTime = _formatDuration(remaining);
+      timelineStatus = l10n.fastInProgress;
     } else if (isAfterMaghrib) {
       countdownLabel = l10n.done;
       countdownTime = '00:00:00';
+      timelineStatus = l10n.iftarCompleted;
     }
 
     return GlassContainer(
@@ -193,7 +204,7 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
                               ),
                             ),
                             child: Text(
-                              'Sunnah',
+                              l10n.sunnahBadge,
                               style: TextStyle(
                                 color: isDark
                                     ? Colors.amber[200]
@@ -229,20 +240,17 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
             ],
           ),
 
-          if (_fajrTime != null && _maghribTime != null) ...[
-            const Divider(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+          const Divider(height: 28),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (_fajrTime != null && _maghribTime != null)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isBeforeFajr
-                          ? 'Suhoor Window'
-                          : (isDuringFast
-                                ? 'Fast in Progress'
-                                : 'Iftar Completed'),
+                      timelineStatus,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -270,30 +278,41 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
                       ),
                     ),
                   ],
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () => IftarDuaDialog.show(context),
-                  icon: const Icon(Icons.menu_book_rounded, size: 16),
-                  label: Text(
-                    l10n.iftarDuaTitle,
-                    style: const TextStyle(
+                )
+              else
+                Expanded(
+                  child: Text(
+                    l10n.sunnahFastingDesc,
+                    style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              FilledButton.tonalIcon(
+                onPressed: () => IftarDuaDialog.show(context),
+                icon: const Icon(Icons.menu_book_rounded, size: 16),
+                label: Text(
+                  l10n.iftarDuaTitle,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

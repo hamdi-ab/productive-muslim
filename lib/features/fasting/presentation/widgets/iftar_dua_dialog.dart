@@ -113,7 +113,7 @@ class IftarDuaDialog extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Sunan Abi Dawud (2357) — Sahih (Al-Albani)',
+                      l10n.iftarHadithRef,
                       style: TextStyle(
                         fontSize: 11,
                         color: isDark
@@ -130,7 +130,7 @@ class IftarDuaDialog extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          tooltip: 'Copy Du\'a',
+          tooltip: l10n.copyDuaTooltip,
           icon: const Icon(Icons.copy_rounded, size: 20),
           onPressed: () {
             HapticFeedback.lightImpact();
@@ -141,9 +141,9 @@ class IftarDuaDialog extends StatelessWidget {
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Du\'a copied to clipboard'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(l10n.duaCopiedMessage),
+                duration: const Duration(seconds: 2),
                 behavior: SnackBarBehavior.floating,
               ),
             );

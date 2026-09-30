@@ -1115,4 +1115,61 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get fastingVirtueDesc =>
       'صيام ثلاثة أيام من كل شهر صيام الدهر كله (متفق عليه).';
+
+  @override
+  String get fastingGuidelinesTitle => 'إرشادات صيام السنة';
+
+  @override
+  String get suhoorSunnahTitle => 'بركة السحور';
+
+  @override
+  String get suhoorSunnahDesc =>
+      'قال النبي ﷺ: «تسحروا فإن في السحور بركة» (رواه البخاري)';
+
+  @override
+  String get hydrationTitle => 'الترطيب المنتظم';
+
+  @override
+  String get hydrationDesc =>
+      'احرص على شرب كميات كافية من الماء بين الإفطار والسحور لتجديد النشاط والتركيز.';
+
+  @override
+  String get breakPromptTitle => 'تعجيل الفطر';
+
+  @override
+  String get breakPromptDesc =>
+      'عجّل بالإفطار عند أذان المغرب على رطبات أو تمر وماء اقتداءً بالسنة النبوية.';
+
+  @override
+  String get whiteDayBadge => 'يوم أبيض';
+
+  @override
+  String get prevMonthTooltip => 'الشهر السابق';
+
+  @override
+  String get nextMonthTooltip => 'الشهر القادم';
+
+  @override
+  String get todayTooltip => 'اليوم';
+
+  @override
+  String get suhoorWindow => 'نافذة السحور';
+
+  @override
+  String get fastInProgress => 'أنت صائم الآن';
+
+  @override
+  String get iftarCompleted => 'تم الإفطار بفضل الله';
+
+  @override
+  String get sunnahBadge => 'سنة';
+
+  @override
+  String get copyDuaTooltip => 'نسخ الدعاء';
+
+  @override
+  String get duaCopiedMessage => 'تم نسخ الدعاء إلى الحافظة';
+
+  @override
+  String get iftarHadithRef => 'سنن أبي داود (٢٣٥٧) — صحيح';
 }

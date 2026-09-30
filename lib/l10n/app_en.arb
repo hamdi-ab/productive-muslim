@@ -434,5 +434,23 @@
     }
   },
   "fastingVirtueTitle": "Virtue of Fasting",
-  "fastingVirtueDesc": "Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim)."
+  "fastingVirtueDesc": "Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).",
+  "fastingGuidelinesTitle": "Sunnah Fasting Guidelines",
+  "suhoorSunnahTitle": "Do Not Skip Suhoor",
+  "suhoorSunnahDesc": "The Prophet (ﷺ) said: \"Take Suhoor, for in Suhoor there is Barakah (blessing).\" (Bukhari)",
+  "hydrationTitle": "Optimal Hydration",
+  "hydrationDesc": "Drink ample water between Iftar and Suhoor to maintain high energy and mental focus.",
+  "breakPromptTitle": "Hasten to Break the Fast",
+  "breakPromptDesc": "Break your fast promptly at Maghrib with dates and water, following the Sunnah.",
+  "whiteDayBadge": "White Day",
+  "prevMonthTooltip": "Previous Month",
+  "nextMonthTooltip": "Next Month",
+  "todayTooltip": "Today",
+  "suhoorWindow": "Suhoor Window",
+  "fastInProgress": "Fast in Progress",
+  "iftarCompleted": "Iftar Completed",
+  "sunnahBadge": "Sunnah",
+  "copyDuaTooltip": "Copy Du'a",
+  "duaCopiedMessage": "Du'a copied to clipboard",
+  "iftarHadithRef": "Sunan Abi Dawud (2357) — Sahih"
 }
