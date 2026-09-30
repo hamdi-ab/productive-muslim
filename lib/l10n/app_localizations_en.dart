@@ -1063,6 +1063,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetBtnFocus => 'Focus';
 
   @override
+  String get widgetBtnPlusOne => '+1';
+
+  @override
   String get hijriCalendarTitle => 'Hijri Calendar & Fasting';
 
   @override

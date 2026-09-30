@@ -1940,6 +1940,12 @@ abstract class AppLocalizations {
   /// **'Focus'**
   String get widgetBtnFocus;
 
+  /// No description provided for @widgetBtnPlusOne.
+  ///
+  /// In en, this message translates to:
+  /// **'+1'**
+  String get widgetBtnPlusOne;
+
   /// No description provided for @hijriCalendarTitle.
   ///
   /// In en, this message translates to:

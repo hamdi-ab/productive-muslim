@@ -397,6 +397,7 @@
   "widgetBtnPrayers": "Prayers",
   "widgetBtnAdhkar": "Adhkar",
   "widgetBtnFocus": "Focus",
+  "widgetBtnPlusOne": "+1",
   "hijriCalendarTitle": "Hijri Calendar & Fasting",
   "hijriToday": "Today: {date}",
   "@hijriToday": {

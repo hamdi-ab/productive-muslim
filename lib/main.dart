@@ -43,6 +43,7 @@ class _MyAppState extends State<MyApp> {
   void _initHomeWidgetDeepLinking() {
     if (getIt.isRegistered<HomeWidgetSyncService>()) {
       final service = getIt<HomeWidgetSyncService>();
+      service.registerBackgroundCallback();
       service.getInitiallyLaunchedUri().then((uri) {
         if (uri != null) {
           AppRouter.handleDeepLinkUri(uri);

@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="14dp">
+    android:padding="12dp">
 
-    <!-- Top Header: App Title & Active Barakah Window Badge -->
+    <!-- Top Header: App Title, Hijri Fasting Badge & Active Barakah Window Badge -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,15 +25,29 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/widget_hijri_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/widget_badge_background"
+            android:paddingHorizontal="7dp"
+            android:paddingVertical="3dp"
+            android:text="14 Sha'ban"
+            android:textColor="#FDE047"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/widget_active_slot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/widget_badge_background"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="7dp"
             android:paddingVertical="3dp"
             android:text="Barakah Hour"
             android:textColor="#34D399"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -44,8 +58,8 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -96,28 +110,64 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Bottom Row: Daily Dhikr Tracker & Quick Launch Actions -->
+    <!-- Bottom Row: Interactive Dhikr (+1 Button & Counter) + Quick Actions -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/widget_dhikr_count"
+        <!-- Interactive Quick Dhikr Group -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dhikr: 33 completed"
-            android:textColor="#D1FAE5"
-            android:textSize="11sp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_btn_plus_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_plus_one_background"
+                android:paddingHorizontal="9dp"
+                android:paddingVertical="4dp"
+                android:text="+1"
+                android:textColor="#064E3B"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_dhikr_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Dhikr: 33"
+                android:textColor="#D1FAE5"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Quick Launch Action Buttons -->
+        <TextView
+            android:id="@+id/widget_action_focus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_button_background"
+            android:paddingHorizontal="7dp"
+            android:paddingVertical="4dp"
+            android:text="Focus"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/widget_action_prayer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:background="@drawable/widget_button_background"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="7dp"
             android:paddingVertical="4dp"
             android:text="Prayers"
             android:textColor="#FFFFFF"
@@ -128,24 +178,11 @@
             android:id="@+id/widget_action_adhkar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="4dp"
             android:background="@drawable/widget_button_background"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="7dp"
             android:paddingVertical="4dp"
             android:text="Adhkar"
-            android:textColor="#FFFFFF"
-            android:textSize="10sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_action_focus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/widget_button_background"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="Focus"
             android:textColor="#FFFFFF"
             android:textSize="10sp"
             android:textStyle="bold" />

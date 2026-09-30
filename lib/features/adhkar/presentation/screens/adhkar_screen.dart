@@ -5,6 +5,7 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -68,7 +69,14 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       // Record completion
       try {
         if (getIt.isRegistered<AdhkarService>()) {
-          await getIt<AdhkarService>().recordDhikrCompletion(dhikrId: item.id);
+          final adhkarService = getIt<AdhkarService>();
+          await adhkarService.recordDhikrCompletion(dhikrId: item.id);
+          if (getIt.isRegistered<HomeWidgetSyncService>()) {
+            final count = adhkarService
+                .getCompletedDhikrIdsForDate(null)
+                .length;
+            getIt<HomeWidgetSyncService>().syncDhikrCount(count);
+          }
         }
       } catch (_) {}
 
