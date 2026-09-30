@@ -330,5 +330,8 @@
   "slotNight": "الليل / قيام الليل",
   "widgetAppTitle": "المسلم المنتج",
   "widgetNextPrayerLabel": "الصلاة القادمة",
-  "widgetDhikrCount": "الأذكار: {count} منجزة"
+  "widgetDhikrCount": "الأذكار: {count} منجزة",
+  "widgetBtnPrayers": "الصلاة",
+  "widgetBtnAdhkar": "الأذكار",
+  "widgetBtnFocus": "التركيز"
 }

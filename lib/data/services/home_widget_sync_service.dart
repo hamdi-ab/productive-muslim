@@ -52,7 +52,11 @@ class HomeWidgetSyncService {
   static const String keyNextPrayerLabel = 'widget_next_prayer_label';
   static const String keyNextPrayerName = 'widget_next_prayer_name';
   static const String keyNextPrayerTime = 'widget_next_prayer_time';
+  static const String keyNextPrayerCountdown = 'widget_next_prayer_countdown';
   static const String keyDhikrCount = 'widget_dhikr_count';
+  static const String keyBtnPrayers = 'widget_btn_prayers';
+  static const String keyBtnAdhkar = 'widget_btn_adhkar';
+  static const String keyBtnFocus = 'widget_btn_focus';
 
   HomeWidgetSyncService({HomeWidgetStorage? storage})
     : _storage = storage ?? const DefaultHomeWidgetStorage();
@@ -62,8 +66,12 @@ class HomeWidgetSyncService {
     required String nextPrayerTime,
     required String activeSlot,
     required int dhikrCount,
+    String nextPrayerCountdown = '',
     String appTitle = 'Productive Muslim',
     String nextPrayerLabel = 'Next Prayer',
+    String btnPrayers = 'Prayers',
+    String btnAdhkar = 'Adhkar',
+    String btnFocus = 'Focus',
     String? customDhikrText,
   }) async {
     try {
@@ -77,13 +85,34 @@ class HomeWidgetSyncService {
       );
       await _storage.saveWidgetData<String>(keyNextPrayerName, nextPrayerName);
       await _storage.saveWidgetData<String>(keyNextPrayerTime, nextPrayerTime);
+      await _storage.saveWidgetData<String>(
+        keyNextPrayerCountdown,
+        nextPrayerCountdown,
+      );
       await _storage.saveWidgetData<String>(keyDhikrCount, dhikrDisplay);
+      await _storage.saveWidgetData<String>(keyBtnPrayers, btnPrayers);
+      await _storage.saveWidgetData<String>(keyBtnAdhkar, btnAdhkar);
+      await _storage.saveWidgetData<String>(keyBtnFocus, btnFocus);
 
       final updated = await _storage.updateWidget(
         name: androidWidgetProvider,
         androidName: androidWidgetProvider,
       );
 
+      return updated ?? true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> syncDhikrCount(int count, {String? customDhikrText}) async {
+    try {
+      final dhikrDisplay = customDhikrText ?? 'Dhikr: $count completed';
+      await _storage.saveWidgetData<String>(keyDhikrCount, dhikrDisplay);
+      final updated = await _storage.updateWidget(
+        name: androidWidgetProvider,
+        androidName: androidWidgetProvider,
+      );
       return updated ?? true;
     } catch (_) {
       return false;

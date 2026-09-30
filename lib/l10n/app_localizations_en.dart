@@ -1028,4 +1028,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String widgetDhikrCount(int count) {
     return 'Dhikr: $count completed';
   }
+
+  @override
+  String get widgetBtnPrayers => 'Prayers';
+
+  @override
+  String get widgetBtnAdhkar => 'Adhkar';
+
+  @override
+  String get widgetBtnFocus => 'Focus';
 }

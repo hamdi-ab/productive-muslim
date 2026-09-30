@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +9,7 @@ import 'package:device_preview/device_preview.dart';
 import 'core/di/di.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'data/services/home_widget_sync_service.dart';
 import 'domain/repositories/barakah_repository.dart';
 import 'domain/repositories/habit_repository.dart';
 import 'domain/repositories/intention_repository.dart';
@@ -21,8 +24,43 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<Uri?>? _widgetClickSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initHomeWidgetDeepLinking();
+  }
+
+  void _initHomeWidgetDeepLinking() {
+    if (getIt.isRegistered<HomeWidgetSyncService>()) {
+      final service = getIt<HomeWidgetSyncService>();
+      service.getInitiallyLaunchedUri().then((uri) {
+        if (uri != null) {
+          AppRouter.handleDeepLinkUri(uri);
+        }
+      });
+      _widgetClickSub = service.widgetClickedStream.listen((uri) {
+        if (uri != null) {
+          AppRouter.handleDeepLinkUri(uri);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _widgetClickSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

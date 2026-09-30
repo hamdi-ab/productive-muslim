@@ -1885,6 +1885,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dhikr: {count} completed'**
   String widgetDhikrCount(int count);
+
+  /// No description provided for @widgetBtnPrayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayers'**
+  String get widgetBtnPrayers;
+
+  /// No description provided for @widgetBtnAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Adhkar'**
+  String get widgetBtnAdhkar;
+
+  /// No description provided for @widgetBtnFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get widgetBtnFocus;
 }
 
 class _AppLocalizationsDelegate

@@ -370,5 +370,8 @@
     "placeholders": {
       "count": {"type": "int"}
     }
-  }
+  },
+  "widgetBtnPrayers": "Prayers",
+  "widgetBtnAdhkar": "Adhkar",
+  "widgetBtnFocus": "Focus"
 }

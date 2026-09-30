@@ -80,6 +80,9 @@ Future<void> setupDi() async {
   );
 
   // Services
+  getIt.registerLazySingleton<HomeWidgetSyncService>(
+    () => HomeWidgetSyncService(),
+  );
   getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
   getIt.registerLazySingleton<AdhanNotificationService>(
     () => AdhanNotificationService(),
@@ -88,6 +91,7 @@ Future<void> setupDi() async {
     () => AdhkarService(
       prayerTimeService: getIt<PrayerTimeService>(),
       settingsService: getIt<SettingsService>(),
+      homeWidgetSyncService: getIt<HomeWidgetSyncService>(),
     ),
   );
   getIt.registerLazySingleton<PrayerNotificationScheduler>(
@@ -99,9 +103,6 @@ Future<void> setupDi() async {
     ),
   );
   getIt.registerLazySingleton<QiblaService>(() => QiblaService());
-  getIt.registerLazySingleton<HomeWidgetSyncService>(
-    () => HomeWidgetSyncService(),
-  );
 
   // Router
   getIt.registerSingleton<GoRouter>(AppRouter.router);

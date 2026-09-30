@@ -1016,4 +1016,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String widgetDhikrCount(int count) {
     return 'الأذكار: $count منجزة';
   }
+
+  @override
+  String get widgetBtnPrayers => 'الصلاة';
+
+  @override
+  String get widgetBtnAdhkar => 'الأذكار';
+
+  @override
+  String get widgetBtnFocus => 'التركيز';
 }
