@@ -20,6 +20,7 @@ import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
@@ -79,6 +80,9 @@ Future<void> setupDi() async {
   );
 
   // Services
+  getIt.registerLazySingleton<HomeWidgetSyncService>(
+    () => HomeWidgetSyncService(),
+  );
   getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
   getIt.registerLazySingleton<AdhanNotificationService>(
     () => AdhanNotificationService(),
@@ -87,6 +91,7 @@ Future<void> setupDi() async {
     () => AdhkarService(
       prayerTimeService: getIt<PrayerTimeService>(),
       settingsService: getIt<SettingsService>(),
+      homeWidgetSyncService: getIt<HomeWidgetSyncService>(),
     ),
   );
   getIt.registerLazySingleton<PrayerNotificationScheduler>(

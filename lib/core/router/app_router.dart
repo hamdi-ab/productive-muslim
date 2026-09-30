@@ -38,6 +38,39 @@ class AppRouter {
     }
   }
 
+  static void handleDeepLinkUri(Uri uri) {
+    final host = uri.host.toLowerCase();
+    final path = uri.path.toLowerCase();
+
+    if (host == 'prayer_times' ||
+        host == 'prayer-times' ||
+        path == '/prayer-times' ||
+        path == '/prayer_times') {
+      router.go('/prayer-times');
+    } else if (host == 'adhkar' || path == '/adhkar') {
+      router.go('/adhkar');
+    } else if (host == 'focus' || path == '/focus') {
+      router.go('/focus');
+    } else if (host == 'barakah' || path == '/barakah') {
+      router.go('/barakah');
+    } else if (host == 'tasks' || path == '/tasks') {
+      router.go('/tasks');
+    } else if (host == 'habits' || path == '/habits') {
+      router.go('/habits');
+    } else if (host == 'journal' || path == '/journal') {
+      router.go('/journal');
+    } else if (host == 'settings' || path == '/settings') {
+      router.go('/settings');
+    } else if (host == 'home' ||
+        host.isEmpty ||
+        path == '/' ||
+        path == '/home') {
+      router.go('/');
+    } else if (path.isNotEmpty) {
+      router.go(path);
+    }
+  }
+
   static bool _isOnboardingDone() {
     try {
       return getIt<SettingsService>().onboardingCompleted;

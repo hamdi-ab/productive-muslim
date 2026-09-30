@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
+import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -244,6 +246,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     _locationName = widget.service!.getLocationName(position);
     _updatePrayerCountdown();
     _startTimer();
+    _syncHomeWidget();
   }
 
   void _startTimer() {
@@ -270,6 +273,52 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
         _loading = false;
       });
     }
+  }
+
+  void _syncHomeWidget() {
+    if (_cachedPrayerTimes == null ||
+        widget.service == null ||
+        !getIt.isRegistered<HomeWidgetSyncService>()) {
+      return;
+    }
+
+    final nextPrayer =
+        widget.service!.getNextPrayerName(_cachedPrayerTimes!) ?? '--';
+    final timeUntil = widget.service!.getTimeUntilNextPrayer(
+      _cachedPrayerTimes!,
+    );
+    final nextPrayerTime = widget.service!.getNextPrayerTime(
+      _cachedPrayerTimes!,
+    );
+    final formattedTime = nextPrayerTime != null
+        ? '${nextPrayerTime.hour.toString().padLeft(2, '0')}:${nextPrayerTime.minute.toString().padLeft(2, '0')}'
+        : '--:--';
+    final countdownStr = timeUntil != null ? _formatDuration(timeUntil) : '';
+
+    int completedDhikr = 0;
+    if (getIt.isRegistered<AdhkarService>()) {
+      completedDhikr = getIt<AdhkarService>()
+          .getCompletedDhikrIdsForDate(null)
+          .length;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final localizedPrayerName = l10n != null
+        ? _getLocalizedPrayerName(nextPrayer, l10n)
+        : nextPrayer;
+
+    getIt<HomeWidgetSyncService>().syncWidgetData(
+      nextPrayerName: localizedPrayerName,
+      nextPrayerTime: formattedTime,
+      nextPrayerCountdown: countdownStr,
+      activeSlot: 'Barakah Window',
+      dhikrCount: completedDhikr,
+      appTitle: l10n?.widgetAppTitle ?? 'Productive Muslim',
+      nextPrayerLabel: l10n?.widgetNextPrayerLabel ?? 'Next Prayer',
+      btnPrayers: l10n?.widgetBtnPrayers ?? 'Prayers',
+      btnAdhkar: l10n?.widgetBtnAdhkar ?? 'Adhkar',
+      btnFocus: l10n?.widgetBtnFocus ?? 'Focus',
+    );
   }
 
   String _formatDuration(Duration duration) {

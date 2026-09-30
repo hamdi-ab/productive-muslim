@@ -362,5 +362,16 @@
     }
   },
   "slotTahajjud": "Tahajjud / Pre-Fajr",
-  "slotNight": "Night / Qiyam"
+  "slotNight": "Night / Qiyam",
+  "widgetAppTitle": "Productive Muslim",
+  "widgetNextPrayerLabel": "Next Prayer",
+  "widgetDhikrCount": "Dhikr: {count} completed",
+  "@widgetDhikrCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "widgetBtnPrayers": "Prayers",
+  "widgetBtnAdhkar": "Adhkar",
+  "widgetBtnFocus": "Focus"
 }

@@ -50,6 +50,19 @@ class PrayerTimeService {
     return 'Fajr'; // next day
   }
 
+  DateTime? getNextPrayerTime(PrayerTimes prayerTimes) {
+    final now = DateTime.now();
+
+    if (prayerTimes.fajr.isAfter(now)) return prayerTimes.fajr;
+    if (prayerTimes.sunrise.isAfter(now)) return prayerTimes.sunrise;
+    if (prayerTimes.dhuhr.isAfter(now)) return prayerTimes.dhuhr;
+    if (prayerTimes.asr.isAfter(now)) return prayerTimes.asr;
+    if (prayerTimes.maghrib.isAfter(now)) return prayerTimes.maghrib;
+    if (prayerTimes.isha.isAfter(now)) return prayerTimes.isha;
+
+    return prayerTimes.fajr.add(const Duration(days: 1));
+  }
+
   Duration? getTimeUntilNextPrayer(PrayerTimes prayerTimes) {
     final now = DateTime.now();
 

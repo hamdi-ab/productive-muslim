@@ -1,16 +1,20 @@
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
+import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 
 class AdhkarService {
   final SettingsService _settingsService;
+  final HomeWidgetSyncService? _homeWidgetSyncService;
 
   AdhkarService({
     PrayerTimeService? prayerTimeService,
     required SettingsService settingsService,
-  }) : _settingsService = settingsService;
+    HomeWidgetSyncService? homeWidgetSyncService,
+  }) : _settingsService = settingsService,
+       _homeWidgetSyncService = homeWidgetSyncService;
 
   DhikrCategory getCurrentContextCategory({
     DateTime? now,
@@ -65,6 +69,8 @@ class AdhkarService {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     await _settingsService.addCompletedDhikr(targetDate, dhikrId);
+    final count = getCompletedDhikrIdsForDate(targetDate).length;
+    await _homeWidgetSyncService?.syncDhikrCount(count);
   }
 
   List<String> getCompletedDhikrIdsForDate(String? date) {
