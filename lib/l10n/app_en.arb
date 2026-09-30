@@ -396,5 +396,61 @@
   },
   "widgetBtnPrayers": "Prayers",
   "widgetBtnAdhkar": "Adhkar",
-  "widgetBtnFocus": "Focus"
+  "widgetBtnFocus": "Focus",
+  "hijriCalendarTitle": "Hijri Calendar & Fasting",
+  "hijriToday": "Today: {date}",
+  "@hijriToday": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "whiteDaysLabel": "White Days (Ayyam al-Beed)",
+  "whiteDaysDesc": "13th, 14th & 15th of the lunar month",
+  "mondayThursdaySunnah": "Monday & Thursday Sunnah",
+  "fastingCountdownSuhoor": "Suhoor ends in {time}",
+  "@fastingCountdownSuhoor": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "fastingCountdownIftar": "Iftar in {time}",
+  "@fastingCountdownIftar": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "fastingTodayActive": "Fasting Today",
+  "fastingTodayInactive": "Not Fasting Today",
+  "fastingIntendAction": "Intend to Fast",
+  "fastingLoggedSuccess": "Fasting record updated",
+  "iftarDuaTitle": "Sunnah Iftar Du'a",
+  "iftarDuaArabic": "ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ",
+  "iftarDuaTransliteration": "Dhahaba adh-dhama'u wabtallatil-'urooqu wa thabatal-ajru in sha Allah",
+  "iftarDuaTranslation": "The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills.",
+  "fastingStreak": "{count} days fasted",
+  "@fastingStreak": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "fastingVirtueTitle": "Virtue of Fasting",
+  "fastingVirtueDesc": "Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).",
+  "fastingGuidelinesTitle": "Sunnah Fasting Guidelines",
+  "suhoorSunnahTitle": "Do Not Skip Suhoor",
+  "suhoorSunnahDesc": "The Prophet (ﷺ) said: \"Take Suhoor, for in Suhoor there is Barakah (blessing).\" (Bukhari)",
+  "hydrationTitle": "Optimal Hydration",
+  "hydrationDesc": "Drink ample water between Iftar and Suhoor to maintain high energy and mental focus.",
+  "breakPromptTitle": "Hasten to Break the Fast",
+  "breakPromptDesc": "Break your fast promptly at Maghrib with dates and water, following the Sunnah.",
+  "whiteDayBadge": "White Day",
+  "prevMonthTooltip": "Previous Month",
+  "nextMonthTooltip": "Next Month",
+  "todayTooltip": "Today",
+  "suhoorWindow": "Suhoor Window",
+  "fastInProgress": "Fast in Progress",
+  "iftarCompleted": "Iftar Completed",
+  "sunnahBadge": "Sunnah",
+  "copyDuaTooltip": "Copy Du'a",
+  "duaCopiedMessage": "Du'a copied to clipboard",
+  "iftarHadithRef": "Sunan Abi Dawud (2357) — Sahih"
 }

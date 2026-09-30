@@ -1061,4 +1061,127 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetBtnFocus => 'Focus';
+
+  @override
+  String get hijriCalendarTitle => 'Hijri Calendar & Fasting';
+
+  @override
+  String hijriToday(String date) {
+    return 'Today: $date';
+  }
+
+  @override
+  String get whiteDaysLabel => 'White Days (Ayyam al-Beed)';
+
+  @override
+  String get whiteDaysDesc => '13th, 14th & 15th of the lunar month';
+
+  @override
+  String get mondayThursdaySunnah => 'Monday & Thursday Sunnah';
+
+  @override
+  String fastingCountdownSuhoor(String time) {
+    return 'Suhoor ends in $time';
+  }
+
+  @override
+  String fastingCountdownIftar(String time) {
+    return 'Iftar in $time';
+  }
+
+  @override
+  String get fastingTodayActive => 'Fasting Today';
+
+  @override
+  String get fastingTodayInactive => 'Not Fasting Today';
+
+  @override
+  String get fastingIntendAction => 'Intend to Fast';
+
+  @override
+  String get fastingLoggedSuccess => 'Fasting record updated';
+
+  @override
+  String get iftarDuaTitle => 'Sunnah Iftar Du\'a';
+
+  @override
+  String get iftarDuaArabic =>
+      'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ';
+
+  @override
+  String get iftarDuaTransliteration =>
+      'Dhahaba adh-dhama\'u wabtallatil-\'urooqu wa thabatal-ajru in sha Allah';
+
+  @override
+  String get iftarDuaTranslation =>
+      'The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills.';
+
+  @override
+  String fastingStreak(int count) {
+    return '$count days fasted';
+  }
+
+  @override
+  String get fastingVirtueTitle => 'Virtue of Fasting';
+
+  @override
+  String get fastingVirtueDesc =>
+      'Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).';
+
+  @override
+  String get fastingGuidelinesTitle => 'Sunnah Fasting Guidelines';
+
+  @override
+  String get suhoorSunnahTitle => 'Do Not Skip Suhoor';
+
+  @override
+  String get suhoorSunnahDesc =>
+      'The Prophet (ﷺ) said: \"Take Suhoor, for in Suhoor there is Barakah (blessing).\" (Bukhari)';
+
+  @override
+  String get hydrationTitle => 'Optimal Hydration';
+
+  @override
+  String get hydrationDesc =>
+      'Drink ample water between Iftar and Suhoor to maintain high energy and mental focus.';
+
+  @override
+  String get breakPromptTitle => 'Hasten to Break the Fast';
+
+  @override
+  String get breakPromptDesc =>
+      'Break your fast promptly at Maghrib with dates and water, following the Sunnah.';
+
+  @override
+  String get whiteDayBadge => 'White Day';
+
+  @override
+  String get prevMonthTooltip => 'Previous Month';
+
+  @override
+  String get nextMonthTooltip => 'Next Month';
+
+  @override
+  String get todayTooltip => 'Today';
+
+  @override
+  String get suhoorWindow => 'Suhoor Window';
+
+  @override
+  String get fastInProgress => 'Fast in Progress';
+
+  @override
+  String get iftarCompleted => 'Iftar Completed';
+
+  @override
+  String get sunnahBadge => 'Sunnah';
+
+  @override
+  String get copyDuaTooltip => 'Copy Du\'a';
+
+  @override
+  String get duaCopiedMessage => 'Du\'a copied to clipboard';
+
+  @override
+  String get iftarHadithRef => 'Sunan Abi Dawud (2357) — Sahih';
 }

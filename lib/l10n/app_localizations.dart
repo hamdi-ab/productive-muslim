@@ -1939,6 +1939,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Focus'**
   String get widgetBtnFocus;
+
+  /// No description provided for @hijriCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hijri Calendar & Fasting'**
+  String get hijriCalendarTitle;
+
+  /// No description provided for @hijriToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {date}'**
+  String hijriToday(String date);
+
+  /// No description provided for @whiteDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'White Days (Ayyam al-Beed)'**
+  String get whiteDaysLabel;
+
+  /// No description provided for @whiteDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'13th, 14th & 15th of the lunar month'**
+  String get whiteDaysDesc;
+
+  /// No description provided for @mondayThursdaySunnah.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday & Thursday Sunnah'**
+  String get mondayThursdaySunnah;
+
+  /// No description provided for @fastingCountdownSuhoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Suhoor ends in {time}'**
+  String fastingCountdownSuhoor(String time);
+
+  /// No description provided for @fastingCountdownIftar.
+  ///
+  /// In en, this message translates to:
+  /// **'Iftar in {time}'**
+  String fastingCountdownIftar(String time);
+
+  /// No description provided for @fastingTodayActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting Today'**
+  String get fastingTodayActive;
+
+  /// No description provided for @fastingTodayInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Fasting Today'**
+  String get fastingTodayInactive;
+
+  /// No description provided for @fastingIntendAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Intend to Fast'**
+  String get fastingIntendAction;
+
+  /// No description provided for @fastingLoggedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting record updated'**
+  String get fastingLoggedSuccess;
+
+  /// No description provided for @iftarDuaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Iftar Du\'a'**
+  String get iftarDuaTitle;
+
+  /// No description provided for @iftarDuaArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ'**
+  String get iftarDuaArabic;
+
+  /// No description provided for @iftarDuaTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhahaba adh-dhama\'u wabtallatil-\'urooqu wa thabatal-ajru in sha Allah'**
+  String get iftarDuaTransliteration;
+
+  /// No description provided for @iftarDuaTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills.'**
+  String get iftarDuaTranslation;
+
+  /// No description provided for @fastingStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days fasted'**
+  String fastingStreak(int count);
+
+  /// No description provided for @fastingVirtueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtue of Fasting'**
+  String get fastingVirtueTitle;
+
+  /// No description provided for @fastingVirtueDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).'**
+  String get fastingVirtueDesc;
+
+  /// No description provided for @fastingGuidelinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Fasting Guidelines'**
+  String get fastingGuidelinesTitle;
+
+  /// No description provided for @suhoorSunnahTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Do Not Skip Suhoor'**
+  String get suhoorSunnahTitle;
+
+  /// No description provided for @suhoorSunnahDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The Prophet (ﷺ) said: \"Take Suhoor, for in Suhoor there is Barakah (blessing).\" (Bukhari)'**
+  String get suhoorSunnahDesc;
+
+  /// No description provided for @hydrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimal Hydration'**
+  String get hydrationTitle;
+
+  /// No description provided for @hydrationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drink ample water between Iftar and Suhoor to maintain high energy and mental focus.'**
+  String get hydrationDesc;
+
+  /// No description provided for @breakPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hasten to Break the Fast'**
+  String get breakPromptTitle;
+
+  /// No description provided for @breakPromptDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Break your fast promptly at Maghrib with dates and water, following the Sunnah.'**
+  String get breakPromptDesc;
+
+  /// No description provided for @whiteDayBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'White Day'**
+  String get whiteDayBadge;
+
+  /// No description provided for @prevMonthTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous Month'**
+  String get prevMonthTooltip;
+
+  /// No description provided for @nextMonthTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Month'**
+  String get nextMonthTooltip;
+
+  /// No description provided for @todayTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayTooltip;
+
+  /// No description provided for @suhoorWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Suhoor Window'**
+  String get suhoorWindow;
+
+  /// No description provided for @fastInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast in Progress'**
+  String get fastInProgress;
+
+  /// No description provided for @iftarCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Iftar Completed'**
+  String get iftarCompleted;
+
+  /// No description provided for @sunnahBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah'**
+  String get sunnahBadge;
+
+  /// No description provided for @copyDuaTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Du\'a'**
+  String get copyDuaTooltip;
+
+  /// No description provided for @duaCopiedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Du\'a copied to clipboard'**
+  String get duaCopiedMessage;
+
+  /// No description provided for @iftarHadithRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunan Abi Dawud (2357) — Sahih'**
+  String get iftarHadithRef;
 }
 
 class _AppLocalizationsDelegate

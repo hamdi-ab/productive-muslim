@@ -19,6 +19,7 @@ import 'package:productive_muslim/features/prayer_times/presentation/screens/pra
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
+import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -51,6 +52,8 @@ class AppRouter {
       router.go('/adhkar');
     } else if (host == 'focus' || path == '/focus') {
       router.go('/focus');
+    } else if (host == 'fasting' || path == '/fasting') {
+      router.go('/fasting');
     } else if (host == 'barakah' || path == '/barakah') {
       router.go('/barakah');
     } else if (host == 'tasks' || path == '/tasks') {
@@ -153,6 +156,10 @@ class AppRouter {
               GoRoute(
                 path: '/energy',
                 builder: (context, state) => const EnergyScreen(),
+              ),
+              GoRoute(
+                path: '/fasting',
+                builder: (context, state) => const FastingScreen(),
               ),
               GoRoute(
                 path: '/adhkar',

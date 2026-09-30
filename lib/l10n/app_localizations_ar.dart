@@ -1049,4 +1049,127 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get widgetBtnFocus => 'التركيز';
+
+  @override
+  String get hijriCalendarTitle => 'التقويم الهجري وصيام السنة';
+
+  @override
+  String hijriToday(String date) {
+    return 'اليوم: $date';
+  }
+
+  @override
+  String get whiteDaysLabel => 'الأيام البيض';
+
+  @override
+  String get whiteDaysDesc => '13 و 14 و 15 من كل شهر قمري';
+
+  @override
+  String get mondayThursdaySunnah => 'سنة صيام الإثنين والخميس';
+
+  @override
+  String fastingCountdownSuhoor(String time) {
+    return 'ينتهي السحور خلال $time';
+  }
+
+  @override
+  String fastingCountdownIftar(String time) {
+    return 'موعد الإفطار خلال $time';
+  }
+
+  @override
+  String get fastingTodayActive => 'صائم اليوم';
+
+  @override
+  String get fastingTodayInactive => 'غير صائم اليوم';
+
+  @override
+  String get fastingIntendAction => 'انوي الصيام';
+
+  @override
+  String get fastingLoggedSuccess => 'تم تحديث سجل الصيام';
+
+  @override
+  String get iftarDuaTitle => 'دعاء الإفطار المأثور';
+
+  @override
+  String get iftarDuaArabic =>
+      'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ';
+
+  @override
+  String get iftarDuaTransliteration =>
+      'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله';
+
+  @override
+  String get iftarDuaTranslation =>
+      'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله (رواه أبو داود)';
+
+  @override
+  String fastingStreak(int count) {
+    return '$count أيام صيام';
+  }
+
+  @override
+  String get fastingVirtueTitle => 'فضل صيام التطوع';
+
+  @override
+  String get fastingVirtueDesc =>
+      'صيام ثلاثة أيام من كل شهر صيام الدهر كله (متفق عليه).';
+
+  @override
+  String get fastingGuidelinesTitle => 'إرشادات صيام السنة';
+
+  @override
+  String get suhoorSunnahTitle => 'بركة السحور';
+
+  @override
+  String get suhoorSunnahDesc =>
+      'قال النبي ﷺ: «تسحروا فإن في السحور بركة» (رواه البخاري)';
+
+  @override
+  String get hydrationTitle => 'الترطيب المنتظم';
+
+  @override
+  String get hydrationDesc =>
+      'احرص على شرب كميات كافية من الماء بين الإفطار والسحور لتجديد النشاط والتركيز.';
+
+  @override
+  String get breakPromptTitle => 'تعجيل الفطر';
+
+  @override
+  String get breakPromptDesc =>
+      'عجّل بالإفطار عند أذان المغرب على رطبات أو تمر وماء اقتداءً بالسنة النبوية.';
+
+  @override
+  String get whiteDayBadge => 'يوم أبيض';
+
+  @override
+  String get prevMonthTooltip => 'الشهر السابق';
+
+  @override
+  String get nextMonthTooltip => 'الشهر القادم';
+
+  @override
+  String get todayTooltip => 'اليوم';
+
+  @override
+  String get suhoorWindow => 'نافذة السحور';
+
+  @override
+  String get fastInProgress => 'أنت صائم الآن';
+
+  @override
+  String get iftarCompleted => 'تم الإفطار بفضل الله';
+
+  @override
+  String get sunnahBadge => 'سنة';
+
+  @override
+  String get copyDuaTooltip => 'نسخ الدعاء';
+
+  @override
+  String get duaCopiedMessage => 'تم نسخ الدعاء إلى الحافظة';
+
+  @override
+  String get iftarHadithRef => 'سنن أبي داود (٢٣٥٧) — صحيح';
 }
