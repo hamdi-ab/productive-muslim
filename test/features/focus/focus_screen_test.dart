@@ -96,4 +96,22 @@ void main() {
       expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
     },
   );
+
+  testWidgets('renders focus screen in Arabic locale', (tester) async {
+    await tester.pumpWidget(
+      RepositoryProvider<TaskRepository>.value(
+        value: FakeTaskRepository(),
+        child: const MaterialApp(
+          locale: Locale('ar'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: FocusScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('جلسة تركيز وخشوع'), findsOneWidget);
+    expect(find.text('ابدأ التركيز'), findsOneWidget);
+  });
 }

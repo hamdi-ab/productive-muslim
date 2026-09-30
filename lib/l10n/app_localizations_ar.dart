@@ -729,6 +729,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get focusSelectTask => 'اختر مهمة للتركيز عليها (اختياري)';
 
   @override
+  String get focusPrayerWarningTitle => 'اقتراب وقت الصلاة';
+
+  @override
+  String focusPrayerOverlap(String prayerName, int minutes) {
+    return 'الصلاة القادمة ($prayerName) بعد $minutes دقيقة. ستتداخل جلستك مع وقت الصلاة.';
+  }
+
+  @override
+  String focusPrayerSuggestion(int minutes, String prayerName) {
+    return 'اضبط $minutes دقيقة للانتهاء قبل صلاة $prayerName';
+  }
+
+  @override
+  String get focusMarkTaskComplete => 'تحديد المهمة المرتبطة كمكتملة';
+
+  @override
+  String get focusTaskCompletedSuccess => 'تم إنجاز المهمة بنجاح! 🎉';
+
+  @override
+  String focusWindDownWarning(int minutes) {
+    return 'الصلاة بعد $minutes د • ابدأ بإنهاء جلستك';
+  }
+
+  @override
   String get focusPreset15 => '15 دقيقة (سريعة)';
 
   @override

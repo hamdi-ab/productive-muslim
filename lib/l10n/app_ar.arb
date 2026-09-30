@@ -238,6 +238,29 @@
   "focusTotalMinutes": "إجمالي التركيز: {minutes} دقيقة",
   "@focusTotalMinutes": {"placeholders": {"minutes": {"type": "int"}}},
   "focusSelectTask": "اختر مهمة للتركيز عليها (اختياري)",
+  "focusPrayerWarningTitle": "اقتراب وقت الصلاة",
+  "focusPrayerOverlap": "الصلاة القادمة ({prayerName}) بعد {minutes} دقيقة. ستتداخل جلستك مع وقت الصلاة.",
+  "@focusPrayerOverlap": {
+    "placeholders": {
+      "prayerName": {"type": "String"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "focusPrayerSuggestion": "اضبط {minutes} دقيقة للانتهاء قبل صلاة {prayerName}",
+  "@focusPrayerSuggestion": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "prayerName": {"type": "String"}
+    }
+  },
+  "focusMarkTaskComplete": "تحديد المهمة المرتبطة كمكتملة",
+  "focusTaskCompletedSuccess": "تم إنجاز المهمة بنجاح! 🎉",
+  "focusWindDownWarning": "الصلاة بعد {minutes} د • ابدأ بإنهاء جلستك",
+  "@focusWindDownWarning": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
   "focusPreset15": "15 دقيقة (سريعة)",
   "focusPreset25": "25 دقيقة (كتلة بركة)",
   "focusPreset45": "45 دقيقة (عمل عميق)",

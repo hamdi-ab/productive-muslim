@@ -739,6 +739,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusSelectTask => 'Select a task to focus on (optional)';
 
   @override
+  String get focusPrayerWarningTitle => 'Prayer Approaching';
+
+  @override
+  String focusPrayerOverlap(String prayerName, int minutes) {
+    return 'Next prayer ($prayerName) is in ${minutes}m. Your session will overlap with Salah.';
+  }
+
+  @override
+  String focusPrayerSuggestion(int minutes, String prayerName) {
+    return 'Set $minutes min session to finish before $prayerName';
+  }
+
+  @override
+  String get focusMarkTaskComplete => 'Mark linked task as completed';
+
+  @override
+  String get focusTaskCompletedSuccess => 'Task completed! 🎉';
+
+  @override
+  String focusWindDownWarning(int minutes) {
+    return 'Salah in ${minutes}m • Wind down your session';
+  }
+
+  @override
   String get focusPreset15 => '15 min (Sprint)';
 
   @override

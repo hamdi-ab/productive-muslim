@@ -238,6 +238,29 @@
   "focusTotalMinutes": "Total Focus: {minutes} mins",
   "@focusTotalMinutes": {"placeholders": {"minutes": {"type": "int"}}},
   "focusSelectTask": "Select a task to focus on (optional)",
+  "focusPrayerWarningTitle": "Prayer Approaching",
+  "focusPrayerOverlap": "Next prayer ({prayerName}) is in {minutes}m. Your session will overlap with Salah.",
+  "@focusPrayerOverlap": {
+    "placeholders": {
+      "prayerName": {"type": "String"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "focusPrayerSuggestion": "Set {minutes} min session to finish before {prayerName}",
+  "@focusPrayerSuggestion": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "prayerName": {"type": "String"}
+    }
+  },
+  "focusMarkTaskComplete": "Mark linked task as completed",
+  "focusTaskCompletedSuccess": "Task completed! 🎉",
+  "focusWindDownWarning": "Salah in {minutes}m • Wind down your session",
+  "@focusWindDownWarning": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
   "focusPreset15": "15 min (Sprint)",
   "focusPreset25": "25 min (Barakah block)",
   "focusPreset45": "45 min (Deep work)",
