@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
 abstract class HomeWidgetStorage {
   Future<bool?> saveWidgetData<T>(String id, T? data);
+  Future<T?> getWidgetData<T>(String id, {T? defaultValue});
   Future<bool?> updateWidget({
     String? name,
     String? androidName,
@@ -12,6 +14,9 @@ abstract class HomeWidgetStorage {
   });
   Future<Uri?> initiallyLaunchedFromHomeWidget();
   Stream<Uri?> get widgetClicked;
+  Future<bool?> registerInteractivityCallback(
+    FutureOr<void> Function(Uri?) callback,
+  );
 }
 
 class DefaultHomeWidgetStorage implements HomeWidgetStorage {
@@ -20,6 +25,10 @@ class DefaultHomeWidgetStorage implements HomeWidgetStorage {
   @override
   Future<bool?> saveWidgetData<T>(String id, T? data) =>
       HomeWidget.saveWidgetData<T>(id, data);
+
+  @override
+  Future<T?> getWidgetData<T>(String id, {T? defaultValue}) =>
+      HomeWidget.getWidgetData<T>(id, defaultValue: defaultValue);
 
   @override
   Future<bool?> updateWidget({
@@ -40,6 +49,23 @@ class DefaultHomeWidgetStorage implements HomeWidgetStorage {
 
   @override
   Stream<Uri?> get widgetClicked => HomeWidget.widgetClicked;
+
+  @override
+  Future<bool?> registerInteractivityCallback(
+    FutureOr<void> Function(Uri?) callback,
+  ) => HomeWidget.registerInteractivityCallback(callback);
+}
+
+@pragma('vm:entry-point')
+Future<void> homeWidgetBackgroundCallback(Uri? uri) async {
+  if (uri != null &&
+      (uri.host == 'increment_tasbih' ||
+          uri.path == '/increment_tasbih' ||
+          (uri.scheme == 'productivemuslim' &&
+              uri.host == 'increment_tasbih'))) {
+    final service = HomeWidgetSyncService();
+    await service.incrementDhikrCountDirectly();
+  }
 }
 
 class HomeWidgetSyncService {
@@ -49,29 +75,48 @@ class HomeWidgetSyncService {
 
   static const String keyAppTitle = 'widget_app_title';
   static const String keyActiveSlot = 'widget_active_slot';
+  static const String keyHijriDate = 'widget_hijri_date';
+  static const String keyFastingBadge = 'widget_fasting_badge';
   static const String keyNextPrayerLabel = 'widget_next_prayer_label';
   static const String keyNextPrayerName = 'widget_next_prayer_name';
   static const String keyNextPrayerTime = 'widget_next_prayer_time';
   static const String keyNextPrayerCountdown = 'widget_next_prayer_countdown';
   static const String keyDhikrCount = 'widget_dhikr_count';
+  static const String keyDhikrRawCount = 'widget_dhikr_raw_count';
   static const String keyBtnPrayers = 'widget_btn_prayers';
   static const String keyBtnAdhkar = 'widget_btn_adhkar';
   static const String keyBtnFocus = 'widget_btn_focus';
+  static const String keyBtnPlusOne = 'widget_btn_plus_one';
 
   HomeWidgetSyncService({HomeWidgetStorage? storage})
     : _storage = storage ?? const DefaultHomeWidgetStorage();
+
+  Future<bool> registerBackgroundCallback([
+    FutureOr<void> Function(Uri?) callback = homeWidgetBackgroundCallback,
+  ]) async {
+    try {
+      final res = await _storage.registerInteractivityCallback(callback);
+      return res ?? true;
+    } catch (e) {
+      debugPrint('Failed to register HomeWidget interactivity callback: $e');
+      return false;
+    }
+  }
 
   Future<bool> syncWidgetData({
     required String nextPrayerName,
     required String nextPrayerTime,
     required String activeSlot,
     required int dhikrCount,
+    String hijriDate = '',
+    String fastingBadge = '',
     String nextPrayerCountdown = '',
     String appTitle = 'Productive Muslim',
     String nextPrayerLabel = 'Next Prayer',
     String btnPrayers = 'Prayers',
     String btnAdhkar = 'Adhkar',
     String btnFocus = 'Focus',
+    String btnPlusOne = '+1',
     String? customDhikrText,
   }) async {
     try {
@@ -79,6 +124,8 @@ class HomeWidgetSyncService {
 
       await _storage.saveWidgetData<String>(keyAppTitle, appTitle);
       await _storage.saveWidgetData<String>(keyActiveSlot, activeSlot);
+      await _storage.saveWidgetData<String>(keyHijriDate, hijriDate);
+      await _storage.saveWidgetData<String>(keyFastingBadge, fastingBadge);
       await _storage.saveWidgetData<String>(
         keyNextPrayerLabel,
         nextPrayerLabel,
@@ -90,9 +137,11 @@ class HomeWidgetSyncService {
         nextPrayerCountdown,
       );
       await _storage.saveWidgetData<String>(keyDhikrCount, dhikrDisplay);
+      await _storage.saveWidgetData<int>(keyDhikrRawCount, dhikrCount);
       await _storage.saveWidgetData<String>(keyBtnPrayers, btnPrayers);
       await _storage.saveWidgetData<String>(keyBtnAdhkar, btnAdhkar);
       await _storage.saveWidgetData<String>(keyBtnFocus, btnFocus);
+      await _storage.saveWidgetData<String>(keyBtnPlusOne, btnPlusOne);
 
       final updated = await _storage.updateWidget(
         name: androidWidgetProvider,
@@ -105,10 +154,19 @@ class HomeWidgetSyncService {
     }
   }
 
+  Future<int?> getStoredDhikrRawCount() async {
+    try {
+      return await _storage.getWidgetData<int>(keyDhikrRawCount);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<bool> syncDhikrCount(int count, {String? customDhikrText}) async {
     try {
-      final dhikrDisplay = customDhikrText ?? 'Dhikr: $count completed';
+      final dhikrDisplay = customDhikrText ?? 'Dhikr: $count';
       await _storage.saveWidgetData<String>(keyDhikrCount, dhikrDisplay);
+      await _storage.saveWidgetData<int>(keyDhikrRawCount, count);
       final updated = await _storage.updateWidget(
         name: androidWidgetProvider,
         androidName: androidWidgetProvider,
@@ -116,6 +174,33 @@ class HomeWidgetSyncService {
       return updated ?? true;
     } catch (_) {
       return false;
+    }
+  }
+
+  Future<int> incrementDhikrCountDirectly({
+    int delta = 1,
+    String? customPrefix,
+  }) async {
+    try {
+      final current = await _storage.getWidgetData<int>(
+        keyDhikrRawCount,
+        defaultValue: 0,
+      );
+      final newCount = (current ?? 0) + delta;
+      final prefix = customPrefix ?? 'Dhikr: ';
+      final display = '$prefix$newCount';
+
+      await _storage.saveWidgetData<int>(keyDhikrRawCount, newCount);
+      await _storage.saveWidgetData<String>(keyDhikrCount, display);
+
+      await _storage.updateWidget(
+        name: androidWidgetProvider,
+        androidName: androidWidgetProvider,
+      );
+
+      return newCount;
+    } catch (_) {
+      return 0;
     }
   }
 

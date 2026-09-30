@@ -8,6 +8,7 @@ import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -307,17 +308,42 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
         ? _getLocalizedPrayerName(nextPrayer, l10n)
         : nextPrayer;
 
+    String hijriDateStr = '';
+    String fastingBadgeStr = '';
+    if (getIt.isRegistered<HijriService>()) {
+      final hijriService = getIt<HijriService>();
+      final now = DateTime.now();
+      final hijriInfo = hijriService.getHijriDate(now);
+      final isAr =
+          l10n != null && Localizations.localeOf(context).languageCode == 'ar';
+      hijriDateStr = isAr ? hijriInfo.formatAr() : hijriInfo.formatEn();
+      if (hijriInfo.isSunnahFastingDay && l10n != null) {
+        if (hijriInfo.isWhiteDay) {
+          fastingBadgeStr = l10n.whiteDayBadge;
+        } else if (hijriInfo.isArafah) {
+          fastingBadgeStr = isAr ? 'عرفة' : 'Arafah';
+        } else if (hijriInfo.isAshura) {
+          fastingBadgeStr = isAr ? 'عاشوراء' : 'Ashura';
+        } else {
+          fastingBadgeStr = l10n.sunnahBadge;
+        }
+      }
+    }
+
     getIt<HomeWidgetSyncService>().syncWidgetData(
       nextPrayerName: localizedPrayerName,
       nextPrayerTime: formattedTime,
       nextPrayerCountdown: countdownStr,
       activeSlot: 'Barakah Window',
       dhikrCount: completedDhikr,
+      hijriDate: hijriDateStr,
+      fastingBadge: fastingBadgeStr,
       appTitle: l10n?.widgetAppTitle ?? 'Productive Muslim',
       nextPrayerLabel: l10n?.widgetNextPrayerLabel ?? 'Next Prayer',
       btnPrayers: l10n?.widgetBtnPrayers ?? 'Prayers',
       btnAdhkar: l10n?.widgetBtnAdhkar ?? 'Adhkar',
       btnFocus: l10n?.widgetBtnFocus ?? 'Focus',
+      btnPlusOne: l10n?.widgetBtnPlusOne ?? '+1',
     );
   }
 

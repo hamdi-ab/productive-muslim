@@ -1051,6 +1051,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get widgetBtnFocus => 'التركيز';
 
   @override
+  String get widgetBtnPlusOne => '+١';
+
+  @override
   String get hijriCalendarTitle => 'التقويم الهجري وصيام السنة';
 
   @override
