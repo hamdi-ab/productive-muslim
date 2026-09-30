@@ -1049,4 +1049,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get widgetBtnFocus => 'التركيز';
+
+  @override
+  String get hijriCalendarTitle => 'التقويم الهجري وصيام السنة';
+
+  @override
+  String hijriToday(String date) {
+    return 'اليوم: $date';
+  }
+
+  @override
+  String get whiteDaysLabel => 'الأيام البيض';
+
+  @override
+  String get whiteDaysDesc => '13 و 14 و 15 من كل شهر قمري';
+
+  @override
+  String get mondayThursdaySunnah => 'سنة صيام الإثنين والخميس';
+
+  @override
+  String fastingCountdownSuhoor(String time) {
+    return 'ينتهي السحور خلال $time';
+  }
+
+  @override
+  String fastingCountdownIftar(String time) {
+    return 'موعد الإفطار خلال $time';
+  }
+
+  @override
+  String get fastingTodayActive => 'صائم اليوم';
+
+  @override
+  String get fastingTodayInactive => 'غير صائم اليوم';
+
+  @override
+  String get fastingIntendAction => 'انوي الصيام';
+
+  @override
+  String get fastingLoggedSuccess => 'تم تحديث سجل الصيام';
+
+  @override
+  String get iftarDuaTitle => 'دعاء الإفطار المأثور';
+
+  @override
+  String get iftarDuaArabic =>
+      'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ';
+
+  @override
+  String get iftarDuaTransliteration =>
+      'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله';
+
+  @override
+  String get iftarDuaTranslation =>
+      'ذهب الظمأ وابتلت العروق وثبت الأجر إن شاء الله (رواه أبو داود)';
+
+  @override
+  String fastingStreak(int count) {
+    return '$count أيام صيام';
+  }
+
+  @override
+  String get fastingVirtueTitle => 'فضل صيام التطوع';
+
+  @override
+  String get fastingVirtueDesc =>
+      'صيام ثلاثة أيام من كل شهر صيام الدهر كله (متفق عليه).';
 }

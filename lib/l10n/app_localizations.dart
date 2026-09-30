@@ -1939,6 +1939,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Focus'**
   String get widgetBtnFocus;
+
+  /// No description provided for @hijriCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hijri Calendar & Fasting'**
+  String get hijriCalendarTitle;
+
+  /// No description provided for @hijriToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {date}'**
+  String hijriToday(String date);
+
+  /// No description provided for @whiteDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'White Days (Ayyam al-Beed)'**
+  String get whiteDaysLabel;
+
+  /// No description provided for @whiteDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'13th, 14th & 15th of the lunar month'**
+  String get whiteDaysDesc;
+
+  /// No description provided for @mondayThursdaySunnah.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday & Thursday Sunnah'**
+  String get mondayThursdaySunnah;
+
+  /// No description provided for @fastingCountdownSuhoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Suhoor ends in {time}'**
+  String fastingCountdownSuhoor(String time);
+
+  /// No description provided for @fastingCountdownIftar.
+  ///
+  /// In en, this message translates to:
+  /// **'Iftar in {time}'**
+  String fastingCountdownIftar(String time);
+
+  /// No description provided for @fastingTodayActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting Today'**
+  String get fastingTodayActive;
+
+  /// No description provided for @fastingTodayInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Fasting Today'**
+  String get fastingTodayInactive;
+
+  /// No description provided for @fastingIntendAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Intend to Fast'**
+  String get fastingIntendAction;
+
+  /// No description provided for @fastingLoggedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting record updated'**
+  String get fastingLoggedSuccess;
+
+  /// No description provided for @iftarDuaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Iftar Du\'a'**
+  String get iftarDuaTitle;
+
+  /// No description provided for @iftarDuaArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ'**
+  String get iftarDuaArabic;
+
+  /// No description provided for @iftarDuaTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhahaba adh-dhama\'u wabtallatil-\'urooqu wa thabatal-ajru in sha Allah'**
+  String get iftarDuaTransliteration;
+
+  /// No description provided for @iftarDuaTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills.'**
+  String get iftarDuaTranslation;
+
+  /// No description provided for @fastingStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days fasted'**
+  String fastingStreak(int count);
+
+  /// No description provided for @fastingVirtueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtue of Fasting'**
+  String get fastingVirtueTitle;
+
+  /// No description provided for @fastingVirtueDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting 3 days each month is like fasting the entire year (Bukhari & Muslim).'**
+  String get fastingVirtueDesc;
 }
 
 class _AppLocalizationsDelegate

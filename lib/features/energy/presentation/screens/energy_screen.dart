@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
@@ -10,6 +11,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/features/fasting/presentation/widgets/fasting_countdown_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class EnergyScreen extends StatefulWidget {
@@ -23,7 +25,6 @@ class _EnergyScreenState extends State<EnergyScreen> {
   late int _physical;
   late int _spiritual;
   late int _mental;
-  late bool _isFasting;
   final String _today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   // Qaylulah Nap Timer
@@ -39,7 +40,6 @@ class _EnergyScreenState extends State<EnergyScreen> {
     _physical = energy.physical;
     _spiritual = energy.spiritual;
     _mental = energy.mental;
-    _isFasting = settings.isSunnahFastingTarget(_today);
   }
 
   @override
@@ -73,14 +73,6 @@ class _EnergyScreenState extends State<EnergyScreen> {
         duration: const Duration(seconds: 2),
       ),
     );
-  }
-
-  Future<void> _toggleFasting() async {
-    HapticFeedback.lightImpact();
-    final settings = _getSettings();
-    await settings.toggleSunnahFastingTarget(_today);
-    if (!mounted) return;
-    setState(() => _isFasting = !_isFasting);
   }
 
   void _toggleNap() {
@@ -179,11 +171,6 @@ class _EnergyScreenState extends State<EnergyScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Check if today is a Sunnah fasting day (Monday = 1, Thursday = 4)
-    final weekday = DateTime.now().weekday;
-    final isSunnahDay =
-        (weekday == DateTime.monday || weekday == DateTime.thursday);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.energyTitle)),
@@ -403,87 +390,30 @@ class _EnergyScreenState extends State<EnergyScreen> {
 
                 const SizedBox(height: AppSpacing.lg),
 
-                // 3. Sunnah Fasting Tracker
-                Text(
-                  l10n.sunnahFasting,
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                // 3. Sunnah Fasting Tracker & Countdown
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.sunnahFasting,
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => context.push('/fasting'),
+                      icon: const Icon(Icons.calendar_month_rounded, size: 16),
+                      label: Text(
+                        l10n.hijriCalendarTitle,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                GlassContainer(
-                  padding: const EdgeInsets.all(18),
-                  borderRadius: 20,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.water_drop_outlined,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  l10n.sunnahFasting,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                if (isSunnahDay) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Text(
-                                      'Sunnah Day',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.sunnahFastingDesc,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch.adaptive(
-                        value: _isFasting,
-                        activeThumbColor: AppColors.primary,
-                        onChanged: (_) => _toggleFasting(),
-                      ),
-                    ],
-                  ),
-                ),
+                const FastingCountdownCard(),
 
                 const SizedBox(height: AppSpacing.xl),
 
