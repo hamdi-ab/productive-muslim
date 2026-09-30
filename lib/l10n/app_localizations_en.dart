@@ -1187,4 +1187,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get iftarHadithRef => 'Sunan Abi Dawud (2357) — Sahih';
+
+  @override
+  String get heatmapTitle => '12-Week Consistency Heatmap';
+
+  @override
+  String get heatmapSubtitle => 'Daily Barakah & habit momentum';
+
+  @override
+  String get heatmapLess => 'Less';
+
+  @override
+  String get heatmapMore => 'More';
+
+  @override
+  String heatmapActiveDays(int count, int total) {
+    return '$count of $total active days';
+  }
+
+  @override
+  String heatmapScoreLabel(int count) {
+    return '$count actions logged';
+  }
+
+  @override
+  String get backupRestoreTitle => 'Data Sovereignty & Local Backup';
+
+  @override
+  String get backupRestoreDesc =>
+      'Export or restore your tasks, habits, and reflections safely on device.';
+
+  @override
+  String get backupExportBtn => 'Export Backup (JSON)';
+
+  @override
+  String get backupImportBtn => 'Restore from JSON';
+
+  @override
+  String get backupExportSuccess => 'Backup JSON copied to clipboard!';
+
+  @override
+  String get backupImportSuccess => 'Data successfully restored!';
+
+  @override
+  String get backupImportError =>
+      'Invalid backup JSON payload. Please check and try again.';
+
+  @override
+  String get backupConfirmTitle => 'Restore Data';
+
+  @override
+  String get backupConfirmMsg =>
+      'Restoring will replace all current local data with the backup contents. Are you sure you want to proceed?';
+
+  @override
+  String get backupRestorePasteHint =>
+      'Paste your exported JSON backup text here...';
+
+  @override
+  String get backupCancel => 'Cancel';
+
+  @override
+  String get backupConfirm => 'Restore Now';
 }

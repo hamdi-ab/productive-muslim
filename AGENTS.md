@@ -63,6 +63,14 @@ This repository maintains a pre-indexed knowledge graph at `graphify-out/` to el
 - **Architectural Queries**: Use `graphify query "<Question>"` for scoped subgraphs on architectural workflows.
 - **Keep Graph Fresh**: Always run `graphify update .` after creating or modifying Dart files in a session (fast AST-only index, zero API cost).
 
+### Ponytail (Minimal & Anti-Overengineering)
+
+Follow the Ponytail Ladder on every task:
+- **YAGNI First**: Question whether speculative logic or abstractions need to exist.
+- **Reuse Before Writing**: Check existing helpers, utilities, and models before creating new ones.
+- **Stdlib & Framework**: Reach for Flutter/Dart stdlib and existing packages before adding dependencies.
+- **Shortest Clean Diff**: Deliver minimal, robust code with zero boilerplate while never compromising tests, validation, error safety, and localization.
+
 ## Testing
 
 ```bash

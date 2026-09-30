@@ -23,6 +23,7 @@ import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
+import 'package:productive_muslim/data/services/backup_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -105,6 +106,12 @@ Future<void> setupDi() async {
   );
   getIt.registerLazySingleton<QiblaService>(() => QiblaService());
   getIt.registerLazySingleton<HijriService>(() => HijriService());
+  getIt.registerLazySingleton<BackupService>(
+    () => BackupService(
+      db: getIt<AppDatabase>(),
+      settingsService: getIt<SettingsService>(),
+    ),
+  );
 
   // Router
   getIt.registerSingleton<GoRouter>(AppRouter.router);

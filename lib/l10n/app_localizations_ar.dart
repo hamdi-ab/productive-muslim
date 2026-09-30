@@ -1175,4 +1175,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get iftarHadithRef => 'سنن أبي داود (٢٣٥٧) — صحيح';
+
+  @override
+  String get heatmapTitle => 'مصفوفة الاستمرارية (١٢ أسبوعاً)';
+
+  @override
+  String get heatmapSubtitle => 'زخم البركة والعادات اليومية';
+
+  @override
+  String get heatmapLess => 'أقل';
+
+  @override
+  String get heatmapMore => 'أكثر';
+
+  @override
+  String heatmapActiveDays(int count, int total) {
+    return '$count من $total يوماً نشطاً';
+  }
+
+  @override
+  String heatmapScoreLabel(int count) {
+    return 'تم تسجيل $count أعمال';
+  }
+
+  @override
+  String get backupRestoreTitle => 'النسخ الاحتياطي والخصوصية المحلية';
+
+  @override
+  String get backupRestoreDesc =>
+      'تصدير أو استعادة المهام والعادات واليوميات بأمان تام على جهازك.';
+
+  @override
+  String get backupExportBtn => 'تصدير النسخة الاحتياطية (JSON)';
+
+  @override
+  String get backupImportBtn => 'استعادة من ملف JSON';
+
+  @override
+  String get backupExportSuccess =>
+      'تم نسخ بيانات النسخة الاحتياطية إلى الحافظة!';
+
+  @override
+  String get backupImportSuccess => 'تمت استعادة البيانات بنجاح!';
+
+  @override
+  String get backupImportError =>
+      'بيانات النسخة الاحتياطية غير صالحة، يرجى التحقق وإعادة المحاولة.';
+
+  @override
+  String get backupConfirmTitle => 'استعادة البيانات';
+
+  @override
+  String get backupConfirmMsg =>
+      'ستؤدي الاستعادة إلى استبدال كافة البيانات المحلية الحالية ببيانات النسخة الاحتياطية. هل أنت متأكد؟';
+
+  @override
+  String get backupRestorePasteHint =>
+      'الصق نص النسخة الاحتياطية بصيغة JSON هنا...';
+
+  @override
+  String get backupCancel => 'إلغاء';
+
+  @override
+  String get backupConfirm => 'استعادة الآن';
 }

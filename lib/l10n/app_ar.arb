@@ -393,5 +393,34 @@
   "sunnahBadge": "سنة",
   "copyDuaTooltip": "نسخ الدعاء",
   "duaCopiedMessage": "تم نسخ الدعاء إلى الحافظة",
-  "iftarHadithRef": "سنن أبي داود (٢٣٥٧) — صحيح"
+  "iftarHadithRef": "سنن أبي داود (٢٣٥٧) — صحيح",
+  "heatmapTitle": "مصفوفة الاستمرارية (١٢ أسبوعاً)",
+  "heatmapSubtitle": "زخم البركة والعادات اليومية",
+  "heatmapLess": "أقل",
+  "heatmapMore": "أكثر",
+  "heatmapActiveDays": "{count} من {total} يوماً نشطاً",
+  "@heatmapActiveDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "heatmapScoreLabel": "تم تسجيل {count} أعمال",
+  "@heatmapScoreLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupRestoreTitle": "النسخ الاحتياطي والخصوصية المحلية",
+  "backupRestoreDesc": "تصدير أو استعادة المهام والعادات واليوميات بأمان تام على جهازك.",
+  "backupExportBtn": "تصدير النسخة الاحتياطية (JSON)",
+  "backupImportBtn": "استعادة من ملف JSON",
+  "backupExportSuccess": "تم نسخ بيانات النسخة الاحتياطية إلى الحافظة!",
+  "backupImportSuccess": "تمت استعادة البيانات بنجاح!",
+  "backupImportError": "بيانات النسخة الاحتياطية غير صالحة، يرجى التحقق وإعادة المحاولة.",
+  "backupConfirmTitle": "استعادة البيانات",
+  "backupConfirmMsg": "ستؤدي الاستعادة إلى استبدال كافة البيانات المحلية الحالية ببيانات النسخة الاحتياطية. هل أنت متأكد؟",
+  "backupRestorePasteHint": "الصق نص النسخة الاحتياطية بصيغة JSON هنا...",
+  "backupCancel": "إلغاء",
+  "backupConfirm": "استعادة الآن"
 }

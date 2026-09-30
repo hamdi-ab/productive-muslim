@@ -13,6 +13,7 @@ import 'package:productive_muslim/features/barakah/logic/barakah_review_bloc.dar
 import 'package:productive_muslim/features/barakah/logic/barakah_review_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_state.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_analytics_cards.dart';
+import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class BarakahReviewScreen extends StatelessWidget {
@@ -199,6 +200,17 @@ class _ReviewContent extends StatelessWidget {
           ),
         const SizedBox(height: AppSpacing.lg),
         BarakahConsistencyMatrixCard(analytics: analytics),
+        const SizedBox(height: AppSpacing.md),
+        BarakahHeatmapCard(
+          activityByDate: {
+            for (final d in analytics.dailySnapshots)
+              BarakahReviewWeek.dateKey(d.date):
+                  (d.barakahAnswer != null ? 2 : 0) +
+                  d.completedDhikrCount +
+                  (d.fastedSunnah ? 3 : 0),
+          },
+          referenceDate: analytics.week.start,
+        ),
         const SizedBox(height: AppSpacing.md),
         EnergyTriadBreakdownCard(analytics: analytics),
         const SizedBox(height: AppSpacing.md),
