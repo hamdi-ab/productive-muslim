@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
@@ -37,9 +38,14 @@ class _TaskScreenState extends State<TaskScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.tasks)),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () => _showCreateSheet(context, today),
-              child: const Icon(Icons.add),
+            floatingActionButton: AppPressable(
+              onTap: () => _showCreateSheet(context, today),
+              pressedScale: 0.90,
+              haptic: AppHapticFeedback.light,
+              child: FloatingActionButton(
+                onPressed: () => _showCreateSheet(context, today),
+                child: const Icon(Icons.add),
+              ),
             ),
             body: state is Loaded
                 ? state.tasks.isEmpty
@@ -275,19 +281,26 @@ class _TaskTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      task.title,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        decoration: task.completed
-                            ? TextDecoration.lineThrough
-                            : null,
-                        fontWeight: FontWeight.w600,
-                        color: task.completed
-                            ? (isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.textDisabled)
-                            : null,
-                      ),
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      style:
+                          (Theme.of(context).textTheme.bodyLarge ??
+                                  const TextStyle())
+                              .copyWith(
+                                decoration: task.completed
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                fontWeight: FontWeight.w600,
+                                color: task.completed
+                                    ? (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.textDisabled)
+                                    : (isDark
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary),
+                              ),
+                      child: Text(task.title),
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -333,31 +346,47 @@ class _TaskTile extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                tooltip: 'Focus on task',
-                icon: const Icon(
-                  Icons.timer_outlined,
-                  size: 20,
-                  color: AppColors.primary,
+              AppPressable(
+                onTap: () => context.push('/focus', extra: task),
+                haptic: AppHapticFeedback.selection,
+                child: IconButton(
+                  tooltip: 'Focus on task',
+                  icon: const Icon(
+                    Icons.timer_outlined,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
+                  onPressed: () => context.push('/focus', extra: task),
                 ),
-                onPressed: () => context.push('/focus', extra: task),
               ),
-              IconButton(
-                icon: Icon(
-                  task.completed
-                      ? Icons.check_circle_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                  color: task.completed
-                      ? AppColors.success
-                      : (isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary),
-                  size: 24,
-                ),
-                onPressed: () {
+              AppPressable(
+                onTap: () {
                   context.read<TaskBloc>().add(TaskToggled(task.id));
-                  HapticFeedback.lightImpact();
                 },
+                pressedScale: 0.85,
+                haptic: AppHapticFeedback.light,
+                child: IconButton(
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, anim) =>
+                        ScaleTransition(scale: anim, child: child),
+                    child: Icon(
+                      task.completed
+                          ? Icons.check_circle_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      key: ValueKey('task_icon_${task.id}_${task.completed}'),
+                      color: task.completed
+                          ? AppColors.success
+                          : (isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary),
+                      size: 24,
+                    ),
+                  ),
+                  onPressed: () {
+                    context.read<TaskBloc>().add(TaskToggled(task.id));
+                  },
+                ),
               ),
             ],
           ),

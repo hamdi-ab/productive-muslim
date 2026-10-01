@@ -9,8 +9,10 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/task.dart';
@@ -539,36 +541,49 @@ class _FocusScreenState extends State<FocusScreen> {
                   ),
                 ],
 
-                // Timer Dial
+                // Timer Dial with calm breathing pulse during active focus
                 Center(
-                  child: AnimatedProgressRing(
-                    progress: progress,
-                    size: 240,
-                    strokeWidth: 14,
-                    color: _isRunning ? AppColors.secondary : AppColors.primary,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _formatTime(_secondsRemaining),
-                          style: const TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -1,
+                  child: PulsingGlow(
+                    animate: _isRunning,
+                    minScale: 0.985,
+                    maxScale: 1.015,
+                    duration: const Duration(milliseconds: 2400),
+                    child: AnimatedProgressRing(
+                      progress: progress,
+                      size: 240,
+                      strokeWidth: 14,
+                      color: _isRunning
+                          ? AppColors.secondary
+                          : AppColors.primary,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _formatTime(_secondsRemaining),
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -1,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _isRunning ? 'In Flow...' : 'Ready',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(height: 4),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: Text(
+                              _isRunning ? 'In Flow...' : 'Ready',
+                              key: ValueKey('focus_status_$_isRunning'),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -583,11 +598,21 @@ class _FocusScreenState extends State<FocusScreen> {
                     alignment: WrapAlignment.center,
                     children: _presets.map((mins) {
                       final isSelected = _selectedDurationMinutes == mins;
-                      return ChoiceChip(
-                        label: Text('$mins min'),
-                        selected: isSelected,
-                        onSelected: (_) => _selectPreset(mins),
-                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      return AppPressable(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          _selectPreset(mins);
+                        },
+                        pressedScale: 0.92,
+                        haptic: AppHapticFeedback.none,
+                        child: ChoiceChip(
+                          label: Text('$mins min'),
+                          selected: isSelected,
+                          onSelected: (_) => _selectPreset(mins),
+                          selectedColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -600,37 +625,54 @@ class _FocusScreenState extends State<FocusScreen> {
                   children: [
                     if (_isRunning ||
                         _secondsRemaining < _selectedDurationMinutes * 60)
-                      IconButton.filledTonal(
-                        onPressed: _resetTimer,
-                        icon: const Icon(Icons.refresh_rounded),
-                        tooltip: l10n.focusReset,
-                        style: IconButton.styleFrom(
-                          padding: const EdgeInsets.all(16),
+                      AppPressable(
+                        onTap: _resetTimer,
+                        pressedScale: 0.88,
+                        haptic: AppHapticFeedback.none,
+                        child: IconButton.filledTonal(
+                          onPressed: _resetTimer,
+                          icon: const Icon(Icons.refresh_rounded),
+                          tooltip: l10n.focusReset,
+                          style: IconButton.styleFrom(
+                            padding: const EdgeInsets.all(16),
+                          ),
                         ),
                       ),
                     const SizedBox(width: 16),
-                    FilledButton.icon(
-                      onPressed: _toggleTimer,
-                      icon: Icon(
-                        _isRunning
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
-                        size: 28,
-                      ),
-                      label: Text(
-                        _isRunning ? l10n.focusPause : l10n.focusStart,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                    AppPressable(
+                      onTap: _toggleTimer,
+                      pressedScale: 0.93,
+                      haptic: AppHapticFeedback.none,
+                      borderRadius: BorderRadius.circular(24),
+                      child: FilledButton.icon(
+                        onPressed: _toggleTimer,
+                        icon: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, anim) =>
+                              ScaleTransition(scale: anim, child: child),
+                          child: Icon(
+                            _isRunning
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            key: ValueKey('timer_icon_$_isRunning'),
+                            size: 28,
+                          ),
                         ),
-                      ),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 36,
-                          vertical: 16,
+                        label: Text(
+                          _isRunning ? l10n.focusPause : l10n.focusStart,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 36,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
                         ),
                       ),
                     ),

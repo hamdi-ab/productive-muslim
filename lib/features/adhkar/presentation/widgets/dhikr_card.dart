@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -64,11 +65,15 @@ class DhikrCard extends StatelessWidget {
                               ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.refresh_rounded, size: 20),
-                        tooltip: l10n.adhkarReset,
-                        onPressed: onReset,
-                        visualDensity: VisualDensity.compact,
+                      AppPressable(
+                        onTap: onReset,
+                        haptic: AppHapticFeedback.light,
+                        child: IconButton(
+                          icon: const Icon(Icons.refresh_rounded, size: 20),
+                          tooltip: l10n.adhkarReset,
+                          onPressed: onReset,
+                          visualDensity: VisualDensity.compact,
+                        ),
                       ),
                     ],
                   ),
@@ -194,78 +199,90 @@ class DhikrCard extends StatelessWidget {
           // Interactive Tap Surface & Progress
           SizedBox(
             height: 100,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(20),
-                splashColor: AppColors.primary.withValues(alpha: 0.2),
-                highlightColor: AppColors.primary.withValues(alpha: 0.1),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
+            child: AppPressable(
+              onTap: onTap,
+              pressedScale: 0.94,
+              haptic: AppHapticFeedback.none,
+              borderRadius: BorderRadius.circular(20),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                      : (isDark
+                            ? AppColors.primary.withValues(alpha: 0.25)
+                            : AppColors.primary.withValues(alpha: 0.12)),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
                     color: isCompleted
-                        ? const Color(0xFF10B981).withValues(alpha: 0.2)
-                        : (isDark
-                              ? AppColors.primary.withValues(alpha: 0.25)
-                              : AppColors.primary.withValues(alpha: 0.12)),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isCompleted
-                          ? const Color(0xFF10B981)
-                          : AppColors.primary.withValues(alpha: 0.4),
-                      width: isCompleted ? 2.0 : 1.5,
-                    ),
+                        ? const Color(0xFF10B981)
+                        : AppColors.primary.withValues(alpha: 0.4),
+                    width: isCompleted ? 2.0 : 1.5,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, anim) =>
+                              ScaleTransition(scale: anim, child: child),
+                          child: Icon(
                             isCompleted
                                 ? Icons.check_circle_rounded
                                 : Icons.touch_app_rounded,
+                            key: ValueKey('dhikr_icon_$isCompleted'),
                             color: isCompleted
                                 ? const Color(0xFF10B981)
                                 : AppColors.primary,
                             size: 26,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
+                        ),
+                        const SizedBox(width: 8),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          transitionBuilder: (child, anim) =>
+                              ScaleTransition(scale: anim, child: child),
+                          child: Text(
                             '$count / ${item.targetCount}',
+                            key: ValueKey('dhikr_count_$count'),
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                               color: isCompleted
                                   ? const Color(0xFF10B981)
                                   : (isDark ? Colors.white : AppColors.primary),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isCompleted
-                            ? l10n.adhkarCompleted
-                            : l10n.adhkarTapToCount,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isCompleted
-                              ? const Color(0xFF10B981)
-                              : (isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isCompleted
+                          ? l10n.adhkarCompleted
+                          : l10n.adhkarTapToCount,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isCompleted
+                            ? const Color(0xFF10B981)
+                            : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

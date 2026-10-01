@@ -8,8 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/fasting/presentation/widgets/fasting_countdown_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -268,13 +270,19 @@ class _EnergyScreenState extends State<EnergyScreen> {
                       const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: FilledButton.icon(
-                          onPressed: _saveEnergy,
-                          icon: const Icon(Icons.check_rounded, size: 18),
-                          label: Text(l10n.save),
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                        child: AppPressable(
+                          onTap: _saveEnergy,
+                          pressedScale: 0.94,
+                          haptic: AppHapticFeedback.none,
+                          borderRadius: BorderRadius.circular(16),
+                          child: FilledButton.icon(
+                            onPressed: _saveEnergy,
+                            icon: const Icon(Icons.check_rounded, size: 18),
+                            label: Text(l10n.save),
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                           ),
                         ),
@@ -344,39 +352,66 @@ class _EnergyScreenState extends State<EnergyScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _formatNap(_napSeconds),
-                            style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.5,
+                          PulsingGlow(
+                            animate: _isNapRunning,
+                            minScale: 0.98,
+                            maxScale: 1.02,
+                            duration: const Duration(milliseconds: 2000),
+                            child: Text(
+                              _formatNap(_napSeconds),
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.5,
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
                             ),
                           ),
                           Row(
                             children: [
                               if (_isNapRunning || _napSeconds < 20 * 60)
-                                IconButton.outlined(
-                                  onPressed: _resetNap,
-                                  icon: const Icon(Icons.refresh_rounded),
+                                AppPressable(
+                                  onTap: _resetNap,
+                                  pressedScale: 0.88,
+                                  haptic: AppHapticFeedback.none,
+                                  child: IconButton.outlined(
+                                    onPressed: _resetNap,
+                                    icon: const Icon(Icons.refresh_rounded),
+                                  ),
                                 ),
                               const SizedBox(width: 8),
-                              FilledButton.icon(
-                                onPressed: _toggleNap,
-                                icon: Icon(
-                                  _isNapRunning
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                ),
-                                label: Text(
-                                  _isNapRunning
-                                      ? l10n.focusPause
-                                      : l10n.qaylulahStart,
-                                ),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.secondary,
-                                  foregroundColor: Colors.black87,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                              AppPressable(
+                                onTap: _toggleNap,
+                                pressedScale: 0.93,
+                                haptic: AppHapticFeedback.none,
+                                borderRadius: BorderRadius.circular(16),
+                                child: FilledButton.icon(
+                                  onPressed: _toggleNap,
+                                  icon: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    transitionBuilder: (child, anim) =>
+                                        ScaleTransition(
+                                          scale: anim,
+                                          child: child,
+                                        ),
+                                    child: Icon(
+                                      _isNapRunning
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      key: ValueKey('nap_icon_$_isNapRunning'),
+                                    ),
+                                  ),
+                                  label: Text(
+                                    _isNapRunning
+                                        ? l10n.focusPause
+                                        : l10n.qaylulahStart,
+                                  ),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.secondary,
+                                    foregroundColor: Colors.black87,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -480,20 +515,26 @@ class _EnergyScreenState extends State<EnergyScreen> {
           children: List.generate(5, (index) {
             final starIndex = index + 1;
             final isFilled = starIndex <= value;
-            return InkWell(
+            return AppPressable(
               onTap: () {
-                HapticFeedback.selectionClick();
                 onChanged(starIndex);
               },
+              pressedScale: 0.85,
+              haptic: AppHapticFeedback.selection,
               borderRadius: BorderRadius.circular(12),
               child: Padding(
                 padding: const EdgeInsets.all(3),
-                child: Icon(
-                  isFilled ? Icons.star_rounded : Icons.star_border_rounded,
-                  color: isFilled
-                      ? color
-                      : AppColors.textSecondary.withValues(alpha: 0.4),
-                  size: 24,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  scale: isFilled ? 1.08 : 1.0,
+                  child: Icon(
+                    isFilled ? Icons.star_rounded : Icons.star_border_rounded,
+                    color: isFilled
+                        ? color
+                        : AppColors.textSecondary.withValues(alpha: 0.4),
+                    size: 24,
+                  ),
                 ),
               ),
             );

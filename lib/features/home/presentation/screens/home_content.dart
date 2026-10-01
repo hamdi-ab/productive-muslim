@@ -10,8 +10,10 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
@@ -287,8 +289,10 @@ class HomeContent extends StatelessWidget {
       children: [
         // Focus Mode Card
         Expanded(
-          child: InkWell(
+          child: AppPressable(
             onTap: () => context.push('/focus'),
+            pressedScale: 0.95,
+            haptic: AppHapticFeedback.light,
             borderRadius: BorderRadius.circular(20),
             child: GlassContainer(
               padding: const EdgeInsets.all(16),
@@ -342,8 +346,10 @@ class HomeContent extends StatelessWidget {
         const SizedBox(width: 14),
         // Energy & Routine Card
         Expanded(
-          child: InkWell(
+          child: AppPressable(
             onTap: () => context.push('/energy'),
+            pressedScale: 0.95,
+            haptic: AppHapticFeedback.light,
             borderRadius: BorderRadius.circular(20),
             child: GlassContainer(
               padding: const EdgeInsets.all(16),
@@ -503,8 +509,10 @@ class HomeContent extends StatelessWidget {
 
               return Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: InkWell(
+                child: AppPressable(
                   onTap: () => _showQualityDetails(context, q, l10n),
+                  pressedScale: 0.93,
+                  haptic: AppHapticFeedback.light,
                   borderRadius: BorderRadius.circular(24),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -879,8 +887,10 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return InkWell(
+    return AppPressable(
       onTap: () => context.push('/prayer-times'),
+      pressedScale: 0.98,
+      haptic: AppHapticFeedback.light,
       borderRadius: BorderRadius.circular(24),
       child: GlassContainer(
         padding: const EdgeInsets.all(16),
@@ -989,38 +999,44 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                           : AppColors.textPrimary,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        width: 1,
+                  PulsingGlow(
+                    animate: true,
+                    minScale: 0.98,
+                    maxScale: 1.02,
+                    duration: const Duration(milliseconds: 2600),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.timer_outlined,
-                          size: 14,
-                          color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          width: 1,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _countdown,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.timer_outlined,
+                            size: 14,
                             color: AppColors.primary,
-                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 4),
+                          Text(
+                            _countdown,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

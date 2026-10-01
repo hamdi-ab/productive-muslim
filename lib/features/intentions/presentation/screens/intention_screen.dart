@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_state.dart';
@@ -46,9 +46,14 @@ class _IntentionScreenState extends State<IntentionScreen> {
             appBar: hasParentScaffold
                 ? null
                 : AppBar(title: Text(l10n.journal)),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () => _showAddDialog(context, today),
-              child: const Icon(Icons.add),
+            floatingActionButton: AppPressable(
+              onTap: () => _showAddDialog(context, today),
+              pressedScale: 0.90,
+              haptic: AppHapticFeedback.light,
+              child: FloatingActionButton(
+                onPressed: () => _showAddDialog(context, today),
+                child: const Icon(Icons.add),
+              ),
             ),
             body: state is IntentionLoaded
                 ? ListView(
@@ -106,26 +111,53 @@ class _IntentionScreenState extends State<IntentionScreen> {
   Widget _buildIntentionTile(BuildContext context, IntentionEntry entry) {
     final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      leading: IconButton(
-        icon: Icon(
-          entry.completed ? Icons.check_circle : Icons.check_circle_outline,
-          color: entry.completed ? AppColors.success : null,
-        ),
-        onPressed: () {
-          HapticFeedback.lightImpact();
+      leading: AppPressable(
+        onTap: () {
           context.read<IntentionBloc>().add(IntentionToggled(entry));
         },
-        tooltip: entry.completed ? l10n.habitUnmark : l10n.habitMarkComplete,
+        pressedScale: 0.85,
+        haptic: AppHapticFeedback.light,
+        child: IconButton(
+          icon: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            transitionBuilder: (child, anim) =>
+                ScaleTransition(scale: anim, child: child),
+            child: Icon(
+              entry.completed ? Icons.check_circle : Icons.check_circle_outline,
+              key: ValueKey('intention_${entry.id}_${entry.completed}'),
+              color: entry.completed ? AppColors.success : null,
+            ),
+          ),
+          onPressed: () {
+            context.read<IntentionBloc>().add(IntentionToggled(entry));
+          },
+          tooltip: entry.completed ? l10n.habitUnmark : l10n.habitMarkComplete,
+        ),
       ),
-      title: Text(entry.title),
+      title: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        style: (Theme.of(context).textTheme.bodyLarge ?? const TextStyle())
+            .copyWith(
+              decoration: entry.completed ? TextDecoration.lineThrough : null,
+              color: entry.completed ? AppColors.textDisabled : null,
+            ),
+        child: Text(entry.title),
+      ),
       subtitle: entry.statement != null ? Text(entry.statement!) : null,
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline, size: 20),
-        onPressed: () {
-          HapticFeedback.mediumImpact();
+      trailing: AppPressable(
+        onTap: () {
           context.read<IntentionBloc>().add(IntentionDeleted(entry.id));
         },
-        tooltip: l10n.delete,
+        pressedScale: 0.85,
+        haptic: AppHapticFeedback.medium,
+        child: IconButton(
+          icon: const Icon(Icons.delete_outline, size: 20),
+          onPressed: () {
+            context.read<IntentionBloc>().add(IntentionDeleted(entry.id));
+          },
+          tooltip: l10n.delete,
+        ),
       ),
     );
   }

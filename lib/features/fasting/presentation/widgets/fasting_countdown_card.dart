@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
@@ -291,23 +292,29 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
                     ),
                   ),
                 ),
-              FilledButton.tonalIcon(
-                onPressed: () => IftarDuaDialog.show(context),
-                icon: const Icon(Icons.menu_book_rounded, size: 16),
-                label: Text(
-                  l10n.iftarDuaTitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              AppPressable(
+                onTap: () => IftarDuaDialog.show(context),
+                pressedScale: 0.94,
+                haptic: AppHapticFeedback.light,
+                borderRadius: BorderRadius.circular(14),
+                child: FilledButton.tonalIcon(
+                  onPressed: () => IftarDuaDialog.show(context),
+                  icon: const Icon(Icons.menu_book_rounded, size: 16),
+                  label: Text(
+                    l10n.iftarDuaTitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                   ),
                 ),
               ),

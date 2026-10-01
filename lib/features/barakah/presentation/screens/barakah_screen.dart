@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
@@ -351,9 +352,12 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                     selected: draft.answer == answer,
                     onSelected: draft.saving
                         ? null
-                        : (_) => context.read<BarakahBloc>().add(
-                            BarakahAnswerSelected(answer),
-                          ),
+                        : (_) {
+                            HapticFeedback.selectionClick();
+                            context.read<BarakahBloc>().add(
+                              BarakahAnswerSelected(answer),
+                            );
+                          },
                   );
                 }).toList(),
               ),
@@ -371,9 +375,12 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                           selected: draft.sourceIds.contains(sourceId),
                           onSelected: draft.saving
                               ? null
-                              : (_) => context.read<BarakahBloc>().add(
-                                  BarakahSourceToggled(sourceId),
-                                ),
+                              : (_) {
+                                  HapticFeedback.selectionClick();
+                                  context.read<BarakahBloc>().add(
+                                    BarakahSourceToggled(sourceId),
+                                  );
+                                },
                         ),
                       )
                       .toList(),
@@ -397,19 +404,34 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                 ),
               ],
               const SizedBox(height: AppSpacing.sm),
-              FilledButton(
-                key: const Key('daily-save'),
-                onPressed: draft.saving || draft.answer == null
+              AppPressable(
+                onTap: draft.saving || draft.answer == null
                     ? null
-                    : () => context.read<BarakahBloc>().add(
-                        const BarakahDailyResponseSaved(),
-                      ),
-                child: Text(
-                  draft.saving
-                      ? l10n.barakahDailySaving
-                      : draft.response == null
-                      ? l10n.barakahDailySave
-                      : l10n.barakahDailyUpdate,
+                    : () {
+                        HapticFeedback.mediumImpact();
+                        context.read<BarakahBloc>().add(
+                          const BarakahDailyResponseSaved(),
+                        );
+                      },
+                pressedScale: 0.94,
+                haptic: AppHapticFeedback.none,
+                child: FilledButton(
+                  key: const Key('daily-save'),
+                  onPressed: draft.saving || draft.answer == null
+                      ? null
+                      : () {
+                          HapticFeedback.mediumImpact();
+                          context.read<BarakahBloc>().add(
+                            const BarakahDailyResponseSaved(),
+                          );
+                        },
+                  child: Text(
+                    draft.saving
+                        ? l10n.barakahDailySaving
+                        : draft.response == null
+                        ? l10n.barakahDailySave
+                        : l10n.barakahDailyUpdate,
+                  ),
                 ),
               ),
               if (draft.saved)

@@ -65,7 +65,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     });
 
     if (next == item.targetCount) {
-      HapticFeedback.mediumImpact();
+      HapticFeedback.heavyImpact();
       // Record completion
       try {
         if (getIt.isRegistered<AdhkarService>()) {
@@ -94,6 +94,8 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           }
         });
       }
+    } else if (next == 33 || next == 66) {
+      HapticFeedback.mediumImpact();
     } else {
       HapticFeedback.lightImpact();
     }

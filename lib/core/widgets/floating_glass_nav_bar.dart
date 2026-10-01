@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 
 class FloatingNavItem {
@@ -54,9 +55,11 @@ class FloatingGlassNavBar extends StatelessWidget {
               button: true,
               selected: isSelected,
               excludeSemantics: true,
-              child: GestureDetector(
+              child: AppPressable(
                 onTap: () => onTap(index),
-                behavior: HitTestBehavior.opaque,
+                pressedScale: 0.90,
+                haptic: AppHapticFeedback.selection,
+                borderRadius: BorderRadius.circular(20),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOutCubic,
@@ -74,16 +77,21 @@ class FloatingGlassNavBar extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        isSelected ? item.activeIcon : item.icon,
-                        size: 22,
-                        color: isSelected
-                            ? (isDark
-                                  ? AppColors.primaryLight
-                                  : AppColors.primary)
-                            : (isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.textSecondary),
+                      AnimatedScale(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutBack,
+                        scale: isSelected ? 1.12 : 1.0,
+                        child: Icon(
+                          isSelected ? item.activeIcon : item.icon,
+                          size: 22,
+                          color: isSelected
+                              ? (isDark
+                                    ? AppColors.primaryLight
+                                    : AppColors.primary)
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
+                        ),
                       ),
                       if (isSelected) ...[
                         const SizedBox(width: 8),

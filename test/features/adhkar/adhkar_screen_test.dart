@@ -72,6 +72,7 @@ void main() {
       expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
 
       // After 600ms + animation, auto-advances to card 2
+      await tester.pump(const Duration(milliseconds: 700));
       await tester.pumpAndSettle();
       expect(getIt<AdhkarService>().isDhikrCompleted('wake_up_1'), isTrue);
       expect(find.text('2 / 2'), findsOneWidget);
