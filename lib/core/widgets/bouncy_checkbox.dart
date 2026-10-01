@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 
 /// A delightfully bouncy animated checkbox with spring pop effect, checkmark drawing,
 /// and tactile haptic feedback.
@@ -85,7 +85,7 @@ class _BouncyCheckboxState extends State<BouncyCheckbox>
 
   void _handleTap() {
     if (widget.onChanged == null) return;
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     _controller.forward(from: 0.0);
     widget.onChanged!(!widget.value);
   }

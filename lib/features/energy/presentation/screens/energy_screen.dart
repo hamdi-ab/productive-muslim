@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
@@ -59,7 +59,7 @@ class _EnergyScreenState extends State<EnergyScreen> {
   }
 
   Future<void> _saveEnergy() async {
-    HapticFeedback.selectionClick();
+    AppHaptics.selectionClick();
     final settings = _getSettings();
     await settings.setDailyEnergy(
       date: _today,
@@ -78,7 +78,7 @@ class _EnergyScreenState extends State<EnergyScreen> {
   }
 
   void _toggleNap() {
-    HapticFeedback.mediumImpact();
+    AppHaptics.mediumImpact();
     if (_isNapRunning) {
       _napTimer?.cancel();
       setState(() => _isNapRunning = false);
@@ -97,7 +97,7 @@ class _EnergyScreenState extends State<EnergyScreen> {
   }
 
   void _resetNap() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     _napTimer?.cancel();
     setState(() {
       _isNapRunning = false;
@@ -106,7 +106,7 @@ class _EnergyScreenState extends State<EnergyScreen> {
   }
 
   void _onNapComplete() {
-    HapticFeedback.heavyImpact();
+    AppHaptics.heavyImpact();
     final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,

@@ -1242,4 +1242,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backupConfirm => 'استعادة الآن';
+
+  @override
+  String get preferencesTitle => 'التفضيلات والتجربة';
+
+  @override
+  String get hapticFeedback => 'الاستجابة اللمسية (الاهتزاز)';
+
+  @override
+  String get hapticFeedbackDesc =>
+      'اهتزاز تفاعلي لطيف عند النقر والعد وإتمام الأوراد والمهام';
 }

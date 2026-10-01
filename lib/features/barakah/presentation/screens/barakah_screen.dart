@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 import 'package:productive_muslim/domain/models/barakah_daily_response.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -187,6 +188,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
           label: Text(source),
           selected: selected,
           onSelected: (selected) {
+            AppHaptics.selectionClick();
             setState(() {
               if (selected) {
                 _selectedSources.add(source);
@@ -353,7 +355,7 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                     onSelected: draft.saving
                         ? null
                         : (_) {
-                            HapticFeedback.selectionClick();
+                            AppHaptics.selectionClick();
                             context.read<BarakahBloc>().add(
                               BarakahAnswerSelected(answer),
                             );
@@ -376,7 +378,7 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                           onSelected: draft.saving
                               ? null
                               : (_) {
-                                  HapticFeedback.selectionClick();
+                                  AppHaptics.selectionClick();
                                   context.read<BarakahBloc>().add(
                                     BarakahSourceToggled(sourceId),
                                   );
@@ -408,19 +410,17 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                 onTap: draft.saving || draft.answer == null
                     ? null
                     : () {
-                        HapticFeedback.mediumImpact();
                         context.read<BarakahBloc>().add(
                           const BarakahDailyResponseSaved(),
                         );
                       },
                 pressedScale: 0.94,
-                haptic: AppHapticFeedback.none,
+                haptic: AppHapticFeedback.medium,
                 child: FilledButton(
                   key: const Key('daily-save'),
                   onPressed: draft.saving || draft.answer == null
                       ? null
                       : () {
-                          HapticFeedback.mediumImpact();
                           context.read<BarakahBloc>().add(
                             const BarakahDailyResponseSaved(),
                           );

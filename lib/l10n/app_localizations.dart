@@ -2275,6 +2275,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore Now'**
   String get backupConfirm;
+
+  /// No description provided for @preferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences & Touch'**
+  String get preferencesTitle;
+
+  /// No description provided for @hapticFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic Feedback'**
+  String get hapticFeedback;
+
+  /// No description provided for @hapticFeedbackDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration feedback on taps, counters, and completions'**
+  String get hapticFeedbackDesc;
 }
 
 class _AppLocalizationsDelegate

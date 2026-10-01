@@ -117,21 +117,24 @@ class _IntentionScreenState extends State<IntentionScreen> {
         },
         pressedScale: 0.85,
         haptic: AppHapticFeedback.light,
-        child: IconButton(
-          icon: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: (child, anim) =>
-                ScaleTransition(scale: anim, child: child),
-            child: Icon(
-              entry.completed ? Icons.check_circle : Icons.check_circle_outline,
-              key: ValueKey('intention_${entry.id}_${entry.completed}'),
-              color: entry.completed ? AppColors.success : null,
+        borderRadius: BorderRadius.circular(24),
+        child: Tooltip(
+          message: entry.completed ? l10n.habitUnmark : l10n.habitMarkComplete,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
+              child: Icon(
+                entry.completed
+                    ? Icons.check_circle
+                    : Icons.check_circle_outline,
+                key: ValueKey('intention_${entry.id}_${entry.completed}'),
+                color: entry.completed ? AppColors.success : null,
+              ),
             ),
           ),
-          onPressed: () {
-            context.read<IntentionBloc>().add(IntentionToggled(entry));
-          },
-          tooltip: entry.completed ? l10n.habitUnmark : l10n.habitMarkComplete,
         ),
       ),
       title: AnimatedDefaultTextStyle(
@@ -151,12 +154,13 @@ class _IntentionScreenState extends State<IntentionScreen> {
         },
         pressedScale: 0.85,
         haptic: AppHapticFeedback.medium,
-        child: IconButton(
-          icon: const Icon(Icons.delete_outline, size: 20),
-          onPressed: () {
-            context.read<IntentionBloc>().add(IntentionDeleted(entry.id));
-          },
-          tooltip: l10n.delete,
+        borderRadius: BorderRadius.circular(20),
+        child: Tooltip(
+          message: l10n.delete,
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.delete_outline, size: 20),
+          ),
         ),
       ),
     );

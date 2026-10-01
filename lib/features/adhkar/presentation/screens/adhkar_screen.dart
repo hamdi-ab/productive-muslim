@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
@@ -44,7 +44,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
   void _onCategorySelected(DhikrCategory category) {
     if (_selectedCategory == category) return;
-    HapticFeedback.selectionClick();
+    AppHaptics.selectionClick();
     setState(() {
       _selectedCategory = category;
       _currentPageIndex = 0;
@@ -65,7 +65,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     });
 
     if (next == item.targetCount) {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavyImpact();
       // Record completion
       try {
         if (getIt.isRegistered<AdhkarService>()) {
@@ -95,14 +95,14 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         });
       }
     } else if (next == 33 || next == 66) {
-      HapticFeedback.mediumImpact();
+      AppHaptics.mediumImpact();
     } else {
-      HapticFeedback.lightImpact();
+      AppHaptics.lightImpact();
     }
   }
 
   void _resetCount(DhikrItem item) {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       _counts[item.id] = 0;
     });

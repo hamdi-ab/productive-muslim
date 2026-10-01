@@ -68,11 +68,13 @@ class DhikrCard extends StatelessWidget {
                       AppPressable(
                         onTap: onReset,
                         haptic: AppHapticFeedback.light,
-                        child: IconButton(
-                          icon: const Icon(Icons.refresh_rounded, size: 20),
-                          tooltip: l10n.adhkarReset,
-                          onPressed: onReset,
-                          visualDensity: VisualDensity.compact,
+                        borderRadius: BorderRadius.circular(20),
+                        child: Tooltip(
+                          message: l10n.adhkarReset,
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.refresh_rounded, size: 20),
+                          ),
                         ),
                       ),
                     ],

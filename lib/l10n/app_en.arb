@@ -483,5 +483,8 @@
   "backupConfirmMsg": "Restoring will replace all current local data with the backup contents. Are you sure you want to proceed?",
   "backupRestorePasteHint": "Paste your exported JSON backup text here...",
   "backupCancel": "Cancel",
-  "backupConfirm": "Restore Now"
+  "backupConfirm": "Restore Now",
+  "preferencesTitle": "Preferences & Touch",
+  "hapticFeedback": "Haptic Feedback",
+  "hapticFeedbackDesc": "Vibration feedback on taps, counters, and completions"
 }

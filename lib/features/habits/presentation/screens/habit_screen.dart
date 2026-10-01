@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
@@ -365,7 +365,7 @@ class _HabitTile extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  HapticFeedback.mediumImpact();
+                  AppHaptics.mediumImpact();
                   Navigator.pop(ctx, true);
                 },
                 child: Text(l10n.delete),

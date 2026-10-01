@@ -18,6 +18,12 @@ class SettingsService {
   static const _adhanNotificationsKey = 'adhan_notifications';
   static const _totalFocusMinutesKey = 'total_focus_minutes';
   static const _sunnahFastingTargetKey = 'sunnah_fasting_target';
+  static const _hapticFeedbackKey = 'haptic_feedback_enabled';
+
+  bool get hapticFeedbackEnabled => _prefs?.getBool(_hapticFeedbackKey) ?? true;
+
+  Future<void> setHapticFeedbackEnabled(bool enabled) async =>
+      _prefs?.setBool(_hapticFeedbackKey, enabled);
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);

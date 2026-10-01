@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/settings/logic/settings_bloc.dart';
@@ -23,8 +24,16 @@ void main() {
     settings = SettingsService(prefs: await SharedPreferences.getInstance());
     scheduler = FakeReminderScheduler();
     service = BarakahReminderService(settings: settings, scheduler: scheduler);
+    if (!getIt.isRegistered<SettingsService>()) {
+      getIt.registerSingleton<SettingsService>(settings);
+    }
   });
-  tearDown(() => service.dispose());
+  tearDown(() {
+    service.dispose();
+    if (getIt.isRegistered<SettingsService>()) {
+      getIt.unregister<SettingsService>();
+    }
+  });
 
   Future<void> pumpScreen(
     WidgetTester tester, {
@@ -277,5 +286,30 @@ void main() {
       isNotNull,
     );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('toggling haptic feedback updates settings service', (
+    tester,
+  ) async {
+    await pumpScreen(tester);
+
+    final toggleFinder = find.byKey(
+      const Key('settings_haptic_feedback_toggle'),
+    );
+    await tester.scrollUntilVisible(toggleFinder, 200);
+    expect(toggleFinder, findsOneWidget);
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isTrue);
+
+    await tester.tap(toggleFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.hapticFeedbackEnabled, isFalse);
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isFalse);
+
+    await tester.tap(toggleFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.hapticFeedbackEnabled, isTrue);
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isTrue);
   });
 }

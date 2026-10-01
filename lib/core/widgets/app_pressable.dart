@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 
 enum AppHapticFeedback { none, selection, light, medium, heavy }
 
@@ -36,7 +36,7 @@ class AppPressable extends StatefulWidget {
 class _AppPressableState extends State<AppPressable>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
@@ -77,16 +77,16 @@ class _AppPressableState extends State<AppPressable>
       case AppHapticFeedback.none:
         break;
       case AppHapticFeedback.selection:
-        HapticFeedback.selectionClick();
+        AppHaptics.selectionClick();
         break;
       case AppHapticFeedback.light:
-        HapticFeedback.lightImpact();
+        AppHaptics.lightImpact();
         break;
       case AppHapticFeedback.medium:
-        HapticFeedback.mediumImpact();
+        AppHaptics.mediumImpact();
         break;
       case AppHapticFeedback.heavy:
-        HapticFeedback.heavyImpact();
+        AppHaptics.heavyImpact();
         break;
     }
   }
@@ -122,22 +122,42 @@ class _AppPressableState extends State<AppPressable>
       return result;
     }
 
-    return GestureDetector(
-      behavior: widget.behavior,
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      onTap: () {
-        _triggerHaptic();
-        widget.onTap?.call();
+    return FocusableActionDetector(
+      enabled: hasAction,
+      mouseCursor: SystemMouseCursors.click,
+      onShowFocusHighlight: (show) {
+        if (show) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
       },
-      onLongPress: widget.onLongPress != null
-          ? () {
-              _triggerHaptic();
-              widget.onLongPress?.call();
-            }
-          : null,
-      child: result,
+      actions: {
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) {
+            _triggerHaptic();
+            widget.onTap?.call();
+            return null;
+          },
+        ),
+      },
+      child: GestureDetector(
+        behavior: widget.behavior,
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        onTap: () {
+          _triggerHaptic();
+          widget.onTap?.call();
+        },
+        onLongPress: widget.onLongPress != null
+            ? () {
+                _triggerHaptic();
+                widget.onLongPress?.call();
+              }
+            : null,
+        child: result,
+      ),
     );
   }
 }

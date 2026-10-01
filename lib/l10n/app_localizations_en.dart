@@ -1252,4 +1252,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupConfirm => 'Restore Now';
+
+  @override
+  String get preferencesTitle => 'Preferences & Touch';
+
+  @override
+  String get hapticFeedback => 'Haptic Feedback';
+
+  @override
+  String get hapticFeedbackDesc =>
+      'Vibration feedback on taps, counters, and completions';
 }

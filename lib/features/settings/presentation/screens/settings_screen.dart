@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter/services.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
@@ -224,7 +225,28 @@ class SettingsView extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                // Section 4: Data Sovereignty & Local Backup
+                // Section 4: Preferences & Touch Experience
+                _SectionTitle(
+                  icon: Icons.vibration_rounded,
+                  title: l10n.preferencesTitle,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark
+                      ? AppColors.darkSurfaceSubtle
+                      : AppColors.surfaceSubtle,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: _HapticFeedbackToggle(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 5: Data Sovereignty & Local Backup
                 _SectionTitle(
                   icon: Icons.shield_rounded,
                   title: l10n.backupRestoreTitle,
@@ -466,6 +488,52 @@ class _BackupRestoreCard extends StatelessWidget {
           onTap: () => _showRestoreDialog(context),
         ),
       ],
+    );
+  }
+}
+
+class _HapticFeedbackToggle extends StatefulWidget {
+  const _HapticFeedbackToggle();
+
+  @override
+  State<_HapticFeedbackToggle> createState() => _HapticFeedbackToggleState();
+}
+
+class _HapticFeedbackToggleState extends State<_HapticFeedbackToggle> {
+  bool _enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (getIt.isRegistered<SettingsService>()) {
+      _enabled = getIt<SettingsService>().hapticFeedbackEnabled;
+    }
+  }
+
+  Future<void> _toggle(bool value) async {
+    if (getIt.isRegistered<SettingsService>()) {
+      await getIt<SettingsService>().setHapticFeedbackEnabled(value);
+    }
+    setState(() => _enabled = value);
+    if (value) {
+      AppHaptics.mediumImpact();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return SwitchListTile(
+      key: const Key('settings_haptic_feedback_toggle'),
+      secondary: const Icon(Icons.vibration_rounded, color: AppColors.primary),
+      title: Text(
+        l10n.hapticFeedback,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(l10n.hapticFeedbackDesc),
+      value: _enabled,
+      onChanged: _toggle,
     );
   }
 }
