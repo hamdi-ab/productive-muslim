@@ -13,6 +13,7 @@ import 'package:productive_muslim/features/barakah/logic/barakah_review_bloc.dar
 import 'package:productive_muslim/features/barakah/logic/barakah_review_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_state.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_analytics_cards.dart';
+import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class BarakahReviewScreen extends StatelessWidget {
@@ -199,6 +200,48 @@ class _ReviewContent extends StatelessWidget {
           ),
         const SizedBox(height: AppSpacing.lg),
         BarakahConsistencyMatrixCard(analytics: analytics),
+        const SizedBox(height: AppSpacing.md),
+        Builder(
+          builder: (context) {
+            final cutoff = analytics.week.today.isBefore(analytics.week.end)
+                ? analytics.week.today
+                : analytics.week.end;
+            final settingsService = getIt.isRegistered<SettingsService>()
+                ? getIt<SettingsService>()
+                : null;
+            final activityMap = <String, int>{};
+            if (settingsService != null) {
+              for (var i = 0; i < 84; i++) {
+                final d = DateTime(cutoff.year, cutoff.month, cutoff.day - i);
+                final key = BarakahReviewWeek.dateKey(d);
+                final dhikrCount = settingsService
+                    .getCompletedDhikrIds(key)
+                    .length;
+                final isFasting = settingsService.isSunnahFastingTarget(key);
+                final energy = settingsService.getDailyEnergy(key);
+                // Only add the energy point when a real saved record exists.
+                final energyPoint = energy.physical > 0 ? 1 : 0;
+                final score = dhikrCount + (isFasting ? 3 : 0) + energyPoint;
+                if (score > 0) {
+                  activityMap[key] = score;
+                }
+              }
+            }
+            for (final d in analytics.dailySnapshots) {
+              final key = BarakahReviewWeek.dateKey(d.date);
+              // Dhikr and fasting are already counted via SettingsService above;
+              // add only the daily-review bonus so we don't double-count.
+              final reviewBonus = d.barakahAnswer != null ? 2 : 0;
+              if (reviewBonus > 0) {
+                activityMap[key] = (activityMap[key] ?? 0) + reviewBonus;
+              }
+            }
+            return BarakahHeatmapCard(
+              activityByDate: activityMap,
+              referenceDate: cutoff,
+            );
+          },
+        ),
         const SizedBox(height: AppSpacing.md),
         EnergyTriadBreakdownCard(analytics: analytics),
         const SizedBox(height: AppSpacing.md),

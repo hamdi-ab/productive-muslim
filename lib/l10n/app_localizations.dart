@@ -2161,6 +2161,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunan Abi Dawud (2357) — Sahih'**
   String get iftarHadithRef;
+
+  /// No description provided for @heatmapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'12-Week Consistency Heatmap'**
+  String get heatmapTitle;
+
+  /// No description provided for @heatmapSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Barakah & habit momentum'**
+  String get heatmapSubtitle;
+
+  /// No description provided for @heatmapLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get heatmapLess;
+
+  /// No description provided for @heatmapMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get heatmapMore;
+
+  /// No description provided for @heatmapActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} active days'**
+  String heatmapActiveDays(int count, int total);
+
+  /// No description provided for @heatmapScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity score: {count}'**
+  String heatmapScoreLabel(int count);
+
+  /// No description provided for @backupRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Sovereignty & Local Backup'**
+  String get backupRestoreTitle;
+
+  /// No description provided for @backupRestoreDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Export or restore your tasks, habits, and reflections safely on device.'**
+  String get backupRestoreDesc;
+
+  /// No description provided for @backupExportBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Backup (JSON)'**
+  String get backupExportBtn;
+
+  /// No description provided for @backupImportBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from JSON'**
+  String get backupImportBtn;
+
+  /// No description provided for @backupExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup JSON copied to clipboard!'**
+  String get backupExportSuccess;
+
+  /// No description provided for @backupExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to export backup. Please try again.'**
+  String get backupExportError;
+
+  /// No description provided for @backupImportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data successfully restored!'**
+  String get backupImportSuccess;
+
+  /// No description provided for @backupImportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid backup JSON payload. Please check and try again.'**
+  String get backupImportError;
+
+  /// No description provided for @backupConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Data'**
+  String get backupConfirmTitle;
+
+  /// No description provided for @backupConfirmMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring will replace all current local data with the backup contents. Are you sure you want to proceed?'**
+  String get backupConfirmMsg;
+
+  /// No description provided for @backupRestorePasteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste your exported JSON backup text here...'**
+  String get backupRestorePasteHint;
+
+  /// No description provided for @backupCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get backupCancel;
+
+  /// No description provided for @backupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Now'**
+  String get backupConfirm;
 }
 
 class _AppLocalizationsDelegate

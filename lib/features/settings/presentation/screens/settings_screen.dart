@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:flutter/services.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
+import 'package:productive_muslim/data/services/backup_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
@@ -220,6 +222,15 @@ class SettingsView extends StatelessWidget {
                     child: _AdhanNotificationToggle(),
                   ),
                 ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 4: Data Sovereignty & Local Backup
+                _SectionTitle(
+                  icon: Icons.shield_rounded,
+                  title: l10n.backupRestoreTitle,
+                ),
+                const SizedBox(height: 8),
+                const Card(elevation: 0, child: _BackupRestoreCard()),
                 const SizedBox(height: AppSpacing.xxl),
               ],
             );
@@ -324,6 +335,137 @@ class _AdhanNotificationToggleState extends State<_AdhanNotificationToggle> {
       subtitle: Text(l10n.adhanNotificationsDescription),
       value: _enabled,
       onChanged: _toggle,
+    );
+  }
+}
+
+class _BackupRestoreCard extends StatelessWidget {
+  const _BackupRestoreCard();
+
+  Future<void> _exportBackup(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (!getIt.isRegistered<BackupService>()) return;
+
+    try {
+      final jsonStr = await getIt<BackupService>().exportBackupToJson();
+      await Clipboard.setData(ClipboardData(text: jsonStr));
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.backupExportSuccess),
+            backgroundColor: AppColors.primary,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.backupExportError),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showRestoreDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.restore_page_rounded, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(l10n.backupConfirmTitle),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.backupConfirmMsg, style: const TextStyle(fontSize: 13)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: l10n.backupRestorePasteHint,
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.all(10),
+              ),
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: Text(l10n.backupCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            child: Text(l10n.backupConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final text = controller.text.trim();
+      if (text.isEmpty) return;
+
+      final success = await getIt<BackupService>().importBackupFromJson(text);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success ? l10n.backupImportSuccess : l10n.backupImportError,
+            ),
+            backgroundColor: success ? AppColors.primary : Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      children: [
+        ListTile(
+          key: const Key('settings_export_backup'),
+          leading: const Icon(Icons.download_rounded, color: AppColors.primary),
+          title: Text(
+            l10n.backupExportBtn,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(l10n.backupRestoreDesc),
+          trailing: const Icon(Icons.copy_rounded, size: 20),
+          onTap: () => _exportBackup(context),
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        ListTile(
+          key: const Key('settings_import_backup'),
+          leading: const Icon(Icons.upload_rounded, color: AppColors.primary),
+          title: Text(
+            l10n.backupImportBtn,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded),
+          onTap: () => _showRestoreDialog(context),
+        ),
+      ],
     );
   }
 }

@@ -453,5 +453,35 @@
   "sunnahBadge": "Sunnah",
   "copyDuaTooltip": "Copy Du'a",
   "duaCopiedMessage": "Du'a copied to clipboard",
-  "iftarHadithRef": "Sunan Abi Dawud (2357) — Sahih"
+  "iftarHadithRef": "Sunan Abi Dawud (2357) — Sahih",
+  "heatmapTitle": "12-Week Consistency Heatmap",
+  "heatmapSubtitle": "Daily Barakah & habit momentum",
+  "heatmapLess": "Less",
+  "heatmapMore": "More",
+  "heatmapActiveDays": "{count} of {total} active days",
+  "@heatmapActiveDays": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "heatmapScoreLabel": "Activity score: {count}",
+  "@heatmapScoreLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "backupRestoreTitle": "Data Sovereignty & Local Backup",
+  "backupRestoreDesc": "Export or restore your tasks, habits, and reflections safely on device.",
+  "backupExportBtn": "Export Backup (JSON)",
+  "backupImportBtn": "Restore from JSON",
+  "backupExportSuccess": "Backup JSON copied to clipboard!",
+  "backupExportError": "Failed to export backup. Please try again.",
+  "backupImportSuccess": "Data successfully restored!",
+  "backupImportError": "Invalid backup JSON payload. Please check and try again.",
+  "backupConfirmTitle": "Restore Data",
+  "backupConfirmMsg": "Restoring will replace all current local data with the backup contents. Are you sure you want to proceed?",
+  "backupRestorePasteHint": "Paste your exported JSON backup text here...",
+  "backupCancel": "Cancel",
+  "backupConfirm": "Restore Now"
 }

@@ -194,4 +194,55 @@ class SettingsService {
     await _prefs?.setInt('bedtime_reminder_hour', hour);
     await _prefs?.setInt('bedtime_reminder_minute', minute);
   }
+
+  Map<String, dynamic> exportSettings() {
+    if (_prefs == null) return {};
+    final map = <String, dynamic>{};
+    for (final key in _prefs.getKeys()) {
+      map[key] = _prefs.get(key);
+    }
+    return map;
+  }
+
+  Future<void> importSettings(Map<String, dynamic> settings) async {
+    if (_prefs == null) return;
+
+    // Validate all values first — throw on unsupported types (null, maps,
+    // etc.) so BackupService can detect failure inside the transaction and
+    // roll back the database changes together with the settings write.
+    for (final entry in settings.entries) {
+      final val = entry.value;
+      if (val == null ||
+          val is Map ||
+          (val is! bool &&
+              val is! int &&
+              val is! double &&
+              val is! String &&
+              val is! List)) {
+        throw ArgumentError(
+          'importSettings: unsupported value type for key "${entry.key}": '
+          '${val.runtimeType}',
+        );
+      }
+    }
+
+    await _prefs.clear();
+    for (final entry in settings.entries) {
+      final val = entry.value;
+      if (val is bool) {
+        await _prefs.setBool(entry.key, val);
+      } else if (val is int) {
+        await _prefs.setInt(entry.key, val);
+      } else if (val is double) {
+        await _prefs.setDouble(entry.key, val);
+      } else if (val is String) {
+        await _prefs.setString(entry.key, val);
+      } else if (val is List) {
+        await _prefs.setStringList(
+          entry.key,
+          val.map((e) => e.toString()).toList(),
+        );
+      }
+    }
+  }
 }
