@@ -83,35 +83,66 @@ class _PrayerTimesTabs extends StatelessWidget {
               vertical: AppSpacing.xs,
             ),
             child: Container(
-              height: 44,
+              height: 46,
+              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.06)
+                    ? Colors.white.withValues(alpha: 0.08)
                     : Colors.black.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(24),
               ),
               child: TabBar(
+                dividerColor: Colors.transparent,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(21),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.textSecondary,
-                labelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
                 tabs: [
                   Tab(
-                    icon: const Icon(Icons.access_time_rounded, size: 16),
-                    text: l10n.qiblaTabTimes,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.access_time_rounded, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.qiblaTabTimes,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Tab(
-                    icon: const Icon(Icons.explore_rounded, size: 16),
-                    text: l10n.qiblaTabCompass,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.explore_rounded, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.qiblaTabCompass,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

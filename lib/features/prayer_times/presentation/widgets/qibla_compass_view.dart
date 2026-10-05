@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/core/theme/app_typography_extension.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -42,7 +42,7 @@ class QiblaCompassView extends StatefulWidget {
 class _QiblaCompassViewState extends State<QiblaCompassView> {
   late final QiblaService _qiblaService;
   late double _heading;
-  StreamSubscription<double>? _headingSubscription;
+  StreamSubscription<dynamic>? _headingSubscription;
 
   @override
   void initState() {
@@ -57,6 +57,17 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
           });
         }
       });
+    } else {
+      try {
+        _headingSubscription = FlutterCompass.events?.listen((event) {
+          final heading = event.heading;
+          if (heading != null && mounted) {
+            setState(() {
+              _heading = heading;
+            });
+          }
+        });
+      } catch (_) {}
     }
   }
 
@@ -110,38 +121,6 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
             ),
             child: Column(
               children: [
-                if (isFacingKaaba)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.check_circle_rounded,
-                          color: Color(0xFF10B981),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.qiblaFacingKaaba,
-                          style: const TextStyle(
-                            color: Color(0xFF10B981),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                 // Rotating Compass Rose
                 SizedBox(
                   width: 240,
@@ -233,24 +212,159 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
 
                 const SizedBox(height: AppSpacing.md),
 
-                // Readout
-                Text(
-                  l10n.qiblaBearing(
-                    _locDigits(context, qiblaBearing.toStringAsFixed(1)),
+                // Real-time Dynamic Heading Readout
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      _locDigits(context, '${((_heading % 360 + 360) % 360).toStringAsFixed(0)}°'),
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _getCardinalDirection((_heading % 360 + 360) % 360),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isFacingKaaba ? const Color(0xFF10B981) : AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // Live Guidance Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
                   ),
-                  style: AppTypography.headlineSmall.copyWith(
-                    fontWeight: FontWeight.bold,
+                  decoration: BoxDecoration(
+                    color: isFacingKaaba
+                        ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                        : (isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.05)),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isFacingKaaba
+                          ? const Color(0xFF10B981).withValues(alpha: 0.4)
+                          : Colors.transparent,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isFacingKaaba
+                            ? Icons.check_circle_rounded
+                            : (_getTurnDiff(qiblaBearing, _heading) > 0
+                                  ? Icons.rotate_right_rounded
+                                  : Icons.rotate_left_rounded),
+                        size: 16,
+                        color: isFacingKaaba
+                            ? const Color(0xFF10B981)
+                            : (isDark ? Colors.white70 : Colors.black87),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getTurnText(context, qiblaBearing, _heading, isFacingKaaba, l10n),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isFacingKaaba
+                              ? const Color(0xFF10B981)
+                              : (isDark ? Colors.white70 : Colors.black87),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.qiblaDistance(
-                    _locDigits(context, distanceKm.toStringAsFixed(0)),
-                  ),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark ? Colors.white60 : Colors.black54,
-                  ),
+                const SizedBox(height: AppSpacing.md),
+
+                // Sub-stats Row (Target Qibla Bearing & Distance)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.04)
+                              : Colors.black.withValues(alpha: 0.03),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              l10n.qiblaBearing(
+                                _locDigits(context, qiblaBearing.toStringAsFixed(1)),
+                              ),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Qibla Direction',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark ? Colors.white54 : Colors.black45,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.04)
+                              : Colors.black.withValues(alpha: 0.03),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              l10n.qiblaDistance(
+                                _locDigits(context, distanceKm.toStringAsFixed(0)),
+                              ),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Distance',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark ? Colors.white54 : Colors.black45,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -319,20 +433,55 @@ class _CompassDialPainter extends CustomPainter {
       ..strokeWidth = 1.5;
 
     for (int i = 0; i < 360; i += 30) {
-      final rad = i * (math.pi / 180.0);
+      final rad = (i - 90) * (math.pi / 180.0);
       final isMajor = i % 90 == 0;
       final tickLength = isMajor ? 12.0 : 6.0;
 
       final start = Offset(
-        center.dx + (radius - 4) * math.cos(rad),
-        center.dy + (radius - 4) * math.sin(rad),
+        center.dx + (radius - 8) * math.cos(rad),
+        center.dy + (radius - 8) * math.sin(rad),
       );
       final end = Offset(
-        center.dx + (radius - 4 - tickLength) * math.cos(rad),
-        center.dy + (radius - 4 - tickLength) * math.sin(rad),
+        center.dx + (radius - 8 - tickLength) * math.cos(rad),
+        center.dy + (radius - 8 - tickLength) * math.sin(rad),
       );
 
       canvas.drawLine(start, end, tickPaint);
+    }
+
+    // Cardinal Labels
+    final textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
+
+    final cardinals = [
+      ('N', 0, const Color(0xFFEF4444)), // Red North
+      ('E', 90, isDark ? Colors.white70 : Colors.black87),
+      ('S', 180, isDark ? Colors.white70 : Colors.black87),
+      ('W', 270, isDark ? Colors.white70 : Colors.black87),
+    ];
+
+    for (final (label, deg, color) in cardinals) {
+      final rad = (deg - 90) * (math.pi / 180.0);
+      final pos = Offset(
+        center.dx + (radius - 28) * math.cos(rad),
+        center.dy + (radius - 28) * math.sin(rad),
+      );
+
+      textPainter.text = TextSpan(
+        text: label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(pos.dx - textPainter.width / 2, pos.dy - textPainter.height / 2),
+      );
     }
   }
 
@@ -340,3 +489,42 @@ class _CompassDialPainter extends CustomPainter {
   bool shouldRepaint(covariant _CompassDialPainter oldDelegate) =>
       oldDelegate.isDark != isDark;
 }
+
+String _getCardinalDirection(double heading) {
+  final normalized = (heading % 360 + 360) % 360;
+  if (normalized >= 337.5 || normalized < 22.5) return 'N';
+  if (normalized >= 22.5 && normalized < 67.5) return 'NE';
+  if (normalized >= 67.5 && normalized < 112.5) return 'E';
+  if (normalized >= 112.5 && normalized < 157.5) return 'SE';
+  if (normalized >= 157.5 && normalized < 202.5) return 'S';
+  if (normalized >= 202.5 && normalized < 247.5) return 'SW';
+  if (normalized >= 247.5 && normalized < 292.5) return 'W';
+  return 'NW';
+}
+
+double _getTurnDiff(double target, double current) {
+  var diff = (target - current) % 360;
+  if (diff > 180) diff -= 360;
+  if (diff < -180) diff += 360;
+  return diff;
+}
+
+String _getTurnText(
+  BuildContext context,
+  double target,
+  double current,
+  bool isFacingKaaba,
+  AppLocalizations l10n,
+) {
+  if (isFacingKaaba) {
+    return l10n.qiblaFacingKaaba;
+  }
+  final diff = _getTurnDiff(target, current);
+  final deg = _locDigits(context, diff.abs().toStringAsFixed(0));
+  if (diff > 0) {
+    return 'Turn $deg° Right';
+  } else {
+    return 'Turn $deg° Left';
+  }
+}
+
