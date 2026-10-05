@@ -130,6 +130,146 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _currentItems;
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
+
+    final content = Column(
+      children: [
+        // Category Tabs
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              ...DhikrCategory.values.map((cat) {
+                final isSelected = cat == _selectedCategory;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(_getCategoryLabel(cat, l10n)),
+                    selected: isSelected,
+                    onSelected: (_) => _onCategorySelected(cat),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  ),
+                );
+              }),
+              if (items.isNotEmpty && hasParentScaffold)
+                Container(
+                  margin: const EdgeInsets.only(left: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${_currentPageIndex + 1} / ${items.length}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.xs),
+
+        // Card Carousel Viewport
+        Expanded(
+          child: items.isEmpty
+              ? Center(child: Text(l10n.adhkarEmptyState))
+              : PageView.builder(
+                  controller: _pageController,
+                  itemCount: items.length,
+                  onPageChanged: (idx) {
+                    setState(() => _currentPageIndex = idx);
+                  },
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    final count = _counts[item.id] ?? 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: DhikrCard(
+                        item: item,
+                        count: count,
+                        onTap: () => _incrementCount(item),
+                        onReset: () => _resetCount(item),
+                      ),
+                    );
+                  },
+                ),
+        ),
+
+        // Carousel Bottom Controls
+        if (items.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: 4,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  onPressed: _currentPageIndex > 0
+                      ? () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                  label: Text(l10n.adhkarPrev),
+                ),
+                Row(
+                  children: List.generate(
+                    items.length,
+                    (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPageIndex == index
+                            ? AppColors.primary
+                            : (isDark ? Colors.white24 : Colors.black12),
+                      ),
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: _currentPageIndex < items.length - 1
+                      ? () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                  label: Text(l10n.adhkarNext),
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+
+    if (hasParentScaffold) {
+      return content;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -150,120 +290,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
             ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Category Tabs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                children: DhikrCategory.values.map((cat) {
-                  final isSelected = cat == _selectedCategory;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(_getCategoryLabel(cat, l10n)),
-                      selected: isSelected,
-                      onSelected: (_) => _onCategorySelected(cat),
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            // Card Carousel Viewport
-            Expanded(
-              child: items.isEmpty
-                  ? Center(child: Text(l10n.adhkarEmptyState))
-                  : PageView.builder(
-                      controller: _pageController,
-                      itemCount: items.length,
-                      onPageChanged: (idx) {
-                        setState(() => _currentPageIndex = idx);
-                      },
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        final count = _counts[item.id] ?? 0;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.sm,
-                          ),
-                          child: DhikrCard(
-                            item: item,
-                            count: count,
-                            onTap: () => _incrementCount(item),
-                            onReset: () => _resetCount(item),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-
-            // Carousel Bottom Controls
-            if (items.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      onPressed: _currentPageIndex > 0
-                          ? () {
-                              _pageController.previousPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          : null,
-                      icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                      label: Text(l10n.adhkarPrev),
-                    ),
-                    Row(
-                      children: List.generate(
-                        items.length,
-                        (index) => Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentPageIndex == index
-                                ? AppColors.primary
-                                : (isDark ? Colors.white24 : Colors.black12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: _currentPageIndex < items.length - 1
-                          ? () {
-                              _pageController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          : null,
-                      label: Text(l10n.adhkarNext),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+      body: SafeArea(child: content),
     );
   }
 }

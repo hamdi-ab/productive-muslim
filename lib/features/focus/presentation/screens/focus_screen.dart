@@ -53,6 +53,19 @@ class _FocusScreenState extends State<FocusScreen> {
     if (!getIt.isRegistered<PrayerTimeService>()) return;
     try {
       final service = getIt<PrayerTimeService>();
+      if (service.cachedPrayerTimes != null) {
+        final pt = service.cachedPrayerTimes!;
+        final next = service.getNextPrayerName(pt) ?? 'Fajr';
+        final nextTime = service.getNextPrayerTime(pt);
+        final until = service.getTimeUntilNextPrayer(pt);
+        if (mounted) {
+          setState(() {
+            _nextPrayerName = next;
+            _nextPrayerTime = nextTime;
+            _timeUntilNextPrayer = until;
+          });
+        }
+      }
       final position = await service.getCurrentPosition();
       if (position != null) {
         final pt = service.getPrayerTimes(position);
@@ -329,6 +342,420 @@ class _FocusScreenState extends State<FocusScreen> {
       }
     }();
 
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
+
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            children: [
+              // Niyyah & Islamic Focus Banner
+              GradientCard(
+                borderRadius: 24,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.mosque_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            l10n.focusNiyyahPrompt,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        l10n.focusDua,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.md),
+
+              // Prayer Collision Warning Card (when preparing session)
+              if (!_isRunning &&
+                  _timeUntilNextPrayer != null &&
+                  _selectedDurationMinutes * 60 >
+                      _timeUntilNextPrayer!.inSeconds - (5 * 60)) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Color(0xFFF59E0B),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.focusPrayerWarningTitle,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFF59E0B),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.focusPrayerOverlap(
+                          _getLocalizedPrayerName(_nextPrayerName, l10n),
+                          _timeUntilNextPrayer!.inMinutes,
+                        ),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      if (_timeUntilNextPrayer!.inMinutes >= 10) ...[
+                        const SizedBox(height: 10),
+                        ActionChip(
+                          avatar: const Icon(
+                            Icons.timer_outlined,
+                            size: 14,
+                            color: Color(0xFFF59E0B),
+                          ),
+                          label: Text(
+                            l10n.focusPrayerSuggestion(
+                              (_timeUntilNextPrayer!.inMinutes - 5).clamp(
+                                5,
+                                60,
+                              ),
+                              _getLocalizedPrayerName(_nextPrayerName, l10n),
+                            ),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: () {
+                            _selectPreset(
+                              (_timeUntilNextPrayer!.inMinutes - 5).clamp(
+                                5,
+                                60,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+
+              // Wind-Down Indicator (when running and prayer is near)
+              if (_isRunning &&
+                  _timeUntilNextPrayer != null &&
+                  _timeUntilNextPrayer!.inMinutes <= 10) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.access_time_filled_rounded,
+                        color: Color(0xFFF59E0B),
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.focusWindDownWarning(
+                          _timeUntilNextPrayer!.inMinutes,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFF59E0B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // Timer Dial with calm breathing pulse during active focus
+              Center(
+                child: PulsingGlow(
+                  animate: _isRunning,
+                  minScale: 0.985,
+                  maxScale: 1.015,
+                  duration: const Duration(milliseconds: 2400),
+                  child: AnimatedProgressRing(
+                    progress: progress,
+                    size: 240,
+                    strokeWidth: 14,
+                    color: _isRunning ? AppColors.secondary : AppColors.primary,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _formatTime(_secondsRemaining),
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -1,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Text(
+                            _isRunning ? 'In Flow...' : 'Ready',
+                            key: ValueKey('focus_status_$_isRunning'),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Preset selector (if not running)
+              if (!_isRunning) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: _presets.map((mins) {
+                    final isSelected = _selectedDurationMinutes == mins;
+                    return AppPressable(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        _selectPreset(mins);
+                      },
+                      pressedScale: 0.92,
+                      haptic: AppHapticFeedback.none,
+                      child: ChoiceChip(
+                        label: Text('$mins min'),
+                        selected: isSelected,
+                        onSelected: (_) => _selectPreset(mins),
+                        selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+
+              // Action Controls
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isRunning ||
+                      _secondsRemaining < _selectedDurationMinutes * 60)
+                    AppPressable(
+                      onTap: _resetTimer,
+                      pressedScale: 0.88,
+                      haptic: AppHapticFeedback.none,
+                      child: IconButton.filledTonal(
+                        onPressed: _resetTimer,
+                        icon: const Icon(Icons.refresh_rounded),
+                        tooltip: l10n.focusReset,
+                        style: IconButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(width: 16),
+                  AppPressable(
+                    onTap: _toggleTimer,
+                    pressedScale: 0.93,
+                    haptic: AppHapticFeedback.none,
+                    borderRadius: BorderRadius.circular(24),
+                    child: FilledButton.icon(
+                      onPressed: _toggleTimer,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, anim) =>
+                            ScaleTransition(scale: anim, child: child),
+                        child: Icon(
+                          _isRunning
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          key: ValueKey('timer_icon_$_isRunning'),
+                          size: 28,
+                        ),
+                      ),
+                      label: Text(
+                        _isRunning ? l10n.focusPause : l10n.focusStart,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 36,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Task link card (Stream from TaskRepository)
+              StreamBuilder<List<Task>>(
+                stream: _tasksStream,
+                builder: (context, snapshot) {
+                  final tasks = snapshot.data ?? [];
+                  if (tasks.isEmpty) return const SizedBox.shrink();
+
+                  Task? matchedTask;
+                  if (_selectedTask != null) {
+                    for (final task in tasks) {
+                      if (task.id == _selectedTask?.id) {
+                        matchedTask = task;
+                        break;
+                      }
+                    }
+                  }
+
+                  return GlassContainer(
+                    padding: const EdgeInsets.all(16),
+                    borderRadius: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.task_alt_rounded,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.focusSelectTask,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<Task?>(
+                          initialValue: matchedTask,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            filled: true,
+                            fillColor: isDark
+                                ? AppColors.darkSurfaceSubtle
+                                : AppColors.surfaceSubtle,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          items: [
+                            const DropdownMenuItem<Task?>(
+                              value: null,
+                              child: Text('No task selected (General Focus)'),
+                            ),
+                            ...tasks.map(
+                              (t) => DropdownMenuItem<Task?>(
+                                value: t,
+                                child: Text(
+                                  t.title,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
+                          ],
+                          onChanged: _isRunning
+                              ? null
+                              : (task) {
+                                  setState(() => _selectedTask = task);
+                                },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (hasParentScaffold) {
+      return content;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.focusTitle),
@@ -358,417 +785,7 @@ class _FocusScreenState extends State<FocusScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              children: [
-                // Niyyah & Islamic Focus Banner
-                GradientCard(
-                  borderRadius: 24,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.mosque_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              l10n.focusNiyyahPrompt,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          l10n.focusDua,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.md),
-
-                // Prayer Collision Warning Card (when preparing session)
-                if (!_isRunning &&
-                    _timeUntilNextPrayer != null &&
-                    _selectedDurationMinutes * 60 >
-                        _timeUntilNextPrayer!.inSeconds - (5 * 60)) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.warning_amber_rounded,
-                              color: Color(0xFFF59E0B),
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              l10n.focusPrayerWarningTitle,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFF59E0B),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          l10n.focusPrayerOverlap(
-                            _getLocalizedPrayerName(_nextPrayerName, l10n),
-                            _timeUntilNextPrayer!.inMinutes,
-                          ),
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        if (_timeUntilNextPrayer!.inMinutes >= 10) ...[
-                          const SizedBox(height: 10),
-                          ActionChip(
-                            avatar: const Icon(
-                              Icons.timer_outlined,
-                              size: 14,
-                              color: Color(0xFFF59E0B),
-                            ),
-                            label: Text(
-                              l10n.focusPrayerSuggestion(
-                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
-                                  5,
-                                  60,
-                                ),
-                                _getLocalizedPrayerName(_nextPrayerName, l10n),
-                              ),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onPressed: () {
-                              _selectPreset(
-                                (_timeUntilNextPrayer!.inMinutes - 5).clamp(
-                                  5,
-                                  60,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-
-                // Wind-Down Indicator (when running and prayer is near)
-                if (_isRunning &&
-                    _timeUntilNextPrayer != null &&
-                    _timeUntilNextPrayer!.inMinutes <= 10) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.access_time_filled_rounded,
-                          color: Color(0xFFF59E0B),
-                          size: 14,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.focusWindDownWarning(
-                            _timeUntilNextPrayer!.inMinutes,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFF59E0B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                // Timer Dial with calm breathing pulse during active focus
-                Center(
-                  child: PulsingGlow(
-                    animate: _isRunning,
-                    minScale: 0.985,
-                    maxScale: 1.015,
-                    duration: const Duration(milliseconds: 2400),
-                    child: AnimatedProgressRing(
-                      progress: progress,
-                      size: 240,
-                      strokeWidth: 14,
-                      color: _isRunning
-                          ? AppColors.secondary
-                          : AppColors.primary,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _formatTime(_secondsRemaining),
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -1,
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: Text(
-                              _isRunning ? 'In Flow...' : 'Ready',
-                              key: ValueKey('focus_status_$_isRunning'),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.xl),
-
-                // Preset selector (if not running)
-                if (!_isRunning) ...[
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    alignment: WrapAlignment.center,
-                    children: _presets.map((mins) {
-                      final isSelected = _selectedDurationMinutes == mins;
-                      return AppPressable(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          _selectPreset(mins);
-                        },
-                        pressedScale: 0.92,
-                        haptic: AppHapticFeedback.none,
-                        child: ChoiceChip(
-                          label: Text('$mins min'),
-                          selected: isSelected,
-                          onSelected: (_) => _selectPreset(mins),
-                          selectedColor: AppColors.primary.withValues(
-                            alpha: 0.2,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                ],
-
-                // Action Controls
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (_isRunning ||
-                        _secondsRemaining < _selectedDurationMinutes * 60)
-                      AppPressable(
-                        onTap: _resetTimer,
-                        pressedScale: 0.88,
-                        haptic: AppHapticFeedback.none,
-                        child: IconButton.filledTonal(
-                          onPressed: _resetTimer,
-                          icon: const Icon(Icons.refresh_rounded),
-                          tooltip: l10n.focusReset,
-                          style: IconButton.styleFrom(
-                            padding: const EdgeInsets.all(16),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(width: 16),
-                    AppPressable(
-                      onTap: _toggleTimer,
-                      pressedScale: 0.93,
-                      haptic: AppHapticFeedback.none,
-                      borderRadius: BorderRadius.circular(24),
-                      child: FilledButton.icon(
-                        onPressed: _toggleTimer,
-                        icon: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 250),
-                          transitionBuilder: (child, anim) =>
-                              ScaleTransition(scale: anim, child: child),
-                          child: Icon(
-                            _isRunning
-                                ? Icons.pause_rounded
-                                : Icons.play_arrow_rounded,
-                            key: ValueKey('timer_icon_$_isRunning'),
-                            size: 28,
-                          ),
-                        ),
-                        label: Text(
-                          _isRunning ? l10n.focusPause : l10n.focusStart,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 36,
-                            vertical: 16,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: AppSpacing.xl),
-
-                // Task link card (Stream from TaskRepository)
-                StreamBuilder<List<Task>>(
-                  stream: _tasksStream,
-                  builder: (context, snapshot) {
-                    final tasks = snapshot.data ?? [];
-                    if (tasks.isEmpty) return const SizedBox.shrink();
-
-                    Task? matchedTask;
-                    if (_selectedTask != null) {
-                      for (final task in tasks) {
-                        if (task.id == _selectedTask?.id) {
-                          matchedTask = task;
-                          break;
-                        }
-                      }
-                    }
-
-                    return GlassContainer(
-                      padding: const EdgeInsets.all(16),
-                      borderRadius: 20,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.task_alt_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                l10n.focusSelectTask,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          DropdownButtonFormField<Task?>(
-                            initialValue: matchedTask,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              filled: true,
-                              fillColor: isDark
-                                  ? AppColors.darkSurfaceSubtle
-                                  : AppColors.surfaceSubtle,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            items: [
-                              const DropdownMenuItem<Task?>(
-                                value: null,
-                                child: Text('No task selected (General Focus)'),
-                              ),
-                              ...tasks.map(
-                                (t) => DropdownMenuItem<Task?>(
-                                  value: t,
-                                  child: Text(
-                                    t.title,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            onChanged: _isRunning
-                                ? null
-                                : (task) {
-                                    setState(() => _selectedTask = task);
-                                  },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      body: content,
     );
   }
 }

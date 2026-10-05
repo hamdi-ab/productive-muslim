@@ -137,7 +137,7 @@ class _HabitList extends StatelessWidget {
     final categoryColors = AppLifeArea.all;
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: 88),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         _WeekHeader(l10n: l10n),
         const Divider(height: 1),

@@ -180,6 +180,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )
             : null,
         actions: [
+          InkWell(
+            onTap: () {
+              final isAr = Localizations.localeOf(context).languageCode == 'ar';
+              _settings.setLocaleCode(isAr ? 'en' : 'ar');
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.language_rounded,
+                    size: 15,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    Localizations.localeOf(context).languageCode == 'ar'
+                        ? 'English'
+                        : 'العربية',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
           TextButton(
             onPressed: _skip,
             child: Text(
@@ -235,6 +275,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
+                    key: const Key('step_progress_indicator'),
                     children: List.generate(_steps.length, (i) {
                       final isActive = i <= _currentStep;
                       final isCurrent = i == _currentStep;

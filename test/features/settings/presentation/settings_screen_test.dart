@@ -59,18 +59,22 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> ensureVisible(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(
+      finder,
+      50,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('toggle enables and disables persisted reminder', (tester) async {
     await pumpScreen(tester);
-    expect(
-      tester
-          .widget<SwitchListTile>(
-            find.byKey(const Key('barakah_reminder_toggle')),
-          )
-          .value,
-      isFalse,
-    );
+    final toggleFinder = find.byKey(const Key('barakah_reminder_toggle'));
+    await ensureVisible(tester, toggleFinder);
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isFalse);
     expect(find.text('8:00 PM'), findsAtLeast(1));
-    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+    await tester.tap(toggleFinder);
     await tester.pumpAndSettle();
     expect(
       settings.barakahReminder.enabled,
@@ -78,15 +82,8 @@ void main() {
       reason:
           'calls=${scheduler.calls}, pending=${service.status.pending}, failure=${service.status.failure}',
     );
-    expect(
-      tester
-          .widget<SwitchListTile>(
-            find.byKey(const Key('barakah_reminder_toggle')),
-          )
-          .value,
-      isTrue,
-    );
-    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isTrue);
+    await tester.tap(toggleFinder);
     await tester.pumpAndSettle();
     expect(settings.barakahReminder.enabled, isFalse);
     expect(scheduler.calls.last, 'cancel');
@@ -96,7 +93,9 @@ void main() {
     tester,
   ) async {
     await pumpScreen(tester);
-    await tester.tap(find.text('Reminder time'));
+    final timeFinder = find.text('Reminder time');
+    await ensureVisible(tester, timeFinder);
+    await tester.tap(timeFinder);
     await tester.pumpAndSettle();
     expect(find.byType(TimePickerDialog), findsOneWidget);
     await tester.tap(find.byIcon(Icons.keyboard_outlined));
@@ -107,7 +106,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(settings.barakahReminder, (enabled: false, hour: 21, minute: 35));
     expect(find.text('9:35 PM'), findsAtLeast(1));
-    await tester.tap(find.text('Reminder time'));
+    await tester.tap(timeFinder);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
@@ -120,17 +119,12 @@ void main() {
   ) async {
     scheduler.permissionResult = Completer<bool>();
     await pumpScreen(tester);
-    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+    final toggleFinder = find.byKey(const Key('barakah_reminder_toggle'));
+    await ensureVisible(tester, toggleFinder);
+    await tester.tap(toggleFinder);
     await tester.pumpAndSettle();
     expect(find.text('Updating reminder…'), findsOneWidget);
-    expect(
-      tester
-          .widget<SwitchListTile>(
-            find.byKey(const Key('barakah_reminder_toggle')),
-          )
-          .onChanged,
-      isNull,
-    );
+    expect(tester.widget<SwitchListTile>(toggleFinder).onChanged, isNull);
     expect(
       tester
           .widget<ListTile>(find.byKey(const Key('barakah_reminder_time')))
@@ -140,14 +134,7 @@ void main() {
     expect(settings.barakahReminder.enabled, isFalse);
     scheduler.permissionResult!.complete(true);
     await tester.pumpAndSettle();
-    expect(
-      tester
-          .widget<SwitchListTile>(
-            find.byKey(const Key('barakah_reminder_toggle')),
-          )
-          .onChanged,
-      isNotNull,
-    );
+    expect(tester.widget<SwitchListTile>(toggleFinder).onChanged, isNotNull);
   });
 
   testWidgets('denial and error show English messages without enabled switch', (
@@ -155,23 +142,18 @@ void main() {
   ) async {
     scheduler.permitted = false;
     await pumpScreen(tester);
-    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+    final toggleFinder = find.byKey(const Key('barakah_reminder_toggle'));
+    await ensureVisible(tester, toggleFinder);
+    await tester.tap(toggleFinder);
     await tester.pumpAndSettle();
     expect(
       find.textContaining('Notifications are not allowed.'),
       findsOneWidget,
     );
-    expect(
-      tester
-          .widget<SwitchListTile>(
-            find.byKey(const Key('barakah_reminder_toggle')),
-          )
-          .value,
-      isFalse,
-    );
+    expect(tester.widget<SwitchListTile>(toggleFinder).value, isFalse);
     scheduler.permitted = true;
     scheduler.scheduleFailed = true;
-    await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+    await tester.tap(toggleFinder);
     await tester.pumpAndSettle();
     expect(
       find.text('The reminder could not be updated. Please try again.'),
@@ -190,10 +172,11 @@ void main() {
         scheduler: scheduler,
       );
       await pumpScreen(tester);
-      expect(
-        find.textContaining('only in the Android and iOS apps'),
-        findsOneWidget,
+      final unsupportedFinder = find.textContaining(
+        'only in the Android and iOS apps',
       );
+      await ensureVisible(tester, unsupportedFinder);
+      expect(unsupportedFinder, findsOneWidget);
       expect(
         tester
             .widget<SwitchListTile>(
@@ -218,12 +201,14 @@ void main() {
       scheduler.permitted = false;
       await pumpScreen(tester, language: 'ar');
       expect(find.text('الإعدادات'), findsOneWidget);
-      expect(find.text('تذكير يومي بالبركة'), findsOneWidget);
       expect(
         Directionality.of(tester.element(find.byType(SettingsView))),
         TextDirection.rtl,
       );
-      await tester.tap(find.text('وقت التذكير'));
+      final timeFinder = find.text('وقت التذكير');
+      await ensureVisible(tester, timeFinder);
+      expect(find.text('تذكير يومي بالبركة'), findsOneWidget);
+      await tester.tap(timeFinder);
       await tester.pumpAndSettle();
       final pickerContext = tester.element(find.byType(TimePickerDialog));
       expect(Directionality.of(pickerContext), TextDirection.rtl);
@@ -231,11 +216,13 @@ void main() {
         find.text(MaterialLocalizations.of(pickerContext).cancelButtonLabel),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+      final toggleFinder = find.byKey(const Key('barakah_reminder_toggle'));
+      await ensureVisible(tester, toggleFinder);
+      await tester.tap(toggleFinder);
       await tester.pumpAndSettle();
       expect(find.textContaining('الإشعارات غير مسموح بها.'), findsOneWidget);
       scheduler.permitted = true;
-      await tester.tap(find.byKey(const Key('barakah_reminder_toggle')));
+      await tester.tap(toggleFinder);
       await tester.pumpAndSettle();
       expect(scheduler.contents.single.title, 'تأمل يومي في البركة');
       expect(
@@ -273,10 +260,11 @@ void main() {
     scheduler.initializationFailed = true;
     await pumpScreen(tester, lifecycle: true);
     expect(find.text('Settings'), findsOneWidget);
-    expect(
-      find.text('The reminder could not be updated. Please try again.'),
-      findsOneWidget,
+    final errorFinder = find.text(
+      'The reminder could not be updated. Please try again.',
     );
+    await ensureVisible(tester, errorFinder);
+    expect(errorFinder, findsOneWidget);
     expect(
       tester
           .widget<SwitchListTile>(
@@ -296,7 +284,13 @@ void main() {
     final toggleFinder = find.byKey(
       const Key('settings_haptic_feedback_toggle'),
     );
-    await tester.scrollUntilVisible(toggleFinder, 200);
+    await tester.scrollUntilVisible(
+      toggleFinder,
+      50,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(toggleFinder, findsOneWidget);
     expect(tester.widget<SwitchListTile>(toggleFinder).value, isTrue);
 
@@ -311,5 +305,60 @@ void main() {
 
     expect(settings.hapticFeedbackEnabled, isTrue);
     expect(tester.widget<SwitchListTile>(toggleFinder).value, isTrue);
+  });
+
+  testWidgets('selecting theme mode updates settings service', (tester) async {
+    await pumpScreen(tester);
+
+    final darkFinder = find.text('Dark');
+    await tester.scrollUntilVisible(
+      darkFinder,
+      50,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(settings.themeMode, 'system');
+
+    await tester.tap(darkFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.themeMode, 'dark');
+    expect(settings.themeModeNotifier.value, ThemeMode.dark);
+
+    final lightFinder = find.text('Light');
+    await tester.tap(lightFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.themeMode, 'light');
+    expect(settings.themeModeNotifier.value, ThemeMode.light);
+  });
+
+  testWidgets('selecting language updates settings service', (tester) async {
+    await pumpScreen(tester);
+
+    final arFinder = find.text('العربية');
+    await tester.scrollUntilVisible(
+      arFinder,
+      50,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(settings.localeCode, 'system');
+    expect(settings.localeNotifier.value, isNull);
+
+    await tester.tap(arFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.localeCode, 'ar');
+    expect(settings.localeNotifier.value, const Locale('ar'));
+
+    final enFinder = find.text('English');
+    await tester.tap(enFinder);
+    await tester.pumpAndSettle();
+
+    expect(settings.localeCode, 'en');
+    expect(settings.localeNotifier.value, const Locale('en'));
   });
 }

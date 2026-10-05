@@ -173,6 +173,18 @@ class _SmartRemindersSettingsCardState
         ),
         const Divider(height: 1, indent: 16, endIndent: 16),
         SwitchListTile(
+          key: const Key('setting_qaylulah_toggle'),
+          secondary: const Icon(Icons.snooze_rounded, color: Color(0xFF10B981)),
+          title: Text(
+            l10n.settingQaylulah,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(l10n.settingQaylulahDesc),
+          value: _qaylulah,
+          onChanged: _toggleQaylulah,
+        ),
+        const Divider(height: 1, indent: 16, endIndent: 16),
+        SwitchListTile(
           key: const Key('setting_evening_adhkar_toggle'),
           secondary: const Icon(
             Icons.nights_stay_rounded,
@@ -253,18 +265,6 @@ class _SmartRemindersSettingsCardState
           subtitle: Text(l10n.settingSunnahFastingDesc),
           value: _fasting,
           onChanged: _toggleFasting,
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        SwitchListTile(
-          key: const Key('setting_qaylulah_toggle'),
-          secondary: const Icon(Icons.snooze_rounded, color: Color(0xFF10B981)),
-          title: Text(
-            l10n.settingQaylulah,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text(l10n.settingQaylulahDesc),
-          value: _qaylulah,
-          onChanged: _toggleQaylulah,
         ),
       ],
     );

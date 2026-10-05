@@ -2293,6 +2293,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vibration feedback on taps, counters, and completions'**
   String get hapticFeedbackDesc;
+
+  /// No description provided for @languageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change app display language'**
+  String get languageDesc;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get languageSystem;
+
+  /// No description provided for @languageEn.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEn;
+
+  /// No description provided for @languageAr.
+  ///
+  /// In en, this message translates to:
+  /// **'العربية (Arabic)'**
+  String get languageAr;
 }
 
 class _AppLocalizationsDelegate

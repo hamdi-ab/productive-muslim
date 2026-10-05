@@ -1,7 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
-  SettingsService({required SharedPreferences prefs}) : _prefs = prefs;
+  SettingsService({required SharedPreferences prefs}) : _prefs = prefs {
+    _initThemeMode();
+    _initLocale();
+  }
 
   SettingsService._empty() : _prefs = null;
 
@@ -9,6 +13,8 @@ class SettingsService {
 
   final SharedPreferences? _prefs;
 
+  static const _themeModeKey = 'app_theme_mode';
+  static const _localeKey = 'app_locale';
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
@@ -19,6 +25,82 @@ class SettingsService {
   static const _totalFocusMinutesKey = 'total_focus_minutes';
   static const _sunnahFastingTargetKey = 'sunnah_fasting_target';
   static const _hapticFeedbackKey = 'haptic_feedback_enabled';
+  static const _lastLatitudeKey = 'last_latitude';
+  static const _lastLongitudeKey = 'last_longitude';
+  static const _lastLocationNameKey = 'last_location_name';
+
+  final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier<ThemeMode>(
+    ThemeMode.system,
+  );
+
+  final ValueNotifier<Locale?> localeNotifier = ValueNotifier<Locale?>(null);
+
+  void _initThemeMode() {
+    final modeStr = _prefs?.getString(_themeModeKey) ?? 'system';
+    themeModeNotifier.value = _parseThemeMode(modeStr);
+  }
+
+  void _initLocale() {
+    final code = _prefs?.getString(_localeKey);
+    localeNotifier.value = _parseLocale(code);
+  }
+
+  static ThemeMode _parseThemeMode(String mode) {
+    switch (mode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  static Locale? _parseLocale(String? code) {
+    switch (code) {
+      case 'en':
+        return const Locale('en');
+      case 'ar':
+        return const Locale('ar');
+      default:
+        return null;
+    }
+  }
+
+  String get themeMode => _prefs?.getString(_themeModeKey) ?? 'system';
+
+  Future<void> setThemeMode(String mode) async {
+    await _prefs?.setString(_themeModeKey, mode);
+    themeModeNotifier.value = _parseThemeMode(mode);
+  }
+
+  String get localeCode => _prefs?.getString(_localeKey) ?? 'system';
+
+  Future<void> setLocaleCode(String code) async {
+    await _prefs?.setString(_localeKey, code);
+    localeNotifier.value = _parseLocale(code);
+  }
+
+  ({double latitude, double longitude})? get lastCoordinates {
+    final lat = _prefs?.getDouble(_lastLatitudeKey);
+    final lon = _prefs?.getDouble(_lastLongitudeKey);
+    if (lat != null && lon != null) {
+      return (latitude: lat, longitude: lon);
+    }
+    return null;
+  }
+
+  Future<void> setLastCoordinates(double lat, double lon) async {
+    await _prefs?.setDouble(_lastLatitudeKey, lat);
+    await _prefs?.setDouble(_lastLongitudeKey, lon);
+  }
+
+  String? get lastLocationName => _prefs?.getString(_lastLocationNameKey);
+
+  Future<void> setLastLocationName(String name) async {
+    await _prefs?.setString(_lastLocationNameKey, name);
+  }
 
   bool get hapticFeedbackEnabled => _prefs?.getBool(_hapticFeedbackKey) ?? true;
 

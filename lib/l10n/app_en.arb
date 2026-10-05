@@ -486,5 +486,10 @@
   "backupConfirm": "Restore Now",
   "preferencesTitle": "Preferences & Touch",
   "hapticFeedback": "Haptic Feedback",
-  "hapticFeedbackDesc": "Vibration feedback on taps, counters, and completions"
+  "hapticFeedbackDesc": "Vibration feedback on taps, counters, and completions",
+  "language": "Language",
+  "languageDesc": "Change app display language",
+  "languageSystem": "System Default",
+  "languageEn": "English",
+  "languageAr": "العربية (Arabic)"
 }

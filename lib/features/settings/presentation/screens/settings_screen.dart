@@ -51,214 +51,254 @@ class SettingsView extends StatelessWidget {
       body: l10n.barakahReminderBody,
     );
     final hasParentScaffold = Scaffold.maybeOf(context) != null;
-    return Scaffold(
-      appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.settings)),
-      body: SafeArea(
-        child: BlocBuilder<SettingsBloc, SettingsState>(
-          builder: (context, state) {
-            final interactive = state.supported && !state.pending;
-            final time = TimeOfDay(hour: state.hour, minute: state.minute);
-            final message = switch (state.failure) {
-              ReminderFailure.permissionDenied => l10n.barakahReminderDenied,
-              ReminderFailure.operationFailed => l10n.barakahReminderError,
-              ReminderFailure.unavailable => l10n.barakahReminderUnsupported,
-              null => null,
-            };
-            return ListView(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              children: [
-                // Section 1: Daily Barakah Reminders
-                _SectionTitle(
-                  icon: Icons.auto_awesome_rounded,
-                  title: l10n.barakahDailyTitle,
+    final contentWidget = BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, state) {
+        final interactive = state.supported && !state.pending;
+        final time = TimeOfDay(hour: state.hour, minute: state.minute);
+        final message = switch (state.failure) {
+          ReminderFailure.permissionDenied => l10n.barakahReminderDenied,
+          ReminderFailure.operationFailed => l10n.barakahReminderError,
+          ReminderFailure.unavailable => l10n.barakahReminderUnsupported,
+          null => null,
+        };
+        return ListView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          children: [
+            // Section 1: Preferences & Appearance
+            _SectionTitle(
+              icon: Icons.palette_rounded,
+              title: l10n.preferencesTitle,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              elevation: 0,
+              color: isDark
+                  ? AppColors.darkSurfaceSubtle
+                  : AppColors.surfaceSubtle,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    _ThemeModeSelector(),
+                    Divider(height: 1, indent: 16, endIndent: 16),
+                    _LocaleSelector(),
+                    Divider(height: 1, indent: 16, endIndent: 16),
+                    _HapticFeedbackToggle(),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: isDark
-                      ? AppColors.darkSurfaceSubtle
-                      : AppColors.surfaceSubtle,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Column(
-                      children: [
-                        SwitchListTile(
-                          key: const Key('barakah_reminder_toggle'),
-                          title: Text(
-                            l10n.barakahReminderLabel,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          subtitle: Text(l10n.barakahReminderDescription),
-                          value: state.enabled,
-                          onChanged: interactive
-                              ? (enabled) => context.read<SettingsBloc>().add(
-                                  ReminderToggled(enabled, content),
-                                )
-                              : null,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Section 2: Adhan & Prayer Notifications
+            _SectionTitle(
+              icon: Icons.notifications_active_rounded,
+              title: l10n.notifications,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              elevation: 0,
+              color: isDark
+                  ? AppColors.darkSurfaceSubtle
+                  : AppColors.surfaceSubtle,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: _AdhanNotificationToggle(),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Section 3: Smart Routine & Sunnah Reminders
+            _SectionTitle(
+              icon: Icons.wb_twilight_rounded,
+              title: l10n.smartNotificationsTitle,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              elevation: 0,
+              color: isDark
+                  ? AppColors.darkSurfaceSubtle
+                  : AppColors.surfaceSubtle,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: SmartRemindersSettingsCard(),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+
+            // Section 4: Daily Barakah Reminders
+            _SectionTitle(
+              icon: Icons.auto_awesome_rounded,
+              title: l10n.barakahDailyTitle,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              elevation: 0,
+              color: isDark
+                  ? AppColors.darkSurfaceSubtle
+                  : AppColors.surfaceSubtle,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      key: const Key('barakah_reminder_toggle'),
+                      secondary: const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Color(0xFFF59E0B),
+                      ),
+                      title: Text(
+                        l10n.barakahReminderLabel,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(l10n.barakahReminderDescription),
+                      value: state.enabled,
+                      onChanged: interactive
+                          ? (enabled) => context.read<SettingsBloc>().add(
+                              ReminderToggled(enabled, content),
+                            )
+                          : null,
+                    ),
+                    const Divider(height: 1, indent: 56, endIndent: 16),
+                    ListTile(
+                      key: const Key('barakah_reminder_time'),
+                      contentPadding: const EdgeInsets.only(
+                        left: 56,
+                        right: 16,
+                      ),
+                      title: Text(
+                        l10n.barakahReminderTime,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
                         ),
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-                        ListTile(
-                          key: const Key('barakah_reminder_time'),
-                          title: Text(
-                            l10n.barakahReminderTime,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          subtitle: Text(time.format(context)),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
+                      ),
+                      subtitle: Text(time.format(context)),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.schedule_rounded,
+                              size: 16,
+                              color: AppColors.primary,
                             ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
+                            const SizedBox(width: 6),
+                            Text(
+                              time.format(context),
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.schedule_rounded,
-                                  size: 16,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  time.format(context),
-                                  style: const TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                          ],
+                        ),
+                      ),
+                      enabled: interactive,
+                      onTap: interactive
+                          ? () async {
+                              final bloc = context.read<SettingsBloc>();
+                              final selected = await showTimePicker(
+                                context: context,
+                                initialTime: time,
+                              );
+                              if (selected != null && !bloc.isClosed) {
+                                bloc.add(
+                                  ReminderTimeChanged(
+                                    selected.hour,
+                                    selected.minute,
+                                    content,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          enabled: interactive,
-                          onTap: interactive
-                              ? () async {
-                                  final bloc = context.read<SettingsBloc>();
-                                  final selected = await showTimePicker(
-                                    context: context,
-                                    initialTime: time,
-                                  );
-                                  if (selected != null && !bloc.isClosed) {
-                                    bloc.add(
-                                      ReminderTimeChanged(
-                                        selected.hour,
-                                        selected.minute,
-                                        content,
-                                      ),
-                                    );
-                                  }
-                                }
-                              : null,
-                        ),
-                      ],
+                                );
+                              }
+                            }
+                          : null,
                     ),
-                  ),
+                  ],
                 ),
-                if (!state.supported)
-                  Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Text(l10n.barakahReminderUnsupported),
-                  )
-                else if (state.pending)
-                  Semantics(
-                    liveRegion: true,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Text(l10n.barakahReminderPending),
-                    ),
-                  )
-                else if (message != null)
-                  Semantics(
-                    liveRegion: true,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Text(message),
-                    ),
-                  ),
-                const SizedBox(height: AppSpacing.lg),
+              ),
+            ),
+            if (!state.supported)
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Text(l10n.barakahReminderUnsupported),
+              )
+            else if (state.pending)
+              Semantics(
+                liveRegion: true,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Text(l10n.barakahReminderPending),
+                ),
+              )
+            else if (message != null)
+              Semantics(
+                liveRegion: true,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Text(message),
+                ),
+              ),
+            const SizedBox(height: AppSpacing.lg),
 
-                // Section 2: Smart Adhkar & Sunnah Reminders
-                _SectionTitle(
-                  icon: Icons.wb_twilight_rounded,
-                  title: l10n.smartNotificationsTitle,
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: isDark
-                      ? AppColors.darkSurfaceSubtle
-                      : AppColors.surfaceSubtle,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                    child: SmartRemindersSettingsCard(),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+            // Section 5: Data Sovereignty & Local Backup
+            _SectionTitle(
+              icon: Icons.shield_rounded,
+              title: l10n.backupRestoreTitle,
+            ),
+            const SizedBox(height: 8),
+            const Card(elevation: 0, child: _BackupRestoreCard()),
+            const SizedBox(height: AppSpacing.xl),
 
-                // Section 3: Adhan & Prayer Notifications
-                _SectionTitle(
-                  icon: Icons.notifications_active_rounded,
-                  title: l10n.notifications,
+            // App Footer Info
+            Center(
+              child: Text(
+                'Productive Muslim v1.0\nBuilt with intention',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.white38 : Colors.black38,
+                  height: 1.5,
                 ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: isDark
-                      ? AppColors.darkSurfaceSubtle
-                      : AppColors.surfaceSubtle,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: _AdhanNotificationToggle(),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+          ],
+        );
+      },
+    );
 
-                // Section 4: Preferences & Touch Experience
-                _SectionTitle(
-                  icon: Icons.vibration_rounded,
-                  title: l10n.preferencesTitle,
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  elevation: 0,
-                  color: isDark
-                      ? AppColors.darkSurfaceSubtle
-                      : AppColors.surfaceSubtle,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                    child: _HapticFeedbackToggle(),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+    if (hasParentScaffold) {
+      return contentWidget;
+    }
 
-                // Section 5: Data Sovereignty & Local Backup
-                _SectionTitle(
-                  icon: Icons.shield_rounded,
-                  title: l10n.backupRestoreTitle,
-                ),
-                const SizedBox(height: 8),
-                const Card(elevation: 0, child: _BackupRestoreCard()),
-                const SizedBox(height: AppSpacing.xxl),
-              ],
-            );
-          },
-        ),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.settings)),
+      body: SafeArea(child: contentWidget),
     );
   }
 }
@@ -353,7 +393,12 @@ class _AdhanNotificationToggleState extends State<_AdhanNotificationToggle> {
     final l10n = AppLocalizations.of(context)!;
 
     return SwitchListTile(
-      title: Text(l10n.adhan),
+      key: const Key('setting_adhan_notification_toggle'),
+      secondary: const Icon(Icons.mosque_rounded, color: AppColors.primary),
+      title: Text(
+        l10n.adhan,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
       subtitle: Text(l10n.adhanNotificationsDescription),
       value: _enabled,
       onChanged: _toggle,
@@ -534,6 +579,157 @@ class _HapticFeedbackToggleState extends State<_HapticFeedbackToggle> {
       subtitle: Text(l10n.hapticFeedbackDesc),
       value: _enabled,
       onChanged: _toggle,
+    );
+  }
+}
+
+class _ThemeModeSelector extends StatelessWidget {
+  const _ThemeModeSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable:
+          settings?.themeModeNotifier ?? ValueNotifier(ThemeMode.system),
+      builder: (context, currentMode, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.palette_rounded,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.theme,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<ThemeMode>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.system,
+                      icon: const Icon(Icons.brightness_auto_rounded, size: 18),
+                      label: Text(l10n.system),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.light,
+                      icon: const Icon(Icons.light_mode_rounded, size: 18),
+                      label: Text(l10n.light),
+                    ),
+                    ButtonSegment<ThemeMode>(
+                      value: ThemeMode.dark,
+                      icon: const Icon(Icons.dark_mode_rounded, size: 18),
+                      label: Text(l10n.dark),
+                    ),
+                  ],
+                  selected: {currentMode},
+                  onSelectionChanged: (newSelection) {
+                    final selected = newSelection.first;
+                    final modeString = switch (selected) {
+                      ThemeMode.light => 'light',
+                      ThemeMode.dark => 'dark',
+                      ThemeMode.system => 'system',
+                    };
+                    settings?.setThemeMode(modeString);
+                    AppHaptics.selectionClick();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LocaleSelector extends StatelessWidget {
+  const _LocaleSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: settings?.localeNotifier ?? ValueNotifier<Locale?>(null),
+      builder: (context, _, _) {
+        final currentCode = settings?.localeCode ?? 'system';
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.language_rounded,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.language,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<String>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment<String>(
+                      value: 'system',
+                      label: Text(l10n.languageSystem),
+                    ),
+                    const ButtonSegment<String>(
+                      value: 'en',
+                      label: Text('English'),
+                    ),
+                    const ButtonSegment<String>(
+                      value: 'ar',
+                      label: Text('العربية'),
+                    ),
+                  ],
+                  selected: {currentCode},
+                  onSelectionChanged: (newSelection) {
+                    final selected = newSelection.first;
+                    settings?.setLocaleCode(selected);
+                    AppHaptics.selectionClick();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

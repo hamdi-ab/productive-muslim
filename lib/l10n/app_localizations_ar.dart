@@ -1252,4 +1252,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get hapticFeedbackDesc =>
       'اهتزاز تفاعلي لطيف عند النقر والعد وإتمام الأوراد والمهام';
+
+  @override
+  String get languageDesc => 'تغيير لغة عرض التطبيق';
+
+  @override
+  String get languageSystem => 'تلقائي (لغة النظام)';
+
+  @override
+  String get languageEn => 'English (الإنجليزية)';
+
+  @override
+  String get languageAr => 'العربية';
 }

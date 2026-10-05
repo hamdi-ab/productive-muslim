@@ -426,5 +426,10 @@
   "backupConfirm": "استعادة الآن",
   "preferencesTitle": "التفضيلات والتجربة",
   "hapticFeedback": "الاستجابة اللمسية (الاهتزاز)",
-  "hapticFeedbackDesc": "اهتزاز تفاعلي لطيف عند النقر والعد وإتمام الأوراد والمهام"
+  "hapticFeedbackDesc": "اهتزاز تفاعلي لطيف عند النقر والعد وإتمام الأوراد والمهام",
+  "language": "اللغة",
+  "languageDesc": "تغيير لغة عرض التطبيق",
+  "languageSystem": "تلقائي (لغة النظام)",
+  "languageEn": "English (الإنجليزية)",
+  "languageAr": "العربية"
 }

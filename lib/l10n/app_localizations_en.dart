@@ -1262,4 +1262,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get hapticFeedbackDesc =>
       'Vibration feedback on taps, counters, and completions';
+
+  @override
+  String get languageDesc => 'Change app display language';
+
+  @override
+  String get languageSystem => 'System Default';
+
+  @override
+  String get languageEn => 'English';
+
+  @override
+  String get languageAr => 'العربية (Arabic)';
 }

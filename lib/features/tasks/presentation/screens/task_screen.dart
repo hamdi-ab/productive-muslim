@@ -160,7 +160,7 @@ class _TaskList extends StatelessWidget {
     final completed = tasks.where((t) => t.completed).toList();
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: 80),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         if (overdue.isNotEmpty) ...[
           _SectionHeader(label: AppLocalizations.of(context)!.taskNoTime),

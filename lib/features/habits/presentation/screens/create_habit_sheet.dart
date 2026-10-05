@@ -77,74 +77,78 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
     // Show primary 3 spheres + personal_dev first
     final primaryCategories = _categories.take(4);
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        24,
-        24,
-        MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(l10n.newHabit, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: l10n.habitAddName,
-              border: const OutlineInputBorder(),
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          bottomPadding > 0 ? bottomPadding + 16 : 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.newHabit, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: l10n.habitAddName,
+                border: const OutlineInputBorder(),
+              ),
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) {
+                if (_canSave) _save();
+              },
             ),
-            autofocus: true,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) {
-              if (_canSave) _save();
-            },
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.habitAddCategory,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: primaryCategories.map((entry) {
-              final (key, color) = entry;
-              final isSelected =
-                  _category == key ||
-                  (_category == 'islam' && key == 'spiritual') ||
-                  (_category == 'family' && key == 'social') ||
-                  (_category == 'work' && key == 'social');
-              return FilterChip(
-                label: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
+            const SizedBox(height: 16),
+            Text(
+              l10n.habitAddCategory,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: primaryCategories.map((entry) {
+                final (key, color) = entry;
+                final isSelected =
+                    _category == key ||
+                    (_category == 'islam' && key == 'spiritual') ||
+                    (_category == 'family' && key == 'social') ||
+                    (_category == 'work' && key == 'social');
+                return FilterChip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(categoryLabels[key] ?? key),
-                  ],
-                ),
-                selected: isSelected,
-                onSelected: (_) => setState(() => _category = key),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _canSave ? _save : null,
-            child: Text(l10n.save),
-          ),
-        ],
+                      const SizedBox(width: 6),
+                      Text(categoryLabels[key] ?? key),
+                    ],
+                  ),
+                  selected: isSelected,
+                  onSelected: (_) => setState(() => _category = key),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: _canSave ? _save : null,
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
       ),
     );
   }

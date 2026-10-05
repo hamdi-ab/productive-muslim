@@ -149,203 +149,56 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.lg + bottomPadding,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Top drag handle
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              bottomPadding > 0 ? bottomPadding + AppSpacing.sm : AppSpacing.md,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Top drag handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkTextSecondary.withValues(alpha: 0.3)
+                            : AppColors.textSecondary.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // Sheet Header
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.darkTextSecondary.withValues(
-                                  alpha: 0.3,
-                                )
-                              : AppColors.textSecondary.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(2),
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                    ),
-
-                    // Sheet Header
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.add_task_rounded,
-                            color: AppColors.primary,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            l10n.newTask,
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded, size: 22),
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: IconButton.styleFrom(
-                            backgroundColor: isDark
-                                ? AppColors.darkSurfaceSubtle
-                                : AppColors.surfaceSubtle,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Title input
-                    TextField(
-                      controller: _titleController,
-                      autofocus: true,
-                      textCapitalization: TextCapitalization.sentences,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: l10n.taskTitle,
-                        prefixIcon: const Icon(
-                          Icons.check_circle_outline_rounded,
-                          size: 20,
+                        child: const Icon(
+                          Icons.add_task_rounded,
                           color: AppColors.primary,
-                        ),
-                        suffixIcon: _titleController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 18),
-                                onPressed: () {
-                                  _titleController.clear();
-                                  setState(() {});
-                                },
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: isDark
-                            ? AppColors.darkSurfaceSubtle
-                            : AppColors.surfaceSubtle,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
-                            width: 1.5,
-                          ),
+                          size: 22,
                         ),
                       ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Life Area / 3 Spheres Section
-                    Text(
-                      l10n.lifeArea,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _LifeAreaSelector(
-                      selected: _lifeArea,
-                      onChanged: (area) => setState(() => _lifeArea = area),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Prayer-Anchored Barakah Window Section
-                    Text(
-                      l10n.prayerSlot,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: BarakahSlot.all.map((slot) {
-                          final isSelected = _selectedPrayerSlot == slot.id;
-                          final label = switch (slot.id) {
-                            'early_morning' => l10n.slotEarlyMorning,
-                            'duha' => l10n.slotDuha,
-                            'dhuhr' => l10n.slotDhuhr,
-                            'asr' => l10n.slotAsr,
-                            'maghrib' => l10n.slotMaghrib,
-                            'isha' => l10n.slotIsha,
-                            _ => slot.id,
-                          };
-
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              avatar: Icon(
-                                slot.icon,
-                                size: 16,
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : (isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.textSecondary),
-                              ),
-                              label: Text(label),
-                              selected: isSelected,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onSelected: (_) => _selectPrayerSlot(slot),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Scheduled Time Section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.taskScheduled,
-                          style: Theme.of(context).textTheme.labelLarge
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          l10n.newTask,
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: isDark
@@ -353,168 +206,307 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                                     : AppColors.textPrimary,
                               ),
                         ),
-                        if (_startTime != null || _endTime != null)
-                          TextButton.icon(
-                            onPressed: _clearTime,
-                            icon: const Icon(Icons.close_rounded, size: 14),
-                            label: Text(
-                              l10n.cancel,
-                              style: const TextStyle(fontSize: 12),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 22),
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: IconButton.styleFrom(
+                          backgroundColor: isDark
+                              ? AppColors.darkSurfaceSubtle
+                              : AppColors.surfaceSubtle,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Title input
+                  TextField(
+                    controller: _titleController,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: l10n.taskTitle,
+                      prefixIcon: const Icon(
+                        Icons.check_circle_outline_rounded,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                      suffixIcon: _titleController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () {
+                                _titleController.clear();
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: isDark
+                          ? AppColors.darkSurfaceSubtle
+                          : AppColors.surfaceSubtle,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Life Area / 3 Spheres Section
+                  Text(
+                    l10n.lifeArea,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _LifeAreaSelector(
+                    selected: _lifeArea,
+                    onChanged: (area) => setState(() => _lifeArea = area),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Prayer-Anchored Barakah Window Section
+                  Text(
+                    l10n.prayerSlot,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: BarakahSlot.all.map((slot) {
+                        final isSelected = _selectedPrayerSlot == slot.id;
+                        final label = switch (slot.id) {
+                          'early_morning' => l10n.slotEarlyMorning,
+                          'duha' => l10n.slotDuha,
+                          'dhuhr' => l10n.slotDhuhr,
+                          'asr' => l10n.slotAsr,
+                          'maghrib' => l10n.slotMaghrib,
+                          'isha' => l10n.slotIsha,
+                          _ => slot.id,
+                        };
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            avatar: Icon(
+                              slot.icon,
+                              size: 16,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary),
                             ),
-                            style: TextButton.styleFrom(
-                              visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              foregroundColor: AppColors.textSecondary,
+                            label: Text(label),
+                            selected: isSelected,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
+                            onSelected: (_) => _selectPrayerSlot(slot),
                           ),
-                      ],
+                        );
+                      }).toList(),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _TimeButton(
-                            label: l10n.taskStartTime,
-                            time: _startTime,
-                            onTap: () => _pickTime(isStart: true),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: _TimeButton(
-                            label: l10n.taskEndTime,
-                            time: _endTime,
-                            onTap: () => _pickTime(isStart: false),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
 
-                    // Repeat Section
-                    Text(
-                      l10n.taskRepeat,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
+                  // Scheduled Time Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.taskScheduled,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                      if (_startTime != null || _endTime != null)
+                        TextButton.icon(
+                          onPressed: _clearTime,
+                          icon: const Icon(Icons.close_rounded, size: 14),
+                          label: Text(
+                            l10n.cancel,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          style: TextButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            foregroundColor: AppColors.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _TimeButton(
+                          label: l10n.taskStartTime,
+                          time: _startTime,
+                          onTap: () => _pickTime(isStart: true),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: _TimeButton(
+                          label: l10n.taskEndTime,
+                          time: _endTime,
+                          onTap: () => _pickTime(isStart: false),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Repeat Section
+                  Text(
+                    l10n.taskRepeat,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      FilterChip(
+                        avatar: Icon(
+                          Icons.repeat_rounded,
+                          size: 16,
+                          color: _repeatDaily
+                              ? AppColors.primary
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
+                        ),
+                        label: Text(l10n.taskRepeatDaily),
+                        selected: _repeatDaily,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        onSelected: (selected) {
+                          HapticFeedback.selectionClick();
+                          setState(() => _repeatDaily = selected);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      FilterChip(
+                        avatar: Icon(
+                          Icons.calendar_view_week_rounded,
+                          size: 16,
+                          color: _repeatWeekly
+                              ? AppColors.primary
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
+                        ),
+                        label: Text(l10n.taskRepeatWeekly),
+                        selected: _repeatWeekly,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        onSelected: (selected) {
+                          HapticFeedback.selectionClick();
+                          setState(() => _repeatWeekly = selected);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Notes input
+                  TextField(
+                    controller: _notesController,
+                    maxLines: 3,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: l10n.taskNotes,
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(bottom: 40),
+                        child: Icon(
+                          Icons.notes_rounded,
+                          size: 20,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      alignLabelWithHint: true,
+                      filled: true,
+                      fillColor: isDark
+                          ? AppColors.darkSurfaceSubtle
+                          : AppColors.surfaceSubtle,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Row(
-                      children: [
-                        FilterChip(
-                          avatar: Icon(
-                            Icons.repeat_rounded,
-                            size: 16,
-                            color: _repeatDaily
-                                ? AppColors.primary
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary),
-                          ),
-                          label: Text(l10n.taskRepeatDaily),
-                          selected: _repeatDaily,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          onSelected: (selected) {
-                            HapticFeedback.selectionClick();
-                            setState(() => _repeatDaily = selected);
-                          },
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        FilterChip(
-                          avatar: Icon(
-                            Icons.calendar_view_week_rounded,
-                            size: 16,
-                            color: _repeatWeekly
-                                ? AppColors.primary
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary),
-                          ),
-                          label: Text(l10n.taskRepeatWeekly),
-                          selected: _repeatWeekly,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          onSelected: (selected) {
-                            HapticFeedback.selectionClick();
-                            setState(() => _repeatWeekly = selected);
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
 
-                    // Notes input
-                    TextField(
-                      controller: _notesController,
-                      maxLines: 3,
-                      textCapitalization: TextCapitalization.sentences,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: l10n.taskNotes,
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.only(bottom: 40),
-                          child: Icon(
-                            Icons.notes_rounded,
-                            size: 20,
-                            color: AppColors.textSecondary,
-                          ),
+                  // Save button
+                  SizedBox(
+                    height: 52,
+                    child: FilledButton.icon(
+                      onPressed: _canSave ? _save : null,
+                      icon: const Icon(Icons.check_rounded, size: 20),
+                      label: Text(
+                        l10n.save,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                        alignLabelWithHint: true,
-                        filled: true,
-                        fillColor: isDark
-                            ? AppColors.darkSurfaceSubtle
-                            : AppColors.surfaceSubtle,
-                        border: OutlineInputBorder(
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
-                            width: 1.5,
-                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-
-                    // Save button
-                    SizedBox(
-                      height: 52,
-                      child: FilledButton.icon(
-                        onPressed: _canSave ? _save : null,
-                        icon: const Icon(Icons.check_rounded, size: 20),
-                        label: Text(
-                          l10n.save,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -21,6 +21,8 @@ import 'package:productive_muslim/features/energy/presentation/screens/energy_sc
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 
+import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
+
 class AppRouter {
   AppRouter._();
 
@@ -116,6 +118,7 @@ class AppRouter {
               }
             },
           ),
+          // 1. Primary Bottom Navigation Shell (Top-level Tabs ONLY)
           ShellRoute(
             builder: (context, state, child) => HomeScreen(child: child),
             routes: [
@@ -139,47 +142,52 @@ class AppRouter {
                 path: '/journal',
                 builder: (context, state) => const IntentionScreen(),
               ),
-              GoRoute(
-                path: '/settings',
-                builder: (context, state) => const SettingsScreen(),
-              ),
-              GoRoute(
-                path: '/prayer-times',
-                builder: (context, state) => const PrayerTimesScreen(),
-              ),
-              GoRoute(
-                path: '/focus',
-                builder: (context, state) => FocusScreen(
-                  initialTask: state.extra is Task ? state.extra as Task : null,
-                ),
-              ),
-              GoRoute(
-                path: '/energy',
-                builder: (context, state) => const EnergyScreen(),
-              ),
-              GoRoute(
-                path: '/fasting',
-                builder: (context, state) => const FastingScreen(),
-              ),
-              GoRoute(
-                path: '/adhkar',
-                builder: (context, state) {
-                  DhikrCategory category = DhikrCategory.morning;
-                  if (state.extra is DhikrCategory) {
-                    category = state.extra as DhikrCategory;
-                  } else {
-                    final queryCat = state.uri.queryParameters['category'];
-                    if (queryCat != null) {
-                      category = DhikrCategory.values.firstWhere(
-                        (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
-                        orElse: () => DhikrCategory.morning,
-                      );
-                    }
-                  }
-                  return AdhkarScreen(initialCategory: category);
-                },
-              ),
             ],
+          ),
+          // 2. Subpages / Detail Screens (Full-Screen, NO Bottom Navigation)
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
+          ),
+          GoRoute(
+            path: '/prayer-times',
+            builder: (context, state) => const PrayerTimesScreen(),
+          ),
+          GoRoute(
+            path: '/focus',
+            builder: (context, state) => FocusScreen(
+              initialTask: state.extra is Task ? state.extra as Task : null,
+            ),
+          ),
+          GoRoute(
+            path: '/energy',
+            builder: (context, state) => const EnergyScreen(),
+          ),
+          GoRoute(
+            path: '/fasting',
+            builder: (context, state) => const FastingScreen(),
+          ),
+          GoRoute(
+            path: '/adhkar',
+            builder: (context, state) {
+              DhikrCategory category = DhikrCategory.morning;
+              if (state.extra is DhikrCategory) {
+                category = state.extra as DhikrCategory;
+              } else {
+                final queryCat = state.uri.queryParameters['category'];
+                if (queryCat != null) {
+                  category = DhikrCategory.values.firstWhere(
+                    (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
+                    orElse: () => DhikrCategory.morning,
+                  );
+                }
+              }
+              return AdhkarScreen(initialCategory: category);
+            },
+          ),
+          GoRoute(
+            path: '/barakah/review',
+            builder: (context, state) => const BarakahReviewScreen(),
           ),
         ],
       ),

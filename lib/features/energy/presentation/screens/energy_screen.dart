@@ -174,322 +174,328 @@ class _EnergyScreenState extends State<EnergyScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.energyTitle)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Header Card
-                GradientCard(
-                  borderRadius: 24,
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.bolt_rounded,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Triple-Energy Management',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              l10n.energySubtitle,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withValues(alpha: 0.9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
-                const SizedBox(height: AppSpacing.lg),
-
-                // 1. Daily Energy Sliders
-                Text(
-                  'Today\'s Energy Levels',
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                GlassContainer(
-                  padding: const EdgeInsets.all(18),
-                  borderRadius: 20,
-                  child: Column(
-                    children: [
-                      _buildEnergyRatingRow(
-                        title: l10n.energySpiritual,
-                        icon: Icons.auto_awesome_rounded,
-                        color: AppColors.primary,
-                        value: _spiritual,
-                        onChanged: (v) => setState(() => _spiritual = v),
-                      ),
-                      const Divider(height: 24),
-                      _buildEnergyRatingRow(
-                        title: l10n.energyPhysical,
-                        icon: Icons.fitness_center_rounded,
-                        color: AppColors.secondary,
-                        value: _physical,
-                        onChanged: (v) => setState(() => _physical = v),
-                      ),
-                      const Divider(height: 24),
-                      _buildEnergyRatingRow(
-                        title: l10n.energyMental,
-                        icon: Icons.psychology_rounded,
-                        color: Colors.blue,
-                        value: _mental,
-                        onChanged: (v) => setState(() => _mental = v),
-                      ),
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: AppPressable(
-                          onTap: _saveEnergy,
-                          pressedScale: 0.94,
-                          haptic: AppHapticFeedback.none,
-                          borderRadius: BorderRadius.circular(16),
-                          child: FilledButton.icon(
-                            onPressed: _saveEnergy,
-                            icon: const Icon(Icons.check_rounded, size: 18),
-                            label: Text(l10n.save),
-                            style: FilledButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // 2. Sunnah Qaylulah (Power Nap) Card
-                Text(
-                  l10n.qaylulah,
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                GlassContainer(
-                  padding: const EdgeInsets.all(18),
-                  borderRadius: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondary.withValues(
-                                alpha: 0.15,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.hotel_rounded,
-                              color: AppColors.secondary,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.qaylulah,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  l10n.qaylulahDesc,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          PulsingGlow(
-                            animate: _isNapRunning,
-                            minScale: 0.98,
-                            maxScale: 1.02,
-                            duration: const Duration(milliseconds: 2000),
-                            child: Text(
-                              _formatNap(_napSeconds),
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.5,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                              ),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              if (_isNapRunning || _napSeconds < 20 * 60)
-                                AppPressable(
-                                  onTap: _resetNap,
-                                  pressedScale: 0.88,
-                                  haptic: AppHapticFeedback.none,
-                                  child: IconButton.outlined(
-                                    onPressed: _resetNap,
-                                    icon: const Icon(Icons.refresh_rounded),
-                                  ),
-                                ),
-                              const SizedBox(width: 8),
-                              AppPressable(
-                                onTap: _toggleNap,
-                                pressedScale: 0.93,
-                                haptic: AppHapticFeedback.none,
-                                borderRadius: BorderRadius.circular(16),
-                                child: FilledButton.icon(
-                                  onPressed: _toggleNap,
-                                  icon: AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 200),
-                                    transitionBuilder: (child, anim) =>
-                                        ScaleTransition(
-                                          scale: anim,
-                                          child: child,
-                                        ),
-                                    child: Icon(
-                                      _isNapRunning
-                                          ? Icons.pause_rounded
-                                          : Icons.play_arrow_rounded,
-                                      key: ValueKey('nap_icon_$_isNapRunning'),
-                                    ),
-                                  ),
-                                  label: Text(
-                                    _isNapRunning
-                                        ? l10n.focusPause
-                                        : l10n.qaylulahStart,
-                                  ),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: AppColors.secondary,
-                                    foregroundColor: Colors.black87,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // 3. Sunnah Fasting Tracker & Countdown
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Header Card
+              GradientCard(
+                borderRadius: 24,
+                padding: const EdgeInsets.all(20),
+                child: Row(
                   children: [
-                    Text(
-                      l10n.sunnahFasting,
-                      style: Theme.of(context).textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.bolt_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
-                    TextButton.icon(
-                      onPressed: () => context.push('/fasting'),
-                      icon: const Icon(Icons.calendar_month_rounded, size: 16),
-                      label: Text(
-                        l10n.hijriCalendarTitle,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Triple-Energy Management',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.energySubtitle,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // 1. Daily Energy Sliders
+              Text(
+                'Today\'s Energy Levels',
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              GlassContainer(
+                padding: const EdgeInsets.all(18),
+                borderRadius: 20,
+                child: Column(
+                  children: [
+                    _buildEnergyRatingRow(
+                      title: l10n.energySpiritual,
+                      icon: Icons.auto_awesome_rounded,
+                      color: AppColors.primary,
+                      value: _spiritual,
+                      onChanged: (v) => setState(() => _spiritual = v),
+                    ),
+                    const Divider(height: 24),
+                    _buildEnergyRatingRow(
+                      title: l10n.energyPhysical,
+                      icon: Icons.fitness_center_rounded,
+                      color: AppColors.secondary,
+                      value: _physical,
+                      onChanged: (v) => setState(() => _physical = v),
+                    ),
+                    const Divider(height: 24),
+                    _buildEnergyRatingRow(
+                      title: l10n.energyMental,
+                      icon: Icons.psychology_rounded,
+                      color: Colors.blue,
+                      value: _mental,
+                      onChanged: (v) => setState(() => _mental = v),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: AppPressable(
+                        onTap: _saveEnergy,
+                        pressedScale: 0.94,
+                        haptic: AppHapticFeedback.none,
+                        borderRadius: BorderRadius.circular(16),
+                        child: FilledButton.icon(
+                          onPressed: _saveEnergy,
+                          icon: const Icon(Icons.check_rounded, size: 18),
+                          label: Text(l10n.save),
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                const FastingCountdownCard(),
+              ),
 
-                const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
 
-                // 4. Physical Productivity Guidelines (Mohammed Faris)
-                Text(
-                  'Physical Productivity Rules',
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+              // 2. Sunnah Qaylulah (Power Nap) Card
+              Text(
+                l10n.qaylulah,
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              GlassContainer(
+                padding: const EdgeInsets.all(18),
+                borderRadius: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.hotel_rounded,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.qaylulah,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                l10n.qaylulahDesc,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PulsingGlow(
+                          animate: _isNapRunning,
+                          minScale: 0.98,
+                          maxScale: 1.02,
+                          duration: const Duration(milliseconds: 2000),
+                          child: Text(
+                            _formatNap(_napSeconds),
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            if (_isNapRunning || _napSeconds < 20 * 60)
+                              AppPressable(
+                                onTap: _resetNap,
+                                pressedScale: 0.88,
+                                haptic: AppHapticFeedback.none,
+                                child: IconButton.outlined(
+                                  onPressed: _resetNap,
+                                  icon: const Icon(Icons.refresh_rounded),
+                                ),
+                              ),
+                            const SizedBox(width: 8),
+                            AppPressable(
+                              onTap: _toggleNap,
+                              pressedScale: 0.93,
+                              haptic: AppHapticFeedback.none,
+                              borderRadius: BorderRadius.circular(16),
+                              child: FilledButton.icon(
+                                onPressed: _toggleNap,
+                                icon: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  transitionBuilder: (child, anim) =>
+                                      ScaleTransition(
+                                        scale: anim,
+                                        child: child,
+                                      ),
+                                  child: Icon(
+                                    _isNapRunning
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    key: ValueKey('nap_icon_$_isNapRunning'),
+                                  ),
+                                ),
+                                label: Text(
+                                  _isNapRunning
+                                      ? l10n.focusPause
+                                      : l10n.qaylulahStart,
+                                ),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.secondary,
+                                  foregroundColor: Colors.black87,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                GlassContainer(
-                  padding: const EdgeInsets.all(16),
-                  borderRadius: 20,
-                  child: Column(
-                    children: [
-                      _buildRuleItem(
-                        icon: Icons.nights_stay_rounded,
-                        title: 'Sleep on the Sunnah',
-                        body: 'Sleep after Isha, make Wudu, recite Surah Al-Mulk, and sleep on your right side for restorative rest.',
-                      ),
-                      const SizedBox(height: 14),
-                      _buildRuleItem(
-                        icon: Icons.restaurant_rounded,
-                        title: 'The 1/3 Rule for Nutrition',
-                        body: 'Eat to live, not live to eat. 1/3 for food, 1/3 for liquid, and 1/3 for breath to avoid post-meal fatigue.',
-                      ),
-                      const SizedBox(height: 14),
-                      _buildRuleItem(
-                        icon: Icons.directions_walk_rounded,
-                        title: 'Daily Movement & Walking',
-                        body: 'Walking to the mosque for congregational prayer builds baseline physical vitality and clears mental clutter.',
-                      ),
-                    ],
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // 3. Sunnah Fasting Tracker & Countdown
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.sunnahFasting,
+                    style: Theme.of(context).textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
+                  TextButton.icon(
+                    onPressed: () => context.push('/fasting'),
+                    icon: const Icon(Icons.calendar_month_rounded, size: 16),
+                    label: Text(
+                      l10n.hijriCalendarTitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              const FastingCountdownCard(),
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // 4. Physical Productivity Guidelines (Mohammed Faris)
+              Text(
+                'Physical Productivity Rules',
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              GlassContainer(
+                padding: const EdgeInsets.all(16),
+                borderRadius: 20,
+                child: Column(
+                  children: [
+                    _buildRuleItem(
+                      icon: Icons.nights_stay_rounded,
+                      title: 'Sleep on the Sunnah',
+                      body: 'Sleep after Isha, make Wudu, recite Surah Al-Mulk, and sleep on your right side for restorative rest.',
+                    ),
+                    const SizedBox(height: 14),
+                    _buildRuleItem(
+                      icon: Icons.restaurant_rounded,
+                      title: 'The 1/3 Rule for Nutrition',
+                      body: 'Eat to live, not live to eat. 1/3 for food, 1/3 for liquid, and 1/3 for breath to avoid post-meal fatigue.',
+                    ),
+                    const SizedBox(height: 14),
+                    _buildRuleItem(
+                      icon: Icons.directions_walk_rounded,
+                      title: 'Daily Movement & Walking',
+                      body: 'Walking to the mosque for congregational prayer builds baseline physical vitality and clears mental clutter.',
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 40),
-              ],
-            ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
           ),
         ),
       ),
+    );
+
+    if (hasParentScaffold) {
+      return content;
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.energyTitle)),
+      body: content,
     );
   }
 

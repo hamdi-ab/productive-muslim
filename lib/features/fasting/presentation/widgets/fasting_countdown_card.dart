@@ -69,6 +69,15 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
     if (!getIt.isRegistered<PrayerTimeService>()) return;
     try {
       final service = getIt<PrayerTimeService>();
+      if (service.cachedPrayerTimes != null) {
+        final pt = service.cachedPrayerTimes!;
+        if (mounted) {
+          setState(() {
+            _fajrTime = pt.fajr;
+            _maghribTime = pt.maghrib;
+          });
+        }
+      }
       final position = await service.getCurrentPosition();
       if (position != null) {
         final pt = service.getPrayerTimes(position);
