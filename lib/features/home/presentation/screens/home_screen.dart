@@ -59,29 +59,11 @@ class HomeScreen extends StatelessWidget {
     final headerInfo = _getHeaderInfo(location, l10n);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isSubPage =
-        location == '/settings' ||
-        location == '/prayer-times' ||
-        location == '/focus' ||
-        location == '/energy';
-
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
         scrolledUnderElevation: 2,
-        titleSpacing: isSubPage ? 0 : 16,
-        leading: isSubPage
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded),
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/');
-                  }
-                },
-              )
-            : null,
+        titleSpacing: 16,
         backgroundColor: isDark
             ? AppColors.darkSurface.withValues(alpha: 0.85)
             : Colors.white.withValues(alpha: 0.85),
@@ -120,12 +102,11 @@ class HomeScreen extends StatelessWidget {
               icon: const Icon(Icons.calendar_month_outlined),
               onPressed: () => context.push('/barakah/review'),
             ),
-          if (location != '/settings')
-            IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              tooltip: l10n.settings,
-              onPressed: () => context.go('/settings'),
-            ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.settings,
+            onPressed: () => context.push('/settings'),
+          ),
           const SizedBox(width: 4),
         ],
       ),
@@ -151,10 +132,6 @@ class HomeScreen extends StatelessWidget {
       ),
       '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
       '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
-      '/settings' => (title: l10n.settings, icon: Icons.settings_rounded),
-      '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
-      '/focus' => (title: l10n.focusTitle, icon: Icons.timer_rounded),
-      '/energy' => (title: l10n.energyTitle, icon: Icons.bolt_rounded),
       _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
     };
   }
@@ -211,6 +188,13 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   @override
   void initState() {
     super.initState();
+    if (widget.service != null && widget.service!.cachedPrayerTimes != null) {
+      _cachedPrayerTimes = widget.service!.cachedPrayerTimes;
+      _locationName = widget.service!.cachedLocationName;
+      _loading = false;
+      _updatePrayerCountdown();
+      _startTimer();
+    }
     _loadPrayerTimes();
   }
 
@@ -235,11 +219,13 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     final position = await widget.service!.getCurrentPosition();
     if (!mounted) return;
     if (position == null) {
-      setState(() {
-        _nextPrayer = '--';
-        _countdown = '--:--';
-        _loading = false;
-      });
+      if (_cachedPrayerTimes == null) {
+        setState(() {
+          _nextPrayer = '--';
+          _countdown = '--:--';
+          _loading = false;
+        });
+      }
       return;
     }
 

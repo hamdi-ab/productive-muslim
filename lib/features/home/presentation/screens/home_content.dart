@@ -14,6 +14,7 @@ import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
+import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
@@ -82,65 +83,108 @@ class HomeContent extends StatelessWidget {
       }
     } catch (_) {}
 
+    String hijriDisplay = '';
+    try {
+      if (getIt.isRegistered<HijriService>()) {
+        final hijriInfo = getIt<HijriService>().getHijriDate(DateTime.now());
+        final isAr = Localizations.localeOf(context).languageCode == 'ar';
+        hijriDisplay = isAr
+            ? '${hijriInfo.hDay} ${hijriInfo.monthNameAr} ${hijriInfo.hYear} هـ'
+            : '${hijriInfo.hDay} ${hijriInfo.monthNameEn} ${hijriInfo.hYear} AH';
+      }
+    } catch (_) {}
+
     return GradientCard(
       borderRadius: 28,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.calendar_today_rounded,
-                      color: Colors.white,
-                      size: 13,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.calendar_today_rounded,
+                          color: Colors.white70,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          displayDate,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      displayDate,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                    if (hijriDisplay.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.nightlight_round,
+                            color: Color(0xFFFDE047),
+                            size: 12,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            hijriDisplay,
+                            style: const TextStyle(
+                              color: Color(0xFFFDE047),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
+              const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.9),
+                  color: AppColors.secondary.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.secondary.withValues(alpha: 0.35),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.auto_awesome_rounded,
                       color: Colors.black87,
-                      size: 14,
+                      size: 12,
                     ),
                     SizedBox(width: 4),
                     Text(
                       'Barakah Mode',
                       style: TextStyle(
                         color: Colors.black87,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -149,7 +193,7 @@ class HomeContent extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Text(
             greeting,
             style: const TextStyle(
@@ -492,57 +536,93 @@ class HomeContent extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Text(
-            '9 Essential Qualities',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '9 Essential Qualities',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Framework',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 48,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: qualities.length,
-            itemBuilder: (context, index) {
-              final q = qualities[index];
-              final qColor = q.color;
-
-              return Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: AppPressable(
-                  onTap: () => _showQualityDetails(context, q, l10n),
-                  pressedScale: 0.93,
-                  haptic: AppHapticFeedback.light,
-                  borderRadius: BorderRadius.circular(24),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: qColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: qColor.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(q.icon, size: 18, color: qColor),
-                        const SizedBox(width: 8),
-                        Text(
-                          q.name,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: qColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: qualities.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 1.15,
           ),
+          itemBuilder: (context, index) {
+            final q = qualities[index];
+            final qColor = q.color;
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
+            return AppPressable(
+              onTap: () => _showQualityDetails(context, q, l10n),
+              pressedScale: 0.94,
+              haptic: AppHapticFeedback.light,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurface.withValues(alpha: 0.7)
+                      : Colors.white.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.05),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: qColor.withValues(alpha: 0.14),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(q.icon, size: 20, color: qColor),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      q.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -812,6 +892,16 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
   @override
   void initState() {
     super.initState();
+    if (getIt.isRegistered<PrayerTimeService>()) {
+      final service = getIt<PrayerTimeService>();
+      if (service.cachedPrayerTimes != null) {
+        _cachedPrayerTimes = service.cachedPrayerTimes;
+        _locationName = service.cachedLocationName;
+        _loading = false;
+        _updatePrayerCountdown();
+        _startTimer();
+      }
+    }
     _loadPrayerTimes();
   }
 
@@ -832,7 +922,9 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       final position = await service.getCurrentPosition();
       if (!mounted) return;
       if (position == null) {
-        setState(() => _loading = false);
+        if (_cachedPrayerTimes == null) {
+          setState(() => _loading = false);
+        }
         return;
       }
 
@@ -841,7 +933,9 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       _updatePrayerCountdown();
       _startTimer();
     } catch (_) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted && _cachedPrayerTimes == null) {
+        setState(() => _loading = false);
+      }
     }
   }
 
