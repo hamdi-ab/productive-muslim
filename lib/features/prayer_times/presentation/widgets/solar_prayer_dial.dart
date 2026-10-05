@@ -64,24 +64,24 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
     final maghrib = (widget.prayerTimes.maghrib as DateTime).toLocal();
     final isha = (widget.prayerTimes.isha as DateTime).toLocal();
 
-    final nowMins = now.hour * 60 + now.minute;
-    final fajrMins = fajr.hour * 60 + fajr.minute;
-    final ishaMins = isha.hour * 60 + isha.minute;
+    final isNight = now.isAfter(maghrib) || now.isBefore(fajr);
 
     double progress = 0.0;
-    if (nowMins >= fajrMins && nowMins <= ishaMins && ishaMins > fajrMins) {
-      progress = (nowMins - fajrMins) / (ishaMins - fajrMins);
-    } else if (nowMins > ishaMins) {
-      final nightDuration = (24 * 60 - ishaMins) + fajrMins;
-      final nightElapsed = nowMins - ishaMins;
-      progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 1.0;
+    if (!isNight) {
+      // Daytime: from Fajr to Maghrib
+      final dayDuration = maghrib.difference(fajr).inSeconds;
+      final dayElapsed = now.difference(fajr).inSeconds;
+      progress = dayDuration > 0 ? (dayElapsed / dayDuration) : 0.5;
     } else {
-      final nightDuration = (24 * 60 - ishaMins) + fajrMins;
-      final nightElapsed = (24 * 60 - ishaMins) + nowMins;
-      progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 0.0;
+      // Nighttime: from Maghrib to Fajr (next morning)
+      final fajrNext = now.isBefore(fajr) ? fajr : fajr.add(const Duration(days: 1));
+      final maghribPrev = now.isAfter(maghrib) ? maghrib : maghrib.subtract(const Duration(days: 1));
+      final nightDuration = fajrNext.difference(maghribPrev).inSeconds;
+      final nightElapsed = now.difference(maghribPrev).inSeconds;
+      progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 0.5;
     }
 
-    String currentSlotName = l10n.slotNight;
+    String currentSlotName;
     if (now.isBefore(fajr)) {
       currentSlotName = l10n.slotTahajjud;
     } else if (now.isBefore(sunrise)) {
@@ -100,6 +100,20 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
 
     final localizedNext = _localizePrayerName(widget.nextPrayer, l10n);
 
+    // High contrast theme tokens
+    final badgeBg = isNight
+        ? (isDark ? const Color(0xFF6366F1).withValues(alpha: 0.25) : const Color(0xFF6366F1).withValues(alpha: 0.12))
+        : (isDark ? AppColors.primary.withValues(alpha: 0.22) : AppColors.primary.withValues(alpha: 0.12));
+    final badgeText = isNight
+        ? (isDark ? const Color(0xFFA5B4FC) : const Color(0xFF4338CA))
+        : (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857));
+
+    final headerIconColor = isNight ? const Color(0xFF818CF8) : const Color(0xFFF59E0B);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final headerTitle = isNight
+        ? (isAr ? 'مسار الليل والتهجد' : 'Night & Tahajjud Arc')
+        : l10n.solarDialTitle;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -108,13 +122,15 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withValues(alpha: 0.05),
+              ? Colors.white.withValues(alpha: 0.12)
+              : Colors.black.withValues(alpha: 0.06),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
@@ -128,17 +144,18 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.wb_sunny_rounded,
+                    Icon(
+                      isNight ? Icons.nightlight_round : Icons.wb_sunny_rounded,
                       size: 18,
-                      color: Color(0xFFF59E0B),
+                      color: headerIconColor,
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Flexible(
                       child: Text(
-                        l10n.solarDialTitle,
+                        headerTitle,
                         style: AppTypography.labelLarge.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -154,13 +171,13 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
+                    color: badgeBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     l10n.solarCurrentWindow(currentSlotName),
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    style: TextStyle(
+                      color: badgeText,
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
                     ),
@@ -178,6 +195,7 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
               painter: _SolarArcPainter(
                 progress: progress.clamp(0.0, 1.0),
                 isDark: isDark,
+                isNight: isNight,
               ),
               child: Center(
                 child: Padding(
@@ -187,9 +205,11 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                     children: [
                       Text(
                         DateFormat.jm().format(now),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
+                          letterSpacing: -0.5,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -197,7 +217,9 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                         l10n.solarNext(localizedNext),
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? Colors.white60 : Colors.black54,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.75)
+                              : AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -216,8 +238,13 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
 class _SolarArcPainter extends CustomPainter {
   final double progress;
   final bool isDark;
+  final bool isNight;
 
-  _SolarArcPainter({required this.progress, required this.isDark});
+  _SolarArcPainter({
+    required this.progress,
+    required this.isDark,
+    required this.isNight,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -229,15 +256,19 @@ class _SolarArcPainter extends CustomPainter {
 
     final backgroundPaint = Paint()
       ..color = isDark
-          ? Colors.white.withValues(alpha: 0.08)
+          ? Colors.white.withValues(alpha: 0.15)
           : Colors.grey.shade200
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
 
+    final List<Color> gradientColors = isNight
+        ? const [Color(0xFF8B5CF6), Color(0xFF6366F1), Color(0xFF38BDF8)]
+        : const [Color(0xFFF59E0B), Color(0xFF10B981), Color(0xFF0EA5E9)];
+
     final progressPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFFF59E0B), Color(0xFF10B981), Color(0xFF6366F1)],
+      ..shader = LinearGradient(
+        colors: gradientColors,
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
@@ -263,23 +294,29 @@ class _SolarArcPainter extends CustomPainter {
       );
     }
 
-    // Draw Sun Indicator dot
+    // Draw Indicator dot (Sun or Moon)
     final currentAngle = startAngle + (sweepAngle * progress);
-    final sunX = center.dx + radius * math.cos(currentAngle);
-    final sunY = center.dy + radius * math.sin(currentAngle);
+    final indicatorX = center.dx + radius * math.cos(currentAngle);
+    final indicatorY = center.dy + radius * math.sin(currentAngle);
 
-    final sunGlow = Paint()
-      ..color = const Color(0xFFF59E0B).withValues(alpha: 0.35)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(sunX, sunY), 12, sunGlow);
+    final auraColor = isNight
+        ? const Color(0xFF818CF8)
+        : const Color(0xFFF59E0B);
 
-    final sunCore = Paint()
-      ..color = const Color(0xFFF59E0B)
+    final indicatorGlow = Paint()
+      ..color = auraColor.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(sunX, sunY), 6, sunCore);
+    canvas.drawCircle(Offset(indicatorX, indicatorY), 13, indicatorGlow);
+
+    final indicatorCore = Paint()
+      ..color = auraColor
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(indicatorX, indicatorY), 6.5, indicatorCore);
   }
 
   @override
   bool shouldRepaint(covariant _SolarArcPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.isDark != isDark;
+      oldDelegate.progress != progress ||
+      oldDelegate.isDark != isDark ||
+      oldDelegate.isNight != isNight;
 }
