@@ -231,6 +231,36 @@ class SettingsService {
     }
   }
 
+  Future<void> removeCompletedDhikr(String date, String dhikrId) async {
+    final list = List<String>.from(
+      _prefs?.getStringList('adhkar_done_$date') ?? [],
+    );
+    if (list.contains(dhikrId)) {
+      list.remove(dhikrId);
+      await _prefs?.setStringList('adhkar_done_$date', list);
+    }
+    await _prefs?.remove('adhkar_count_${date}_$dhikrId');
+  }
+
+  int getDhikrCount(String date, String dhikrId) {
+    return _prefs?.getInt('adhkar_count_${date}_$dhikrId') ?? 0;
+  }
+
+  Future<void> setDhikrCount(String date, String dhikrId, int count) async {
+    await _prefs?.setInt('adhkar_count_${date}_$dhikrId', count);
+  }
+
+  Future<void> resetCategoryDhikrs(String date, List<String> dhikrIds) async {
+    final list = List<String>.from(
+      _prefs?.getStringList('adhkar_done_$date') ?? [],
+    );
+    list.removeWhere((id) => dhikrIds.contains(id));
+    await _prefs?.setStringList('adhkar_done_$date', list);
+    for (final id in dhikrIds) {
+      await _prefs?.remove('adhkar_count_${date}_$id');
+    }
+  }
+
   bool get adhkarHapticsEnabled =>
       _prefs?.getBool('adhkar_haptics_enabled') ?? true;
 

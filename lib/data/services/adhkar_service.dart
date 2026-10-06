@@ -79,6 +79,48 @@ class AdhkarService {
     return _settingsService.getCompletedDhikrIds(targetDate);
   }
 
+  Future<void> recordDhikrCount({
+    required String dhikrId,
+    required int count,
+    String? date,
+  }) async {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    await _settingsService.setDhikrCount(targetDate, dhikrId, count);
+  }
+
+  int getDhikrCount(String dhikrId, {String? date}) {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    return _settingsService.getDhikrCount(targetDate, dhikrId);
+  }
+
+  Future<void> resetDhikr({
+    required String dhikrId,
+    String? date,
+  }) async {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    await _settingsService.removeCompletedDhikr(targetDate, dhikrId);
+    final count = getCompletedDhikrIdsForDate(targetDate).length;
+    await _homeWidgetSyncService?.syncDhikrCount(count);
+  }
+
+  Future<void> resetCategory(
+    DhikrCategory category, {
+    String? date,
+  }) async {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    final items = AdhkarCatalog.getByCategory(category);
+    await _settingsService.resetCategoryDhikrs(
+      targetDate,
+      items.map((i) => i.id).toList(),
+    );
+    final count = getCompletedDhikrIdsForDate(targetDate).length;
+    await _homeWidgetSyncService?.syncDhikrCount(count);
+  }
+
   bool isDhikrCompleted(String dhikrId, {String? date}) {
     final completed = getCompletedDhikrIdsForDate(date);
     return completed.contains(dhikrId);

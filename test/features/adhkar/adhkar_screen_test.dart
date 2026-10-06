@@ -94,4 +94,66 @@ void main() {
 
     expect(find.text('Entering the Evening Supplication'), findsOneWidget);
   });
+
+  testWidgets('restores persisted counts and completed state on init', (
+    tester,
+  ) async {
+    final adhkarService = getIt<AdhkarService>();
+    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
+
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.wakingUp),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+  });
+
+  testWidgets('reset button on card resets count and removes completion', (
+    tester,
+  ) async {
+    final adhkarService = getIt<AdhkarService>();
+    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
+
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.wakingUp),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 / 1'), findsOneWidget);
+
+    final resetBtn = find.byTooltip('Reset Count');
+    expect(resetBtn, findsOneWidget);
+    await tester.tap(resetBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 / 1'), findsOneWidget);
+    expect(adhkarService.isDhikrCompleted('wake_up_1'), isFalse);
+  });
+
+  testWidgets('reset category button resets all items in the category', (
+    tester,
+  ) async {
+    final adhkarService = getIt<AdhkarService>();
+    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
+    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_2');
+
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.wakingUp),
+    );
+    await tester.pumpAndSettle();
+
+    expect(adhkarService.isDhikrCompleted('wake_up_1'), isTrue);
+    expect(adhkarService.isDhikrCompleted('wake_up_2'), isTrue);
+
+    final resetCategoryBtn = find.byTooltip('Reset Category');
+    expect(resetCategoryBtn, findsOneWidget);
+    await tester.tap(resetCategoryBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 / 1'), findsOneWidget);
+    expect(adhkarService.isDhikrCompleted('wake_up_1'), isFalse);
+    expect(adhkarService.isDhikrCompleted('wake_up_2'), isFalse);
+  });
 }

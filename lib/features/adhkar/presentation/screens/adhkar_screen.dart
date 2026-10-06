@@ -31,6 +31,26 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     super.initState();
     _selectedCategory = widget.initialCategory;
     _pageController = PageController();
+    _loadSavedCounts();
+  }
+
+  void _loadSavedCounts() {
+    try {
+      if (getIt.isRegistered<AdhkarService>()) {
+        final adhkarService = getIt<AdhkarService>();
+        final completedIds = adhkarService.getCompletedDhikrIdsForDate(null);
+        for (final item in AdhkarCatalog.all) {
+          if (completedIds.contains(item.id)) {
+            _counts[item.id] = item.targetCount;
+          } else {
+            final saved = adhkarService.getDhikrCount(item.id);
+            if (saved > 0) {
+              _counts[item.id] = saved;
+            }
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   @override
@@ -63,6 +83,15 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     setState(() {
       _counts[item.id] = next;
     });
+
+    try {
+      if (getIt.isRegistered<AdhkarService>()) {
+        await getIt<AdhkarService>().recordDhikrCount(
+          dhikrId: item.id,
+          count: next,
+        );
+      }
+    } catch (_) {}
 
     if (next == item.targetCount) {
       AppHaptics.heavyImpact();
@@ -101,11 +130,31 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     }
   }
 
-  void _resetCount(DhikrItem item) {
+  Future<void> _resetCount(DhikrItem item) async {
     AppHaptics.lightImpact();
     setState(() {
       _counts[item.id] = 0;
     });
+    try {
+      if (getIt.isRegistered<AdhkarService>()) {
+        await getIt<AdhkarService>().resetDhikr(dhikrId: item.id);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _resetCategory(DhikrCategory category) async {
+    AppHaptics.mediumImpact();
+    final items = AdhkarCatalog.getByCategory(category);
+    setState(() {
+      for (final item in items) {
+        _counts[item.id] = 0;
+      }
+    });
+    try {
+      if (getIt.isRegistered<AdhkarService>()) {
+        await getIt<AdhkarService>().resetCategory(category);
+      }
+    } catch (_) {}
   }
 
   String _getCategoryLabel(DhikrCategory category, AppLocalizations l10n) {
@@ -155,7 +204,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   ),
                 );
               }),
-              if (items.isNotEmpty && hasParentScaffold)
+              if (items.isNotEmpty && hasParentScaffold) ...[
                 Container(
                   margin: const EdgeInsets.only(left: 4),
                   padding: const EdgeInsets.symmetric(
@@ -175,6 +224,13 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     ),
                   ),
                 ),
+                IconButton(
+                  tooltip: l10n.adhkarResetCategory,
+                  icon: const Icon(Icons.restart_alt_rounded, size: 20),
+                  onPressed: () => _resetCategory(_selectedCategory),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
             ],
           ),
         ),
@@ -275,7 +331,12 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       appBar: AppBar(
         title: Text(l10n.adhkarTitle),
         actions: [
-          if (items.isNotEmpty)
+          if (items.isNotEmpty) ...[
+            IconButton(
+              tooltip: l10n.adhkarResetCategory,
+              icon: const Icon(Icons.restart_alt_rounded),
+              onPressed: () => _resetCategory(_selectedCategory),
+            ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(right: 16),
@@ -288,6 +349,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                 ),
               ),
             ),
+          ],
         ],
       ),
       body: SafeArea(child: content),

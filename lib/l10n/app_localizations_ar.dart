@@ -855,6 +855,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarReset => 'إعادة العد';
 
   @override
+  String get adhkarResetCategory => 'إعادة تعيين القسم';
+
+  @override
   String get adhkarTransliteration => 'النطق بالحروف اللاتينية';
 
   @override

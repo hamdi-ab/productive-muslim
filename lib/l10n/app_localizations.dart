@@ -1598,6 +1598,12 @@ abstract class AppLocalizations {
   /// **'Reset Count'**
   String get adhkarReset;
 
+  /// No description provided for @adhkarResetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Category'**
+  String get adhkarResetCategory;
+
   /// No description provided for @adhkarTransliteration.
   ///
   /// In en, this message translates to:

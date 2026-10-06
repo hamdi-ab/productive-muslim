@@ -867,6 +867,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhkarReset => 'Reset Count';
 
   @override
+  String get adhkarResetCategory => 'Reset Category';
+
+  @override
   String get adhkarTransliteration => 'Transliteration';
 
   @override
