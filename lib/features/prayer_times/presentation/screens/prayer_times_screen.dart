@@ -187,12 +187,12 @@ class _PrayerTimesList extends StatelessWidget {
     final timeFormat = DateFormat.jm();
 
     final entries = [
-      ('Fajr', l10n.fajr, prayerTimes.fajr as DateTime),
-      ('Sunrise', l10n.sunrise, prayerTimes.sunrise as DateTime),
-      ('Dhuhr', l10n.dhuhr, prayerTimes.dhuhr as DateTime),
-      ('Asr', l10n.asr, prayerTimes.asr as DateTime),
-      ('Maghrib', l10n.maghrib, prayerTimes.maghrib as DateTime),
-      ('Isha', l10n.isha, prayerTimes.isha as DateTime),
+      ('Fajr', l10n.fajr, (prayerTimes.fajr as DateTime).toLocal()),
+      ('Sunrise', l10n.sunrise, (prayerTimes.sunrise as DateTime).toLocal()),
+      ('Dhuhr', l10n.dhuhr, (prayerTimes.dhuhr as DateTime).toLocal()),
+      ('Asr', l10n.asr, (prayerTimes.asr as DateTime).toLocal()),
+      ('Maghrib', l10n.maghrib, (prayerTimes.maghrib as DateTime).toLocal()),
+      ('Isha', l10n.isha, (prayerTimes.isha as DateTime).toLocal()),
     ];
 
     final hasLocation = locationName != null && locationName!.isNotEmpty;
