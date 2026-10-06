@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
@@ -7,6 +6,7 @@ import 'package:productive_muslim/core/constants/app_prayer_slots.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
@@ -69,7 +69,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
   }
 
   void _selectPrayerSlot(BarakahSlot slot) async {
-    HapticFeedback.selectionClick();
+    AppHaptics.selectionClick();
     int startMins = slot.defaultStartMinutes;
     int endMins = slot.defaultEndMinutes;
 
@@ -415,7 +415,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         onSelected: (selected) {
-                          HapticFeedback.selectionClick();
+                          AppHaptics.selectionClick();
                           setState(() => _repeatDaily = selected);
                         },
                       ),
@@ -436,7 +436,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         onSelected: (selected) {
-                          HapticFeedback.selectionClick();
+                          AppHaptics.selectionClick();
                           setState(() => _repeatWeekly = selected);
                         },
                       ),
@@ -569,7 +569,7 @@ class _LifeAreaSelector extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           onSelected: (_) {
-            HapticFeedback.selectionClick();
+            AppHaptics.selectionClick();
             onChanged(area.$1);
           },
         );

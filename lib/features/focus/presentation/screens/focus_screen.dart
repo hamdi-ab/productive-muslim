@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -127,7 +126,7 @@ class _FocusScreenState extends State<FocusScreen> {
   }
 
   void _toggleTimer() {
-    HapticFeedback.mediumImpact();
+    AppHaptics.mediumImpact();
     if (_isRunning) {
       _pauseTimer();
     } else {
@@ -159,7 +158,7 @@ class _FocusScreenState extends State<FocusScreen> {
   }
 
   void _resetTimer() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     _timer?.cancel();
     setState(() {
       _isRunning = false;
@@ -168,7 +167,7 @@ class _FocusScreenState extends State<FocusScreen> {
   }
 
   Future<void> _onSessionComplete() async {
-    HapticFeedback.heavyImpact();
+    AppHaptics.heavyImpact();
     try {
       final settings = getIt<SettingsService>();
       await settings.addFocusMinutes(_selectedDurationMinutes);

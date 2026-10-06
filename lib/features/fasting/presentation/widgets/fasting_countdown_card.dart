@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -92,7 +92,7 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
   }
 
   Future<void> _toggleFasting() async {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     try {
       final settings = getIt<SettingsService>();
       await settings.toggleSunnahFastingTarget(_today);

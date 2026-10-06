@@ -16,7 +16,8 @@ abstract final class AppHaptics {
   /// Subtle touch feedback for regular buttons, chips, and list interactions.
   static Future<void> lightImpact() async {
     if (isEnabled) {
-      await HapticFeedback.lightImpact();
+      await HapticFeedback.selectionClick();
+      await HapticFeedback.vibrate();
     }
   }
 
@@ -24,6 +25,7 @@ abstract final class AppHaptics {
   static Future<void> mediumImpact() async {
     if (isEnabled) {
       await HapticFeedback.mediumImpact();
+      await HapticFeedback.vibrate();
     }
   }
 
@@ -31,6 +33,7 @@ abstract final class AppHaptics {
   static Future<void> heavyImpact() async {
     if (isEnabled) {
       await HapticFeedback.heavyImpact();
+      await HapticFeedback.vibrate();
     }
   }
 

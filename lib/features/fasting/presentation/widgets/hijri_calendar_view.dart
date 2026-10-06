@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
@@ -32,21 +32,21 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
   DateTime _selectedDate = DateTime.now();
 
   void _prevMonth() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
     });
   }
 
   void _nextMonth() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
     });
   }
 
   void _goToToday() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       final now = DateTime.now();
       _currentMonth = DateTime(now.year, now.month, 1);
@@ -63,7 +63,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
   }
 
   void _showDayDetails(BuildContext context, HijriDateInfo info) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selectionClick();
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
@@ -278,7 +278,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           onPressed: () async {
-                            HapticFeedback.mediumImpact();
+                            AppHaptics.mediumImpact();
                             await settings.toggleSunnahFastingTarget(dateStr);
                             if (ctx.mounted) {
                               setSheetState(() => isFasting = !isFasting);
