@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
@@ -584,7 +585,7 @@ class _FocusScreenState extends State<FocusScreen> {
                     final isSelected = _selectedDurationMinutes == mins;
                     return AppPressable(
                       onTap: () {
-                        HapticFeedback.selectionClick();
+                        AppHaptics.selectionClick();
                         _selectPreset(mins);
                       },
                       pressedScale: 0.92,
@@ -592,7 +593,10 @@ class _FocusScreenState extends State<FocusScreen> {
                       child: ChoiceChip(
                         label: Text('$mins min'),
                         selected: isSelected,
-                        onSelected: (_) => _selectPreset(mins),
+                        onSelected: (_) {
+                          AppHaptics.selectionClick();
+                          _selectPreset(mins);
+                        },
                         selectedColor: AppColors.primary.withValues(alpha: 0.2),
                       ),
                     );

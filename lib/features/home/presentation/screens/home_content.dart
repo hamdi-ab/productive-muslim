@@ -947,12 +947,26 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
   }
 
   void _updatePrayerCountdown() {
-    if (_cachedPrayerTimes == null ||
-        !getIt.isRegistered<PrayerTimeService>()) {
+    if (!getIt.isRegistered<PrayerTimeService>()) {
       return;
     }
 
     final service = getIt<PrayerTimeService>();
+    final now = DateTime.now();
+
+    // Refresh prayer times if the calendar date has rolled over
+    if (_cachedPrayerTimes != null && _cachedPrayerTimes!.fajr.day != now.day) {
+      if (service.cachedPosition != null) {
+        _cachedPrayerTimes = service.getPrayerTimes(service.cachedPosition!, date: now);
+      } else if (service.cachedPrayerTimes != null) {
+        _cachedPrayerTimes = service.cachedPrayerTimes;
+      }
+    }
+
+    if (_cachedPrayerTimes == null) {
+      return;
+    }
+
     final nextPrayer = service.getNextPrayerName(_cachedPrayerTimes!);
     final timeUntil = service.getTimeUntilNextPrayer(_cachedPrayerTimes!);
 

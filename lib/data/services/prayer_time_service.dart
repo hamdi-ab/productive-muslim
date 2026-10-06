@@ -12,7 +12,15 @@ class PrayerTimeService {
   Future<Position?>? _ongoingFetch;
 
   Position? get cachedPosition => _cachedPosition;
-  PrayerTimes? get cachedPrayerTimes => _cachedPrayerTimes;
+  PrayerTimes? get cachedPrayerTimes {
+    final now = DateTime.now();
+    if (_cachedPrayerTimes != null &&
+        _cachedPosition != null &&
+        _cachedPrayerTimes!.fajr.day != now.day) {
+      _cachedPrayerTimes = getPrayerTimes(_cachedPosition!, date: now);
+    }
+    return _cachedPrayerTimes;
+  }
   String? get cachedLocationName => _cachedLocationName;
 
   Future<Position?> getCurrentPosition() async {

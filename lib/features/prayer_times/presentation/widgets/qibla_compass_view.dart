@@ -317,7 +317,7 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Qibla Direction',
+                              l10n.qiblaDirectionLabel,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isDark ? Colors.white54 : Colors.black45,
@@ -354,7 +354,7 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Distance',
+                              l10n.qiblaDistanceLabel,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isDark ? Colors.white54 : Colors.black45,
@@ -522,9 +522,9 @@ String _getTurnText(
   final diff = _getTurnDiff(target, current);
   final deg = _locDigits(context, diff.abs().toStringAsFixed(0));
   if (diff > 0) {
-    return 'Turn $deg° Right';
+    return l10n.qiblaTurnRight(deg);
   } else {
-    return 'Turn $deg° Left';
+    return l10n.qiblaTurnLeft(deg);
   }
 }
 

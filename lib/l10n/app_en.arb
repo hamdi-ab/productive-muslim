@@ -370,6 +370,20 @@
     }
   },
   "qiblaFacingKaaba": "You are facing the Kaaba",
+  "qiblaDirectionLabel": "Qibla Direction",
+  "qiblaDistanceLabel": "Distance",
+  "qiblaTurnRight": "Turn {degrees}° Right",
+  "@qiblaTurnRight": {
+    "placeholders": {
+      "degrees": {"type": "String"}
+    }
+  },
+  "qiblaTurnLeft": "Turn {degrees}° Left",
+  "@qiblaTurnLeft": {
+    "placeholders": {
+      "degrees": {"type": "String"}
+    }
+  },
   "qiblaCalibrate": "Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.",
   "solarDialTitle": "Solar Prayer Arc",
   "solarCurrentWindow": "Active Window: {slot}",

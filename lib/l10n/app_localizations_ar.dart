@@ -1008,6 +1008,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaFacingKaaba => 'أنت باتجاه القبلة تماماً';
 
   @override
+  String get qiblaDirectionLabel => 'اتجاه القبلة';
+
+  @override
+  String get qiblaDistanceLabel => 'المسافة';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'استدر $degrees° يميناً';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'استدر $degrees° يساراً';
+  }
+
+  @override
   String get qiblaCalibrate =>
       'معايرة البوصلة: حرك الجهاز بشكل رقم 8 بعيداً عن المعادن والمجالات المغناطيسية.';
 

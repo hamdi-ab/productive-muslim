@@ -1020,6 +1020,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaFacingKaaba => 'You are facing the Kaaba';
 
   @override
+  String get qiblaDirectionLabel => 'Qibla Direction';
+
+  @override
+  String get qiblaDistanceLabel => 'Distance';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'Turn $degrees° Right';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'Turn $degrees° Left';
+  }
+
+  @override
   String get qiblaCalibrate =>
       'Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.';
 

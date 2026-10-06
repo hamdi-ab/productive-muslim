@@ -244,7 +244,25 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   }
 
   void _updatePrayerCountdown() {
-    if (_cachedPrayerTimes == null || widget.service == null) {
+    if (widget.service == null) {
+      return;
+    }
+
+    final now = DateTime.now();
+
+    // Refresh prayer times if the calendar date has rolled over
+    if (_cachedPrayerTimes != null && _cachedPrayerTimes!.fajr.day != now.day) {
+      if (widget.service!.cachedPosition != null) {
+        _cachedPrayerTimes = widget.service!.getPrayerTimes(
+          widget.service!.cachedPosition!,
+          date: now,
+        );
+      } else if (widget.service!.cachedPrayerTimes != null) {
+        _cachedPrayerTimes = widget.service!.cachedPrayerTimes;
+      }
+    }
+
+    if (_cachedPrayerTimes == null) {
       return;
     }
 

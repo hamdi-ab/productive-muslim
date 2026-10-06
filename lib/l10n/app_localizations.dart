@@ -1868,6 +1868,30 @@ abstract class AppLocalizations {
   /// **'You are facing the Kaaba'**
   String get qiblaFacingKaaba;
 
+  /// No description provided for @qiblaDirectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla Direction'**
+  String get qiblaDirectionLabel;
+
+  /// No description provided for @qiblaDistanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get qiblaDistanceLabel;
+
+  /// No description provided for @qiblaTurnRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn {degrees}° Right'**
+  String qiblaTurnRight(String degrees);
+
+  /// No description provided for @qiblaTurnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn {degrees}° Left'**
+  String qiblaTurnLeft(String degrees);
+
   /// No description provided for @qiblaCalibrate.
   ///
   /// In en, this message translates to:
