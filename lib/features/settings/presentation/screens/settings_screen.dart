@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/theme/arabic_typography.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
 import 'package:productive_muslim/data/services/backup_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
@@ -88,6 +90,8 @@ class SettingsView extends StatelessWidget {
                     _ThemeModeSelector(),
                     Divider(height: 1, indent: 16, endIndent: 16),
                     _LocaleSelector(),
+                    Divider(height: 1, indent: 16, endIndent: 16),
+                    _ArabicTypographyTile(),
                     Divider(height: 1, indent: 16, endIndent: 16),
                     _HapticFeedbackToggle(),
                   ],
@@ -733,3 +737,69 @@ class _LocaleSelector extends StatelessWidget {
     );
   }
 }
+
+class _ArabicTypographyTile extends StatelessWidget {
+  const _ArabicTypographyTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+
+    return ValueListenableBuilder<String>(
+      valueListenable:
+          settings?.arabicFontFamilyNotifier ?? ValueNotifier('amiri'),
+      builder: (context, currentFontKey, _) {
+        final fontOption = ArabicFontFamily.fromKey(currentFontKey);
+        final label = isArabic ? fontOption.labelAr : fontOption.labelEn;
+
+        return ListTile(
+          key: const Key('settings_arabic_typography'),
+          leading: const Icon(Icons.format_size_rounded, color: AppColors.primary),
+          title: Text(
+            l10n.adhkarTypography,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            l10n.typographyTitle,
+            style: const TextStyle(fontSize: 12),
+          ),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label.split('(').first.trim(),
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ],
+            ),
+          ),
+          onTap: () {
+            AppHaptics.selectionClick();
+            ArabicTypographySheet.show(context);
+          },
+        );
+      },
+    );
+  }
+}
+

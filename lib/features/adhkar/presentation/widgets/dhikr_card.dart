@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/theme/arabic_typography.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -29,6 +32,12 @@ class DhikrCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final isCompleted = count >= item.targetCount;
+
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+    final font = ArabicFontFamily.fromKey(settings?.arabicFontFamily);
+    final fontSize = settings?.arabicFontSize ?? 22.0;
 
     final displayTitle = isArabic && item.titleAr.isNotEmpty
         ? item.titleAr
@@ -105,8 +114,8 @@ class DhikrCard extends StatelessWidget {
                         item.arabic,
                         textAlign: TextAlign.center,
                         textDirection: TextDirection.rtl,
-                        style: TextStyle(
-                          fontSize: 22,
+                        style: font.getTextStyle(
+                          fontSize: fontSize,
                           height: 1.8,
                           fontWeight: FontWeight.w600,
                           color: isDark ? Colors.white : Colors.black87,

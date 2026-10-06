@@ -278,6 +278,15 @@ class AdhkarCatalog {
   ];
 
   static List<DhikrItem> getByCategory(DhikrCategory category) {
+    if (category == DhikrCategory.morning) {
+      final waking =
+          all.where((d) => d.category == DhikrCategory.wakingUp).toList()
+            ..sort((a, b) => a.order.compareTo(b.order));
+      final morning =
+          all.where((d) => d.category == DhikrCategory.morning).toList()
+            ..sort((a, b) => a.order.compareTo(b.order));
+      return [...waking, ...morning];
+    }
     return all.where((d) => d.category == category).toList()
       ..sort((a, b) => a.order.compareTo(b.order));
   }

@@ -7,6 +7,7 @@ import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -157,6 +158,11 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     } catch (_) {}
   }
 
+  Future<void> _showTypographySheet() async {
+    await ArabicTypographySheet.show(context);
+    if (mounted) setState(() {});
+  }
+
   String _getCategoryLabel(DhikrCategory category, AppLocalizations l10n) {
     switch (category) {
       case DhikrCategory.morning:
@@ -223,6 +229,12 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                       color: AppColors.primary,
                     ),
                   ),
+                ),
+                IconButton(
+                  tooltip: l10n.typographyTooltip,
+                  icon: const Icon(Icons.format_size_rounded, size: 20),
+                  onPressed: _showTypographySheet,
+                  visualDensity: VisualDensity.compact,
                 ),
                 IconButton(
                   tooltip: l10n.adhkarResetCategory,
@@ -332,6 +344,11 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         title: Text(l10n.adhkarTitle),
         actions: [
           if (items.isNotEmpty) ...[
+            IconButton(
+              tooltip: l10n.typographyTooltip,
+              icon: const Icon(Icons.format_size_rounded),
+              onPressed: _showTypographySheet,
+            ),
             IconButton(
               tooltip: l10n.adhkarResetCategory,
               icon: const Icon(Icons.restart_alt_rounded),

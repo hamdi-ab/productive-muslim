@@ -43,10 +43,7 @@ void main() {
       expect(find.text('Daily Adhkar & Remembrances'), findsOneWidget);
       expect(find.text('Morning'), findsOneWidget);
       expect(find.text('Evening'), findsOneWidget);
-      expect(
-        find.text('Ayat al-Kursi (The Verse of the Throne)'),
-        findsOneWidget,
-      );
+      expect(find.text('Waking Up Remembrance'), findsOneWidget);
       expect(find.text('Tap anywhere to count'), findsOneWidget);
     },
   );

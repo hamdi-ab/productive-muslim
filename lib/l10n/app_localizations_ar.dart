@@ -858,6 +858,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarResetCategory => 'إعادة تعيين القسم';
 
   @override
+  String get adhkarTypography => 'الخط العربي';
+
+  @override
+  String get typographyTitle => 'الخطوط العربية وتنسيق النصوص';
+
+  @override
+  String get typographyFontFamily => 'نوع الخط والخطاط';
+
+  @override
+  String get typographyFontSize => 'حجم الخط العربي';
+
+  @override
+  String get typographyPreview => 'معاينة حية للآيات والأذكار';
+
+  @override
+  String get typographyTooltip => 'تخصيص الخط العربي وحجمه';
+
+  @override
   String get adhkarTransliteration => 'النطق بالحروف اللاتينية';
 
   @override

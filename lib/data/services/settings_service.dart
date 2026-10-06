@@ -5,6 +5,7 @@ class SettingsService {
   SettingsService({required SharedPreferences prefs}) : _prefs = prefs {
     _initThemeMode();
     _initLocale();
+    _initArabicTypography();
   }
 
   SettingsService._empty() : _prefs = null;
@@ -15,6 +16,8 @@ class SettingsService {
 
   static const _themeModeKey = 'app_theme_mode';
   static const _localeKey = 'app_locale';
+  static const _arabicFontFamilyKey = 'arabic_font_family';
+  static const _arabicFontSizeKey = 'arabic_font_size';
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
@@ -35,6 +38,14 @@ class SettingsService {
 
   final ValueNotifier<Locale?> localeNotifier = ValueNotifier<Locale?>(null);
 
+  final ValueNotifier<String> arabicFontFamilyNotifier = ValueNotifier<String>(
+    'amiri',
+  );
+
+  final ValueNotifier<double> arabicFontSizeNotifier = ValueNotifier<double>(
+    22.0,
+  );
+
   void _initThemeMode() {
     final modeStr = _prefs?.getString(_themeModeKey) ?? 'system';
     themeModeNotifier.value = _parseThemeMode(modeStr);
@@ -43,6 +54,13 @@ class SettingsService {
   void _initLocale() {
     final code = _prefs?.getString(_localeKey);
     localeNotifier.value = _parseLocale(code);
+  }
+
+  void _initArabicTypography() {
+    arabicFontFamilyNotifier.value =
+        _prefs?.getString(_arabicFontFamilyKey) ?? 'amiri';
+    arabicFontSizeNotifier.value =
+        _prefs?.getDouble(_arabicFontSizeKey) ?? 22.0;
   }
 
   static ThemeMode _parseThemeMode(String mode) {
@@ -106,6 +124,21 @@ class SettingsService {
 
   Future<void> setHapticFeedbackEnabled(bool enabled) async =>
       _prefs?.setBool(_hapticFeedbackKey, enabled);
+
+  String get arabicFontFamily =>
+      _prefs?.getString(_arabicFontFamilyKey) ?? 'amiri';
+
+  Future<void> setArabicFontFamily(String font) async {
+    await _prefs?.setString(_arabicFontFamilyKey, font);
+    arabicFontFamilyNotifier.value = font;
+  }
+
+  double get arabicFontSize => _prefs?.getDouble(_arabicFontSizeKey) ?? 22.0;
+
+  Future<void> setArabicFontSize(double size) async {
+    await _prefs?.setDouble(_arabicFontSizeKey, size);
+    arabicFontSizeNotifier.value = size;
+  }
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);

@@ -870,6 +870,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhkarResetCategory => 'Reset Category';
 
   @override
+  String get adhkarTypography => 'Arabic Calligraphy';
+
+  @override
+  String get typographyTitle => 'Arabic Typography & Calligraphy';
+
+  @override
+  String get typographyFontFamily => 'Calligraphy Script';
+
+  @override
+  String get typographyFontSize => 'Arabic Font Size';
+
+  @override
+  String get typographyPreview => 'Live Verse Preview';
+
+  @override
+  String get typographyTooltip => 'Customize Arabic calligraphy and font size';
+
+  @override
   String get adhkarTransliteration => 'Transliteration';
 
   @override

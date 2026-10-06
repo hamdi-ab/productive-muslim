@@ -1604,6 +1604,42 @@ abstract class AppLocalizations {
   /// **'Reset Category'**
   String get adhkarResetCategory;
 
+  /// No description provided for @adhkarTypography.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Calligraphy'**
+  String get adhkarTypography;
+
+  /// No description provided for @typographyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Typography & Calligraphy'**
+  String get typographyTitle;
+
+  /// No description provided for @typographyFontFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Calligraphy Script'**
+  String get typographyFontFamily;
+
+  /// No description provided for @typographyFontSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Font Size'**
+  String get typographyFontSize;
+
+  /// No description provided for @typographyPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Verse Preview'**
+  String get typographyPreview;
+
+  /// No description provided for @typographyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Arabic calligraphy and font size'**
+  String get typographyTooltip;
+
   /// No description provided for @adhkarTransliteration.
   ///
   /// In en, this message translates to:

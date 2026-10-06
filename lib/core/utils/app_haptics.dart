@@ -24,7 +24,7 @@ abstract final class AppHaptics {
       await _channel.invokeMethod<bool>('vibrate', {
         'type': type,
         'duration': duration,
-        if (amplitude != null) 'amplitude': amplitude,
+        'amplitude': ?amplitude,
       });
     } catch (_) {}
   }
