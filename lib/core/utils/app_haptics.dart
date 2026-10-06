@@ -4,6 +4,8 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 
 /// Centralized haptic feedback controller that respects the global user preference.
 abstract final class AppHaptics {
+  static const _channel = MethodChannel('productive_muslim/haptics');
+
   static bool get isEnabled {
     try {
       if (getIt.isRegistered<SettingsService>()) {
@@ -13,11 +15,25 @@ abstract final class AppHaptics {
     return true;
   }
 
+  static Future<void> _vibrateNative({
+    String type = 'click',
+    int duration = 30,
+    int? amplitude,
+  }) async {
+    try {
+      await _channel.invokeMethod<bool>('vibrate', {
+        'type': type,
+        'duration': duration,
+        if (amplitude != null) 'amplitude': amplitude,
+      });
+    } catch (_) {}
+  }
+
   /// Subtle touch feedback for regular buttons, chips, and list interactions.
   static Future<void> lightImpact() async {
     if (isEnabled) {
       await HapticFeedback.selectionClick();
-      await HapticFeedback.vibrate();
+      await _vibrateNative(type: 'click', duration: 30);
     }
   }
 
@@ -25,7 +41,7 @@ abstract final class AppHaptics {
   static Future<void> mediumImpact() async {
     if (isEnabled) {
       await HapticFeedback.mediumImpact();
-      await HapticFeedback.vibrate();
+      await _vibrateNative(type: 'click', duration: 55);
     }
   }
 
@@ -33,7 +49,7 @@ abstract final class AppHaptics {
   static Future<void> heavyImpact() async {
     if (isEnabled) {
       await HapticFeedback.heavyImpact();
-      await HapticFeedback.vibrate();
+      await _vibrateNative(type: 'heavy', duration: 90);
     }
   }
 
@@ -41,6 +57,7 @@ abstract final class AppHaptics {
   static Future<void> selectionClick() async {
     if (isEnabled) {
       await HapticFeedback.selectionClick();
+      await _vibrateNative(type: 'tick', duration: 20);
     }
   }
 
@@ -48,6 +65,7 @@ abstract final class AppHaptics {
   static Future<void> vibrate() async {
     if (isEnabled) {
       await HapticFeedback.vibrate();
+      await _vibrateNative(type: 'click', duration: 40);
     }
   }
 }

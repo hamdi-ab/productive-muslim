@@ -436,7 +436,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
               crossAxisCount: 7,
               crossAxisSpacing: 4,
               mainAxisSpacing: 4,
-              childAspectRatio: 0.88,
+              childAspectRatio: 0.78,
             ),
             itemBuilder: (context, index) {
               if (index < leadingEmptyCount) {
@@ -479,58 +479,67 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                     border: border,
                   ),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 2,
+                    vertical: 2,
+                    horizontal: 1,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Gregorian Day
-                      Text(
-                        '${date.day}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isToday || isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      // Hijri Day with indicator
-                      Row(
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (info.isWhiteDay)
-                            const Icon(
-                              Icons.brightness_2_rounded,
-                              size: 9,
-                              color: Colors.amber,
-                            ),
+                          // Gregorian Day
                           Text(
-                            '${info.hDay}',
+                            '${date.day}',
                             style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: info.isWhiteDay
-                                  ? Colors.amber[800]
-                                  : (isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary),
+                              fontSize: 13,
+                              fontWeight: isToday || isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
                             ),
                           ),
+                          const SizedBox(height: 1),
+                          // Hijri Day with indicator
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (info.isWhiteDay) ...[
+                                const Icon(
+                                  Icons.brightness_2_rounded,
+                                  size: 8,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 1),
+                              ],
+                              Text(
+                                '${info.hDay}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: info.isWhiteDay
+                                      ? Colors.amber[800]
+                                      : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (isFasted)
+                            Container(
+                              margin: const EdgeInsets.only(top: 2),
+                              width: 4,
+                              height: 4,
+                              decoration: const BoxDecoration(
+                                color: AppColors.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                         ],
                       ),
-                      if (isFasted)
-                        Container(
-                          margin: const EdgeInsets.only(top: 2),
-                          width: 4,
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            color: AppColors.secondary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               );
