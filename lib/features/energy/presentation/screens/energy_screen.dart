@@ -11,6 +11,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/fasting/presentation/widgets/fasting_countdown_card.dart';
@@ -173,8 +174,6 @@ class _EnergyScreenState extends State<EnergyScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     final content = SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -489,12 +488,19 @@ class _EnergyScreenState extends State<EnergyScreen> {
       ),
     );
 
-    if (hasParentScaffold) {
-      return content;
-    }
-
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.energyTitle)),
+      appBar: ProductiveAppBar(
+        title: l10n.energyTitle,
+        subtitle: 'Triple-Energy & Qaylulah Nap',
+        showBackButton: true,
+        actions: [
+          ProductiveAppBarAction(
+            icon: Icons.check_rounded,
+            tooltip: l10n.energySaved,
+            onTap: _saveEnergy,
+          ),
+        ],
+      ),
       body: content,
     );
   }

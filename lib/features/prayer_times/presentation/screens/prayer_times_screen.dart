@@ -6,6 +6,7 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/features/prayer_times/logic/prayer_times_bloc.dart';
 import 'package:productive_muslim/features/prayer_times/logic/prayer_times_event.dart';
@@ -30,7 +31,7 @@ class PrayerTimesScreen extends StatelessWidget {
       child: Scaffold(
         appBar: hasParentScaffold
             ? null
-            : AppBar(title: Text(l10n.prayerTimes)),
+            : ProductiveAppBar(title: l10n.prayerTimes, showBackButton: true),
         body: BlocBuilder<PrayerTimesBloc, PrayerTimesState>(
           builder: (context, state) {
             return switch (state) {

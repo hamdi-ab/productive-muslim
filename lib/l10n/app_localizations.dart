@@ -1301,7 +1301,7 @@ abstract class AppLocalizations {
   /// No description provided for @focusSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Work with presence, intention, and divine blessing'**
+  /// **'Khushu\' Timer'**
   String get focusSubtitle;
 
   /// No description provided for @focusNiyyahPrompt.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Manage your spiritual, physical, and mental vitality'**
+  /// **'Qaylulah & Battery'**
   String get energySubtitle;
 
   /// No description provided for @qaylulah.
@@ -2383,6 +2383,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'العربية (Arabic)'**
   String get languageAr;
+
+  /// No description provided for @plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get plan;
+
+  /// No description provided for @quickToolkit.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Toolkit'**
+  String get quickToolkit;
+
+  /// No description provided for @allTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Access'**
+  String get allTools;
+
+  /// No description provided for @fastingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Days'**
+  String get fastingSubtitle;
+
+  /// No description provided for @adhkarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Remembrances'**
+  String get adhkarSubtitle;
+
+  /// No description provided for @timeAwareMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Barakah Window'**
+  String get timeAwareMorningTitle;
+
+  /// No description provided for @timeAwareMorningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with morning adhkar & set your daily intention.'**
+  String get timeAwareMorningDesc;
+
+  /// No description provided for @timeAwareMiddayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Midday Qaylulah & Focus'**
+  String get timeAwareMiddayTitle;
+
+  /// No description provided for @timeAwareMiddayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recharge with a 20-min Sunnah nap or start deep work.'**
+  String get timeAwareMiddayDesc;
+
+  /// No description provided for @timeAwareEveningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Adhkar & Wind-down'**
+  String get timeAwareEveningTitle;
+
+  /// No description provided for @timeAwareEveningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite your evening protections and review today\'s progress.'**
+  String get timeAwareEveningDesc;
+
+  /// No description provided for @timeAwareNightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Night Reflection & Muhasabah'**
+  String get timeAwareNightTitle;
+
+  /// No description provided for @timeAwareNightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record your gratitude (Shukr) and recite bedtime adhkar.'**
+  String get timeAwareNightDesc;
+
+  /// No description provided for @startNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get startNow;
+
+  /// No description provided for @fastingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting & Hijri'**
+  String get fastingTitle;
+
+  /// No description provided for @energy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy & Routines'**
+  String get energy;
+
+  /// No description provided for @adhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Adhkar Studio'**
+  String get adhkar;
 }
 
 class _AppLocalizationsDelegate

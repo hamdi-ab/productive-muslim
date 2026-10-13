@@ -95,10 +95,7 @@ class AdhkarService {
     return _settingsService.getDhikrCount(targetDate, dhikrId);
   }
 
-  Future<void> resetDhikr({
-    required String dhikrId,
-    String? date,
-  }) async {
+  Future<void> resetDhikr({required String dhikrId, String? date}) async {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     await _settingsService.removeCompletedDhikr(targetDate, dhikrId);
@@ -106,10 +103,7 @@ class AdhkarService {
     await _homeWidgetSyncService?.syncDhikrCount(count);
   }
 
-  Future<void> resetCategory(
-    DhikrCategory category, {
-    String? date,
-  }) async {
+  Future<void> resetCategory(DhikrCategory category, {String? date}) async {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     final items = AdhkarCatalog.getByCategory(category);

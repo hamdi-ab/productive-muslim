@@ -7,6 +7,7 @@ import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -335,34 +336,44 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       ],
     );
 
-    if (hasParentScaffold) {
-      return content;
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.adhkarTitle),
+      appBar: ProductiveAppBar(
+        title: l10n.adhkarTitle,
+        subtitle: l10n.adhkarSubtitle,
+        showBackButton: true,
         actions: [
           if (items.isNotEmpty) ...[
-            IconButton(
+            ProductiveAppBarAction(
               tooltip: l10n.typographyTooltip,
-              icon: const Icon(Icons.format_size_rounded),
-              onPressed: _showTypographySheet,
+              icon: Icons.format_size_rounded,
+              onTap: _showTypographySheet,
             ),
-            IconButton(
+            ProductiveAppBarAction(
               tooltip: l10n.adhkarResetCategory,
-              icon: const Icon(Icons.restart_alt_rounded),
-              onPressed: () => _resetCategory(_selectedCategory),
+              icon: Icons.restart_alt_rounded,
+              onTap: () => _resetCategory(_selectedCategory),
             ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Text(
-                  '${_currentPageIndex + 1} / ${items.length}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.primaryLight.withValues(alpha: 0.16)
+                    : AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.primaryLight.withValues(alpha: 0.3)
+                      : AppColors.primary.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                '${_currentPageIndex + 1} / ${items.length}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: isDark ? AppColors.primaryLight : AppColors.primary,
                 ),
               ),
             ),

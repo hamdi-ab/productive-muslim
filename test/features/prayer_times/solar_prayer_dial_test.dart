@@ -37,7 +37,10 @@ void main() {
       await tester.pumpAndSettle();
 
       final hasDayTitle = find.text('Solar Prayer Arc').evaluate().isNotEmpty;
-      final hasNightTitle = find.text('Night & Tahajjud Arc').evaluate().isNotEmpty;
+      final hasNightTitle = find
+          .text('Night & Tahajjud Arc')
+          .evaluate()
+          .isNotEmpty;
       expect(hasDayTitle || hasNightTitle, isTrue);
       expect(find.textContaining('Next: Dhuhr'), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
@@ -54,7 +57,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final hasArDay = find.text('مسار الشمس ومواقيت الصلاة').evaluate().isNotEmpty;
+      final hasArDay = find
+          .text('مسار الشمس ومواقيت الصلاة')
+          .evaluate()
+          .isNotEmpty;
       final hasArNight = find.text('مسار الليل والتهجد').evaluate().isNotEmpty;
       expect(hasArDay || hasArNight, isTrue);
     });

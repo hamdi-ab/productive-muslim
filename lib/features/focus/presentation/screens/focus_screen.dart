@@ -12,6 +12,7 @@ import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
@@ -341,8 +342,6 @@ class _FocusScreenState extends State<FocusScreen> {
         return 0;
       }
     }();
-
-    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     final content = SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -755,34 +754,35 @@ class _FocusScreenState extends State<FocusScreen> {
       ),
     );
 
-    if (hasParentScaffold) {
-      return content;
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.focusTitle),
+      appBar: ProductiveAppBar(
+        title: l10n.focusTitle,
+        subtitle: _selectedTask != null
+            ? _selectedTask!.title
+            : 'Khushu\' Pomodoro Session',
+        showBackButton: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  l10n.focusTotalMinutes(totalFocusMins),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.primaryLight.withValues(alpha: 0.16)
+                  : AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.primaryLight.withValues(alpha: 0.3)
+                    : AppColors.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              l10n.focusTotalMinutes(totalFocusMins),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.primaryLight : AppColors.primary,
               ),
             ),
           ),

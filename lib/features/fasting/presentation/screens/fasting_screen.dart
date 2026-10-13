@@ -7,6 +7,7 @@ import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/fasting/presentation/widgets/fasting_countdown_card.dart';
 import 'package:productive_muslim/features/fasting/presentation/widgets/hijri_calendar_view.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -53,8 +54,6 @@ class _FastingScreenState extends State<FastingScreen> {
         ? getIt<HijriService>()
         : HijriService();
     final todayHijri = hijriService.getHijriDate(DateTime.now());
-
-    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     final content = SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -223,12 +222,16 @@ class _FastingScreenState extends State<FastingScreen> {
       ),
     );
 
-    if (hasParentScaffold) {
-      return content;
-    }
+    final formattedHijri = isArabic
+        ? todayHijri.formatAr()
+        : todayHijri.formatEn();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.hijriCalendarTitle)),
+      appBar: ProductiveAppBar(
+        title: l10n.hijriCalendarTitle,
+        subtitle: formattedHijri,
+        showBackButton: true,
+      ),
       body: content,
     );
   }

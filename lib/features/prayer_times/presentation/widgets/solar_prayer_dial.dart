@@ -74,8 +74,12 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
       progress = dayDuration > 0 ? (dayElapsed / dayDuration) : 0.5;
     } else {
       // Nighttime: from Maghrib to Fajr (next morning)
-      final fajrNext = now.isBefore(fajr) ? fajr : fajr.add(const Duration(days: 1));
-      final maghribPrev = now.isAfter(maghrib) ? maghrib : maghrib.subtract(const Duration(days: 1));
+      final fajrNext = now.isBefore(fajr)
+          ? fajr
+          : fajr.add(const Duration(days: 1));
+      final maghribPrev = now.isAfter(maghrib)
+          ? maghrib
+          : maghrib.subtract(const Duration(days: 1));
       final nightDuration = fajrNext.difference(maghribPrev).inSeconds;
       final nightElapsed = now.difference(maghribPrev).inSeconds;
       progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 0.5;
@@ -102,13 +106,19 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
 
     // High contrast theme tokens
     final badgeBg = isNight
-        ? (isDark ? const Color(0xFF6366F1).withValues(alpha: 0.25) : const Color(0xFF6366F1).withValues(alpha: 0.12))
-        : (isDark ? AppColors.primary.withValues(alpha: 0.22) : AppColors.primary.withValues(alpha: 0.12));
+        ? (isDark
+              ? const Color(0xFF6366F1).withValues(alpha: 0.25)
+              : const Color(0xFF6366F1).withValues(alpha: 0.12))
+        : (isDark
+              ? AppColors.primary.withValues(alpha: 0.22)
+              : AppColors.primary.withValues(alpha: 0.12));
     final badgeText = isNight
         ? (isDark ? const Color(0xFFA5B4FC) : const Color(0xFF4338CA))
         : (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857));
 
-    final headerIconColor = isNight ? const Color(0xFF818CF8) : const Color(0xFFF59E0B);
+    final headerIconColor = isNight
+        ? const Color(0xFF818CF8)
+        : const Color(0xFFF59E0B);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final headerTitle = isNight
         ? (isAr ? 'مسار الليل والتهجد' : 'Night & Tahajjud Arc')
@@ -267,9 +277,8 @@ class _SolarArcPainter extends CustomPainter {
         : const [Color(0xFFF59E0B), Color(0xFF10B981), Color(0xFF0EA5E9)];
 
     final progressPaint = Paint()
-      ..shader = LinearGradient(
-        colors: gradientColors,
-      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = LinearGradient(colors: gradientColors)
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;

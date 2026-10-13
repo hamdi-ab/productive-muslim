@@ -185,6 +185,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -194,8 +195,10 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Text(
         label.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: AppColors.textSecondary, letterSpacing: 1.2),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }

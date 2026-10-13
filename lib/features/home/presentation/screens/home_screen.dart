@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
@@ -34,14 +36,14 @@ class HomeScreen extends StatelessWidget {
         label: l10n.home,
       ),
       FloatingNavItem(
-        icon: Icons.task_alt_outlined,
-        activeIcon: Icons.task_alt_rounded,
-        label: l10n.tasks,
+        icon: Icons.checklist_rtl_outlined,
+        activeIcon: Icons.checklist_rtl_rounded,
+        label: l10n.plan,
       ),
       FloatingNavItem(
-        icon: Icons.published_with_changes_outlined,
-        activeIcon: Icons.published_with_changes_rounded,
-        label: l10n.habits,
+        icon: Icons.mosque_outlined,
+        activeIcon: Icons.mosque_rounded,
+        label: l10n.prayerTimes,
       ),
       FloatingNavItem(
         icon: Icons.auto_awesome_outlined,
@@ -57,57 +59,137 @@ class HomeScreen extends StatelessWidget {
 
     final currentIndex = _getIndexForLocation(location);
     final headerInfo = _getHeaderInfo(location, l10n);
+    final isHome = location == '/';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    String hijriSubtitle = '';
+    if (isHome) {
+      if (getIt.isRegistered<HijriService>()) {
+        final hijri = getIt<HijriService>().getHijriDate(DateTime.now());
+        final isAr = Localizations.localeOf(context).languageCode == 'ar';
+        final hijriStr = isAr
+            ? '${hijri.hDay} ${hijri.monthNameAr}'
+            : '${hijri.hDay} ${hijri.monthNameEn}';
+        final loc = prayerService?.cachedLocationName;
+        hijriSubtitle = loc != null && loc.isNotEmpty
+            ? '$hijriStr • 📍 $loc'
+            : hijriStr;
+      }
+    }
+
+    final Widget? homeLeading = isHome
+        ? Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Center(
+              child: Stack(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary, Color(0xFFD4AF37)],
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: isDark
+                          ? AppColors.darkSurface
+                          : Colors.white,
+                      child: const Icon(
+                        Icons.spa_rounded,
+                        size: 18,
+                        color: Color(0xFFD4AF37),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF0B1512)
+                              : Colors.white,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        : null;
 
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        scrolledUnderElevation: 2,
-        titleSpacing: 16,
-        backgroundColor: isDark
-            ? AppColors.darkSurface.withValues(alpha: 0.85)
-            : Colors.white.withValues(alpha: 0.85),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(headerInfo.icon, color: AppColors.primary, size: 18),
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                headerInfo.title,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  letterSpacing: -0.2,
+      appBar: ProductiveAppBar(
+        title: headerInfo.title,
+        subtitle: isHome ? hijriSubtitle : null,
+        leading: homeLeading,
+        leadingIcon: isHome ? null : headerInfo.icon,
+        showBackButton: false,
+        actions: [
+          if (isHome)
+            AppPressable(
+              onTap: () => context.push('/barakah'),
+              pressedScale: 0.92,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                margin: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                      : const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.local_fire_department_rounded,
+                      color: Color(0xFFD97706),
+                      size: 14,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '12d',
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFFFBBF24)
+                            : const Color(0xFF92400E),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
-        actions: [
           _PrayerHeaderChip(service: prayerService),
           if (location == '/barakah')
-            IconButton(
+            ProductiveAppBarAction(
               key: const Key('open-review'),
               tooltip: l10n.barakahWeeklyTitle,
-              icon: const Icon(Icons.calendar_month_outlined),
-              onPressed: () => context.push('/barakah/review'),
+              icon: Icons.calendar_month_outlined,
+              onTap: () => context.push('/barakah/review'),
             ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
+          ProductiveAppBarAction(
+            icon: Icons.settings_outlined,
             tooltip: l10n.settings,
-            onPressed: () => context.push('/settings'),
+            onTap: () => context.push('/settings'),
           ),
-          const SizedBox(width: 4),
         ],
       ),
       body: Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
@@ -125,11 +207,10 @@ class HomeScreen extends StatelessWidget {
   ) {
     return switch (location) {
       '/' => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
-      '/tasks' => (title: l10n.tasks, icon: Icons.task_alt_rounded),
-      '/habits' => (
-        title: l10n.habits,
-        icon: Icons.published_with_changes_rounded,
-      ),
+      '/plan' ||
+      '/tasks' ||
+      '/habits' => (title: l10n.plan, icon: Icons.checklist_rtl_rounded),
+      '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
       '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
       '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
       _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
@@ -139,8 +220,8 @@ class HomeScreen extends StatelessWidget {
   static int _getIndexForLocation(String location) {
     return switch (location) {
       '/' => 0,
-      '/tasks' => 1,
-      '/habits' => 2,
+      '/plan' || '/tasks' || '/habits' => 1,
+      '/prayer-times' => 2,
       '/barakah' => 3,
       '/journal' => 4,
       _ => 0,
@@ -153,10 +234,10 @@ class HomeScreen extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        context.go('/tasks');
+        context.go('/plan');
         break;
       case 2:
-        context.go('/habits');
+        context.go('/prayer-times');
         break;
       case 3:
         context.go('/barakah');
@@ -367,60 +448,42 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Tooltip(
-      message:
-          '${l10n.nextPrayer}${_locationName != null ? ' • 📍 $_locationName' : ''}',
-      child: InkWell(
-        onTap: () => context.push('/prayer-times'),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.secondary.withValues(alpha: 0.2)
-                : AppColors.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.secondary.withValues(alpha: 0.4)
-                  : AppColors.primary.withValues(alpha: 0.25),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.access_time_filled_rounded,
-                size: 15,
+    final locSuffix = _locationName != null && _locationName!.isNotEmpty
+        ? ' • 📍 $_locationName'
+        : '';
+    final prayerDesc = _cachedPrayerTimes != null && _nextPrayer != '--'
+        ? ': ${_getLocalizedPrayerName(_nextPrayer, l10n)} ($_countdown)'
+        : '';
+    final tooltipText = '${l10n.nextPrayer}$prayerDesc$locSuffix';
+
+    return ProductiveAppBarAction(
+      tooltip: _cachedPrayerTimes == null ? l10n.nextPrayer : tooltipText,
+      icon: Icons.mosque_rounded,
+      iconColor: isDark ? AppColors.secondary : AppColors.primary,
+      onTap: () => context.push('/prayer-times'),
+      badge: _loading
+          ? SizedBox(
+              width: 10,
+              height: 10,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
                 color: isDark ? AppColors.secondary : AppColors.primary,
               ),
-              const SizedBox(width: 6),
-              if (_loading)
-                const SizedBox(
-                  width: 12,
-                  height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else
-                Flexible(
-                  child: Text(
-                    '${_getLocalizedPrayerName(_nextPrayer, l10n)} $_countdown',
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.textPrimary,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+            )
+          : (_cachedPrayerTimes != null && _nextPrayer != '--'
+                ? Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF0B1512) : Colors.white,
+                        width: 1.5,
+                      ),
                     ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+                  )
+                : null),
     );
   }
 }

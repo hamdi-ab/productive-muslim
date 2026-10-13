@@ -12,6 +12,7 @@ import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_state.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_analytics_cards.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -38,7 +39,11 @@ class _ReviewView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final dates = DateFormat.yMMMd(Localizations.localeOf(context).toString());
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.barakahWeeklyTitle)),
+      appBar: ProductiveAppBar(
+        title: l10n.barakahWeeklyTitle,
+        subtitle: 'Weekly Muhasabah & Consistency',
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: BlocBuilder<BarakahReviewBloc, BarakahReviewState>(
           builder: (context, state) => Column(

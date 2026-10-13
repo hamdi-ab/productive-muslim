@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:flutter/services.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
@@ -7,6 +8,7 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/arabic_typography.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
 import 'package:productive_muslim/data/services/backup_service.dart';
@@ -52,7 +54,6 @@ class SettingsView extends StatelessWidget {
       title: l10n.barakahDailyTitle,
       body: l10n.barakahReminderBody,
     );
-    final hasParentScaffold = Scaffold.maybeOf(context) != null;
     final contentWidget = BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
         final interactive = state.supported && !state.pending;
@@ -100,11 +101,8 @@ class SettingsView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Section 2: Adhan & Prayer Notifications
-            _SectionTitle(
-              icon: Icons.notifications_active_rounded,
-              title: l10n.notifications,
-            ),
+            // Section 2: Prayer Times & Location
+            _SectionTitle(icon: Icons.mosque_rounded, title: l10n.prayerTimes),
             const SizedBox(height: 8),
             Card(
               elevation: 0,
@@ -116,7 +114,13 @@ class SettingsView extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                child: _AdhanNotificationToggle(),
+                child: Column(
+                  children: [
+                    const _LocationPermissionToggle(),
+                    const Divider(height: 1, indent: 56, endIndent: 16),
+                    _AdhanNotificationToggle(),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -296,12 +300,12 @@ class SettingsView extends StatelessWidget {
       },
     );
 
-    if (hasParentScaffold) {
-      return contentWidget;
-    }
-
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
+      appBar: ProductiveAppBar(
+        title: l10n.settings,
+        subtitle: 'Preferences & Notifications',
+        showBackButton: true,
+      ),
       body: SafeArea(child: contentWidget),
     );
   }
@@ -331,6 +335,154 @@ class _SectionTitle extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LocationPermissionToggle extends StatefulWidget {
+  const _LocationPermissionToggle();
+
+  @override
+  State<_LocationPermissionToggle> createState() =>
+      _LocationPermissionToggleState();
+}
+
+class _LocationPermissionToggleState extends State<_LocationPermissionToggle> {
+  LocationPermission _permission = LocationPermission.denied;
+  bool _serviceEnabled = false;
+  bool _loading = false;
+  String? _locationName;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final permission = await Geolocator.checkPermission();
+      String? locName;
+      if (getIt.isRegistered<PrayerTimeService>()) {
+        locName = getIt<PrayerTimeService>().cachedLocationName;
+      }
+      if (mounted) {
+        setState(() {
+          _serviceEnabled = serviceEnabled;
+          _permission = permission;
+          _locationName = locName;
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _toggle(bool value) async {
+    if (_loading) return;
+    setState(() => _loading = true);
+
+    try {
+      if (value) {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Please enable location services on your device.',
+                ),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+          await _checkStatus();
+          return;
+        }
+
+        var perm = await Geolocator.checkPermission();
+        if (perm == LocationPermission.denied) {
+          perm = await Geolocator.requestPermission();
+        }
+
+        if (perm == LocationPermission.deniedForever) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Location permission permanently denied. Open settings to grant.',
+                ),
+                action: SnackBarAction(
+                  label: 'Settings',
+                  onPressed: () => Geolocator.openAppSettings(),
+                ),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        } else if (perm == LocationPermission.whileInUse ||
+            perm == LocationPermission.always) {
+          if (getIt.isRegistered<PrayerTimeService>()) {
+            await getIt<PrayerTimeService>().getCurrentPosition();
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'To revoke location access, adjust permissions in device settings.',
+              ),
+              action: SnackBarAction(
+                label: 'Settings',
+                onPressed: () => Geolocator.openAppSettings(),
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) {
+        await _checkStatus();
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isGranted =
+        _permission == LocationPermission.whileInUse ||
+        _permission == LocationPermission.always;
+
+    String subtitleText;
+    if (isGranted) {
+      subtitleText = _locationName != null && _locationName!.isNotEmpty
+          ? '📍 $_locationName • Accurate prayer times active'
+          : 'Active for accurate local prayer times & Qibla';
+    } else if (!_serviceEnabled) {
+      subtitleText = 'Location service disabled on device';
+    } else if (_permission == LocationPermission.deniedForever) {
+      subtitleText = 'Permission denied permanently. Tap to open settings';
+    } else {
+      subtitleText = l10n.onboardingPermissionBody;
+    }
+
+    return SwitchListTile(
+      key: const Key('setting_location_permission_toggle'),
+      secondary: Icon(
+        isGranted ? Icons.location_on_rounded : Icons.location_off_rounded,
+        color: isGranted ? AppColors.primary : Colors.grey,
+      ),
+      title: const Text(
+        'Location Access',
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(subtitleText, style: const TextStyle(fontSize: 12)),
+      value: isGranted,
+      onChanged: _loading ? null : _toggle,
     );
   }
 }
@@ -758,7 +910,10 @@ class _ArabicTypographyTile extends StatelessWidget {
 
         return ListTile(
           key: const Key('settings_arabic_typography'),
-          leading: const Icon(Icons.format_size_rounded, color: AppColors.primary),
+          leading: const Icon(
+            Icons.format_size_rounded,
+            color: AppColors.primary,
+          ),
           title: Text(
             l10n.adhkarTypography,
             style: const TextStyle(fontWeight: FontWeight.w600),
@@ -802,4 +957,3 @@ class _ArabicTypographyTile extends StatelessWidget {
     );
   }
 }
-

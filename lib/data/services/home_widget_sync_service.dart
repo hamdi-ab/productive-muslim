@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 abstract class HomeWidgetStorage {
@@ -58,7 +59,6 @@ class DefaultHomeWidgetStorage implements HomeWidgetStorage {
     return true;
   }
 }
-
 
 @pragma('vm:entry-point')
 Future<void> homeWidgetBackgroundCallback(Uri? uri) async {

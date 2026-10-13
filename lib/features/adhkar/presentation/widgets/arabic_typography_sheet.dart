@@ -104,9 +104,8 @@ class _ArabicTypographySheetState extends State<ArabicTypographySheet> {
                     const SizedBox(width: 10),
                     Text(
                       l10n.typographyTitle,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

@@ -219,7 +219,10 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      _locDigits(context, '${((_heading % 360 + 360) % 360).toStringAsFixed(0)}°'),
+                      _locDigits(
+                        context,
+                        '${((_heading % 360 + 360) % 360).toStringAsFixed(0)}°',
+                      ),
                       style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w900,
@@ -233,7 +236,9 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isFacingKaaba ? const Color(0xFF10B981) : AppColors.primary,
+                        color: isFacingKaaba
+                            ? const Color(0xFF10B981)
+                            : AppColors.primary,
                       ),
                     ),
                   ],
@@ -275,7 +280,13 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        _getTurnText(context, qiblaBearing, _heading, isFacingKaaba, l10n),
+                        _getTurnText(
+                          context,
+                          qiblaBearing,
+                          _heading,
+                          isFacingKaaba,
+                          l10n,
+                        ),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -308,7 +319,10 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                           children: [
                             Text(
                               l10n.qiblaBearing(
-                                _locDigits(context, qiblaBearing.toStringAsFixed(1)),
+                                _locDigits(
+                                  context,
+                                  qiblaBearing.toStringAsFixed(1),
+                                ),
                               ),
                               style: const TextStyle(
                                 fontSize: 13,
@@ -344,7 +358,10 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                           children: [
                             Text(
                               l10n.qiblaDistance(
-                                _locDigits(context, distanceKm.toStringAsFixed(0)),
+                                _locDigits(
+                                  context,
+                                  distanceKm.toStringAsFixed(0),
+                                ),
                               ),
                               textAlign: TextAlign.center,
                               style: const TextStyle(
@@ -527,4 +544,3 @@ String _getTurnText(
     return l10n.qiblaTurnLeft(deg);
   }
 }
-

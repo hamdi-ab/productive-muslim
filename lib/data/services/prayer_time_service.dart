@@ -21,6 +21,7 @@ class PrayerTimeService {
     }
     return _cachedPrayerTimes;
   }
+
   String? get cachedLocationName => _cachedLocationName;
 
   Future<Position?> getCurrentPosition() async {
@@ -123,8 +124,7 @@ class PrayerTimeService {
     if (getIt.isRegistered<SettingsService>()) {
       final settings = getIt<SettingsService>();
       settings.setLastCoordinates(position.latitude, position.longitude);
-      if (_cachedLocationName != null &&
-          !_cachedLocationName!.contains('°')) {
+      if (_cachedLocationName != null && !_cachedLocationName!.contains('°')) {
         settings.setLastLocationName(_cachedLocationName!);
       }
     }
@@ -141,14 +141,14 @@ class PrayerTimeService {
         final city = place.locality?.isNotEmpty == true
             ? place.locality
             : place.subAdministrativeArea?.isNotEmpty == true
-                ? place.subAdministrativeArea
-                : place.subLocality?.isNotEmpty == true
-                    ? place.subLocality
-                    : place.administrativeArea?.isNotEmpty == true
-                        ? place.administrativeArea
-                        : place.name?.isNotEmpty == true
-                            ? place.name
-                            : place.country;
+            ? place.subAdministrativeArea
+            : place.subLocality?.isNotEmpty == true
+            ? place.subLocality
+            : place.administrativeArea?.isNotEmpty == true
+            ? place.administrativeArea
+            : place.name?.isNotEmpty == true
+            ? place.name
+            : place.country;
         if (city != null && city.isNotEmpty) {
           _cachedLocationName = city;
           if (getIt.isRegistered<SettingsService>()) {

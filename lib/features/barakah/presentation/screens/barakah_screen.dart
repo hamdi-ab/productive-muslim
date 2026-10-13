@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
@@ -55,14 +56,15 @@ class _BarakahScreenState extends State<BarakahScreen> {
               return Scaffold(
                 appBar: hasParentScaffold
                     ? null
-                    : AppBar(
-                        title: Text(l10n.barakah),
+                    : ProductiveAppBar(
+                        title: l10n.barakah,
+                        showBackButton: true,
                         actions: [
-                          IconButton(
+                          ProductiveAppBarAction(
                             key: const Key('open-review'),
                             tooltip: l10n.barakahWeeklyTitle,
-                            icon: const Icon(Icons.calendar_month_outlined),
-                            onPressed: () => Navigator.of(context).push(
+                            icon: Icons.calendar_month_outlined,
+                            onTap: () => Navigator.of(context).push(
                               MaterialPageRoute<void>(
                                 builder: (_) => const BarakahReviewScreen(),
                               ),

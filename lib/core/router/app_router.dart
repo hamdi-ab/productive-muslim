@@ -9,13 +9,12 @@ import 'package:productive_muslim/features/settings/presentation/screens/setting
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
-import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
-import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
+import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
@@ -118,7 +117,7 @@ class AppRouter {
               }
             },
           ),
-          // 1. Primary Bottom Navigation Shell (Top-level Tabs ONLY)
+          // 1. Primary Bottom Navigation Shell (Top-level Tabs)
           ShellRoute(
             builder: (context, state, child) => HomeScreen(child: child),
             routes: [
@@ -127,12 +126,22 @@ class AppRouter {
                 builder: (context, state) => const HomeContent(),
               ),
               GoRoute(
+                path: '/plan',
+                builder: (context, state) => const PlanScreen(),
+              ),
+              GoRoute(
                 path: '/tasks',
-                builder: (context, state) => const TaskScreen(),
+                builder: (context, state) =>
+                    const PlanScreen(initialTab: PlanTab.tasks),
               ),
               GoRoute(
                 path: '/habits',
-                builder: (context, state) => const HabitScreen(),
+                builder: (context, state) =>
+                    const PlanScreen(initialTab: PlanTab.habits),
+              ),
+              GoRoute(
+                path: '/prayer-times',
+                builder: (context, state) => const PrayerTimesScreen(),
               ),
               GoRoute(
                 path: '/barakah',
@@ -148,10 +157,6 @@ class AppRouter {
           GoRoute(
             path: '/settings',
             builder: (context, state) => const SettingsScreen(),
-          ),
-          GoRoute(
-            path: '/prayer-times',
-            builder: (context, state) => const PrayerTimesScreen(),
           ),
           GoRoute(
             path: '/focus',
