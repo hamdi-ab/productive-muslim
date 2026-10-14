@@ -18,7 +18,9 @@ import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class TaskScreen extends StatefulWidget {
-  const TaskScreen({super.key});
+  final String? date;
+
+  const TaskScreen({super.key, this.date});
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
@@ -28,22 +30,23 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final activeDate =
+        widget.date ?? DateFormat('yyyy-MM-dd').format(DateTime.now());
     final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return BlocProvider(
       create: (context) =>
-          TaskBloc(context.read<TaskRepository>())..add(TaskLoaded(today)),
+          TaskBloc(context.read<TaskRepository>())..add(TaskLoaded(activeDate)),
       child: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Scaffold(
             appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.tasks)),
             floatingActionButton: AppPressable(
-              onTap: () => _showCreateSheet(context, today),
+              onTap: () => _showCreateSheet(context, activeDate),
               pressedScale: 0.90,
               haptic: AppHapticFeedback.light,
               child: FloatingActionButton(
-                onPressed: () => _showCreateSheet(context, today),
+                onPressed: () => _showCreateSheet(context, activeDate),
                 child: const Icon(Icons.add),
               ),
             ),
@@ -168,6 +171,7 @@ class _TaskList extends StatelessWidget {
         ],
         if (scheduled.isNotEmpty) ...[
           _SectionHeader(label: AppLocalizations.of(context)!.taskScheduled),
+          const _SunnahNudgeCard(),
           ...scheduled.map((task) => _TaskTile(task: task)),
         ],
         if (completed.isNotEmpty) ...[
@@ -175,6 +179,69 @@ class _TaskList extends StatelessWidget {
           ...completed.map((task) => _TaskTile(task: task)),
         ],
       ],
+    );
+  }
+}
+
+class _SunnahNudgeCard extends StatelessWidget {
+  const _SunnahNudgeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFFD4AF37).withValues(alpha: 0.08)
+            : const Color(0xFFFEF3C7).withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFD4AF37).withValues(alpha: isDark ? 0.25 : 0.4),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFFD4AF37).withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.water_drop_rounded,
+              color: Color(0xFFD4AF37),
+              size: 17,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Renew Wudhu before Adhan',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Spiritual Nudge • Sunnah of Readiness',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: Color(0xFFD4AF37),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
