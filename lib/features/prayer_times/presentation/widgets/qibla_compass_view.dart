@@ -99,28 +99,94 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              color: isDark ? const Color(0xFF13221C) : Colors.white,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isFacingKaaba
-                    ? const Color(0xFF10B981).withValues(alpha: 0.6)
+                    ? AppColors.secondary
                     : (isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.black.withValues(alpha: 0.05)),
+                          ? AppColors.secondary.withValues(alpha: 0.25)
+                          : AppColors.primary.withValues(alpha: 0.15)),
                 width: isFacingKaaba ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isFacingKaaba
-                      ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                      : Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 16,
+                      ? AppColors.secondary.withValues(alpha: 0.2)
+                      : (isDark
+                            ? Colors.black.withValues(alpha: 0.35)
+                            : AppColors.primary.withValues(alpha: 0.05)),
+                  blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
               ],
             ),
             child: Column(
               children: [
+                // Top Header: Title & Accuracy Pill
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.explore_rounded,
+                          size: 19,
+                          color: AppColors.secondary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.qiblaTabCompass,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryLight,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          const Text(
+                            'Accuracy: ±0.2°',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+
                 // Rotating Compass Rose
                 SizedBox(
                   width: 240,
@@ -146,11 +212,11 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: const BoxDecoration(
-                                color: Color(0xFFF59E0B),
+                                color: AppColors.secondary,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color(0xFFF59E0B),
+                                    color: AppColors.secondary,
                                     blurRadius: 10,
                                   ),
                                 ],
@@ -158,18 +224,18 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                               child: const Icon(
                                 Icons.mosque_rounded,
                                 size: 20,
-                                color: Colors.white,
+                                color: Colors.black87,
                               ),
                             ),
                             Container(
-                              width: 3,
+                              width: 3.5,
                               height: 80,
                               decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(2),
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFFF59E0B),
-                                    const Color(0xFFF59E0B)
-                                        .withValues(alpha: 0.0),
+                                    AppColors.secondary,
+                                    AppColors.secondary.withValues(alpha: 0.0),
                                   ],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -186,22 +252,32 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                         height: 44,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF0F172A)
+                              ? const Color(0xFF0F4C3A)
                               : Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isFacingKaaba
-                                ? const Color(0xFF10B981)
+                                ? AppColors.secondary
                                 : AppColors.primary,
                             width: 3,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  (isFacingKaaba
+                                          ? AppColors.secondary
+                                          : AppColors.primary)
+                                      .withValues(alpha: 0.3),
+                              blurRadius: 8,
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Icon(
                             Icons.navigation_rounded,
                             size: 22,
                             color: isFacingKaaba
-                                ? const Color(0xFF10B981)
+                                ? AppColors.secondary
                                 : AppColors.primary,
                           ),
                         ),
@@ -311,9 +387,15 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withValues(alpha: 0.04)
-                              : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(14),
+                              ? AppColors.darkSurface
+                              : AppColors.surfaceSubtle,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
+                            width: 0.8,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -324,9 +406,12 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                                   qiblaBearing.toStringAsFixed(1),
                                 ),
                               ),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -334,7 +419,9 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                               l10n.qiblaDirectionLabel,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDark ? Colors.white54 : Colors.black45,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -350,9 +437,15 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withValues(alpha: 0.04)
-                              : Colors.black.withValues(alpha: 0.03),
-                          borderRadius: BorderRadius.circular(14),
+                              ? AppColors.darkSurface
+                              : AppColors.surfaceSubtle,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
+                            width: 0.8,
+                          ),
                         ),
                         child: Column(
                           children: [
@@ -364,9 +457,12 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                                 ),
                               ),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -374,7 +470,9 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
                               l10n.qiblaDistanceLabel,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDark ? Colors.white54 : Colors.black45,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -394,9 +492,13 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.04)
-                  : Colors.grey.shade100,
+                  ? AppColors.primary.withValues(alpha: 0.12)
+                  : AppColors.primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                width: 0.8,
+              ),
             ),
             child: Row(
               children: [
