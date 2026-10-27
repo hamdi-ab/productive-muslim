@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -228,44 +230,93 @@ class _PlanScreenState extends State<PlanScreen> {
         onTap: () => _showCreateAction(context),
         pressedScale: 0.90,
         haptic: AppHapticFeedback.light,
-        child: FloatingActionButton.extended(
-          onPressed: () => _showCreateAction(context),
-          backgroundColor: AppColors.primary,
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-          label: Text(
-            _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.secondary, Color(0xFFFFD54F)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.secondary.withValues(alpha: 0.35),
+                blurRadius: 18,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            onPressed: () => _showCreateAction(context),
+            elevation: 0,
+            highlightElevation: 0,
+            backgroundColor: Colors.transparent,
+            icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
+            label: Text(
+              _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
+              style: const TextStyle(
+                color: Color(0xFF241A00),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // 1. Date Switcher Navigator
-          _buildDateNavigator(context, isDark),
-
-          // 2. Spiritual Anchor Banner (Bismillah & Niyyah Renewal)
-          _buildSpiritualAnchorBanner(context, isDark),
-
-          // 3. Barakah Alignment Progress Meter
-          _buildBarakahAlignmentMeter(context, isDark),
-
-          // 4. Segmented Capsule Switcher [Tasks | Habits]
-          _buildSegmentedTabSwitcher(context, l10n, isDark),
-
-          // 5. Active Tab Content View
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
-              child: _selectedTab == PlanTab.tasks
-                  ? TaskScreen(
-                      key: ValueKey('plan_task_view_$_formattedDate'),
-                      date: _formattedDate,
-                    )
-                  : const HabitScreen(key: ValueKey('plan_habit_view')),
+          // Subtle Atmospheric Sacred Glow (Stitch style)
+          Positioned(
+            top: -50,
+            left: 0,
+            right: 0,
+            height: 240,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: const Alignment(0, -0.6),
+                    radius: 0.85,
+                    colors: [
+                      AppColors.secondary.withValues(
+                        alpha: isDark ? 0.12 : 0.08,
+                      ),
+                      const Color(0xFF0F4C3A)
+                          .withValues(alpha: isDark ? 0.08 : 0.04),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
             ),
+          ),
+          Column(
+            children: [
+              // 1. Date Switcher Navigator
+              _buildDateNavigator(context, isDark),
+
+              // 2. Spiritual Anchor Banner (Bismillah & Niyyah Renewal)
+              _buildSpiritualAnchorBanner(context, isDark),
+
+              // 3. Barakah Alignment Progress Meter
+              _buildBarakahAlignmentMeter(context, isDark),
+
+              // 4. Segmented Capsule Switcher [Tasks | Habits]
+              _buildSegmentedTabSwitcher(context, l10n, isDark),
+
+              // 5. Active Tab Content View
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child: _selectedTab == PlanTab.tasks
+                      ? TaskScreen(
+                          key: ValueKey('plan_task_view_$_formattedDate'),
+                          date: _formattedDate,
+                        )
+                      : const HabitScreen(key: ValueKey('plan_habit_view')),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -278,11 +329,11 @@ class _PlanScreenState extends State<PlanScreen> {
         _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     String hijriText = '';
     if (getIt.isRegistered<HijriService>()) {
       final hijri = getIt<HijriService>().getHijriDate(_selectedDate);
-      final isAr = Localizations.localeOf(context).languageCode == 'ar';
       hijriText = isAr
           ? '${hijri.hDay} ${hijri.monthNameAr} ${hijri.hYear} هـ'
           : '${hijri.hDay} ${hijri.monthNameEn} ${hijri.hYear} AH';
@@ -302,142 +353,274 @@ class _PlanScreenState extends State<PlanScreen> {
       }
     }
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(
+    final dayOfYear =
+        _selectedDate.difference(DateTime(_selectedDate.year, 1, 1)).inDays + 1;
+    final dayProgressStr = isAr
+        ? 'اليوم $dayOfYear من ٣٥٤'
+        : 'Day $dayOfYear of 354';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
         AppSpacing.xs,
         AppSpacing.md,
         0,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : AppColors.primary.withValues(alpha: 0.12),
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AppPressable(
-            onTap: () => _changeDate(-1),
-            pressedScale: 0.88,
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.black.withValues(alpha: 0.04),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.chevron_left_rounded,
-                size: 20,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          // Hijri Date Anchor & Day Pill Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.event_note_rounded,
-                      size: 15,
-                      color: AppColors.secondary,
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.secondary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
                         hijriText.isNotEmpty
                             ? hijriText
-                            : DateFormat('d MMMM yyyy').format(_selectedDate),
+                            : DateFormat('EEEE, d MMMM yyyy')
+                                  .format(_selectedDate),
                         style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.secondary,
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (isToday) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: const Text(
-                          'Today',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  prayerTimesSub,
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.07)
+                      : Colors.black.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Text(
+                  dayProgressStr,
                   style: TextStyle(
                     fontSize: 10.5,
                     color: isDark
                         ? AppColors.darkTextSecondary
                         : AppColors.textSecondary,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // Daily Plan Screen Title & Barakah Focus Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                isAr ? 'الخطة اليومية' : 'Daily Plan',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.primaryLight.withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.energy_savings_leaf_rounded,
+                      size: 13,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isAr ? 'تركيز البركة' : 'Barakah Focus',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.primaryLight
+                            : AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Date Switcher Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurface : Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : AppColors.primary.withValues(alpha: 0.12),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
+                      .withValues(alpha: isDark ? 0.2 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-          ),
-          AppPressable(
-            onTap: () => _changeDate(1),
-            pressedScale: 0.88,
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : Colors.black.withValues(alpha: 0.04),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.chevron_right_rounded,
-                size: 20,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppPressable(
+                  onTap: () => _changeDate(-1),
+                  pressedScale: 0.88,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : Colors.black.withValues(alpha: 0.04),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.chevron_left_rounded,
+                      size: 20,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.calendar_month_rounded,
+                            size: 15,
+                            color: AppColors.secondary,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              DateFormat('d MMMM yyyy').format(_selectedDate),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isToday) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.15,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Text(
+                                'Today',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        prayerTimesSub,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                AppPressable(
+                  onTap: () => _changeDate(1),
+                  pressedScale: 0.88,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : Colors.black.withValues(alpha: 0.04),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -591,64 +774,93 @@ class _PlanScreenState extends State<PlanScreen> {
             AppSpacing.md,
             0,
           ),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : AppColors.primary.withValues(alpha: 0.1),
+                  ? AppColors.secondary.withValues(alpha: 0.25)
+                  : AppColors.secondary.withValues(alpha: 0.18),
+              width: 1.1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
+                    .withValues(alpha: isDark ? 0.25 : 0.04),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.bolt_rounded,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        totalTasks == 0
-                            ? 'Daily Intention Alignment'
-                            : '$completedTasks of $totalTasks Intentions Completed',
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Daily Intention Alignment',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          totalTasks == 0
+                              ? 'Daily Intention Alignment'
+                              : '$completedTasks of $totalTasks Intentions Completed',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                      ),
-                    ),
-                    child: Text(
-                      '$percent% Barakah Alignment',
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF92400E),
-                      ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CustomPaint(
+                          size: const Size(44, 44),
+                          painter: _GaugeRingPainter(
+                            progress: percent / 100,
+                            trackColor: isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.06),
+                            progressColor: AppColors.secondary,
+                          ),
+                        ),
+                        Text(
+                          '$percent%',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               // Segmented 10-bar progress indicator
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
@@ -696,9 +908,14 @@ class _PlanScreenState extends State<PlanScreen> {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
+              ? AppColors.darkSurface.withValues(alpha: 0.8)
               : Colors.black.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
+          ),
         ),
         child: Row(
           children: [
@@ -717,7 +934,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 context: context,
                 tab: PlanTab.habits,
                 label: l10n.habits,
-                icon: Icons.published_with_changes_rounded,
+                icon: Icons.local_fire_department_rounded,
                 isSelected: _selectedTab == PlanTab.habits,
               ),
             ),
@@ -743,8 +960,21 @@ class _PlanScreenState extends State<PlanScreen> {
         duration: const Duration(milliseconds: 180),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [AppColors.primary, Color(0xFF0F4C3A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isSelected ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
+          border: isSelected
+              ? Border.all(
+                  color: AppColors.secondary.withValues(alpha: 0.35),
+                  width: 1,
+                )
+              : null,
           boxShadow: isSelected
               ? [
                   BoxShadow(
@@ -767,7 +997,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 Icon(
                   icon,
                   size: 17,
-                  color: isSelected ? Colors.white : unselectedColor,
+                  color: isSelected ? AppColors.secondary : unselectedColor,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -785,4 +1015,51 @@ class _PlanScreenState extends State<PlanScreen> {
       ),
     );
   }
+}
+
+class _GaugeRingPainter extends CustomPainter {
+  final double progress;
+  final Color trackColor;
+  final Color progressColor;
+
+  _GaugeRingPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.progressColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const strokeWidth = 3.5;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
+
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+    canvas.drawCircle(center, radius, trackPaint);
+
+    if (progress > 0) {
+      final progressPaint = Paint()
+        ..color = progressColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round;
+      final sweepAngle = 2 * math.pi * progress.clamp(0.0, 1.0);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2,
+        sweepAngle,
+        false,
+        progressPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GaugeRingPainter oldDelegate) =>
+      oldDelegate.progress != progress ||
+      oldDelegate.trackColor != trackColor ||
+      oldDelegate.progressColor != progressColor;
 }

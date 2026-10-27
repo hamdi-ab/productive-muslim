@@ -7,7 +7,6 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
-import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
@@ -87,22 +86,64 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.task_alt,
-            size: 64,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            l10n.emptyTasks,
-            style: Theme.of(context).textTheme.bodyLarge
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-        ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 84,
+              height: 84,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.12),
+                border: Border.all(
+                  color: AppColors.secondary.withValues(alpha: 0.3),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(
+                      alpha: isDark ? 0.25 : 0.08,
+                    ),
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.task_alt_rounded,
+                size: 42,
+                color: AppColors.secondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              l10n.emptyTasks,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Plan your daily intentions around prayer times for maximum Barakah.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -194,29 +235,39 @@ class _SunnahNudgeCard extends StatelessWidget {
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.xs,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFFD4AF37).withValues(alpha: 0.08)
-            : const Color(0xFFFEF3C7).withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(16),
+            ? AppColors.darkSurface.withValues(alpha: 0.75)
+            : const Color(0xFFFEF9C3).withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withValues(alpha: isDark ? 0.25 : 0.4),
+          color: AppColors.secondary.withValues(alpha: isDark ? 0.35 : 0.25),
+          width: 1.2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.25 : 0.04,
+            ),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFFD4AF37).withValues(alpha: 0.2),
+              color: AppColors.secondary.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.water_drop_rounded,
-              color: Color(0xFFD4AF37),
-              size: 17,
+              color: AppColors.secondary,
+              size: 20,
             ),
           ),
           const SizedBox(width: 12),
@@ -226,18 +277,38 @@ class _SunnahNudgeCard extends StatelessWidget {
               children: [
                 Text(
                   'Renew Wudhu before Adhan',
-                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 2),
                 Text(
                   'Spiritual Nudge • Sunnah of Readiness',
                   style: TextStyle(
-                    fontSize: 10.5,
-                    color: Color(0xFFD4AF37),
-                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
+            ),
+          ),
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.06)
+                  : Colors.black.withValues(alpha: 0.04),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.08),
+              ),
+            ),
+            child: const Icon(
+              Icons.check_rounded,
+              size: 16,
+              color: AppColors.secondary,
             ),
           ),
         ],
@@ -256,16 +327,30 @@ class _SectionHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
+        AppSpacing.md,
         AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.sm,
+        AppSpacing.xs,
       ),
-      child: Text(
-        label.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-          letterSpacing: 1.2,
-        ),
+      child: Row(
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: const BoxDecoration(
+              color: AppColors.secondary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: isDark ? AppColors.secondary : AppColors.secondaryDark,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -302,8 +387,12 @@ class _TaskTile extends StatelessWidget {
         ),
         padding: const EdgeInsets.only(right: AppSpacing.lg),
         decoration: BoxDecoration(
-          color: AppColors.success,
-          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0F4C3A), Color(0xFF10B981)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -330,12 +419,32 @@ class _TaskTile extends StatelessWidget {
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.xs,
         ),
-        child: GlassContainer(
-          padding: const EdgeInsets.all(16),
-          borderRadius: 20,
-          color: isDark
-              ? AppColors.darkSurface.withValues(alpha: 0.8)
-              : Colors.white.withValues(alpha: 0.8),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: task.completed
+                ? (isDark
+                      ? const Color(0xFF0D251C).withValues(alpha: 0.6)
+                      : const Color(0xFFF0FDF4).withValues(alpha: 0.8))
+                : (isDark ? AppColors.darkSurface : Colors.white),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: task.completed
+                  ? AppColors.primary.withValues(alpha: 0.2)
+                  : (isDark
+                        ? AppColors.secondary.withValues(alpha: 0.22)
+                        : AppColors.secondary.withValues(alpha: 0.15)),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
+                    .withValues(alpha: isDark ? 0.25 : 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: Row(
             children: [
               Container(
@@ -370,7 +479,11 @@ class _TaskTile extends StatelessWidget {
                                           ? AppColors.darkTextPrimary
                                           : AppColors.textPrimary),
                               ),
-                      child: Text(task.title),
+                      child: Text(
+                        task.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Row(
@@ -381,8 +494,12 @@ class _TaskTile extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.12),
+                            color: color.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: color.withValues(alpha: 0.25),
+                              width: 0.8,
+                            ),
                           ),
                           child: Text(
                             areaLabel,
