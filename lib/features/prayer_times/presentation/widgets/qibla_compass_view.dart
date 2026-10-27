@@ -6,6 +6,7 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -81,6 +82,7 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     final lat = widget.latitude ?? widget.position?.latitude ?? 21.4225;
     final lng = widget.longitude ?? widget.position?.longitude ?? 39.8262;
@@ -91,437 +93,518 @@ class _QiblaCompassViewState extends State<QiblaCompassView> {
     final angleDifference = (qiblaBearing - _heading).abs() % 360;
     final isFacingKaaba = angleDifference < 5 || angleDifference > 355;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        children: [
-          // Compass Card
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF13221C) : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isFacingKaaba
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Hero Compass Glass Container
+              GlassContainer(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
+                borderRadius: 24,
+                blur: 18,
+                color: isDark
+                    ? const Color(0xFF13221C).withValues(alpha: 0.88)
+                    : Colors.white.withValues(alpha: 0.9),
+                borderColor: isFacingKaaba
                     ? AppColors.secondary
                     : (isDark
-                          ? AppColors.secondary.withValues(alpha: 0.25)
-                          : AppColors.primary.withValues(alpha: 0.15)),
-                width: isFacingKaaba ? 2 : 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: isFacingKaaba
-                      ? AppColors.secondary.withValues(alpha: 0.2)
-                      : (isDark
-                            ? Colors.black.withValues(alpha: 0.35)
-                            : AppColors.primary.withValues(alpha: 0.05)),
-                  blurRadius: 18,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Top Header: Title & Accuracy Pill
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ? AppColors.secondary.withValues(alpha: 0.28)
+                          : AppColors.primary.withValues(alpha: 0.2)),
+                child: Column(
                   children: [
-                    Row(
+                    // Top Header: Title & Accuracy Pill
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
-                        const Icon(
-                          Icons.explore_rounded,
-                          size: 19,
-                          color: AppColors.secondary,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.explore_rounded,
+                              size: 19,
+                              color: AppColors.secondary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.qiblaTabCompass,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.qiblaTabCompass,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.textPrimary,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primaryLight,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              const Text(
+                                'Accuracy: ±0.2°',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryLight,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Rotating Celestial Compass Rose
+                    SizedBox(
+                      width: 240,
+                      height: 240,
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primaryLight,
-                              shape: BoxShape.circle,
+                          // Compass Dial
+                          Transform.rotate(
+                            angle: -_heading * (math.pi / 180.0),
+                            child: CustomPaint(
+                              size: const Size(240, 240),
+                              painter: _CompassDialPainter(isDark: isDark),
                             ),
                           ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'Accuracy: ±0.2°',
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight,
+
+                          // Kaaba Indicator Pointer Needle
+                          Transform.rotate(
+                            angle:
+                                (qiblaBearing - _heading) * (math.pi / 180.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.secondary.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                        blurRadius: 12,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.mosque_rounded,
+                                    size: 20,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Container(
+                                  width: 3.5,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.secondary,
+                                        AppColors.secondary.withValues(
+                                          alpha: 0.0,
+                                        ),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Center Hub Indicator
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF0F4C3A)
+                                  : Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isFacingKaaba
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      (isFacingKaaba
+                                              ? AppColors.secondary
+                                              : AppColors.primary)
+                                          .withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.navigation_rounded,
+                                size: 22,
+                                color: isFacingKaaba
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
 
-                // Rotating Compass Rose
-                SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Compass Dial
-                      Transform.rotate(
-                        angle: -_heading * (math.pi / 180.0),
-                        child: CustomPaint(
-                          size: const Size(240, 240),
-                          painter: _CompassDialPainter(isDark: isDark),
-                        ),
-                      ),
+                    const SizedBox(height: AppSpacing.md),
 
-                      // Kaaba Indicator Pointer
-                      Transform.rotate(
-                        angle: (qiblaBearing - _heading) * (math.pi / 180.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: AppColors.secondary,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.secondary,
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.mosque_rounded,
-                                size: 20,
-                                color: Colors.black87,
-                              ),
+                    // Real-time Dynamic Heading Readout (FittedBox prevents overflow)
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            _locDigits(
+                              context,
+                              '${((_heading % 360 + 360) % 360).toStringAsFixed(0)}°',
                             ),
-                            Container(
-                              width: 3.5,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(2),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.secondary,
-                                    AppColors.secondary.withValues(alpha: 0.0),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                              ),
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                              color: isFacingKaaba
+                                  ? AppColors.secondary
+                                  : (isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary),
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-
-                      // Center Hub
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF0F4C3A)
-                              : Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isFacingKaaba
-                                ? AppColors.secondary
-                                : AppColors.primary,
-                            width: 3,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  (isFacingKaaba
-                                          ? AppColors.secondary
-                                          : AppColors.primary)
-                                      .withValues(alpha: 0.3),
-                              blurRadius: 8,
+                          const SizedBox(width: 8),
+                          Text(
+                            _getCardinalDirection((_heading % 360 + 360) % 360),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: isFacingKaaba
+                                  ? const Color(0xFF10B981)
+                                  : AppColors.primary,
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.navigation_rounded,
-                            size: 22,
-                            color: isFacingKaaba
-                                ? AppColors.secondary
-                                : AppColors.primary,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.md),
-
-                // Real-time Dynamic Heading Readout
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      _locDigits(
-                        context,
-                        '${((_heading % 360 + 360) % 360).toStringAsFixed(0)}°',
-                      ),
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _getCardinalDirection((_heading % 360 + 360) % 360),
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isFacingKaaba
-                            ? const Color(0xFF10B981)
-                            : AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
 
-                // Live Guidance Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isFacingKaaba
-                        ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                        : (isDark
-                              ? Colors.white.withValues(alpha: 0.08)
-                              : Colors.black.withValues(alpha: 0.05)),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isFacingKaaba
-                          ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                          : Colors.transparent,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isFacingKaaba
-                            ? Icons.check_circle_rounded
-                            : (_getTurnDiff(qiblaBearing, _heading) > 0
-                                  ? Icons.rotate_right_rounded
-                                  : Icons.rotate_left_rounded),
-                        size: 16,
-                        color: isFacingKaaba
-                            ? const Color(0xFF10B981)
-                            : (isDark ? Colors.white70 : Colors.black87),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _getTurnText(
-                          context,
-                          qiblaBearing,
-                          _heading,
-                          isFacingKaaba,
-                          l10n,
-                        ),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: isFacingKaaba
-                              ? const Color(0xFF10B981)
-                              : (isDark ? Colors.white70 : Colors.black87),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: 8),
 
-                // Sub-stats Row (Target Qibla Bearing & Distance)
-                Row(
-                  children: [
-                    Expanded(
+                    // Live Guidance Badge (FittedBox scales down cleanly on extreme fonts)
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 10,
                           horizontal: 12,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.darkSurface
-                              : AppColors.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(16),
+                          color: isFacingKaaba
+                              ? const Color(0xFF10B981).withValues(alpha: 0.18)
+                              : (isDark
+                                    ? Colors.white.withValues(alpha: 0.08)
+                                    : Colors.black.withValues(alpha: 0.05)),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isDark
-                                ? AppColors.borderDark
-                                : AppColors.borderLight,
-                            width: 0.8,
+                            color: isFacingKaaba
+                                ? const Color(0xFF10B981)
+                                      .withValues(alpha: 0.45)
+                                : Colors.transparent,
                           ),
                         ),
-                        child: Column(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              l10n.qiblaBearing(
-                                _locDigits(
-                                  context,
-                                  qiblaBearing.toStringAsFixed(1),
-                                ),
-                              ),
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? AppColors.secondary
-                                    : AppColors.primary,
-                              ),
+                            Icon(
+                              isFacingKaaba
+                                  ? Icons.check_circle_rounded
+                                  : (_getTurnDiff(qiblaBearing, _heading) > 0
+                                        ? Icons.rotate_right_rounded
+                                        : Icons.rotate_left_rounded),
+                              size: 16,
+                              color: isFacingKaaba
+                                  ? const Color(0xFF10B981)
+                                  : (isDark ? Colors.white70 : Colors.black87),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(width: 6),
                             Text(
-                              l10n.qiblaDirectionLabel,
+                              _getTurnText(
+                                context,
+                                qiblaBearing,
+                                _heading,
+                                isFacingKaaba,
+                                l10n,
+                              ),
                               style: TextStyle(
-                                fontSize: 11,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: isFacingKaaba
+                                    ? const Color(0xFF10B981)
+                                    : (isDark
+                                          ? Colors.white70
+                                          : Colors.black87),
                               ),
                             ),
                           ],
                         ),
                       ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Sub-stats Row (Bearing & Distance to Kaaba)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkSurface
+                                  : AppColors.surfaceSubtle,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? AppColors.borderDark
+                                    : AppColors.borderLight,
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  l10n.qiblaBearing(
+                                    _locDigits(
+                                      context,
+                                      qiblaBearing.toStringAsFixed(1),
+                                    ),
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.secondary
+                                        : AppColors.primary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.qiblaDirectionLabel,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkSurface
+                                  : AppColors.surfaceSubtle,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? AppColors.borderDark
+                                    : AppColors.borderLight,
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  l10n.qiblaDistance(
+                                    _locDigits(
+                                      context,
+                                      distanceKm.toStringAsFixed(0),
+                                    ),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.secondary
+                                        : AppColors.primary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  l10n.qiblaDistanceLabel,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.sm),
+
+              // 2. Flat phone alignment guidance banner (Stitch Design)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF141E1A)
+                      : AppColors.surfaceSubtle,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.borderDark
+                        : AppColors.borderLight,
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.screen_rotation_rounded,
+                      size: 18,
+                      color: AppColors.secondary,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 12,
-                        ),
-                        decoration: BoxDecoration(
+                      child: Text(
+                        isAr
+                            ? 'ضع الهاتف بشكل أفقي مسطح باتجاه الكعبة المشرفة بمكة المكرمة.'
+                            : 'Orient phone flat towards the Holy Kaaba in Makkah al-Mukarramah.',
+                        style: TextStyle(
+                          fontSize: 11.5,
                           color: isDark
-                              ? AppColors.darkSurface
-                              : AppColors.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isDark
-                                ? AppColors.borderDark
-                                : AppColors.borderLight,
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n.qiblaDistance(
-                                _locDigits(
-                                  context,
-                                  distanceKm.toStringAsFixed(0),
-                                ),
-                              ),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? AppColors.secondary
-                                    : AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              l10n.qiblaDistanceLabel,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                          height: 1.35,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // Calibration advice
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.primary.withValues(alpha: 0.12)
-                  : AppColors.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.2),
-                width: 0.8,
               ),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.info_outline_rounded,
-                  size: 20,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    l10n.qiblaCalibrate,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.white70 : Colors.black87,
-                      height: 1.4,
-                    ),
+
+              const SizedBox(height: AppSpacing.xs),
+
+              // 3. Calibration advice card
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.primary.withValues(alpha: 0.12)
+                      : AppColors.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.22),
+                    width: 0.8,
                   ),
                 ),
-              ],
-            ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.qiblaCalibrate,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: isDark ? Colors.white70 : Colors.black87,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -537,32 +620,41 @@ class _CompassDialPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
 
+    // Outer subtle gold/metallic ring
     final outerRing = Paint()
-      ..color = isDark
-          ? Colors.white.withValues(alpha: 0.1)
-          : Colors.grey.shade300
+      ..color = (isDark ? AppColors.secondary : Colors.grey.shade400)
+          .withValues(alpha: 0.25)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     canvas.drawCircle(center, radius - 4, outerRing);
 
-    // Cardinal points
+    // Inner dashed circle
+    final innerDashedRing = Paint()
+      ..color = (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    canvas.drawCircle(center, radius - 18, innerDashedRing);
+
+    // Cardinal tick marks
     final tickPaint = Paint()
       ..color = isDark ? Colors.white54 : Colors.black45
       ..strokeWidth = 1.5;
 
-    for (int i = 0; i < 360; i += 30) {
+    for (int i = 0; i < 360; i += 15) {
       final rad = (i - 90) * (math.pi / 180.0);
       final isMajor = i % 90 == 0;
-      final tickLength = isMajor ? 12.0 : 6.0;
+      final isSemiMajor = i % 30 == 0;
+      final tickLength = isMajor ? 12.0 : (isSemiMajor ? 8.0 : 4.0);
 
       final start = Offset(
-        center.dx + (radius - 8) * math.cos(rad),
-        center.dy + (radius - 8) * math.sin(rad),
+        center.dx + (radius - 6) * math.cos(rad),
+        center.dy + (radius - 6) * math.sin(rad),
       );
       final end = Offset(
-        center.dx + (radius - 8 - tickLength) * math.cos(rad),
-        center.dy + (radius - 8 - tickLength) * math.sin(rad),
+        center.dx + (radius - 6 - tickLength) * math.cos(rad),
+        center.dy + (radius - 6 - tickLength) * math.sin(rad),
       );
 
       canvas.drawLine(start, end, tickPaint);

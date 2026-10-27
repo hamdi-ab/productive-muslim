@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class SolarPrayerDial extends StatefulWidget {
@@ -28,7 +29,7 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
   }
@@ -94,13 +95,27 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
     final isNight = now.isAfter(maghrib) || now.isBefore(fajr);
 
     double progress = 0.0;
+    List<double> nodeFractions;
+
     if (!isNight) {
       // Daytime: from Fajr to Maghrib
       final dayDuration = maghrib.difference(fajr).inSeconds;
       final dayElapsed = now.difference(fajr).inSeconds;
       progress = dayDuration > 0 ? (dayElapsed / dayDuration) : 0.5;
+
+      if (dayDuration > 0) {
+        nodeFractions = [
+          0.0,
+          (sunrise.difference(fajr).inSeconds / dayDuration).clamp(0.05, 0.95),
+          (dhuhr.difference(fajr).inSeconds / dayDuration).clamp(0.1, 0.95),
+          (asr.difference(fajr).inSeconds / dayDuration).clamp(0.15, 0.95),
+          1.0,
+        ];
+      } else {
+        nodeFractions = [0.0, 0.2, 0.5, 0.75, 1.0];
+      }
     } else {
-      // Nighttime: from Maghrib to Fajr (next morning)
+      // Nighttime: from Maghrib to Fajr
       final fajrNext = now.isBefore(fajr)
           ? fajr
           : fajr.add(const Duration(days: 1));
@@ -110,6 +125,20 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
       final nightDuration = fajrNext.difference(maghribPrev).inSeconds;
       final nightElapsed = now.difference(maghribPrev).inSeconds;
       progress = nightDuration > 0 ? (nightElapsed / nightDuration) : 0.5;
+
+      if (nightDuration > 0) {
+        final ishaPrev = now.isAfter(isha)
+            ? isha
+            : isha.subtract(const Duration(days: 1));
+        final ishaFraction =
+            (ishaPrev.difference(maghribPrev).inSeconds / nightDuration).clamp(
+              0.05,
+              0.95,
+            );
+        nodeFractions = [0.0, ishaFraction, 0.5, 0.75, 1.0];
+      } else {
+        nodeFractions = [0.0, 0.25, 0.5, 0.75, 1.0];
+      }
     }
 
     String currentSlotName;
@@ -159,6 +188,7 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
     }
 
     String countdownString = '';
+    String countdownMinutesSeconds = '';
     if (nextTime != null) {
       final diff = nextTime.difference(now);
       if (!diff.isNegative) {
@@ -167,13 +197,15 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         final seconds = diff.inSeconds % 60;
         if (hours > 0) {
           countdownString = '${hours}h ${minutes}m ${seconds}s';
+          countdownMinutesSeconds = '${hours}h ${minutes}m';
         } else {
           countdownString = '${minutes}m ${seconds}s';
+          countdownMinutesSeconds = '${minutes}m ${seconds}s';
         }
       }
     }
 
-    // High contrast theme tokens
+    // High contrast theme tokens matching Stitch
     final badgeBg = isNight
         ? (isDark
               ? const Color(0xFF6366F1).withValues(alpha: 0.25)
@@ -196,249 +228,268 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md + 2),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF13221C) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark
-              ? AppColors.secondary.withValues(alpha: 0.25)
-              : AppColors.primary.withValues(alpha: 0.15),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.4)
-                : AppColors.primary.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header Row: Arc title and current spiritual time window
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: headerIconColor.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isNight
-                            ? Icons.nightlight_round
-                            : Icons.wb_sunny_rounded,
-                        size: 17,
-                        color: headerIconColor,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs + 2),
-                    Flexible(
-                      child: Text(
-                        headerTitle,
-                        style: AppTypography.labelLarge.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14.5,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: badgeBg,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: badgeText.withValues(alpha: 0.2),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Text(
-                    l10n.solarCurrentWindow(currentSlotName),
-                    style: TextStyle(
-                      color: badgeText,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.xs),
-
-          // Celestial Arc Canvas
-          SizedBox(
-            height: 140,
-            width: double.infinity,
-            child: CustomPaint(
-              painter: _SolarArcPainter(
-                progress: progress.clamp(0.0, 1.0),
-                isDark: isDark,
-                isNight: isNight,
-              ),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Column(
+      child: GlassContainer(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        borderRadius: 24,
+        blur: 16,
+        color: isDark
+            ? const Color(0xFF13221C).withValues(alpha: 0.88)
+            : Colors.white.withValues(alpha: 0.9),
+        borderColor: isDark
+            ? AppColors.secondary.withValues(alpha: 0.28)
+            : AppColors.primary.withValues(alpha: 0.2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // 1. Header Row: Arc title and current active spiritual window
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        DateFormat.jm().format(now),
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary,
-                          letterSpacing: -0.5,
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: headerIconColor.withValues(alpha: 0.18),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isNight
+                              ? Icons.nightlight_round
+                              : Icons.wb_sunny_rounded,
+                          size: 15,
+                          color: headerIconColor,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        countdownString.isNotEmpty
-                            ? '${l10n.solarNext(localizedNext)} • $countdownString'
-                            : l10n.solarNext(localizedNext),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark
-                              ? AppColors.secondary
-                              : AppColors.secondaryDark,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(width: AppSpacing.xs + 2),
+                      Flexible(
+                        child: Text(
+                          headerTitle,
+                          style: AppTypography.labelLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.5,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
-          ),
-
-          // Celestial Horizon Info (Sunrise and Sunset)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.wb_twilight_rounded,
-                      size: 14,
-                      color: AppColors.secondary,
+                const SizedBox(width: AppSpacing.xs),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 3.5,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      timeFmt.format(sunrise),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
+                    decoration: BoxDecoration(
+                      color: badgeBg,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: badgeText.withValues(alpha: 0.25),
+                        width: 0.8,
                       ),
                     ),
-                  ],
-                ),
-                Text(
-                  isNight
-                      ? (isAr ? 'الثلث الأخير من الليل' : 'Last Third of Night')
-                      : (isAr
-                            ? 'مسار الشمس: مدار نهاري'
-                            : 'Solar Trajectory: Daytime Arc'),
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? AppColors.secondary
-                        : AppColors.secondaryDark,
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.wb_sunny_rounded,
-                      size: 14,
-                      color: AppColors.primaryLight,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      timeFmt.format(maghrib),
+                    child: Text(
+                      l10n.solarCurrentWindow(currentSlotName),
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
+                        color: badgeText,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10.5,
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Sunnah / Barakah advice tip footer
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.primary.withValues(alpha: 0.12)
-                  : AppColors.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.2),
-                width: 0.8,
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.spa_rounded,
-                  size: 15,
-                  color: AppColors.primaryLight,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _getSunnahAdvice(widget.nextPrayer, isAr),
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.primaryDark,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            const SizedBox(height: AppSpacing.xs),
+
+            // 2. Celestial Arc Visual Canvas
+            SizedBox(
+              height: 136,
+              width: double.infinity,
+              child: CustomPaint(
+                painter: _SolarArcPainter(
+                  progress: progress.clamp(0.0, 1.0),
+                  nodeFractions: nodeFractions,
+                  isDark: isDark,
+                  isNight: isNight,
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 36),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          countdownString.isNotEmpty
+                              ? '${l10n.solarNext(localizedNext)} • $countdownString'
+                              : l10n.solarNext(localizedNext),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.secondary
+                                : AppColors.secondaryDark,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          countdownMinutesSeconds.isNotEmpty
+                              ? countdownMinutesSeconds
+                              : DateFormat.jm().format(now),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            color: isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          isNight
+                              ? (isAr
+                                    ? 'مسار الليل والتهجد'
+                                    : 'Night arc • Tahajjud time')
+                              : (isAr
+                                    ? 'مسار الشمس: مدار نهاري'
+                                    : 'Solar zenith • Declining arc'),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isDark
+                                ? AppColors.primaryLight
+                                : AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // 3. Horizon times: Sunrise & Sunset
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.wb_twilight_rounded,
+                        size: 13,
+                        color: AppColors.secondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        timeFmt.format(sunrise),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Flexible(
+                    child: Text(
+                      isNight
+                          ? (isAr
+                                ? 'الثلث الأخير من الليل'
+                                : 'Last Third of Night')
+                          : (isAr ? 'المسار النهاري' : 'Daytime Trajectory'),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.secondary
+                            : AppColors.secondaryDark,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.wb_sunny_rounded,
+                        size: 13,
+                        color: AppColors.primaryLight,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        timeFmt.format(maghrib),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            // 4. Sunnah / Barakah advice tip footer with Dua guide link
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.12)
+                    : AppColors.primary.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.22),
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.spa_rounded,
+                    size: 15,
+                    color: AppColors.primaryLight,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _getSunnahAdvice(widget.nextPrayer, isAr),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.primaryDark,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -446,18 +497,20 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
 
 class _SolarArcPainter extends CustomPainter {
   final double progress;
+  final List<double> nodeFractions;
   final bool isDark;
   final bool isNight;
 
   _SolarArcPainter({
     required this.progress,
+    required this.nodeFractions,
     required this.isDark,
     required this.isNight,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.92);
+    final center = Offset(size.width / 2, size.height * 0.94);
     final radius = math.min(size.width * 0.44, size.height * 0.88);
 
     const startAngle = math.pi;
@@ -523,9 +576,8 @@ class _SolarArcPainter extends CustomPainter {
       );
     }
 
-    // 4. Draw node anchors along the arc: [0.0, 0.2, 0.5, 0.75, 1.0]
-    final nodes = [0.0, 0.2, 0.5, 0.75, 1.0];
-    for (final node in nodes) {
+    // 4. Draw node anchors along the arc
+    for (final node in nodeFractions) {
       final nodeAngle = startAngle + (sweepAngle * node);
       final nx = center.dx + radius * math.cos(nodeAngle);
       final ny = center.dy + radius * math.sin(nodeAngle);
@@ -580,5 +632,6 @@ class _SolarArcPainter extends CustomPainter {
   bool shouldRepaint(covariant _SolarArcPainter oldDelegate) =>
       oldDelegate.progress != progress ||
       oldDelegate.isDark != isDark ||
-      oldDelegate.isNight != isNight;
+      oldDelegate.isNight != isNight ||
+      oldDelegate.nodeFractions != nodeFractions;
 }
