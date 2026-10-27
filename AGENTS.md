@@ -39,6 +39,7 @@ Core shared code lives under `lib/core/`:
 - **Formatting**: `dart format .` before committing
 - **Analysis**: `flutter analyze` must pass clean
 - **Commits**: conventional commits — `feat:`, `fix:`, `refactor:`, `test:`, `chore:`
+- **RTL & Text-Scale Resilience**: Every dynamic or localized `Text` in a `Row` must be wrapped in `Expanded` or `Flexible` with `overflow: TextOverflow.ellipsis` to prevent RenderFlex overflows under large font scaling and RTL Arabic. Verify with `test/helpers/overflow_test_helper.dart`.
 
 ## Agent skills
 
@@ -53,6 +54,10 @@ Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-huma
 ### Domain docs
 
 Single-context repo — one `CONTEXT.md` + `docs/adr/` at the root. See `docs/agents/domain.md`.
+
+### Stitch design system
+
+Stitch MCP tools require fully qualified resource paths (`name: "projects/<id>/screens/<id>"`). See `docs/agents/stitch.md`.
 
 ### Knowledge graph & token efficiency (Graphify)
 
@@ -74,16 +79,19 @@ Follow the Ponytail Ladder on every task:
 ## Testing
 
 ```bash
-# Unit + widget tests
+# Tier 1: Fast targeted tests during implementation (fast local feedback)
+flutter test test/features/<feature>/
+
+# Tier 2: Full regression suite before commit / push
 flutter test
 
 # Code generation (run after schema changes)
 dart run build_runner build --delete-conflicting-outputs
 
-# Static analysis
+# Static analysis (enforced by .githooks/pre-commit)
 flutter analyze
 
-# Format check
+# Format check (enforced by .githooks/pre-commit)
 dart format --output=none --set-exit-if-changed .
 ```
 
