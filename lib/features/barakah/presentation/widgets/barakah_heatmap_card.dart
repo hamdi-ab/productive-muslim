@@ -32,7 +32,7 @@ class BarakahHeatmapCard extends StatelessWidget {
     if (score == 1) return const Color(0xFF86EFAC); // Light green
     if (score <= 3) return const Color(0xFF4ADE80); // Medium green
     if (score <= 5) return const Color(0xFF22C55E); // Deep green
-    return const Color(0xFF15803D); // Peak Barakah emerald
+    return const Color(0xFF10B981); // Peak Barakah emerald
   }
 
   String _formatDateKey(DateTime d) =>
@@ -87,18 +87,21 @@ class BarakahHeatmapCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withValues(alpha: 0.05),
+              ? AppColors.secondary.withValues(alpha: 0.3)
+              : AppColors.secondary.withValues(alpha: 0.22),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ),
+            blurRadius: 18,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -115,34 +118,40 @@ class BarakahHeatmapCard extends StatelessWidget {
                     const Icon(
                       Icons.calendar_month_rounded,
                       size: 18,
-                      color: AppColors.primary,
+                      color: AppColors.secondary,
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    Flexible(
+                    Expanded(
                       child: Text(
                         l10n.heatmapTitle,
                         style: AppTypography.labelLarge.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: AppSpacing.xs),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.primaryLight.withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
                 ),
                 child: Text(
                   _locDigits(context, l10n.heatmapActiveDays(activeDays, 84)),
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: isDark ? AppColors.primaryLight : AppColors.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),

@@ -41,63 +41,63 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
       nameEn: 'Ruh (Spiritual)',
       nameAr: 'الروح',
       score: 88,
-      color: Color(0xFFD4AF37),
+      color: Color(0xFFE9C349),
     ),
     BarakahQualityDimension(
       key: 'jism',
       nameEn: 'Jism (Physical)',
       nameAr: 'الجسد',
       score: 82,
-      color: Color(0xFF4EDE92),
+      color: Color(0xFF6FFBBE),
     ),
     BarakahQualityDimension(
       key: 'ummah',
       nameEn: 'Ummah (Social)',
       nameAr: 'الأمة',
       score: 78,
-      color: Color(0xFF38BDF8),
+      color: Color(0xFF4EDEA3),
     ),
     BarakahQualityDimension(
       key: 'aql',
       nameEn: 'Aql (Mindset)',
       nameAr: 'العقل',
       score: 90,
-      color: Color(0xFFD4AF37),
+      color: Color(0xFFE9C349),
     ),
     BarakahQualityDimension(
       key: 'istiqamah',
-      nameEn: 'Istiqamah',
+      nameEn: 'Istiqaamah',
       nameAr: 'الاستقامة',
       score: 94,
-      color: Color(0xFFF59E0B),
+      color: Color(0xFFFFE088),
     ),
     BarakahQualityDimension(
       key: 'khushu',
       nameEn: "Khushu' (Focus)",
       nameAr: 'الخشوع',
       score: 72,
-      color: Color(0xFFF87171),
+      color: Color(0xFFFFB4AB),
     ),
     BarakahQualityDimension(
       key: 'niyyah',
       nameEn: 'Niyyah (Intention)',
       nameAr: 'النية',
       score: 86,
-      color: Color(0xFF34D399),
+      color: Color(0xFF4EDEA3),
     ),
     BarakahQualityDimension(
       key: 'shukr',
       nameEn: 'Shukr (Gratitude)',
       nameAr: 'الشكر',
       score: 91,
-      color: Color(0xFFD4AF37),
+      color: Color(0xFFE9C349),
     ),
     BarakahQualityDimension(
       key: 'ihsan',
       nameEn: 'Ihsan (Excellence)',
       nameAr: 'الإحسان',
       score: 85,
-      color: Color(0xFF10B981),
+      color: Color(0xFF6FFBBE),
     ),
   ];
 
@@ -132,13 +132,17 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          width: 1,
+          color: isDark
+              ? AppColors.secondary.withValues(alpha: 0.35)
+              : AppColors.secondary.withValues(alpha: 0.25),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
-            blurRadius: 18,
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.3 : 0.06,
+            ),
+            blurRadius: 20,
             offset: const Offset(0, 5),
           ),
         ],
@@ -169,7 +173,9 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        '9 Qualities Matrix',
+                        isAr
+                            ? 'أبعاد البركة التسعة'
+                            : 'Productive Muslim 9 Qualities',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -184,28 +190,30 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: AppColors.secondary.withValues(alpha: 0.4),
-                    width: 0.8,
+                    color: AppColors.secondary.withValues(alpha: 0.45),
+                    width: 0.9,
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.stars_rounded,
-                      size: 12,
+                    const Icon(
+                      Icons.eco_rounded,
+                      size: 13,
                       color: AppColors.secondary,
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Text(
-                      '84/100 • Al-Ihsan',
-                      style: TextStyle(
-                        fontSize: 10,
+                      isAr
+                          ? '٨٤/١٠٠ • رتبة الإحسان'
+                          : '84 / 100 • Al-Ihsan Tier',
+                      style: const TextStyle(
+                        fontSize: 10.5,
                         fontWeight: FontWeight.bold,
                         color: AppColors.secondary,
                       ),
@@ -217,20 +225,22 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
           ),
           const SizedBox(height: 4),
           Text(
-            isAr ? 'تقييم شامل لأبعاد البركة والإنتاجية المتوازنة' : 'Synthesized alignment of spiritual state, intentional action, and physical consistency.',
+            isAr
+                ? 'تقييم شامل وموحد للحالة الروحية، والعمل الواعي، والاستمرارية البدنية.'
+                : 'Synthesized alignment of spiritual state, intentional action, and physical consistency.',
             style: TextStyle(
               fontSize: 11.5,
               color: isDark
                   ? AppColors.darkTextSecondary
                   : AppColors.textSecondary,
-              height: 1.3,
+              height: 1.35,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
-          // Radar Spider Chart
+          // Radar Spider Chart Canvas
           SizedBox(
-            height: 270,
+            height: 275,
             child: AnimatedBuilder(
               animation: _animation,
               builder: (context, _) {
@@ -251,12 +261,12 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
 
           // Insight Badges: Full-width stacked cards to guarantee zero pixel overflow on any viewport
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: isDark ? 0.22 : 0.08),
+              color: AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.08),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.primaryLight.withValues(alpha: 0.3),
+                color: AppColors.primaryLight.withValues(alpha: 0.35),
                 width: 1,
               ),
             ),
@@ -264,15 +274,15 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
               children: [
                 const Icon(
                   Icons.check_circle_rounded,
-                  size: 15,
+                  size: 16,
                   color: AppColors.primaryLight,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
                     isAr
-                        ? 'أعلى نقطة قوة: الاستقامة • 94%'
-                        : 'Top Strength: Istiqamah • 94%',
+                        ? 'أعلى نقطة قوة: الاستقامة • ٩٤٪'
+                        : 'Top Strength: Consistency (Istiqaamah) • 94%',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,
@@ -286,9 +296,9 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 7),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.secondary.withValues(
                 alpha: isDark ? 0.18 : 0.08,
@@ -302,16 +312,16 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
             child: Row(
               children: [
                 const Icon(
-                  Icons.bolt_rounded,
+                  Icons.priority_high_rounded,
                   size: 16,
                   color: AppColors.secondary,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
                     isAr
-                        ? 'فرصة النمو: الخشوع • 72%'
-                        : "Growth Focus: Khushu' • 72%",
+                        ? 'فرصة النمو: الخشوع • ٧٢٪'
+                        : "Growth Focus: Khushu' (Focus) • 72%",
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,
@@ -326,13 +336,24 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                   onTap: () {
                     AppHaptics.selectionClick();
                   },
-                  child: Text(
-                    isAr ? 'تحسين ←' : 'Strengthen →',
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.secondary,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isAr ? 'تحسين' : 'Improve',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 12,
+                        color: AppColors.secondary,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -371,18 +392,18 @@ class _NonagonRadarPainter extends CustomPainter {
         alpha: 0.12,
       )
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+      ..strokeWidth = 0.9;
 
     // Spoke ray paint
     final spokePaint = Paint()
       ..color = (isDark ? Colors.white : AppColors.primary).withValues(
-        alpha: 0.14,
+        alpha: 0.12,
       )
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.9;
+      ..strokeWidth = 0.8;
 
-    // 1. Draw 4 Concentric Nonagon Rings (25%, 50%, 75%, 100%)
-    const ringLevels = [0.25, 0.50, 0.75, 1.0];
+    // 1. Draw 5 Concentric Nonagon Rings (20%, 40%, 60%, 80%, 100%)
+    const ringLevels = [0.20, 0.40, 0.60, 0.80, 1.0];
     for (final level in ringLevels) {
       final path = Path();
       for (int i = 0; i < n; i++) {
@@ -426,7 +447,7 @@ class _NonagonRadarPainter extends CustomPainter {
       );
     }
 
-    // 4. Fill Data Polygon with Radial/Linear Gradient
+    // 4. Fill Data Polygon with Radial Gradient
     final polyPath = Path();
     for (int i = 0; i < dataPoints.length; i++) {
       if (i == 0) {
@@ -440,11 +461,11 @@ class _NonagonRadarPainter extends CustomPainter {
     final fillPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFF10B981).withValues(alpha: 0.45),
-          const Color(0xFF0F4C3A).withValues(alpha: 0.35),
-          const Color(0xFFD4AF37).withValues(alpha: 0.30),
+          const Color(0xFF4EDEA3).withValues(alpha: 0.55),
+          const Color(0xFF0F4C3A).withValues(alpha: 0.38),
+          const Color(0xFFE9C349).withValues(alpha: 0.45),
         ],
-        stops: const [0.0, 0.6, 1.0],
+        stops: const [0.0, 0.55, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: maxRadius))
       ..style = PaintingStyle.fill;
     canvas.drawPath(polyPath, fillPaint);
@@ -453,26 +474,35 @@ class _NonagonRadarPainter extends CustomPainter {
     final strokePaint = Paint()
       ..color = const Color(0xFFE9C349)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
+      ..strokeWidth = 2.4
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(polyPath, strokePaint);
 
-    // 6. Draw Vertices (Dots) & Labels
+    // 6. Draw Vertices (Glow Dots) & Labels
     for (int i = 0; i < n; i++) {
       final p = dataPoints[i];
       final item = dimensions[i];
+      final isTopStrength = item.score >= 93;
+
+      // Glow halo for top strength
+      if (isTopStrength) {
+        final glowPaint = Paint()
+          ..color = const Color(0xFFFFE088).withValues(alpha: 0.35)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(p, 7.5, glowPaint);
+      }
 
       // Outer dot
       final dotPaint = Paint()
         ..color = item.color
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(p, 4.0, dotPaint);
+      canvas.drawCircle(p, isTopStrength ? 5.0 : 4.0, dotPaint);
 
       final dotBorderPaint = Paint()
         ..color = isDark ? const Color(0xFF0B1512) : Colors.white
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
-      canvas.drawCircle(p, 4.0, dotBorderPaint);
+        ..strokeWidth = 1.6;
+      canvas.drawCircle(p, isTopStrength ? 5.0 : 4.0, dotBorderPaint);
 
       // Label Positioning around perimeter
       final angle = -math.pi / 2 + i * (2 * math.pi / n);
@@ -488,9 +518,11 @@ class _NonagonRadarPainter extends CustomPainter {
       final textSpan = TextSpan(
         text: labelText,
         style: TextStyle(
-          color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+          color: isTopStrength
+              ? (isDark ? const Color(0xFFFFE088) : AppColors.secondaryDark)
+              : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155)),
           fontSize: 9.0,
-          fontWeight: FontWeight.w600,
+          fontWeight: isTopStrength ? FontWeight.bold : FontWeight.w600,
         ),
       );
 

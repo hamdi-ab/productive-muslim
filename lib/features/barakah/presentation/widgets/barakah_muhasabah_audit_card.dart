@@ -55,12 +55,16 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          width: 1,
+          color: isDark
+              ? AppColors.secondary.withValues(alpha: 0.35)
+              : AppColors.secondary.withValues(alpha: 0.22),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ),
             blurRadius: 18,
             offset: const Offset(0, 5),
           ),
@@ -104,13 +108,14 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 7,
-                  vertical: 2.5,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.primaryLight.withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
                 ),
                 child: const Text(
                   'Muhasabah',
