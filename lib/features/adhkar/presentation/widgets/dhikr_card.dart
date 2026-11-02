@@ -11,7 +11,7 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// Custom painter for the circular Tasbih bead gauge
+/// Custom painter for the circular Tasbih bead gauge with authentic 33-bead track
 class _TasbihProgressPainter extends CustomPainter {
   final double progress;
   final Color trackColor;
@@ -26,23 +26,52 @@ class _TasbihProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - 8) / 2;
+    final radius = (size.width - 10) / 2;
 
     // Background track ring
     final trackPaint = Paint()
-      ..color = trackColor
+      ..color = trackColor.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5;
+      ..strokeWidth = 2.0;
     canvas.drawCircle(center, radius, trackPaint);
 
-    // Active progress arc
+    // Beaded track dots (33 beads)
+    final beadPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.fill;
+    const int beadCount = 33;
+    for (int i = 0; i < beadCount; i++) {
+      final angle = -math.pi / 2 + (2 * math.pi * i / beadCount);
+      final bx = center.dx + radius * math.cos(angle);
+      final by = center.dy + radius * math.sin(angle);
+      canvas.drawCircle(Offset(bx, by), 1.5, beadPaint);
+    }
+
+    // Active progress arc with ambient glow and circumference indicator dot
     if (progress > 0) {
       final sweepAngle = 2 * math.pi * progress.clamp(0.0, 1.0);
+
+      // Soft ambient glow
+      final glowPaint = Paint()
+        ..color = progressColor.withValues(alpha: 0.35)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 6.5
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2,
+        sweepAngle,
+        false,
+        glowPaint,
+      );
+
+      // Crisp core progress arc
       final progressPaint = Paint()
         ..color = progressColor
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
-        ..strokeWidth = 4.5;
+        ..strokeWidth = 4.0;
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         -math.pi / 2,
@@ -50,6 +79,22 @@ class _TasbihProgressPainter extends CustomPainter {
         false,
         progressPaint,
       );
+
+      // Tip indicator dot on ring circumference
+      final tipAngle = -math.pi / 2 + sweepAngle;
+      final tipX = center.dx + radius * math.cos(tipAngle);
+      final tipY = center.dy + radius * math.sin(tipAngle);
+      final tipCenter = Offset(tipX, tipY);
+
+      final tipGlow = Paint()
+        ..color = progressColor.withValues(alpha: 0.7)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+      canvas.drawCircle(tipCenter, 4.5, tipGlow);
+
+      final tipCore = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(tipCenter, 2.2, tipCore);
     }
   }
 
@@ -143,86 +188,91 @@ class DhikrCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (index != null && total != null) ...[
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.darkSurfaceSubtle
-                                      : AppColors.surfaceSubtle,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.35,
+                        Flexible(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              if (index != null && total != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.darkSurfaceSubtle
+                                        : AppColors.surfaceSubtle,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.secondary.withValues(
+                                        alpha: 0.35,
+                                      ),
+                                      width: 1,
                                     ),
-                                    width: 1,
                                   ),
-                                ),
-                                child: Text(
-                                  'Dhikr $index of $total',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? AppColors.secondary
-                                        : AppColors.secondaryDark,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? AppColors.primaryLight.withValues(
-                                        alpha: 0.14,
-                                      )
-                                    : AppColors.primary.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: AppColors.primaryLight.withValues(
-                                    alpha: 0.25,
-                                  ),
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.verified_rounded,
-                                    size: 13,
-                                    color: isDark
-                                        ? AppColors.primaryLight
-                                        : AppColors.primary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Authentic',
+                                  child: Text(
+                                    'Dhikr $index of $total',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                       color: isDark
+                                          ? AppColors.secondary
+                                          : AppColors.secondaryDark,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.primaryLight.withValues(
+                                          alpha: 0.14,
+                                        )
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.08,
+                                        ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.primaryLight.withValues(
+                                      alpha: 0.25,
+                                    ),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.verified_rounded,
+                                      size: 13,
+                                      color: isDark
                                           ? AppColors.primaryLight
                                           : AppColors.primary,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Authentic',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? AppColors.primaryLight
+                                            : AppColors.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         AppPressable(
                           onTap: onReset,
                           haptic: AppHapticFeedback.light,
@@ -481,57 +531,97 @@ class DhikrCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 150),
-                                  transitionBuilder: (child, anim) =>
-                                      ScaleTransition(
-                                        scale: anim,
-                                        child: child,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Row(
+                                children: [
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 150),
+                                    transitionBuilder: (child, anim) =>
+                                        ScaleTransition(
+                                          scale: anim,
+                                          child: child,
+                                        ),
+                                    child: Text(
+                                      '$count / ${item.targetCount}',
+                                      key: ValueKey('dhikr_count_$count'),
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        fontFeatures: const [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                        color: isCompleted
+                                            ? const Color(0xFF10B981)
+                                            : (isDark
+                                                  ? Colors.white
+                                                  : AppColors.primary),
                                       ),
-                                  child: Text(
-                                    '$count / ${item.targetCount}',
-                                    key: ValueKey('dhikr_count_$count'),
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      fontFeatures: const [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                      color: isCompleted
-                                          ? const Color(0xFF10B981)
-                                          : (isDark
-                                                ? Colors.white
-                                                : AppColors.primary),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isCompleted
+                                          ? const Color(0xFF10B981)
+                                                .withValues(alpha: 0.2)
+                                          : (isDark
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.08,
+                                                  )
+                                                : Colors.black.withValues(
+                                                    alpha: 0.05,
+                                                  )),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      remaining > 0
+                                          ? '$remaining remaining'
+                                          : 'Done',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: isCompleted
+                                            ? const Color(0xFF10B981)
+                                            : (isDark
+                                                  ? AppColors.darkTextSecondary
+                                                  : AppColors.textSecondary),
+                                      ),
+                                    ),
                                   ),
-                                  decoration: BoxDecoration(
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCompleted
+                                        ? Icons.check_circle_outline_rounded
+                                        : Icons.touch_app_rounded,
+                                    size: 13,
                                     color: isCompleted
                                         ? const Color(0xFF10B981)
-                                              .withValues(alpha: 0.2)
                                         : (isDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.08,
-                                                )
-                                              : Colors.black.withValues(
-                                                  alpha: 0.05,
-                                                )),
-                                    borderRadius: BorderRadius.circular(10),
+                                              ? AppColors.secondary
+                                              : AppColors.primary),
                                   ),
-                                  child: Text(
-                                    remaining > 0
-                                        ? '$remaining remaining'
-                                        : 'Done',
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    isCompleted
+                                        ? l10n.adhkarCompleted
+                                        : l10n.adhkarTapToCount,
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: isCompleted
                                           ? const Color(0xFF10B981)
@@ -540,22 +630,7 @@ class DhikrCard extends StatelessWidget {
                                                 : AppColors.textSecondary),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              isCompleted
-                                  ? l10n.adhkarCompleted
-                                  : l10n.adhkarTapToCount,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: isCompleted
-                                    ? const Color(0xFF10B981)
-                                    : (isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.textSecondary),
+                                ],
                               ),
                             ),
                           ],

@@ -196,7 +196,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     final content = Column(
       children: [
-        // Category Tabs (Horizontal Pill Selector)
+        // Category Tabs (Horizontal Pill Selector matching Stitch)
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -310,7 +310,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                 ),
         ),
 
-        // Bottom Session Completion & Action Dock
+        // Bottom Session Completion & Action Dock (matching Stitch fixed panel)
         if (items.isNotEmpty) ...[
           Container(
             padding: const EdgeInsets.fromLTRB(
@@ -338,37 +338,47 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.fact_check_rounded,
-                          size: 14,
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.fact_check_rounded,
+                            size: 14,
+                            color: isDark
+                                ? AppColors.secondary
+                                : AppColors.secondaryDark,
+                          ),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              'Session Progress',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '$completedCount of ${items.length} completed (${(progressPercent * 100).round()}%)',
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
                           color: isDark
                               ? AppColors.secondary
                               : AppColors.secondaryDark,
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Session Progress',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '$completedCount of ${items.length} completed (${(progressPercent * 100).round()}%)',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppColors.secondary
-                            : AppColors.secondaryDark,
                       ),
                     ),
                   ],
@@ -391,60 +401,66 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Controls Row (Prev / Dots / Next)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      onPressed: _currentPageIndex > 0
-                          ? () {
-                              _pageController.previousPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          : null,
-                      icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                      label: Text(l10n.adhkarPrev),
-                    ),
-                    Row(
-                      children: List.generate(items.length, (index) {
-                        final isCurrent = _currentPageIndex == index;
-                        final isItemDone =
-                            (_counts[items[index].id] ?? 0) >=
-                            items[index].targetCount;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: isCurrent ? 14 : 6,
-                          height: 6,
-                          margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            color: isCurrent
-                                ? AppColors.secondary
-                                : (isItemDone
-                                      ? const Color(0xFF10B981)
-                                            .withValues(alpha: 0.6)
-                                      : (isDark
-                                            ? Colors.white24
-                                            : Colors.black12)),
-                          ),
-                        );
-                      }),
-                    ),
-                    TextButton.icon(
-                      onPressed: _currentPageIndex < items.length - 1
-                          ? () {
-                              _pageController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          : null,
-                      label: Text(l10n.adhkarNext),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                    ),
-                  ],
+                // Controls Row (Prev / Dots / Next) wrapped in FittedBox
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _currentPageIndex > 0
+                            ? () {
+                                _pageController.previousPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                );
+                              }
+                            : null,
+                        icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                        label: Text(l10n.adhkarPrev),
+                      ),
+                      const SizedBox(width: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(items.length, (index) {
+                          final isCurrent = _currentPageIndex == index;
+                          final isItemDone =
+                              (_counts[items[index].id] ?? 0) >=
+                              items[index].targetCount;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: isCurrent ? 14 : 6,
+                            height: 6,
+                            margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3),
+                              color: isCurrent
+                                  ? AppColors.secondary
+                                  : (isItemDone
+                                        ? const Color(0xFF10B981)
+                                              .withValues(alpha: 0.6)
+                                        : (isDark
+                                              ? Colors.white24
+                                              : Colors.black12)),
+                            ),
+                          );
+                        }),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        onPressed: _currentPageIndex < items.length - 1
+                            ? () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                );
+                              }
+                            : null,
+                        label: Text(l10n.adhkarNext),
+                        icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -454,6 +470,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     );
 
     return Scaffold(
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: ProductiveAppBar(
         title: l10n.adhkarTitle,
         subtitle: l10n.adhkarSubtitle,
@@ -485,12 +502,15 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   width: 1,
                 ),
               ),
-              child: Text(
-                '${_currentPageIndex + 1} / ${items.length}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: isDark ? AppColors.primaryLight : AppColors.primary,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '${_currentPageIndex + 1} / ${items.length}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: isDark ? AppColors.primaryLight : AppColors.primary,
+                  ),
                 ),
               ),
             ),
@@ -499,32 +519,74 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       ),
       body: Stack(
         children: [
-          // Ambient Sacred Atmosphere Aura
+          // Background Islamic Rosette Lattice Watermark (matching Stitch obsidian/emerald design)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
+              ),
+            ),
+          ),
+
+          // Ambient Sacred Atmosphere Aura matching Stitch
           if (isDark) ...[
             Positioned(
-              top: -60,
-              left: MediaQuery.of(context).size.width / 2 - 100,
+              top: -80,
+              left: MediaQuery.of(context).size.width / 2 - 120,
               child: IgnorePointer(
                 child: Container(
-                  width: 200,
-                  height: 200,
+                  width: 240,
+                  height: 240,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    gradient: RadialGradient(
+                      colors: [
+                        const Color(0xFF10B981).withValues(alpha: 0.18),
+                        const Color(0xFF0F4C3A).withValues(alpha: 0.06),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 280,
+              right: -70,
+              child: IgnorePointer(
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.secondary.withValues(alpha: 0.10),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
                   ),
                 ),
               ),
             ),
             Positioned(
               bottom: 80,
-              right: -50,
+              left: -70,
               child: IgnorePointer(
                 child: Container(
-                  width: 180,
-                  height: 180,
+                  width: 220,
+                  height: 220,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.secondary.withValues(alpha: 0.06),
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primaryLight.withValues(alpha: 0.10),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
                   ),
                 ),
               ),
@@ -535,4 +597,31 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       ),
     );
   }
+}
+
+/// Subtle Islamic geometric lattice watermark painter for background ambiance
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? const Color(0xFF10B981) : AppColors.primary)
+          .withValues(alpha: isDark ? 0.025 : 0.015)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    const step = 56.0;
+    for (double x = 0; x < size.width + step; x += step) {
+      for (double y = 0; y < size.height + step; y += step) {
+        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
