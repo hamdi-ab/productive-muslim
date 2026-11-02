@@ -11,11 +11,20 @@ Future<void> pumpAndCheckOverflow(
   double textScale = 1.5,
   bool isDark = true,
   Size screenSize = const Size(360, 780),
+  bool wrapInScrollView = true,
 }) async {
   tester.view.physicalSize = screenSize;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
+
+  final Widget content = wrapInScrollView
+      ? SingleChildScrollView(child: child)
+      : SizedBox(
+          width: screenSize.width,
+          height: screenSize.height,
+          child: child,
+        );
 
   await tester.pumpWidget(
     MaterialApp(
@@ -28,7 +37,7 @@ Future<void> pumpAndCheckOverflow(
           size: screenSize,
           textScaler: TextScaler.linear(textScale),
         ),
-        child: Scaffold(body: SingleChildScrollView(child: child)),
+        child: Scaffold(body: content),
       ),
     ),
   );

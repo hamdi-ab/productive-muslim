@@ -25,6 +25,8 @@ Each feature lives under `lib/features/<feature>/` with:
 - `presentation/` — screens and widgets
 - `data/` — repository implementations
 
+Note on Shell vs Content screens: In navigation containers like `home`, `HomeScreen` serves as the GoRouter shell scaffold hosting the bottom navigation bar, while `HomeContent` represents the scrollable dashboard feed. Tests targeting dashboard content should render `HomeContent` directly or supply a mock GoRouter context.
+
 Core shared code lives under `lib/core/`:
 - `di/` — get_it container setup
 - `router/` — GoRouter configuration
@@ -40,6 +42,7 @@ Core shared code lives under `lib/core/`:
 - **Analysis**: `flutter analyze` must pass clean
 - **Commits**: conventional commits — `feat:`, `fix:`, `refactor:`, `test:`, `chore:`
 - **RTL & Text-Scale Resilience**: Every dynamic or localized `Text` in a `Row` must be wrapped in `Expanded` or `Flexible` with `overflow: TextOverflow.ellipsis` to prevent RenderFlex overflows under large font scaling and RTL Arabic. Verify with `test/helpers/overflow_test_helper.dart`.
+- **FittedBox in Flex**: A `FittedBox` inside a `Row` or `Column` must be wrapped in `Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: ...))` or `Expanded` to prevent unconstrained width calculation and enforce downward scaling when constrained.
 
 ## Agent skills
 
