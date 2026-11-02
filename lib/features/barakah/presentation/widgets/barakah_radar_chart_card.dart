@@ -189,36 +189,44 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.secondary.withValues(alpha: 0.45),
-                    width: 0.9,
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 4,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.eco_rounded,
-                      size: 13,
-                      color: AppColors.secondary,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.secondary.withValues(alpha: 0.45),
+                      width: 0.9,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isAr
-                          ? '٨٤/١٠٠ • رتبة الإحسان'
-                          : '84 / 100 • Al-Ihsan Tier',
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.eco_rounded,
+                          size: 13,
+                          color: AppColors.secondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isAr
+                              ? '٨٤/١٠٠ • رتبة الإحسان'
+                              : '84 / 100 • Al-Ihsan Tier',
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],

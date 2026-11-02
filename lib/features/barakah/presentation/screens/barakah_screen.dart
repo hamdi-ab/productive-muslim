@@ -80,18 +80,37 @@ class _BarakahScreenState extends State<BarakahScreen> {
                       ),
                 body: Stack(
                   children: [
-                    // Sacred Ambient Atmosphere Aura
+                    // Subtle Islamic Geometric Watermark Lattice
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _IslamicLatticeBackgroundPainter(
+                            isDark: isDark,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Sacred Ambient Atmosphere Aura matching Stitch
                     if (isDark) ...[
                       Positioned(
                         top: -60,
-                        left: MediaQuery.of(context).size.width / 2 - 100,
+                        left: MediaQuery.of(context).size.width / 2 - 120,
                         child: IgnorePointer(
                           child: Container(
-                            width: 200,
-                            height: 200,
+                            width: 240,
+                            height: 240,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.primary.withValues(alpha: 0.12),
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFF0F4C3A)
+                                      .withValues(alpha: 0.20),
+                                  const Color(0xFF0F4C3A)
+                                      .withValues(alpha: 0.05),
+                                  Colors.transparent,
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -101,12 +120,16 @@ class _BarakahScreenState extends State<BarakahScreen> {
                         right: -50,
                         child: IgnorePointer(
                           child: Container(
-                            width: 180,
-                            height: 180,
+                            width: 200,
+                            height: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.secondary.withValues(
-                                alpha: 0.07,
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.secondary.withValues(alpha: 0.10),
+                                  AppColors.secondary.withValues(alpha: 0.02),
+                                  Colors.transparent,
+                                ],
                               ),
                             ),
                           ),
@@ -114,15 +137,21 @@ class _BarakahScreenState extends State<BarakahScreen> {
                       ),
                       Positioned(
                         bottom: 100,
-                        left: -40,
+                        left: -50,
                         child: IgnorePointer(
                           child: Container(
-                            width: 170,
-                            height: 170,
+                            width: 200,
+                            height: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.primaryDark.withValues(
-                                alpha: 0.14,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFF004D33)
+                                      .withValues(alpha: 0.22),
+                                  const Color(0xFF0F4C3A)
+                                      .withValues(alpha: 0.05),
+                                  Colors.transparent,
+                                ],
                               ),
                             ),
                           ),
@@ -247,6 +276,10 @@ class _BarakahScreenState extends State<BarakahScreen> {
 
                               // 6. Today's History Section
                               _buildHistory(context, state.entries),
+                              const SizedBox(height: AppSpacing.md),
+
+                              // 7. Daily Shukr (Gratitude) Log matching Stitch
+                              _buildDailyShukrLogSection(isDark, isAr),
                               const SizedBox(height: AppSpacing.lg),
 
                               // 7. 9-Qualities Radar / Spider Chart Card
@@ -332,14 +365,14 @@ class _BarakahScreenState extends State<BarakahScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
-              ? [const Color(0xFF0F4C3A), const Color(0xFF14533D)]
+              ? [const Color(0xFF0B1512), const Color(0xFF0F4C3A)]
               : [const Color(0xFF0F4C3A), const Color(0xFF1B6B52)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.secondary.withValues(alpha: 0.5),
+          color: AppColors.secondary.withValues(alpha: 0.45),
           width: 1.2,
         ),
         boxShadow: [
@@ -363,6 +396,8 @@ class _BarakahScreenState extends State<BarakahScreen> {
                   children: [
                     Text(
                       isAr ? 'البركة والتأمل اليومي' : 'Barakah & Reflection',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -375,6 +410,8 @@ class _BarakahScreenState extends State<BarakahScreen> {
                       isAr
                           ? 'إطار الأبعاد التسعة للإنتاجية'
                           : '9 Qualities Framework',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 11.5,
                         color: Color(0xFFB4EFD6),
@@ -385,46 +422,46 @@ class _BarakahScreenState extends State<BarakahScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.22),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.secondary.withValues(alpha: 0.6),
-                    width: 1,
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0xFF4EDEA3),
-                      ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF222C29).withValues(alpha: 0.9)
+                        : AppColors.secondary.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.secondary.withValues(alpha: 0.5),
+                      width: 1,
                     ),
-                    const SizedBox(width: 5),
-                    const Icon(
-                      Icons.stars_rounded,
-                      size: 15,
-                      color: AppColors.secondary,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const _PulseBeaconDot(),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.stars_rounded,
+                          size: 15,
+                          color: AppColors.secondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isAr ? '٩٢٪ مقياس البركة' : '92% Barakah Score',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isAr ? '٩٢٪ مقياس البركة' : '92% Barakah Score',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -896,6 +933,152 @@ class _BarakahScreenState extends State<BarakahScreen> {
     });
   }
 
+  Widget _buildDailyShukrLogSection(bool isDark, bool isAr) {
+    final items = isAr
+        ? [
+            'الحمد لله على الصحة والنشاط بعد صلاة الفجر',
+            'الحمد لله على سلامة الأسرة واجتماع مائدة الإفطار',
+            'الحمد لله على صفاء الذهن وبركة وقت العمل المركز',
+          ]
+        : [
+            'Alhamdulillah for health and energy after Fajr prayer',
+            'Alhamdulillah for family safety and peaceful meals',
+            'Alhamdulillah for clarity and barakah during deep work sprint',
+          ];
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark
+              ? AppColors.secondary.withValues(alpha: 0.35)
+              : AppColors.secondary.withValues(alpha: 0.22),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.3 : 0.05,
+            ),
+            blurRadius: 18,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4EDEA3).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.favorite_rounded,
+                        size: 16,
+                        color: Color(0xFF4EDEA3),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        isAr
+                            ? 'سجل الشكر اليومي (شكر النعم)'
+                            : 'Daily Shukr (Gratitude) Log',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.secondary.withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  isAr ? '٣ نِعَم مسجلة' : '3 Recorded',
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ...items.map((item) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.darkSurfaceSubtle
+                    : AppColors.surfaceSubtle,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.black.withValues(alpha: 0.06),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Text(
+                    '☪',
+                    style: TextStyle(fontSize: 15, color: AppColors.secondary),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    size: 16,
+                    color: Color(0xFF4EDEA3),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHistory(BuildContext context, List<BarakahEntry> entries) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     if (entries.isEmpty) {
@@ -1204,6 +1387,51 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
                 onChanged: (note) =>
                     context.read<BarakahBloc>().add(BarakahNoteChanged(note)),
               ),
+              Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.lock_rounded,
+                            size: 13,
+                            color: Color(0xFF4EDEA3),
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              Localizations.localeOf(context).languageCode ==
+                                      'ar'
+                                  ? 'نية خالصة لوجه الله (الإخلاص)'
+                                  : 'Intention Sanctified (Ikhlas)',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4EDEA3),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${_controller.text.length}/280',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             const SizedBox(height: AppSpacing.sm),
             AppPressable(
@@ -1274,4 +1502,63 @@ class _DailyPromptCardState extends State<_DailyPromptCard> {
       ),
     );
   }
+}
+
+class _PulseBeaconDot extends StatelessWidget {
+  const _PulseBeaconDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 14,
+      height: 14,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF4EDEA3).withValues(alpha: 0.35),
+            ),
+          ),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF4EDEA3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? const Color(0xFF10B981) : AppColors.primary)
+          .withValues(alpha: isDark ? 0.025 : 0.015)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    const step = 56.0;
+    for (double x = 0; x < size.width + step; x += step) {
+      for (double y = 0; y < size.height + step; y += step) {
+        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }

@@ -108,6 +108,17 @@ class BarakahHeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Weekly Spiritual Alignment (7-Day Matrix matching Stitch)
+          _buildWeeklySpiritualAlignment(context, isDark, isAr, now),
+          const SizedBox(height: AppSpacing.md),
+          Divider(
+            color: isDark
+                ? AppColors.secondary.withValues(alpha: 0.2)
+                : AppColors.secondary.withValues(alpha: 0.12),
+            thickness: 0.8,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
           // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -291,6 +302,296 @@ class BarakahHeatmapCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeeklySpiritualAlignment(
+    BuildContext context,
+    bool isDark,
+    bool isAr,
+    DateTime now,
+  ) {
+    final days = isAr
+        ? [
+            ('إث', '88%', Icons.check_rounded, false, false),
+            ('ثل', '76%', Icons.check_rounded, false, false),
+            ('أر', '92%', Icons.check_rounded, false, false),
+            ('خم', '94%', Icons.star_rounded, false, false),
+            ('جمعة', '98%', Icons.hotel_class_rounded, true, false),
+            ('سبت', '86%', Icons.check_rounded, false, false),
+            ('اليوم', '92%', null, false, true),
+          ]
+        : [
+            ('Mon', '88%', Icons.check_rounded, false, false),
+            ('Tue', '76%', Icons.check_rounded, false, false),
+            ('Wed', '92%', Icons.check_rounded, false, false),
+            ('Thu', '94%', Icons.star_rounded, false, false),
+            ('Fri', '98%', Icons.hotel_class_rounded, true, false),
+            ('Sat', '86%', Icons.check_rounded, false, false),
+            ('Today', '92%', null, false, true),
+          ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Sub-Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_view_week_rounded,
+                    size: 18,
+                    color: AppColors.secondary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isAr
+                          ? 'المحاذاة الروحية الأسبوعية'
+                          : 'Weekly Spiritual Alignment',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.labelLarge.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.primaryDark.withValues(alpha: 0.35)
+                    : AppColors.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.secondary.withValues(alpha: 0.3),
+                  width: 0.8,
+                ),
+              ),
+              child: Text(
+                isAr ? 'آخر ٧ أيام' : 'Last 7 Days',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.secondary : AppColors.secondaryDark,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // 7-Day Matrix Tiles
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: days.map((dayData) {
+              final (label, score, icon, isJumuah, isToday) = dayData;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Day Label
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: (isJumuah || isToday)
+                            ? FontWeight.bold
+                            : FontWeight.w600,
+                        color: isJumuah
+                            ? AppColors.secondary
+                            : isToday
+                            ? const Color(0xFF4EDEA3)
+                            : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Tile
+                    Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            gradient: isJumuah
+                                ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFFE9C349),
+                                      Color(0xFF4EDEA3),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : null,
+                            color: isJumuah
+                                ? null
+                                : isToday
+                                ? const Color(0xFF4EDEA3)
+                                : (isDark
+                                          ? const Color(0xFF0F4C3A)
+                                          : const Color(0xFF1B6B52))
+                                      .withValues(alpha: 0.65),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isJumuah
+                                  ? const Color(0xFFFFE088)
+                                  : isToday
+                                  ? const Color(0xFFB4EFD6)
+                                  : AppColors.primaryLight.withValues(
+                                      alpha: 0.25,
+                                    ),
+                              width: isToday || isJumuah ? 1.5 : 0.8,
+                            ),
+                            boxShadow: (isToday || isJumuah)
+                                ? [
+                                    BoxShadow(
+                                      color:
+                                          (isJumuah
+                                                  ? AppColors.secondary
+                                                  : const Color(0xFF4EDEA3))
+                                              .withValues(alpha: 0.35),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _locDigits(context, score),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: (isJumuah || isToday)
+                                  ? const Color(0xFF06100D)
+                                  : Colors.white,
+                            ),
+                          ),
+                        ),
+
+                        // Jumu'ah Crown Indicator Dot
+                        if (isJumuah)
+                          Positioned(
+                            top: -3,
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: const BoxDecoration(
+                                color: AppColors.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Status Indicator (Icon or Live)
+                    if (isToday)
+                      Text(
+                        isAr ? 'مباشر' : 'Live',
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4EDEA3),
+                        ),
+                      )
+                    else if (icon != null)
+                      Icon(
+                        icon,
+                        size: 12,
+                        color: isJumuah
+                            ? AppColors.secondary
+                            : const Color(0xFF4EDEA3),
+                      )
+                    else
+                      const SizedBox(height: 12),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Caption Footer Row matching Stitch
+        Container(
+          padding: const EdgeInsets.only(top: 6),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.06),
+                width: 0.8,
+              ),
+            ),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: AppColors.secondary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  isAr ? '٥/٧ أيام التدفق الإيماني' : '5/7 Peak Flow Days',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Icon(
+                  Icons.bolt_rounded,
+                  size: 14,
+                  color: AppColors.secondary,
+                ),
+                const SizedBox(width: 3),
+                Text(
+                  isAr
+                      ? 'دفعة الجمعة نشطة (+١٨٪)'
+                      : "Jumu'ah Boost Active (+18%)",
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

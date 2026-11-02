@@ -78,35 +78,42 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.psychology_alt_rounded,
+                        size: 18,
+                        color: AppColors.secondary,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.psychology_alt_rounded,
-                      size: 18,
-                      color: AppColors.secondary,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        isAr
+                            ? 'محاسبة الخشوع والتركيز'
+                            : "Spiritual Focus & Khushu' Audit",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    isAr
-                        ? 'محاسبة الخشوع والتركيز'
-                        : "Spiritual Focus & Khushu' Audit",
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.textPrimary,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -117,9 +124,9 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                     width: 0.8,
                   ),
                 ),
-                child: const Text(
-                  'Muhasabah',
-                  style: TextStyle(
+                child: Text(
+                  isAr ? 'محاسبة النفس' : 'Muhasabah',
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryLight,
@@ -145,57 +152,64 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isAr
-                      ? 'تقييم الحضور القلبي اليوم:'
-                      : "Rate Today's Spiritual Focus:",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
+                Expanded(
+                  child: Text(
+                    isAr
+                        ? 'تقييم الحضور القلبي اليوم:'
+                        : "Rate Today's Spiritual Focus:",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
                   ),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ...List.generate(5, (index) {
-                      final starNum = index + 1;
-                      final isFilled = starNum <= _rating;
-                      return InkWell(
-                        onTap: () => _setRating(starNum),
-                        borderRadius: BorderRadius.circular(6),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2),
-                          child: Icon(
-                            isFilled
-                                ? Icons.star_rounded
-                                : Icons.star_border_rounded,
-                            size: 21,
-                            color: isFilled
-                                ? AppColors.secondary
-                                : (isDark
-                                      ? AppColors.darkTextSecondary.withValues(
-                                          alpha: 0.4,
-                                        )
-                                      : AppColors.textSecondary.withValues(
-                                          alpha: 0.4,
-                                        )),
+                const SizedBox(width: 8),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...List.generate(5, (index) {
+                        final starNum = index + 1;
+                        final isFilled = starNum <= _rating;
+                        return InkWell(
+                          onTap: () => _setRating(starNum),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: Icon(
+                              isFilled
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                              size: 21,
+                              color: isFilled
+                                  ? AppColors.secondary
+                                  : (isDark
+                                        ? AppColors.darkTextSecondary
+                                              .withValues(alpha: 0.4)
+                                        : AppColors.textSecondary.withValues(
+                                            alpha: 0.4,
+                                          )),
+                            ),
                           ),
+                        );
+                      }),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$_rating/5',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.secondary,
                         ),
-                      );
-                    }),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$_rating/5',
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.secondary,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
