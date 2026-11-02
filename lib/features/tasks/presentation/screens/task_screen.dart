@@ -98,16 +98,15 @@ class _EmptyState extends StatelessWidget {
               height: 84,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.12),
+                color: const Color(0xFF0F4C3A).withValues(alpha: 0.25),
                 border: Border.all(
-                  color: AppColors.secondary.withValues(alpha: 0.3),
+                  color: const Color(0xFFE9C349).withValues(alpha: 0.4),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(
-                      alpha: isDark ? 0.25 : 0.08,
-                    ),
+                    color: const Color(0xFF0F4C3A)
+                        .withValues(alpha: isDark ? 0.35 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 5),
                   ),
@@ -116,7 +115,7 @@ class _EmptyState extends StatelessWidget {
               child: const Icon(
                 Icons.task_alt_rounded,
                 size: 42,
-                color: AppColors.secondary,
+                color: Color(0xFFE9C349),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -125,9 +124,7 @@ class _EmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
+                color: isDark ? const Color(0xFFDAE5E0) : AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 6),
@@ -137,7 +134,7 @@ class _EmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 color: isDark
-                    ? AppColors.darkTextSecondary
+                    ? const Color(0xFFBFC9C3)
                     : AppColors.textSecondary,
                 height: 1.4,
               ),
@@ -207,16 +204,31 @@ class _TaskList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         if (overdue.isNotEmpty) ...[
-          _SectionHeader(label: AppLocalizations.of(context)!.taskNoTime),
+          _SectionHeader(
+            label: AppLocalizations.of(context)!.taskNoTime,
+            icon: Icons.schedule_rounded,
+            badge: 'No Time',
+          ),
           ...overdue.map((task) => _TaskTile(task: task)),
         ],
         if (scheduled.isNotEmpty) ...[
-          _SectionHeader(label: AppLocalizations.of(context)!.taskScheduled),
+          _SectionHeader(
+            label: AppLocalizations.of(context)!.taskScheduled,
+            icon: Icons.wb_sunny_rounded,
+            badge: 'Upcoming',
+          ),
           const _SunnahNudgeCard(),
-          ...scheduled.map((task) => _TaskTile(task: task)),
+          ...scheduled.map(
+            (task) =>
+                _TaskTile(task: task, isCurrentFocus: task == scheduled.first),
+          ),
         ],
         if (completed.isNotEmpty) ...[
-          _SectionHeader(label: AppLocalizations.of(context)!.done),
+          _SectionHeader(
+            label: AppLocalizations.of(context)!.done,
+            icon: Icons.done_all_rounded,
+            badge: 'Completed',
+          ),
           ...completed.map((task) => _TaskTile(task: task)),
         ],
       ],
@@ -238,11 +250,12 @@ class _SunnahNudgeCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkSurface.withValues(alpha: 0.75)
+            ? const Color(0xFF141E1A)
             : const Color(0xFFFEF9C3).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppColors.secondary.withValues(alpha: isDark ? 0.35 : 0.25),
+          color: const Color(0xFFE9C349)
+              .withValues(alpha: isDark ? 0.35 : 0.25),
           width: 1.2,
         ),
         boxShadow: [
@@ -261,30 +274,36 @@ class _SunnahNudgeCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.secondary.withValues(alpha: 0.18),
+              color: const Color(0xFFE9C349).withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.water_drop_rounded,
-              color: AppColors.secondary,
+              color: Color(0xFFE9C349),
               size: 20,
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Renew Wudhu before Adhan',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isDark
+                        ? const Color(0xFFDAE5E0)
+                        : AppColors.textPrimary,
+                  ),
                 ),
-                SizedBox(height: 2),
-                Text(
+                const SizedBox(height: 2),
+                const Text(
                   'Spiritual Nudge • Sunnah of Readiness',
                   style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.secondary,
+                    color: Color(0xFFE9C349),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -308,7 +327,7 @@ class _SunnahNudgeCard extends StatelessWidget {
             child: const Icon(
               Icons.check_rounded,
               size: 16,
-              color: AppColors.secondary,
+              color: Color(0xFFE9C349),
             ),
           ),
         ],
@@ -319,7 +338,10 @@ class _SunnahNudgeCard extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String label;
-  const _SectionHeader({required this.label});
+  final IconData? icon;
+  final String? badge;
+
+  const _SectionHeader({required this.label, this.icon, this.badge});
 
   @override
   Widget build(BuildContext context) {
@@ -332,24 +354,88 @@ class _SectionHeader extends StatelessWidget {
         AppSpacing.xs,
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: const BoxDecoration(
-              color: AppColors.secondary,
-              shape: BoxShape.circle,
+          Expanded(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF141E1A)
+                        : Colors.black.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFE9C349).withValues(alpha: 0.6),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE9C349),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                if (icon != null) ...[
+                  Icon(icon, size: 14, color: const Color(0xFFE9C349)),
+                  const SizedBox(width: 6),
+                ],
+                Expanded(
+                  child: Text(
+                    label.toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: isDark
+                          ? const Color(0xFFE9C349)
+                          : AppColors.secondaryDark,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            label.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: isDark ? AppColors.secondary : AppColors.secondaryDark,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.bold,
+          if (badge != null) ...[
+            const SizedBox(width: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF18221E)
+                      : Colors.black.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF404944).withValues(alpha: 0.3)
+                        : Colors.black.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Text(
+                  badge!,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? const Color(0xFFBFC9C3)
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -358,7 +444,9 @@ class _SectionHeader extends StatelessWidget {
 
 class _TaskTile extends StatelessWidget {
   final Task task;
-  const _TaskTile({required this.task});
+  final bool isCurrentFocus;
+
+  const _TaskTile({required this.task, this.isCurrentFocus = false});
 
   static const _lifeAreaColors = AppLifeArea.all;
 
@@ -373,6 +461,7 @@ class _TaskTile extends StatelessWidget {
         : null;
 
     final areaLabel = _areaLabel(l10n, task.lifeArea);
+    final showFocusHighlight = isCurrentFocus && !task.completed && isDark;
 
     return Dismissible(
       key: ValueKey(task.id),
@@ -422,159 +511,279 @@ class _TaskTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: task.completed
+            gradient: showFocusHighlight
+                ? const LinearGradient(
+                    colors: [
+                      Color(0xFF0F4C3A),
+                      Color(0xFF18221E),
+                      Color(0xFF222C29),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: showFocusHighlight
+                ? null
+                : task.completed
                 ? (isDark
                       ? const Color(0xFF0D251C).withValues(alpha: 0.6)
                       : const Color(0xFFF0FDF4).withValues(alpha: 0.8))
-                : (isDark ? AppColors.darkSurface : Colors.white),
+                : (isDark ? const Color(0xFF141E1A) : Colors.white),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: task.completed
-                  ? AppColors.primary.withValues(alpha: 0.2)
+              color: showFocusHighlight
+                  ? const Color(0xFFE9C349).withValues(alpha: 0.7)
+                  : task.completed
+                  ? const Color(0xFF4EDEA3).withValues(alpha: 0.2)
                   : (isDark
-                        ? AppColors.secondary.withValues(alpha: 0.22)
+                        ? const Color(0xFF404944).withValues(alpha: 0.5)
                         : AppColors.secondary.withValues(alpha: 0.15)),
-              width: 1.1,
+              width: showFocusHighlight ? 1.5 : 1.1,
             ),
             boxShadow: [
               BoxShadow(
-                color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
-                    .withValues(alpha: isDark ? 0.25 : 0.04),
-                blurRadius: 12,
+                color: showFocusHighlight
+                    ? const Color(0xFFE9C349).withValues(alpha: 0.15)
+                    : (isDark ? const Color(0xFF0F4C3A) : Colors.black)
+                          .withValues(alpha: isDark ? 0.25 : 0.04),
+                blurRadius: showFocusHighlight ? 18 : 12,
                 offset: const Offset(0, 3),
               ),
             ],
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: 4,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              if (showFocusHighlight) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      style:
-                          (Theme.of(context).textTheme.bodyLarge ??
-                                  const TextStyle())
-                              .copyWith(
-                                decoration: task.completed
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                                fontWeight: FontWeight.w600,
-                                color: task.completed
-                                    ? (isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.textDisabled)
-                                    : (isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary),
-                              ),
-                      child: Text(
-                        task.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: color.withValues(alpha: 0.25),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Text(
-                            areaLabel,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9C349).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFFE9C349),
+                          width: 0.8,
                         ),
-                        if (timeLabel != null) ...[
-                          const SizedBox(width: AppSpacing.sm),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.schedule_rounded,
-                                size: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                timeLabel,
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(color: AppColors.textSecondary),
-                              ),
-                            ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.flare_rounded,
+                            size: 11,
+                            color: Color(0xFFE9C349),
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Current Focus',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFE9C349),
+                            ),
                           ),
                         ],
-                      ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.bolt_rounded,
+                      size: 14,
+                      color: Color(0xFF4EDEA3),
                     ),
                   ],
                 ),
-              ),
-              AppPressable(
-                onTap: () => context.push('/focus', extra: task),
-                haptic: AppHapticFeedback.selection,
-                child: IconButton(
-                  tooltip: 'Focus on task',
-                  icon: const Icon(
-                    Icons.timer_outlined,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
-                  onPressed: () => context.push('/focus', extra: task),
-                ),
-              ),
-              AppPressable(
-                onTap: () {
-                  context.read<TaskBloc>().add(TaskToggled(task.id));
-                },
-                pressedScale: 0.85,
-                haptic: AppHapticFeedback.light,
-                child: IconButton(
-                  icon: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    transitionBuilder: (child, anim) =>
-                        ScaleTransition(scale: anim, child: child),
-                    child: Icon(
-                      task.completed
-                          ? Icons.check_circle_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      key: ValueKey('task_icon_${task.id}_${task.completed}'),
-                      color: task.completed
-                          ? AppColors.success
-                          : (isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary),
-                      size: 24,
+                const SizedBox(height: 8),
+              ],
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  onPressed: () {
-                    context.read<TaskBloc>().add(TaskToggled(task.id));
-                  },
-                ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeOutCubic,
+                          style:
+                              (Theme.of(context).textTheme.bodyLarge ??
+                                      const TextStyle())
+                                  .copyWith(
+                                    decoration: task.completed
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                                    fontWeight: FontWeight.w600,
+                                    color: task.completed
+                                        ? (isDark
+                                              ? const Color(0xFF8A938D)
+                                              : AppColors.textDisabled)
+                                        : (isDark
+                                              ? const Color(0xFFDAE5E0)
+                                              : AppColors.textPrimary),
+                                  ),
+                          child: Text(
+                            task.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: color.withValues(alpha: 0.25),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                areaLabel,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: color,
+                                ),
+                              ),
+                            ),
+                            if (timeLabel != null)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.schedule_rounded,
+                                    size: 12,
+                                    color: Color(0xFF8A938D),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    timeLabel,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: isDark
+                                              ? const Color(0xFFBFC9C3)
+                                              : AppColors.textSecondary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppPressable(
+                    onTap: () => context.push('/focus', extra: task),
+                    haptic: AppHapticFeedback.selection,
+                    child: IconButton(
+                      tooltip: 'Focus on task',
+                      icon: const Icon(
+                        Icons.timer_outlined,
+                        size: 20,
+                        color: Color(0xFF4EDEA3),
+                      ),
+                      onPressed: () => context.push('/focus', extra: task),
+                    ),
+                  ),
+                  AppPressable(
+                    onTap: () {
+                      context.read<TaskBloc>().add(TaskToggled(task.id));
+                    },
+                    pressedScale: 0.85,
+                    haptic: AppHapticFeedback.light,
+                    child: IconButton(
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (child, anim) =>
+                            ScaleTransition(scale: anim, child: child),
+                        child: Icon(
+                          task.completed
+                              ? Icons.check_circle_rounded
+                              : Icons.radio_button_unchecked_rounded,
+                          key: ValueKey(
+                            'task_icon_${task.id}_${task.completed}',
+                          ),
+                          color: task.completed
+                              ? const Color(0xFF4EDEA3)
+                              : (isDark
+                                    ? const Color(0xFF8A938D)
+                                    : AppColors.textSecondary),
+                          size: 24,
+                        ),
+                      ),
+                      onPressed: () {
+                        context.read<TaskBloc>().add(TaskToggled(task.id));
+                      },
+                    ),
+                  ),
+                ],
               ),
+              if (showFocusHighlight) ...[
+                const SizedBox(height: 10),
+                AppPressable(
+                  onTap: () => context.push('/focus', extra: task),
+                  pressedScale: 0.97,
+                  haptic: AppHapticFeedback.medium,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9C349),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFE9C349).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.timer_rounded,
+                          size: 16,
+                          color: Color(0xFF241A00),
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'Start Focus Timer',
+                          style: TextStyle(
+                            color: Color(0xFF241A00),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

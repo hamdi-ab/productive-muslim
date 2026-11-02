@@ -226,6 +226,7 @@ class _PlanScreenState extends State<PlanScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0B1512) : null,
       floatingActionButton: AppPressable(
         onTap: () => _showCreateAction(context),
         pressedScale: 0.90,
@@ -233,14 +234,14 @@ class _PlanScreenState extends State<PlanScreen> {
         child: Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [AppColors.secondary, Color(0xFFFFD54F)],
+              colors: [Color(0xFFE9C349), Color(0xFFFFD54F)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: AppColors.secondary.withValues(alpha: 0.35),
+                color: const Color(0xFFE9C349).withValues(alpha: 0.35),
                 blurRadius: 18,
                 offset: const Offset(0, 5),
               ),
@@ -264,12 +265,20 @@ class _PlanScreenState extends State<PlanScreen> {
       ),
       body: Stack(
         children: [
+          // Background Sacred Geometry Watermark
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
+              ),
+            ),
+          ),
           // Subtle Atmospheric Sacred Glow (Stitch style)
           Positioned(
             top: -50,
             left: 0,
             right: 0,
-            height: 240,
+            height: 260,
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -277,14 +286,33 @@ class _PlanScreenState extends State<PlanScreen> {
                     center: const Alignment(0, -0.6),
                     radius: 0.85,
                     colors: [
-                      AppColors.secondary.withValues(
-                        alpha: isDark ? 0.12 : 0.08,
-                      ),
+                      const Color(0xFFE9C349)
+                          .withValues(alpha: isDark ? 0.12 : 0.08),
                       const Color(0xFF0F4C3A)
                           .withValues(alpha: isDark ? 0.08 : 0.04),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Bottom subtle emerald glow
+          Positioned(
+            bottom: -40,
+            left: -40,
+            width: 220,
+            height: 220,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF0F4C3A)
+                          .withValues(alpha: isDark ? 0.12 : 0.04),
+                      Colors.transparent,
+                    ],
                   ),
                 ),
               ),
@@ -373,7 +401,7 @@ class _PlanScreenState extends State<PlanScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
+              Expanded(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -381,12 +409,12 @@ class _PlanScreenState extends State<PlanScreen> {
                       width: 6,
                       height: 6,
                       decoration: const BoxDecoration(
-                        color: AppColors.secondary,
+                        color: Color(0xFFE9C349),
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Flexible(
+                    Expanded(
                       child: Text(
                         hijriText.isNotEmpty
                             ? hijriText
@@ -395,7 +423,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         style: const TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.secondary,
+                          color: Color(0xFFE9C349),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -409,12 +437,12 @@ class _PlanScreenState extends State<PlanScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.07)
+                      ? const Color(0xFF141E1A)
                       : Colors.black.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.1)
+                        ? const Color(0xFF404944).withValues(alpha: 0.4)
                         : Colors.black.withValues(alpha: 0.08),
                   ),
                 ),
@@ -423,7 +451,7 @@ class _PlanScreenState extends State<PlanScreen> {
                   style: TextStyle(
                     fontSize: 10.5,
                     color: isDark
-                        ? AppColors.darkTextSecondary
+                        ? const Color(0xFFBFC9C3)
                         : AppColors.textSecondary,
                   ),
                 ),
@@ -435,27 +463,32 @@ class _PlanScreenState extends State<PlanScreen> {
           // Daily Plan Screen Title & Barakah Focus Badge
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                isAr ? 'الخطة اليومية' : 'Daily Plan',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                  color: isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.textPrimary,
+              Expanded(
+                child: Text(
+                  isAr ? 'الخطة اليومية' : 'Daily Plan',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                    color: isDark
+                        ? const Color(0xFFDAE5E0)
+                        : AppColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
+                  color: isDark
+                      ? const Color(0xFF004D33).withValues(alpha: 0.5)
+                      : AppColors.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AppColors.primaryLight.withValues(alpha: 0.3),
+                    color: const Color(0xFF4EDEA3).withValues(alpha: 0.3),
                     width: 0.8,
                   ),
                 ),
@@ -465,7 +498,7 @@ class _PlanScreenState extends State<PlanScreen> {
                     const Icon(
                       Icons.energy_savings_leaf_rounded,
                       size: 13,
-                      color: AppColors.primary,
+                      color: Color(0xFF4EDEA3),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -474,7 +507,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: isDark
-                            ? AppColors.primaryLight
+                            ? const Color(0xFF4EDEA3)
                             : AppColors.primary,
                       ),
                     ),
@@ -489,11 +522,11 @@ class _PlanScreenState extends State<PlanScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : Colors.white,
+              color: isDark ? const Color(0xFF141E1A) : Colors.white,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
+                    ? const Color(0xFF404944).withValues(alpha: 0.4)
                     : AppColors.primary.withValues(alpha: 0.12),
               ),
               boxShadow: [
@@ -525,7 +558,7 @@ class _PlanScreenState extends State<PlanScreen> {
                       Icons.chevron_left_rounded,
                       size: 20,
                       color: isDark
-                          ? AppColors.darkTextPrimary
+                          ? const Color(0xFFDAE5E0)
                           : AppColors.textPrimary,
                     ),
                   ),
@@ -539,7 +572,7 @@ class _PlanScreenState extends State<PlanScreen> {
                           const Icon(
                             Icons.calendar_month_rounded,
                             size: 15,
-                            color: AppColors.secondary,
+                            color: Color(0xFFE9C349),
                           ),
                           const SizedBox(width: 6),
                           Flexible(
@@ -560,14 +593,12 @@ class _PlanScreenState extends State<PlanScreen> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(
-                                  alpha: 0.15,
-                                ),
+                                color: const Color(0xFF004D33)
+                                    .withValues(alpha: isDark ? 0.6 : 0.15),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.3,
-                                  ),
+                                  color: const Color(0xFF4EDEA3)
+                                      .withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -576,7 +607,7 @@ class _PlanScreenState extends State<PlanScreen> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                                  color: Color(0xFF4EDEA3),
                                 ),
                               ),
                             ),
@@ -589,7 +620,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         style: TextStyle(
                           fontSize: 10.5,
                           color: isDark
-                              ? AppColors.darkTextSecondary
+                              ? const Color(0xFFBFC9C3)
                               : AppColors.textSecondary,
                         ),
                         maxLines: 1,
@@ -615,7 +646,7 @@ class _PlanScreenState extends State<PlanScreen> {
                       Icons.chevron_right_rounded,
                       size: 20,
                       color: isDark
-                          ? AppColors.darkTextPrimary
+                          ? const Color(0xFFDAE5E0)
                           : AppColors.textPrimary,
                     ),
                   ),
@@ -636,9 +667,9 @@ class _PlanScreenState extends State<PlanScreen> {
         gradient: LinearGradient(
           colors: isDark
               ? [
-                  const Color(0xFF072118),
-                  AppColors.primaryDark,
+                  const Color(0xFF06100D),
                   const Color(0xFF0F4C3A),
+                  const Color(0xFF141E1A),
                 ]
               : [
                   const Color(0xFF0A3427),
@@ -650,7 +681,7 @@ class _PlanScreenState extends State<PlanScreen> {
         ),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: const Color(0xFFD4AF37).withValues(alpha: 0.35),
+          color: const Color(0xFFE9C349).withValues(alpha: 0.35),
           width: 1,
         ),
         boxShadow: [
@@ -668,61 +699,81 @@ class _PlanScreenState extends State<PlanScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4AF37).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFD4AF37).withValues(alpha: 0.4),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.star_rounded,
-                      size: 13,
-                      color: Color(0xFFFFD700),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
                     ),
-                    SizedBox(width: 4),
-                    Text(
-                      'Spiritual Anchor',
-                      style: TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFFFE082),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9C349).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE9C349).withValues(alpha: 0.4),
                       ),
                     ),
-                  ],
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star_rounded,
+                          size: 13,
+                          color: Color(0xFFE9C349),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Spiritual Anchor',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFFE088),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              AppPressable(
-                onTap: () => _showRenewNiyyahSheet(context),
-                pressedScale: 0.92,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Renew Niyyah',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: AppPressable(
+                    onTap: () => _showRenewNiyyahSheet(context),
+                    pressedScale: 0.92,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
                       ),
-                      SizedBox(width: 4),
-                      Icon(Icons.sync_rounded, size: 13, color: Colors.white),
-                    ],
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Renew Niyyah',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(
+                            Icons.sync_rounded,
+                            size: 13,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -776,11 +827,11 @@ class _PlanScreenState extends State<PlanScreen> {
           ),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurface : Colors.white,
+            color: isDark ? const Color(0xFF141E1A) : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark
-                  ? AppColors.secondary.withValues(alpha: 0.25)
+                  ? const Color(0xFFE9C349).withValues(alpha: 0.25)
                   : AppColors.secondary.withValues(alpha: 0.18),
               width: 1.1,
             ),
@@ -808,7 +859,7 @@ class _PlanScreenState extends State<PlanScreen> {
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                             color: isDark
-                                ? AppColors.darkTextSecondary
+                                ? const Color(0xFFBFC9C3)
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -816,12 +867,12 @@ class _PlanScreenState extends State<PlanScreen> {
                         Text(
                           totalTasks == 0
                               ? 'Daily Intention Alignment'
-                              : '$completedTasks of $totalTasks Intentions Completed',
+                              : '$completedTasks of $totalTasks Tasks Completed',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDark
-                                ? AppColors.darkTextPrimary
+                                ? const Color(0xFFDAE5E0)
                                 : AppColors.textPrimary,
                           ),
                           maxLines: 1,
@@ -842,9 +893,9 @@ class _PlanScreenState extends State<PlanScreen> {
                           painter: _GaugeRingPainter(
                             progress: percent / 100,
                             trackColor: isDark
-                                ? Colors.white.withValues(alpha: 0.08)
+                                ? const Color(0xFF2D3733)
                                 : Colors.black.withValues(alpha: 0.06),
-                            progressColor: AppColors.secondary,
+                            progressColor: const Color(0xFFE9C349),
                           ),
                         ),
                         Text(
@@ -852,7 +903,7 @@ class _PlanScreenState extends State<PlanScreen> {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
+                            color: Color(0xFFE9C349),
                           ),
                         ),
                       ],
@@ -876,8 +927,8 @@ class _PlanScreenState extends State<PlanScreen> {
                           decoration: BoxDecoration(
                             color: isFilled
                                 ? (idx < 7
-                                      ? AppColors.primary
-                                      : const Color(0xFFD4AF37))
+                                      ? const Color(0xFF4EDEA3)
+                                      : const Color(0xFFE9C349))
                                 : (isDark
                                       ? Colors.white.withValues(alpha: 0.1)
                                       : Colors.black.withValues(alpha: 0.06)),
@@ -908,12 +959,12 @@ class _PlanScreenState extends State<PlanScreen> {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: isDark
-              ? AppColors.darkSurface.withValues(alpha: 0.8)
+              ? const Color(0xFF18221E)
               : Colors.black.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
+                ? const Color(0xFF404944).withValues(alpha: 0.4)
                 : Colors.black.withValues(alpha: 0.06),
           ),
         ),
@@ -962,7 +1013,7 @@ class _PlanScreenState extends State<PlanScreen> {
         decoration: BoxDecoration(
           gradient: isSelected
               ? const LinearGradient(
-                  colors: [AppColors.primary, Color(0xFF0F4C3A)],
+                  colors: [Color(0xFF0F4C3A), Color(0xFF004D33)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
@@ -971,14 +1022,14 @@ class _PlanScreenState extends State<PlanScreen> {
           borderRadius: BorderRadius.circular(20),
           border: isSelected
               ? Border.all(
-                  color: AppColors.secondary.withValues(alpha: 0.35),
+                  color: const Color(0xFFE9C349).withValues(alpha: 0.35),
                   width: 1,
                 )
               : null,
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
+                    color: const Color(0xFF4EDEA3).withValues(alpha: 0.22),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -989,7 +1040,7 @@ class _PlanScreenState extends State<PlanScreen> {
           builder: (context) {
             final isDark = Theme.of(context).brightness == Brightness.dark;
             final unselectedColor = isDark
-                ? AppColors.darkTextSecondary
+                ? const Color(0xFFBFC9C3)
                 : AppColors.textSecondary;
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -997,15 +1048,21 @@ class _PlanScreenState extends State<PlanScreen> {
                 Icon(
                   icon,
                   size: 17,
-                  color: isSelected ? AppColors.secondary : unselectedColor,
+                  color: isSelected ? const Color(0xFFE9C349) : unselectedColor,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : unselectedColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                    fontSize: 13.5,
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : unselectedColor,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w600,
+                      fontSize: 13.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -1062,4 +1119,30 @@ class _GaugeRingPainter extends CustomPainter {
       oldDelegate.progress != progress ||
       oldDelegate.trackColor != trackColor ||
       oldDelegate.progressColor != progressColor;
+}
+
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? const Color(0xFF4EDEA3) : AppColors.primary)
+          .withValues(alpha: isDark ? 0.025 : 0.015)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    const step = 56.0;
+    for (double x = 0; x < size.width + step; x += step) {
+      for (double y = 0; y < size.height + step; y += step) {
+        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
