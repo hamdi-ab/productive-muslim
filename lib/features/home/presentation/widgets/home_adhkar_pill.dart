@@ -133,20 +133,25 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        _getCategoryTitle(activeCategory, l10n),
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          _getCategoryTitle(activeCategory, l10n),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      if (isAllDone)
+                      if (isAllDone) ...[
+                        const SizedBox(width: 6),
                         const Icon(
                           Icons.check_circle_rounded,
                           size: 16,
                           color: Color(0xFF10B981),
                         ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 2),

@@ -32,52 +32,119 @@ class HomeContent extends StatelessWidget {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Hero Celestial Solar Arc Prayer Card
-              const _HomePrayerCard(),
-              const SizedBox(height: AppSpacing.md),
-
-              // 2. Sub-Hero Proactive Barakah Nap Timer Banner
-              const _HomeNapTimerBanner(),
-              const SizedBox(height: AppSpacing.md),
-
-              // 3. Daily Energy & Khushu' Level Meter
-              const _DailyEnergyKhushuMeter(),
-              const SizedBox(height: AppSpacing.lg),
-
-              // 4. Spiritual Performance Toolkit (2x2 Bento)
-              const _HomeProductivityToolkit(),
-              const SizedBox(height: AppSpacing.lg),
-
-              // 5. Daily Ayah of Barakah
-              _buildDailyAyahCard(context, isDark),
-              const SizedBox(height: AppSpacing.lg),
-
-              // 6. Quick Adhkar Routine Pill
-              const HomeAdhkarPill(),
-              const SizedBox(height: AppSpacing.md),
-
-              // 7. Daily Progress Rings
-              _buildDailyProgressSection(context, today, l10n),
-              const SizedBox(height: AppSpacing.lg),
-
-              // 8. Today's Tasks Overview
-              _buildTodayTaskOverview(context, today, l10n),
-              const SizedBox(height: AppSpacing.lg),
-
-              // 9. The 9 Essential Qualities Carousel
-              _buildQualitiesCarousel(context, l10n),
-            ],
+    return Stack(
+      children: [
+        // Subtle Islamic Lattice Watermark
+        Positioned.fill(
+          child: CustomPaint(
+            painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
           ),
         ),
-      ),
+
+        // Atmospheric Radial Spiritual Glow Orbs
+        Positioned(
+          top: -60,
+          left: 20,
+          child: Container(
+            width: 320,
+            height: 320,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFF0F4C3A)
+                      .withValues(alpha: isDark ? 0.35 : 0.12),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 360,
+          right: -40,
+          child: Container(
+            width: 280,
+            height: 280,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFFE9C349)
+                      .withValues(alpha: isDark ? 0.18 : 0.08),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 120,
+          left: -40,
+          child: Container(
+            width: 260,
+            height: 260,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFF4EDEA3)
+                      .withValues(alpha: isDark ? 0.20 : 0.08),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. Hero Celestial Solar Arc Prayer Card
+                  const _HomePrayerCard(),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 2. Sub-Hero Proactive Barakah Nap Timer Banner
+                  const _HomeNapTimerBanner(),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 3. Daily Energy & Khushu' Level Meter
+                  const _DailyEnergyKhushuMeter(),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // 4. Spiritual Performance Toolkit (2x2 Bento)
+                  const _HomeProductivityToolkit(),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // 5. Daily Ayah of Barakah
+                  _buildDailyAyahCard(context, isDark),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // 6. Quick Adhkar Routine Pill
+                  const HomeAdhkarPill(),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 7. Daily Progress Rings
+                  _buildDailyProgressSection(context, today, l10n),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // 8. Today's Tasks Overview
+                  _buildTodayTaskOverview(context, today, l10n),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // 9. The 9 Essential Qualities Carousel
+                  _buildQualitiesCarousel(context, l10n),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -95,28 +162,36 @@ class HomeContent extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.menu_book_rounded,
-                        color: Color(0xFFD4AF37),
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'AYAH OF BARAKAH',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.8,
-                          color: isDark
-                              ? const Color(0xFFD4AF37)
-                              : const Color(0xFF92600E),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.menu_book_rounded,
+                          color: Color(0xFFD4AF37),
+                          size: 18,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            'AYAH OF BARAKAH',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.8,
+                              color: isDark
+                                  ? const Color(0xFFD4AF37)
+                                  : const Color(0xFF92600E),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.volume_up_rounded, size: 18),
@@ -190,26 +265,36 @@ class HomeContent extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Personal reflection note empty',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
+                  Expanded(
+                    child: Text(
+                      'Personal reflection note empty',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
                     ),
                   ),
-                  TextButton.icon(
-                    onPressed: () => context.push('/journal'),
-                    icon: const Icon(Icons.edit_note_rounded, size: 18),
-                    label: const Text('Reflect & Journal'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: isDark
-                          ? AppColors.secondary
-                          : AppColors.primary,
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: TextButton.icon(
+                        onPressed: () => context.push('/journal'),
+                        icon: const Icon(Icons.edit_note_rounded, size: 18),
+                        label: const Text('Reflect & Journal'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: isDark
+                              ? AppColors.secondary
+                              : AppColors.primary,
+                          textStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -374,22 +459,32 @@ class HomeContent extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  l10n.tasks,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    l10n.tasks,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () => context.push('/plan'),
-                  child: Text(
-                    'View All',
-                    style: TextStyle(
-                      color: isDark
-                          ? AppColors.primaryLight
-                          : AppColors.primary,
-                      fontSize: 13,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: TextButton(
+                      onPressed: () => context.push('/plan'),
+                      child: Text(
+                        'View All',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
+                          fontSize: 13,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -436,17 +531,29 @@ class HomeContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Essential Qualities',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-            ),
-            TextButton(
-              onPressed: () => context.push('/barakah'),
+            const Expanded(
               child: Text(
-                'Explore All',
-                style: TextStyle(
-                  color: isDark ? AppColors.primaryLight : AppColors.primary,
-                  fontSize: 13,
+                'Essential Qualities',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: TextButton(
+                  onPressed: () => context.push('/barakah'),
+                  child: Text(
+                    'Explore All',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.primaryLight
+                          : AppColors.primary,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -454,7 +561,7 @@ class HomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 130,
+          height: 154,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: qualities.length,
@@ -746,75 +853,86 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          const Text(
+                            'SUNNAH ALIGNMENT',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.8,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF10B981),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      const Text(
-                        'SUNNAH ALIGNMENT',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.8,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.black.withValues(alpha: 0.04),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.12)
-                          : Colors.black.withValues(alpha: 0.08),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.volume_up_rounded,
-                        size: 13,
-                        color: AppColors.primary,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
                       ),
-                      SizedBox(width: 4),
-                      Text(
-                        'Adhan: Mishary',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.12)
+                              : Colors.black.withValues(alpha: 0.08),
                         ),
                       ),
-                    ],
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.volume_up_rounded,
+                            size: 13,
+                            color: AppColors.primary,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'Adhan: Mishary',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -874,55 +992,61 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                PulsingGlow(
-                  animate: true,
-                  minScale: 0.96,
-                  maxScale: 1.04,
-                  duration: const Duration(milliseconds: 2400),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_loading)
-                          const SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFFD97706),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: PulsingGlow(
+                      animate: true,
+                      minScale: 0.96,
+                      maxScale: 1.04,
+                      duration: const Duration(milliseconds: 2400),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 11,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF3C7),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: const Color(0xFFF59E0B)
+                                .withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_loading)
+                              const SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFFD97706),
+                                  ),
+                                ),
+                              )
+                            else ...[
+                              const Icon(
+                                Icons.schedule_rounded,
+                                size: 13,
+                                color: Color(0xFFD97706),
                               ),
-                            ),
-                          )
-                        else ...[
-                          const Icon(
-                            Icons.schedule_rounded,
-                            size: 13,
-                            color: Color(0xFFD97706),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'in $_countdown',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF92400E),
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            ),
-                          ),
-                        ],
-                      ],
+                              const SizedBox(width: 4),
+                              Text(
+                                'in $_countdown',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF92400E),
+                                  fontFeatures: [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1264,10 +1388,14 @@ class _HomeNapTimerBannerState extends State<_HomeNapTimerBanner> {
               ),
             ),
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
                       Icons.bedtime_rounded,
@@ -1297,6 +1425,7 @@ class _HomeNapTimerBannerState extends State<_HomeNapTimerBanner> {
                   ],
                 ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: Icon(
@@ -1327,62 +1456,78 @@ class _HomeNapTimerBannerState extends State<_HomeNapTimerBanner> {
             ),
           ] else ...[
             const SizedBox(height: 12),
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                FilledButton.icon(
-                  onPressed: () => _startNap(15),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF0F4C3A),
-                    foregroundColor: const Color(0xFF99D3BA),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: FilledButton.icon(
+                    onPressed: () => _startNap(15),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF0F4C3A),
+                      foregroundColor: const Color(0xFF99D3BA),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                        ),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                    icon: const Icon(Icons.bedtime_rounded, size: 16),
+                    label: const Text(
+                      'Start 15m Nap',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  icon: const Icon(Icons.bedtime_rounded, size: 16),
-                  label: const Text(
-                    'Start 15m Nap',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: OutlinedButton(
+                    onPressed: () => _startNap(20),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.15)
+                            : Colors.black.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: const Text(
+                      '20m',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                OutlinedButton(
-                  onPressed: () => _startNap(20),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    side: BorderSide(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.15)
-                          : Colors.black.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: const Text(
-                    '20m',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => setState(() => _dismissed = true),
-                  child: Text(
-                    'Dismiss',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: TextButton(
+                    onPressed: () => setState(() => _dismissed = true),
+                    child: Text(
+                      'Dismiss',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ),
@@ -1418,42 +1563,56 @@ class _DailyEnergyKhushuMeter extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.monitor_heart_rounded,
-                      color: Color(0xFF10B981),
-                      size: 19,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Daily Energy & Khushu' Level",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.monitor_heart_rounded,
+                        color: Color(0xFF10B981),
+                        size: 19,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          "Daily Energy & Khushu' Level",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: const Text(
-                    '84% Optimal',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF92400E),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: const Text(
+                        '84% Optimal',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF92400E),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1497,57 +1656,71 @@ class _DailyEnergyKhushuMeter extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                      ),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF10B981),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Physical Energy 88%',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Physical Energy 88%',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+                const SizedBox(width: 4),
                 Text(
                   '•',
                   style: TextStyle(
                     color: isDark ? Colors.white30 : Colors.black26,
                   ),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFD4AF37),
-                        shape: BoxShape.circle,
-                      ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFD4AF37),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Spiritual Focus 80%',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Spiritual Focus 80%',
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const Icon(
                   Icons.arrow_forward_ios_rounded,
@@ -1596,29 +1769,41 @@ class _HomeProductivityToolkitState extends State<_HomeProductivityToolkit> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.widgets_rounded,
-                    size: 19,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.quickToolkit,
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.widgets_rounded,
+                      size: 19,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        l10n.quickToolkit,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    l10n.allTools,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
                     ),
                   ),
-                ],
-              ),
-              Text(
-                l10n.allTools,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -1703,16 +1888,21 @@ class _HomeProductivityToolkitState extends State<_HomeProductivityToolkit> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "I'm Fasting",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white
-                                : AppColors.textPrimary,
+                        Expanded(
+                          child: Text(
+                            "I'm Fasting",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 4),
                         SizedBox(
                           width: 18,
                           height: 18,
@@ -1882,18 +2072,27 @@ class _HomeProductivityToolkitState extends State<_HomeProductivityToolkit> {
                 ),
                 child: Icon(icon, color: iconColor, size: 17),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: pillColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  pillLabel,
-                  style: TextStyle(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.bold,
-                    color: pillColor,
+              const SizedBox(width: 6),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: pillColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      pillLabel,
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                        color: pillColor,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -2165,4 +2364,37 @@ String _getLocalizedPrayerName(String key, AppLocalizations l10n) {
     'isha' => l10n.isha,
     _ => key,
   };
+}
+
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = isDark
+          ? const Color(0xFFE9C349).withValues(alpha: 0.025)
+          : const Color(0xFF0F4C3A).withValues(alpha: 0.02)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    const spacing = 50.0;
+    for (double x = 0; x < size.width + spacing; x += spacing) {
+      for (double y = 0; y < size.height + spacing; y += spacing) {
+        canvas.drawCircle(Offset(x, y), spacing * 0.45, paint);
+        final path = Path()
+          ..moveTo(x, y - spacing * 0.45)
+          ..lineTo(x + spacing * 0.45, y)
+          ..lineTo(x, y + spacing * 0.45)
+          ..lineTo(x - spacing * 0.45, y)
+          ..close();
+        canvas.drawPath(path, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
