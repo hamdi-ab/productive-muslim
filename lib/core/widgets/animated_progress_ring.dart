@@ -10,6 +10,8 @@ class AnimatedProgressRing extends StatelessWidget {
   final double strokeWidth;
   final Color? color;
   final Color? backgroundColor;
+  final Color? glowColor;
+  final bool showCursorDot;
   final Widget? child;
 
   const AnimatedProgressRing({
@@ -19,6 +21,8 @@ class AnimatedProgressRing extends StatelessWidget {
     this.strokeWidth = 6,
     this.color,
     this.backgroundColor,
+    this.glowColor,
+    this.showCursorDot = false,
     this.child,
   });
 
@@ -49,6 +53,8 @@ class AnimatedProgressRing extends StatelessWidget {
                   strokeWidth: strokeWidth,
                   color: activeColor,
                   backgroundColor: trackColor,
+                  glowColor: glowColor,
+                  showCursorDot: showCursorDot,
                 ),
               );
             },
@@ -65,12 +71,16 @@ class _RingPainter extends CustomPainter {
   final double strokeWidth;
   final Color color;
   final Color backgroundColor;
+  final Color? glowColor;
+  final bool showCursorDot;
 
   _RingPainter({
     required this.progress,
     required this.strokeWidth,
     required this.color,
     required this.backgroundColor,
+    this.glowColor,
+    this.showCursorDot = false,
   });
 
   @override
@@ -88,6 +98,25 @@ class _RingPainter extends CustomPainter {
 
     // Progress Arc
     if (progress > 0) {
+      if (glowColor != null) {
+        final glowPaint = Paint()
+          ..color = glowColor!.withValues(alpha: 0.35)
+          ..strokeWidth = strokeWidth + 4
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+
+        final startAngle = -pi / 2;
+        final sweepAngle = 2 * pi * progress;
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          startAngle,
+          sweepAngle,
+          false,
+          glowPaint,
+        );
+      }
+
       final fgPaint = Paint()
         ..color = color
         ..strokeWidth = strokeWidth
@@ -103,6 +132,30 @@ class _RingPainter extends CustomPainter {
         false,
         fgPaint,
       );
+
+      if (showCursorDot) {
+        final tipAngle = startAngle + sweepAngle;
+        final dotX = center.dx + radius * cos(tipAngle);
+        final dotY = center.dy + radius * sin(tipAngle);
+        final dotCenter = Offset(dotX, dotY);
+
+        if (glowColor != null) {
+          final dotGlow = Paint()
+            ..color = glowColor!.withValues(alpha: 0.6)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+          canvas.drawCircle(dotCenter, strokeWidth * 0.9, dotGlow);
+        }
+
+        final dotPaint = Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(dotCenter, strokeWidth * 0.6, dotPaint);
+
+        final innerDot = Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(dotCenter, strokeWidth * 0.3, innerDot);
+      }
     }
   }
 
@@ -110,6 +163,8 @@ class _RingPainter extends CustomPainter {
   bool shouldRepaint(covariant _RingPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.color != color ||
-        oldDelegate.backgroundColor != backgroundColor;
+        oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.glowColor != glowColor ||
+        oldDelegate.showCursorDot != showCursorDot;
   }
 }

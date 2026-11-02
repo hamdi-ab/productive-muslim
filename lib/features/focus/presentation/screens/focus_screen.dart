@@ -217,6 +217,7 @@ class _FocusScreenState extends State<FocusScreen> {
                 Expanded(
                   child: Text(
                     l10n.focusComplete,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -263,12 +264,15 @@ class _FocusScreenState extends State<FocusScreen> {
                         color: AppColors.primaryLight,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '+$_selectedDurationMinutes min focus added',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryLight,
-                          fontSize: 13,
+                      Expanded(
+                        child: Text(
+                          '+$_selectedDurationMinutes min focus added',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryLight,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -297,6 +301,7 @@ class _FocusScreenState extends State<FocusScreen> {
                           Expanded(
                             child: Text(
                               l10n.focusTaskCompletedSuccess,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Color(0xFF10B981),
                                 fontWeight: FontWeight.bold,
@@ -387,6 +392,7 @@ class _FocusScreenState extends State<FocusScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final totalSeconds = _selectedDurationMinutes * 60;
     final progress = totalSeconds > 0
         ? (_secondsRemaining / totalSeconds).clamp(0.0, 1.0)
@@ -412,7 +418,7 @@ class _FocusScreenState extends State<FocusScreen> {
         title: l10n.focusTitle,
         subtitle: _selectedTask != null
             ? _selectedTask!.title
-            : 'Khushu\' Pomodoro Session',
+            : l10n.focusSubtitle,
         showBackButton: true,
         actions: [
           Container(
@@ -433,18 +439,40 @@ class _FocusScreenState extends State<FocusScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.8),
+                        blurRadius: 4,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
                 Icon(
                   Icons.insights_rounded,
                   size: 14,
                   color: isDark ? AppColors.primaryLight : AppColors.primary,
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  l10n.focusTotalMinutes(totalFocusMins),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.primaryLight : AppColors.primary,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 140),
+                  child: Text(
+                    l10n.focusTotalMinutes(totalFocusMins),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.primaryLight
+                          : AppColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -454,41 +482,75 @@ class _FocusScreenState extends State<FocusScreen> {
       ),
       body: Stack(
         children: [
-          // Ambient Background Glow Orbs matching Stitch
+          // Background Islamic Rosette Lattice Watermark (matching Stitch obsidian/emerald design)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
+              ),
+            ),
+          ),
+
+          // Ambient Background Glow Orbs matching Stitch luxury aesthetic
           if (isDark) ...[
             Positioned(
-              top: -80,
-              left: MediaQuery.of(context).size.width / 2 - 140,
-              child: Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary.withValues(alpha: 0.25),
+              top: -100,
+              left: MediaQuery.of(context).size.width / 2 - 150,
+              child: IgnorePointer(
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        const Color(0xFF10B981).withValues(alpha: 0.20),
+                        const Color(0xFF0F4C3A).withValues(alpha: 0.08),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
                 ),
               ),
             ),
             Positioned(
-              top: 260,
-              right: -60,
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.secondary.withValues(alpha: 0.08),
+              top: 240,
+              right: -80,
+              child: IgnorePointer(
+                child: Container(
+                  width: 240,
+                  height: 240,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.secondary.withValues(alpha: 0.12),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
+                  ),
                 ),
               ),
             ),
             Positioned(
-              bottom: 120,
-              left: -60,
-              child: Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primaryLight.withValues(alpha: 0.08),
+              bottom: 100,
+              left: -80,
+              child: IgnorePointer(
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primaryLight.withValues(alpha: 0.12),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -587,21 +649,24 @@ class _FocusScreenState extends State<FocusScreen> {
                                 ),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.verified_rounded,
                                   color: AppColors.secondary,
                                   size: 13,
                                 ),
-                                SizedBox(width: 3),
-                                Text(
-                                  'Sanctified',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.secondary,
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    isRtl ? 'خالص لله' : 'Sanctified',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.secondary,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -638,17 +703,20 @@ class _FocusScreenState extends State<FocusScreen> {
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  l10n.focusPrayerWarningTitle,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFF59E0B),
-                                    fontSize: 13,
+                                Expanded(
+                                  child: Text(
+                                    l10n.focusPrayerWarningTitle,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFF59E0B),
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Text(
                               l10n.focusPrayerOverlap(
                                 _getLocalizedPrayerName(_nextPrayerName, l10n),
@@ -657,7 +725,7 @@ class _FocusScreenState extends State<FocusScreen> {
                               style: const TextStyle(fontSize: 12),
                             ),
                             if (_timeUntilNextPrayer!.inMinutes >= 10) ...[
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               ActionChip(
                                 avatar: const Icon(
                                   Icons.timer_outlined,
@@ -724,14 +792,17 @@ class _FocusScreenState extends State<FocusScreen> {
                               size: 14,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              l10n.focusWindDownWarning(
-                                _timeUntilNextPrayer!.inMinutes,
-                              ),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFF59E0B),
+                            Flexible(
+                              child: Text(
+                                l10n.focusWindDownWarning(
+                                  _timeUntilNextPrayer!.inMinutes,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFF59E0B),
+                                ),
                               ),
                             ),
                           ],
@@ -739,7 +810,7 @@ class _FocusScreenState extends State<FocusScreen> {
                       ),
                     ],
 
-                    // Timer Dial with calm breathing pulse & Islamic Rosette watermark
+                    // Timer Dial with calm breathing pulse, cursor dot & Islamic Rosette watermark
                     Center(
                       child: PulsingGlow(
                         animate: _isRunning,
@@ -760,12 +831,12 @@ class _FocusScreenState extends State<FocusScreen> {
                                     color:
                                         (_isRunning
                                                 ? AppColors.secondary
-                                                : AppColors.primaryLight)
+                                                : const Color(0xFF10B981))
                                             .withValues(
-                                              alpha: isDark ? 0.2 : 0.08,
+                                              alpha: isDark ? 0.22 : 0.10,
                                             ),
-                                    blurRadius: 36,
-                                    spreadRadius: 6,
+                                    blurRadius: 40,
+                                    spreadRadius: 8,
                                   ),
                                 ],
                               ),
@@ -780,133 +851,151 @@ class _FocusScreenState extends State<FocusScreen> {
                                             ? AppColors.secondary
                                             : AppColors.primary)
                                         .withValues(
-                                          alpha: isDark ? 0.09 : 0.06,
+                                          alpha: isDark ? 0.11 : 0.07,
                                         ),
                               ),
                             ),
 
-                            // Animated Progress Ring
+                            // Animated Progress Ring with circumference glowing cursor dot
                             AnimatedProgressRing(
                               progress: progress,
                               size: 220,
                               strokeWidth: 10,
                               color: _isRunning
                                   ? AppColors.secondary
-                                  : AppColors.primaryLight,
+                                  : const Color(0xFF10B981),
+                              glowColor: _isRunning
+                                  ? AppColors.secondaryLight
+                                  : const Color(0xFF4EDEA3),
+                              showCursorDot: true,
                               backgroundColor: isDark
-                                  ? Colors.white.withValues(alpha: 0.07)
+                                  ? Colors.white.withValues(alpha: 0.08)
                                   : Colors.black.withValues(alpha: 0.06),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Barakah Flow pill
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 9,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? AppColors.primary.withValues(
-                                              alpha: 0.4,
-                                            )
-                                          : AppColors.primary.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: isDark
-                                            ? AppColors.primaryLight.withValues(
-                                                alpha: 0.3,
-                                              )
-                                            : AppColors.primary.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 5,
-                                          height: 5,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _isRunning
-                                                ? AppColors.secondary
-                                                : AppColors.primaryLight,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color:
-                                                    (_isRunning
-                                                            ? AppColors
-                                                                  .secondary
-                                                            : AppColors
-                                                                  .primaryLight)
-                                                        .withValues(alpha: 0.8),
-                                                blurRadius: 4,
-                                              ),
-                                            ],
-                                          ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      // Barakah Flow pill
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 9,
+                                          vertical: 2,
                                         ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                          'BARAKAH FLOW',
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.7,
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? AppColors.primary.withValues(
+                                                  alpha: 0.45,
+                                                )
+                                              : AppColors.primary.withValues(
+                                                  alpha: 0.1,
+                                                ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
                                             color: isDark
                                                 ? AppColors.primaryLight
-                                                : AppColors.primary,
+                                                      .withValues(alpha: 0.35)
+                                                : AppColors.primary.withValues(
+                                                    alpha: 0.2,
+                                                  ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    _formatTime(_secondsRemaining),
-                                    style: const TextStyle(
-                                      fontSize: 44,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: -1.2,
-                                      fontFeatures: [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 300),
-                                    child: Text(
-                                      _isRunning ? 'In Flow...' : 'Ready',
-                                      key: ValueKey('focus_status_$_isRunning'),
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark
-                                            ? AppColors.darkTextSecondary
-                                            : AppColors.textSecondary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 1),
-                                  Text(
-                                    _isRunning
-                                        ? 'Khushu\' State • Level 1 Active'
-                                        : 'Level 1 Calm',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: isDark
-                                          ? AppColors.darkTextSecondary
-                                                .withValues(alpha: 0.6)
-                                          : AppColors.textSecondary.withValues(
-                                              alpha: 0.6,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 5,
+                                              height: 5,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: _isRunning
+                                                    ? AppColors.secondary
+                                                    : const Color(0xFF10B981),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color:
+                                                        (_isRunning
+                                                                ? AppColors
+                                                                      .secondary
+                                                                : const Color(
+                                                                    0xFF10B981,
+                                                                  ))
+                                                            .withValues(
+                                                              alpha: 0.8,
+                                                            ),
+                                                    blurRadius: 4,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                    ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              'BARAKAH FLOW',
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 0.7,
+                                                color: isDark
+                                                    ? const Color(0xFF4EDEA3)
+                                                    : AppColors.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        _formatTime(_secondsRemaining),
+                                        style: const TextStyle(
+                                          fontSize: 44,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -1.2,
+                                          fontFeatures: [
+                                            FontFeature.tabularFigures(),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        child: Text(
+                                          _isRunning ? 'In Flow...' : 'Ready',
+                                          key: ValueKey(
+                                            'focus_status_$_isRunning',
+                                          ),
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: isDark
+                                                ? AppColors.darkTextSecondary
+                                                : AppColors.textSecondary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 1),
+                                      Text(
+                                        _isRunning
+                                            ? 'Khushu\' State • Level 1 Active'
+                                            : 'Ready • Level 1 Calm',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: isDark
+                                              ? AppColors.darkTextSecondary
+                                                    .withValues(alpha: 0.6)
+                                              : AppColors.textSecondary
+                                                    .withValues(alpha: 0.6),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ],
@@ -1026,25 +1115,32 @@ class _FocusScreenState extends State<FocusScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Row(
-                                children: [
-                                  Icon(
-                                    Icons.graphic_eq_rounded,
-                                    size: 18,
-                                    color: AppColors.secondary,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'AMBIENT BARAKAH SOUNDSCAPE',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.6,
+                              const Expanded(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.graphic_eq_rounded,
+                                      size: 18,
                                       color: AppColors.secondary,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'AMBIENT BARAKAH SOUNDSCAPE',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.6,
+                                          color: AppColors.secondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              const SizedBox(width: 8),
                               // Audio wave visualizer bars
                               _SoundWaveVisualizer(
                                 isPlaying:
@@ -1093,161 +1189,166 @@ class _FocusScreenState extends State<FocusScreen> {
                     const SizedBox(height: AppSpacing.lg),
 
                     // Primary Action Controls matching Stitch
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Reset button
-                        if (_isRunning ||
-                            _secondsRemaining < _selectedDurationMinutes * 60)
-                          AppPressable(
-                            onTap: _resetTimer,
-                            pressedScale: 0.88,
-                            haptic: AppHapticFeedback.none,
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isDark
-                                    ? AppColors.darkSurfaceSubtle
-                                    : AppColors.surfaceSubtle,
-                                border: Border.all(
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Reset button
+                          if (_isRunning ||
+                              _secondsRemaining < _selectedDurationMinutes * 60)
+                            AppPressable(
+                              onTap: _resetTimer,
+                              pressedScale: 0.88,
+                              haptic: AppHapticFeedback.none,
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: isDark
-                                      ? AppColors.borderDark
-                                      : AppColors.borderLight,
+                                      ? AppColors.darkSurfaceSubtle
+                                      : AppColors.surfaceSubtle,
+                                  border: Border.all(
+                                    color: isDark
+                                        ? AppColors.borderDark
+                                        : AppColors.borderLight,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.refresh_rounded,
+                                  size: 22,
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.refresh_rounded,
-                                size: 22,
-                              ),
                             ),
-                          ),
-                        if (_isRunning ||
-                            _secondsRemaining < _selectedDurationMinutes * 60)
-                          const SizedBox(width: 14),
+                          if (_isRunning ||
+                              _secondsRemaining < _selectedDurationMinutes * 60)
+                            const SizedBox(width: 14),
 
-                        // Main Glowing Action Button
-                        AppPressable(
-                          onTap: _toggleTimer,
-                          pressedScale: 0.94,
-                          haptic: AppHapticFeedback.none,
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 14,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: _isRunning
-                                  ? AppColors.goldGradient
-                                  : const LinearGradient(
-                                      colors: [
-                                        Color(0xFF0F4C3A),
-                                        Color(0xFF10B981),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
+                          // Main Glowing Action Button
+                          AppPressable(
+                            onTap: _toggleTimer,
+                            pressedScale: 0.94,
+                            haptic: AppHapticFeedback.none,
+                            borderRadius: BorderRadius.circular(30),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: _isRunning
+                                    ? AppColors.goldGradient
+                                    : const LinearGradient(
+                                        colors: [
+                                          Color(0xFF0F4C3A),
+                                          Color(0xFF10B981),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        (_isRunning
+                                                ? AppColors.secondary
+                                                : AppColors.primaryLight)
+                                            .withValues(alpha: 0.35),
+                                    blurRadius: 20,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                border: Border.all(
                                   color:
                                       (_isRunning
-                                              ? AppColors.secondary
+                                              ? AppColors.secondaryLight
                                               : AppColors.primaryLight)
-                                          .withValues(alpha: 0.35),
-                                  blurRadius: 20,
-                                  spreadRadius: 1,
-                                  offset: const Offset(0, 4),
+                                          .withValues(alpha: 0.5),
+                                  width: 1.5,
                                 ),
-                              ],
-                              border: Border.all(
-                                color:
-                                    (_isRunning
-                                            ? AppColors.secondaryLight
-                                            : AppColors.primaryLight)
-                                        .withValues(alpha: 0.5),
-                                width: 1.5,
                               ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 250),
-                                  transitionBuilder: (child, anim) =>
-                                      ScaleTransition(
-                                        scale: anim,
-                                        child: child,
-                                      ),
-                                  child: Icon(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 250),
+                                    transitionBuilder: (child, anim) =>
+                                        ScaleTransition(
+                                          scale: anim,
+                                          child: child,
+                                        ),
+                                    child: Icon(
+                                      _isRunning
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      key: ValueKey('timer_icon_$_isRunning'),
+                                      size: 28,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
                                     _isRunning
-                                        ? Icons.pause_rounded
-                                        : Icons.play_arrow_rounded,
-                                    key: ValueKey('timer_icon_$_isRunning'),
-                                    size: 28,
-                                    color: Colors.white,
+                                        ? l10n.focusPause
+                                        : l10n.focusStart,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  _isRunning
-                                      ? l10n.focusPause
-                                      : l10n.focusStart,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
 
-                        // End Session / Muhasabah Button
-                        if (_isRunning) ...[
-                          const SizedBox(width: 14),
-                          AppPressable(
-                            onTap: _onSessionComplete,
-                            pressedScale: 0.88,
-                            haptic: AppHapticFeedback.none,
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isDark
-                                    ? AppColors.darkSurfaceSubtle
-                                    : AppColors.surfaceSubtle,
-                                border: Border.all(
+                          // End Session / Muhasabah Button
+                          if (_isRunning) ...[
+                            const SizedBox(width: 14),
+                            AppPressable(
+                              onTap: _onSessionComplete,
+                              pressedScale: 0.88,
+                              haptic: AppHapticFeedback.none,
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: isDark
-                                      ? AppColors.borderDark
-                                      : AppColors.borderLight,
+                                      ? AppColors.darkSurfaceSubtle
+                                      : AppColors.surfaceSubtle,
+                                  border: Border.all(
+                                    color: isDark
+                                        ? AppColors.borderDark
+                                        : AppColors.borderLight,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.flag_rounded,
+                                  size: 22,
+                                  color: AppColors.secondary,
                                 ),
                               ),
-                              child: const Icon(
-                                Icons.flag_rounded,
-                                size: 22,
-                                color: AppColors.secondary,
-                              ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
 
                     const SizedBox(height: AppSpacing.xl),
 
-                    // Linked Focus Task Section
+                    // Linked Focus Task Section (matching Stitch Luxury Card)
                     StreamBuilder<List<Task>>(
                       key: const ValueKey('focus_task_stream_builder'),
                       stream: _tasksStream,
                       builder: (context, snapshot) {
                         final tasks = snapshot.data ?? [];
-                        if (tasks.isEmpty) return const SizedBox.shrink();
+                        if (tasks.isEmpty && _selectedTask == null) {
+                          return const SizedBox.shrink();
+                        }
 
                         Task? matchedTask;
                         if (_selectedTask != null) {
@@ -1257,6 +1358,204 @@ class _FocusScreenState extends State<FocusScreen> {
                               break;
                             }
                           }
+                          matchedTask ??= _selectedTask;
+                        }
+
+                        if (matchedTask != null) {
+                          return GlassContainer(
+                            padding: const EdgeInsets.all(14),
+                            borderRadius: 18,
+                            borderColor: isDark
+                                ? AppColors.secondary.withValues(alpha: 0.25)
+                                : AppColors.primary.withValues(alpha: 0.2),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.task_alt_rounded,
+                                            size: 16,
+                                            color: AppColors.secondary,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'LINKED SACRED TASK',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                                letterSpacing: 0.6,
+                                                color: isDark
+                                                    ? AppColors.secondaryLight
+                                                    : AppColors.secondaryDark,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (!_isRunning)
+                                      GestureDetector(
+                                        onTap: () => setState(
+                                          () => _selectedTask = null,
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 3,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.error.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'Clear',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.error,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.darkSurfaceSubtle
+                                        : AppColors.surfaceSubtle,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppColors.borderDark.withValues(
+                                              alpha: 0.6,
+                                            )
+                                          : AppColors.borderLight,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        matchedTask.completed
+                                            ? Icons.check_circle_rounded
+                                            : Icons
+                                                  .radio_button_unchecked_rounded,
+                                        color: matchedTask.completed
+                                            ? const Color(0xFF10B981)
+                                            : AppColors.secondary,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              matchedTask.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: isDark
+                                                    ? AppColors.darkTextPrimary
+                                                    : AppColors.textPrimary,
+                                                decoration:
+                                                    matchedTask.completed
+                                                    ? TextDecoration.lineThrough
+                                                    : null,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Wrap(
+                                              spacing: 6,
+                                              runSpacing: 4,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.secondary
+                                                        .withValues(
+                                                          alpha: 0.14,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    matchedTask
+                                                            .lifeArea
+                                                            .isNotEmpty
+                                                        ? matchedTask.lifeArea
+                                                        : 'Focus Target',
+                                                    style: const TextStyle(
+                                                      fontSize: 9,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color:
+                                                          AppColors.secondary,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors
+                                                        .primaryLight
+                                                        .withValues(
+                                                          alpha: 0.14,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    '${_selectedDurationMinutes}m Target',
+                                                    style: const TextStyle(
+                                                      fontSize: 9,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: AppColors
+                                                          .primaryLight,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
                         }
 
                         return GlassContainer(
@@ -1269,55 +1568,32 @@ class _FocusScreenState extends State<FocusScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.task_alt_rounded,
-                                        size: 18,
-                                        color: AppColors.primaryLight,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        l10n.focusSelectTask,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          letterSpacing: 0.5,
-                                          color: isDark
-                                              ? AppColors.darkTextSecondary
-                                              : AppColors.textSecondary,
-                                        ),
-                                      ),
-                                    ],
+                                  const Icon(
+                                    Icons.task_alt_rounded,
+                                    size: 18,
+                                    color: AppColors.primaryLight,
                                   ),
-                                  if (matchedTask != null)
-                                    GestureDetector(
-                                      onTap: _isRunning
-                                          ? null
-                                          : () {
-                                              setState(
-                                                () => _selectedTask = null,
-                                              );
-                                            },
-                                      child: Text(
-                                        'Clear',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.error.withValues(
-                                            alpha: 0.8,
-                                          ),
-                                        ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.focusSelectTask,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        letterSpacing: 0.5,
+                                        color: isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary,
                                       ),
                                     ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 10),
                               DropdownButtonFormField<Task?>(
-                                initialValue: matchedTask,
+                                initialValue: null,
                                 isExpanded: true,
                                 decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.symmetric(
@@ -1338,6 +1614,7 @@ class _FocusScreenState extends State<FocusScreen> {
                                     value: null,
                                     child: Text(
                                       'No task selected (General Focus)',
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(fontSize: 13),
                                     ),
                                   ),
@@ -1424,7 +1701,11 @@ class _FocusScreenState extends State<FocusScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  Wrap(
+                                    spacing: 6,
+                                    runSpacing: 2,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
                                     children: [
                                       Text(
                                         'Next: ${_getLocalizedPrayerName(_nextPrayerName, l10n)} in ${_timeUntilNextPrayer!.inMinutes}m',
@@ -1436,7 +1717,6 @@ class _FocusScreenState extends State<FocusScreen> {
                                               : AppColors.textPrimary,
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 6,
@@ -1463,6 +1743,8 @@ class _FocusScreenState extends State<FocusScreen> {
                                   const SizedBox(height: 2),
                                   Text(
                                     'Session finishes safely ${_timeUntilNextPrayer!.inMinutes - _selectedDurationMinutes}m before prayer call.',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: isDark
@@ -1473,6 +1755,7 @@ class _FocusScreenState extends State<FocusScreen> {
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 6),
                             const Icon(
                               Icons.lock_clock_rounded,
                               size: 18,
@@ -1511,7 +1794,7 @@ class _FocusScreenState extends State<FocusScreen> {
         pressedScale: 0.94,
         haptic: AppHapticFeedback.none,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark
@@ -1531,6 +1814,7 @@ class _FocusScreenState extends State<FocusScreen> {
             ),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
@@ -1542,33 +1826,40 @@ class _FocusScreenState extends State<FocusScreen> {
                           : AppColors.textSecondary),
               ),
               const SizedBox(height: 4),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected
-                      ? (isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary)
-                      : (isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected
+                        ? (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary)
+                        : (isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary),
+                  ),
                 ),
               ),
               const SizedBox(height: 1),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 8,
-                  color: isSelected
-                      ? AppColors.primaryLight
-                      : (isDark
-                            ? AppColors.darkTextSecondary.withValues(alpha: 0.5)
-                            : AppColors.textSecondary.withValues(alpha: 0.5)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 8,
+                    color: isSelected
+                        ? AppColors.primaryLight
+                        : (isDark
+                              ? AppColors.darkTextSecondary.withValues(
+                                  alpha: 0.5,
+                                )
+                              : AppColors.textSecondary.withValues(alpha: 0.5)),
+                  ),
                 ),
               ),
             ],
@@ -1577,6 +1868,33 @@ class _FocusScreenState extends State<FocusScreen> {
       ),
     );
   }
+}
+
+/// Subtle Islamic geometric lattice watermark painter for background ambiance
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? const Color(0xFF10B981) : AppColors.primary)
+          .withValues(alpha: isDark ? 0.025 : 0.015)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    const step = 56.0;
+    for (double x = 0; x < size.width + step; x += step) {
+      for (double y = 0; y < size.height + step; y += step) {
+        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
 
 /// Animated 4-bar equalizer for the spiritual soundscape
