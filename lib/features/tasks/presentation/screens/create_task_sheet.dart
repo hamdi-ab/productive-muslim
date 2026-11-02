@@ -182,15 +182,19 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: isDark ? const Color(0xFF0B1512) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: isDark
+              ? const Color(0xFF404944).withValues(alpha: 0.5)
+              : AppColors.borderLight,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.35 : 0.12,
+            ),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -213,7 +217,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      AppColors.secondary.withValues(alpha: 0.8),
+                      const Color(0xFFE9C349).withValues(alpha: 0.8),
                       Colors.transparent,
                     ],
                   ),
@@ -231,7 +235,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.darkTextSecondary.withValues(alpha: 0.35)
+                        ? const Color(0xFF8A938D).withValues(alpha: 0.35)
                         : AppColors.textSecondary.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -252,30 +256,33 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-                                textDirection: TextDirection.rtl,
-                                style: ArabicFontFamily.amiri.getTextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.secondary
-                                      : AppColors.secondaryDark,
-                                  height: 1.2,
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                                  textDirection: TextDirection.rtl,
+                                  style: ArabicFontFamily.amiri.getTextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFE9C349),
+                                    height: 1.2,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.secondary,
-                                  shape: BoxShape.circle,
+                                const SizedBox(width: 6),
+                                Container(
+                                  width: 4,
+                                  height: 4,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFE9C349),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -283,17 +290,21 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                               const Icon(
                                 Icons.verified_rounded,
                                 size: 13,
-                                color: AppColors.primaryLight,
+                                color: Color(0xFF4EDEA3),
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                'Purify your intention before action',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
+                              Expanded(
+                                child: Text(
+                                  'Purify your intention before action',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? const Color(0xFFBFC9C3)
+                                        : AppColors.textSecondary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -306,10 +317,10 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: IconButton.styleFrom(
                         backgroundColor: isDark
-                            ? AppColors.darkSurfaceSubtle
+                            ? const Color(0xFF222C29)
                             : AppColors.surfaceSubtle,
                         foregroundColor: isDark
-                            ? AppColors.darkTextPrimary
+                            ? const Color(0xFFDAE5E0)
                             : AppColors.textPrimary,
                         padding: const EdgeInsets.all(6),
                         minimumSize: const Size(32, 32),
@@ -329,12 +340,12 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.darkBackground
+                        ? const Color(0xFF141E1A)
                         : AppColors.surfaceSubtle,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? AppColors.borderDark
+                          ? const Color(0xFF404944).withValues(alpha: 0.4)
                           : AppColors.borderLight,
                       width: 1,
                     ),
@@ -347,43 +358,48 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [AppColors.primary, Color(0xFF14533D)],
+                              colors: [Color(0xFF0F4C3A), Color(0xFF004D33)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppColors.secondary.withValues(alpha: 0.5),
+                              color: const Color(0xFFE9C349)
+                                  .withValues(alpha: 0.5),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryLight.withValues(
-                                  alpha: 0.25,
-                                ),
+                                color: const Color(0xFF4EDEA3)
+                                    .withValues(alpha: 0.22),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.task_alt_rounded,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.newTask,
-                                style: const TextStyle(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.task_alt_rounded,
+                                  size: 16,
                                   color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  l10n.newTask,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -399,55 +415,58 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.repeat_rounded,
-                                  size: 16,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l10n.newHabit,
-                                  style: TextStyle(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.repeat_rounded,
+                                    size: 16,
                                     color: isDark
-                                        ? AppColors.darkTextSecondary
+                                        ? const Color(0xFFBFC9C3)
                                         : AppColors.textSecondary,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5,
-                                    vertical: 1.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.18,
-                                    ),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: AppColors.secondary.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Sunnah',
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.newHabit,
                                     style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.secondary,
+                                      color: isDark
+                                          ? const Color(0xFFBFC9C3)
+                                          : AppColors.textSecondary,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE9C349)
+                                          .withValues(alpha: 0.18),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: const Color(0xFFE9C349)
+                                            .withValues(alpha: 0.4),
+                                        width: 0.8,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Sunnah',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFE9C349),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -475,68 +494,80 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                     children: [
                       // Task Title Input with Niyyah trigger
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                l10n.taskTitle,
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                '*',
-                                style: TextStyle(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            onTap: _renewIntentionPrompt,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(
-                                  alpha: 0.12,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.3,
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    l10n.taskTitle,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark
+                                              ? AppColors.darkTextPrimary
+                                              : AppColors.textPrimary,
+                                        ),
                                   ),
-                                  width: 0.8,
                                 ),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.auto_awesome_rounded,
-                                    size: 11,
+                                const SizedBox(width: 4),
+                                const Text(
+                                  '*',
+                                  style: TextStyle(
                                     color: AppColors.secondary,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Renew Niyyah',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primaryLight,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: InkWell(
+                              onTap: _renewIntentionPrompt,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.3,
                                     ),
+                                    width: 0.8,
                                   ),
-                                ],
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.auto_awesome_rounded,
+                                      size: 11,
+                                      color: AppColors.secondary,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Renew Niyyah',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -588,7 +619,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                               : null,
                           filled: true,
                           fillColor: isDark
-                              ? AppColors.darkSurfaceSubtle
+                              ? const Color(0xFF141E1A)
                               : AppColors.surfaceSubtle,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14,
@@ -598,7 +629,8 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
@@ -606,14 +638,15 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: Color(0xFF4EDEA3),
                               width: 1.5,
                             ),
                           ),
@@ -624,26 +657,33 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
                       // Life Area / 3 Spheres Dimension Section
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            l10n.lifeArea,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              l10n.lifeArea,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          Text(
-                            'Islamic Holism',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark
-                                  ? AppColors.primaryLight
-                                  : AppColors.primary,
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Islamic Holism',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark
+                                    ? AppColors.primaryLight
+                                    : AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -657,57 +697,69 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
                       // Prayer-Anchored Routine Window Section
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.schedule_rounded,
-                                size: 14,
-                                color: AppColors.secondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                l10n.prayerSlot,
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondary.withValues(
-                                alpha: 0.15,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Row(
+                          Expanded(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  Icons.wb_sunny_rounded,
-                                  size: 10,
+                                const Icon(
+                                  Icons.schedule_rounded,
+                                  size: 14,
                                   color: AppColors.secondary,
                                 ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Sunnah Routine',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.secondary,
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    l10n.prayerSlot,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark
+                                              ? AppColors.darkTextPrimary
+                                              : AppColors.textPrimary,
+                                        ),
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.15,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.wb_sunny_rounded,
+                                    size: 10,
+                                    color: AppColors.secondary,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Sunnah Routine',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -770,24 +822,33 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
                       // Khushu' Focus Sprints
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Khushu' Focus Sprint",
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              "Khushu' Focus Sprint",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          const Text(
-                            'Mindful Single-Tasking',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: AppColors.primaryLight,
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Mindful Single-Tasking',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppColors.primaryLight,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -814,34 +875,42 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
                       // Scheduled Time Section
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            l10n.taskScheduled,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              l10n.taskScheduled,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          if (_startTime != null || _endTime != null)
-                            TextButton.icon(
-                              onPressed: _clearTime,
-                              icon: const Icon(Icons.close_rounded, size: 14),
-                              label: Text(
-                                l10n.cancel,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              style: TextButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                          if (_startTime != null || _endTime != null) ...[
+                            const SizedBox(width: 8),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: TextButton.icon(
+                                onPressed: _clearTime,
+                                icon: const Icon(Icons.close_rounded, size: 14),
+                                label: Text(
+                                  l10n.cancel,
+                                  style: const TextStyle(fontSize: 12),
                                 ),
-                                foregroundColor: AppColors.textSecondary,
+                                style: TextButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  foregroundColor: AppColors.textSecondary,
+                                ),
                               ),
                             ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -868,24 +937,31 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
 
                       // Barakah Quality Alignment (9 Qualities framework)
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Barakah Quality Alignment',
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              'Barakah Quality Alignment',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          const Text(
-                            'Spiritual Fuel',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 8),
+                          const FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Spiritual Fuel',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.secondary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -941,7 +1017,9 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
-                      Row(
+                      Wrap(
+                        spacing: AppSpacing.sm,
+                        runSpacing: 6,
                         children: [
                           FilterChip(
                             avatar: Icon(
@@ -966,7 +1044,6 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                               setState(() => _repeatDaily = selected);
                             },
                           ),
-                          const SizedBox(width: AppSpacing.sm),
                           FilterChip(
                             avatar: Icon(
                               Icons.calendar_view_week_rounded,
@@ -1003,15 +1080,19 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             color: AppColors.primaryLight,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            'Intention (Niyyah) & Notes',
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              'Intention (Niyyah) & Notes',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
                         ],
                       ),
@@ -1043,14 +1124,15 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           alignLabelWithHint: true,
                           filled: true,
                           fillColor: isDark
-                              ? AppColors.darkSurfaceSubtle
+                              ? const Color(0xFF141E1A)
                               : AppColors.surfaceSubtle,
                           contentPadding: const EdgeInsets.all(12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
@@ -1058,14 +1140,15 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: Color(0xFF4EDEA3),
                               width: 1.5,
                             ),
                           ),
@@ -1094,16 +1177,15 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: _canSave
-                                ? AppColors.secondary.withValues(alpha: 0.6)
+                                ? const Color(0xFFE9C349).withValues(alpha: 0.6)
                                 : Colors.transparent,
                             width: 1,
                           ),
                           boxShadow: _canSave
                               ? [
                                   BoxShadow(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.25,
-                                    ),
+                                    color: const Color(0xFFE9C349)
+                                        .withValues(alpha: 0.25),
                                     blurRadius: 16,
                                     offset: const Offset(0, 3),
                                   ),
@@ -1116,29 +1198,38 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             onTap: _canSave ? _save : null,
                             borderRadius: BorderRadius.circular(16),
                             child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.bolt_rounded,
-                                    size: 20,
-                                    color: _canSave
-                                        ? AppColors.secondary
-                                        : Colors.grey,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.bolt_rounded,
+                                        size: 20,
+                                        color: _canSave
+                                            ? const Color(0xFFE9C349)
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Bismillah — ${l10n.save}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: _canSave
+                                              ? const Color(0xFFE9C349)
+                                              : Colors.grey,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Bismillah — ${l10n.save}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: _canSave
-                                          ? AppColors.secondary
-                                          : Colors.grey,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -1147,27 +1238,34 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       const SizedBox(height: AppSpacing.sm),
 
                       // Sync notice caption
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.sync_rounded,
-                            size: 13,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.sync_rounded,
+                                size: 13,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Will sync with daily Barakah agenda',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Will sync with daily Barakah agenda',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -1231,25 +1329,31 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                     ),
                   ),
                 ),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected
-                      ? (isDark ? AppColors.secondary : AppColors.primary)
-                      : (isDark
-                            ? AppColors.darkTextPrimary
-                            : AppColors.textPrimary),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected
+                        ? (isDark ? AppColors.secondary : AppColors.primary)
+                        : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary),
+                  ),
                 ),
               ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 9,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.textSecondary,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -1430,34 +1534,38 @@ class _TimeButton extends StatelessWidget {
             width: 1,
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.access_time_rounded,
-              size: 17,
-              color: isSet
-                  ? AppColors.primaryLight
-                  : (isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textSecondary),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              displayText,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSet ? FontWeight.bold : FontWeight.w500,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.access_time_rounded,
+                size: 17,
                 color: isSet
-                    ? (isDark
-                          ? AppColors.darkTextPrimary
-                          : AppColors.textPrimary)
+                    ? AppColors.primaryLight
                     : (isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.textSecondary),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                displayText,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSet ? FontWeight.bold : FontWeight.w500,
+                  color: isSet
+                      ? (isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary)
+                      : (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

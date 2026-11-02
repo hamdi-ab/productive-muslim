@@ -118,15 +118,19 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: isDark ? const Color(0xFF0B1512) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: isDark
+              ? const Color(0xFF404944).withValues(alpha: 0.5)
+              : AppColors.borderLight,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
+            color: (isDark ? const Color(0xFF0F4C3A) : Colors.black).withValues(
+              alpha: isDark ? 0.35 : 0.12,
+            ),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -149,7 +153,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      AppColors.secondary.withValues(alpha: 0.8),
+                      const Color(0xFFE9C349).withValues(alpha: 0.8),
                       Colors.transparent,
                     ],
                   ),
@@ -167,7 +171,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.darkTextSecondary.withValues(alpha: 0.35)
+                        ? const Color(0xFF8A938D).withValues(alpha: 0.35)
                         : AppColors.textSecondary.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -188,30 +192,33 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-                                textDirection: TextDirection.rtl,
-                                style: ArabicFontFamily.amiri.getTextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.secondary
-                                      : AppColors.secondaryDark,
-                                  height: 1.2,
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                                  textDirection: TextDirection.rtl,
+                                  style: ArabicFontFamily.amiri.getTextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFE9C349),
+                                    height: 1.2,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                width: 4,
-                                height: 4,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.secondary,
-                                  shape: BoxShape.circle,
+                                const SizedBox(width: 6),
+                                Container(
+                                  width: 4,
+                                  height: 4,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFE9C349),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -219,17 +226,21 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                               const Icon(
                                 Icons.auto_awesome_rounded,
                                 size: 12,
-                                color: AppColors.secondary,
+                                color: Color(0xFFE9C349),
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                "Continuous Deeds (Ahabbul A'mal)",
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
+                              Expanded(
+                                child: Text(
+                                  "Continuous Deeds (Ahabbul A'mal)",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? const Color(0xFFBFC9C3)
+                                        : AppColors.textSecondary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -242,10 +253,10 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: IconButton.styleFrom(
                         backgroundColor: isDark
-                            ? AppColors.darkSurfaceSubtle
+                            ? const Color(0xFF222C29)
                             : AppColors.surfaceSubtle,
                         foregroundColor: isDark
-                            ? AppColors.darkTextPrimary
+                            ? const Color(0xFFDAE5E0)
                             : AppColors.textPrimary,
                         padding: const EdgeInsets.all(6),
                         minimumSize: const Size(32, 32),
@@ -265,12 +276,12 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.darkBackground
+                        ? const Color(0xFF141E1A)
                         : AppColors.surfaceSubtle,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? AppColors.borderDark
+                          ? const Color(0xFF404944).withValues(alpha: 0.4)
                           : AppColors.borderLight,
                       width: 1,
                     ),
@@ -289,28 +300,33 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.task_alt_rounded,
-                                  size: 16,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l10n.newTask,
-                                  style: TextStyle(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.task_alt_rounded,
+                                    size: 16,
                                     color: isDark
-                                        ? AppColors.darkTextSecondary
+                                        ? const Color(0xFFBFC9C3)
                                         : AppColors.textSecondary,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.newTask,
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? const Color(0xFFBFC9C3)
+                                          : AppColors.textSecondary,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -321,70 +337,75 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [AppColors.primary, Color(0xFF14533D)],
+                              colors: [Color(0xFF0F4C3A), Color(0xFF004D33)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: AppColors.secondary.withValues(alpha: 0.5),
+                              color: const Color(0xFFE9C349)
+                                  .withValues(alpha: 0.5),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryLight.withValues(
-                                  alpha: 0.25,
-                                ),
+                                color: const Color(0xFF4EDEA3)
+                                    .withValues(alpha: 0.22),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.repeat_rounded,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.newHabit,
-                                style: const TextStyle(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.repeat_rounded,
+                                  size: 16,
                                   color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 1.5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.secondary.withValues(
-                                    alpha: 0.25,
-                                  ),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.6,
-                                    ),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Sunnah',
-                                  style: TextStyle(
-                                    fontSize: 9,
+                                const SizedBox(width: 6),
+                                Text(
+                                  l10n.newHabit,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.secondary,
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 1.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withValues(
+                                      alpha: 0.25,
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: AppColors.secondary.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Sunnah',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -411,38 +432,50 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                     children: [
                       // Habit Name Header
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                l10n.habitAddName,
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                '*',
-                                style: TextStyle(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    l10n.habitAddName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark
+                                              ? AppColors.darkTextPrimary
+                                              : AppColors.textPrimary,
+                                        ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                const Text(
+                                  '*',
+                                  style: TextStyle(
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(
-                            'Sunnah Routine',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? AppColors.secondary
-                                  : AppColors.secondaryDark,
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Sunnah Routine',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppColors.secondary
+                                    : AppColors.secondaryDark,
+                              ),
                             ),
                           ),
                         ],
@@ -492,7 +525,7 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                               : null,
                           filled: true,
                           fillColor: isDark
-                              ? AppColors.darkSurfaceSubtle
+                              ? const Color(0xFF141E1A)
                               : AppColors.surfaceSubtle,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14,
@@ -502,7 +535,8 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
@@ -510,14 +544,15 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
                               color: isDark
-                                  ? AppColors.borderDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.5)
                                   : AppColors.borderLight,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryLight,
+                              color: Color(0xFF4EDEA3),
                               width: 1.5,
                             ),
                           ),
@@ -530,26 +565,33 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
 
                       // Category / Life Area Sphere Section
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            l10n.habitAddCategory,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              l10n.habitAddCategory,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          Text(
-                            'Islamic Holism',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: isDark
-                                  ? AppColors.primaryLight
-                                  : AppColors.primary,
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 8),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Islamic Holism',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark
+                                    ? AppColors.primaryLight
+                                    : AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -616,24 +658,31 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
 
                       // Sunnah Frequency & Rhythm
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Frequency & Prophetic Rhythm',
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary,
-                                ),
+                          Expanded(
+                            child: Text(
+                              'Frequency & Prophetic Rhythm',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
+                                  ),
+                            ),
                           ),
-                          const Text(
-                            'Sunnah Cycle',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight,
+                          const SizedBox(width: 8),
+                          const FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Sunnah Cycle',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryLight,
+                              ),
                             ),
                           ),
                         ],
@@ -686,34 +735,46 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
 
                       // Prayer Anchor Hook (Habit Stacking)
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.anchor_rounded,
-                                size: 14,
-                                color: AppColors.secondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Anchor to Daily Prayer',
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? AppColors.darkTextPrimary
-                                          : AppColors.textPrimary,
-                                    ),
-                              ),
-                            ],
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.anchor_rounded,
+                                  size: 14,
+                                  color: AppColors.secondary,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Anchor to Daily Prayer',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark
+                                              ? AppColors.darkTextPrimary
+                                              : AppColors.textPrimary,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const Text(
-                            'Habit Stacking',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight,
+                          const SizedBox(width: 8),
+                          const FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Habit Stacking',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryLight,
+                              ),
                             ),
                           ),
                         ],
@@ -798,24 +859,29 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                                       ),
                                     ),
                                     const SizedBox(height: 2),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          _targetCount,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment:
+                                          AlignmentDirectional.centerStart,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            _targetCount,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primaryLight,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Icon(
+                                            Icons.tune_rounded,
+                                            size: 14,
                                             color: AppColors.primaryLight,
                                           ),
-                                        ),
-                                        const Icon(
-                                          Icons.tune_rounded,
-                                          size: 14,
-                                          color: AppColors.primaryLight,
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -850,24 +916,28 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '40 Days',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
+                                  const FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: AlignmentDirectional.centerStart,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '40 Days',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.secondary,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Icon(
+                                          Icons.verified_rounded,
+                                          size: 14,
                                           color: AppColors.secondary,
                                         ),
-                                      ),
-                                      Icon(
-                                        Icons.verified_rounded,
-                                        size: 14,
-                                        color: AppColors.secondary,
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -920,29 +990,38 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                             onTap: _canSave ? _save : null,
                             borderRadius: BorderRadius.circular(16),
                             child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.verified_user_rounded,
-                                    size: 20,
-                                    color: _canSave
-                                        ? AppColors.secondary
-                                        : Colors.grey,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.verified_user_rounded,
+                                        size: 20,
+                                        color: _canSave
+                                            ? AppColors.secondary
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Start Habit Streak (Istiqamah)',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: _canSave
+                                              ? AppColors.secondary
+                                              : Colors.grey,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Start Habit Streak (Istiqamah)',
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: _canSave
-                                          ? AppColors.secondary
-                                          : Colors.grey,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
