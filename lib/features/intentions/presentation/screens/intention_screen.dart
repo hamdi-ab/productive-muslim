@@ -4,7 +4,9 @@ import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_state.dart';
@@ -33,6 +35,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
@@ -45,7 +48,13 @@ class _IntentionScreenState extends State<IntentionScreen> {
           return Scaffold(
             appBar: hasParentScaffold
                 ? null
-                : AppBar(title: Text(l10n.journal)),
+                : ProductiveAppBar(
+                    title: l10n.journal,
+                    subtitle: DateFormat.yMMMMd(
+                      Localizations.localeOf(context).toString(),
+                    ).format(DateTime.now()),
+                    showBackButton: true,
+                  ),
             floatingActionButton: AppPressable(
               onTap: () => _showAddDialog(context, today),
               pressedScale: 0.90,
@@ -59,9 +68,9 @@ class _IntentionScreenState extends State<IntentionScreen> {
                 ? ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     children: [
-                      _buildTodayCard(context, today, state.entries),
+                      _buildTodayCard(context, today, state.entries, isDark),
                       const SizedBox(height: AppSpacing.md),
-                      _buildReflectionCard(context, state.entries),
+                      _buildReflectionCard(context, state.entries, isDark),
                     ],
                   )
                 : state is IntentionLoading
@@ -81,10 +90,17 @@ class _IntentionScreenState extends State<IntentionScreen> {
     BuildContext context,
     String today,
     List<IntentionEntry> entries,
+    bool isDark,
   ) {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
+      elevation: 0,
+      color: isDark ? AppColors.darkSurfaceSubtle : AppColors.surfaceSubtle,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.12)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
@@ -92,7 +108,8 @@ class _IntentionScreenState extends State<IntentionScreen> {
           children: [
             Text(
               l10n.todayIntentions,
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSpacing.sm),
             if (entries.isEmpty)
@@ -145,9 +162,11 @@ class _IntentionScreenState extends State<IntentionScreen> {
               decoration: entry.completed ? TextDecoration.lineThrough : null,
               color: entry.completed ? AppColors.textDisabled : null,
             ),
-        child: Text(entry.title),
+        child: Text(entry.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       ),
-      subtitle: entry.statement != null ? Text(entry.statement!) : null,
+      subtitle: entry.statement != null
+          ? Text(entry.statement!, maxLines: 2, overflow: TextOverflow.ellipsis)
+          : null,
       trailing: AppPressable(
         onTap: () {
           context.read<IntentionBloc>().add(IntentionDeleted(entry.id));
@@ -169,6 +188,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
   Widget _buildReflectionCard(
     BuildContext context,
     List<IntentionEntry> entries,
+    bool isDark,
   ) {
     final l10n = AppLocalizations.of(context)!;
     final completed = entries.where((e) => e.completed).toList();
@@ -176,6 +196,12 @@ class _IntentionScreenState extends State<IntentionScreen> {
     final ratio = total == 0 ? 0.0 : completed.length / total;
 
     return Card(
+      elevation: 0,
+      color: isDark ? AppColors.darkSurfaceSubtle : AppColors.surfaceSubtle,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.12)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
@@ -183,7 +209,8 @@ class _IntentionScreenState extends State<IntentionScreen> {
           children: [
             Text(
               l10n.reflection,
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(context).textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -191,7 +218,15 @@ class _IntentionScreenState extends State<IntentionScreen> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: AppSpacing.sm),
-            LinearProgressIndicator(value: ratio),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: ratio,
+                color: AppColors.secondary,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                minHeight: 6,
+              ),
+            ),
             const SizedBox(height: AppSpacing.md),
             TextField(
               controller: _reflectionController,
@@ -199,10 +234,12 @@ class _IntentionScreenState extends State<IntentionScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.sm),
-            FilledButton(
+            FilledButton.icon(
+              icon: const Icon(Icons.check_rounded, size: 18),
               onPressed: completed.isEmpty
                   ? null
                   : () {
+                      AppHaptics.mediumImpact();
                       final bloc = context.read<IntentionBloc>();
                       for (final entry in completed) {
                         bloc.add(
@@ -213,7 +250,7 @@ class _IntentionScreenState extends State<IntentionScreen> {
                         );
                       }
                     },
-              child: Text(l10n.saveReflection),
+              label: Text(l10n.saveReflection),
             ),
           ],
         ),
