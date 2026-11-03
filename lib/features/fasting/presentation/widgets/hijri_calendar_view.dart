@@ -87,96 +87,125 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic ? info.formatAr() : info.formatEn(),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateFormat.yMMMMEEEEd(isArabic ? 'ar' : 'en')
-                              .format(info.gregorianDate),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (info.isWhiteDay)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.secondary.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.brightness_2_rounded,
-                              size: 14,
-                              color: Colors.amber,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic ? info.formatAr() : info.formatEn(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              l10n.whiteDayBadge,
-                              style: const TextStyle(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            DateFormat.yMMMMEEEEd(isArabic ? 'ar' : 'en')
+                                .format(info.gregorianDate),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    if (info.isWhiteDay)
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.brightness_2_rounded,
+                                  size: 14,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n.whiteDayBadge,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else if (info.isArafah)
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(
+                                alpha: 0.25,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: const Text(
+                              'Arafah',
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    else if (info.isArafah)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.secondary.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: const Text(
-                          'Arafah',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       )
                     else if (info.isAshura)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'Ashura',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'Ashura',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -582,37 +611,44 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
     Color? dotColor,
     required String label,
   }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: icon != null
-              ? Icon(icon, size: 9, color: iconColor)
-              : (dotColor != null
-                    ? Center(
-                        child: Container(
-                          width: 4,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: dotColor,
-                            shape: BoxShape.circle,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 260),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 14,
+            height: 14,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: icon != null
+                ? Icon(icon, size: 9, color: iconColor)
+                : (dotColor != null
+                      ? Center(
+                          child: Container(
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: dotColor,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                      )
-                    : null),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-        ),
-      ],
+                        )
+                      : null),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -111,21 +111,42 @@ class _FastingScreenState extends State<FastingScreen> {
                             ],
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Text(
-                            l10n.fastingStreak(_fastedDaysThisMonth),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: const Color(0xFFD4AF37)
+                                      .withValues(alpha: 0.6),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.local_fire_department_rounded,
+                                    color: Color(0xFFD4AF37),
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    l10n.fastingStreak(_fastedDaysThisMonth),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -264,6 +285,8 @@ class _FastingScreenState extends State<FastingScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
