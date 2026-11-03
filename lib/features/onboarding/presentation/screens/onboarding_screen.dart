@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -75,6 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextStep() async {
+    AppHaptics.lightImpact();
     if (_currentStep == 1 && _nameController.text.isNotEmpty) {
       await _settings.setUserName(_nameController.text);
     }
@@ -99,6 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _previousStep() {
+    AppHaptics.lightImpact();
     if (_currentStep > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 350),
@@ -154,6 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _toggleQuality(String quality) {
+    AppHaptics.selectionClick();
     setState(() {
       if (_selectedQualities.contains(quality)) {
         _selectedQualities.remove(quality);
@@ -644,11 +648,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.onboardingPermissionGranted,
-                  style: TextStyle(
-                    color: isDark ? AppColors.secondary : AppColors.primary,
-                    fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Text(
+                    l10n.onboardingPermissionGranted,
+                    style: TextStyle(
+                      color: isDark ? AppColors.secondary : AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
