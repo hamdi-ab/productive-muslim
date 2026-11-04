@@ -43,7 +43,7 @@ class _ReviewView extends StatelessWidget {
     return Scaffold(
       appBar: ProductiveAppBar(
         title: l10n.barakahWeeklyTitle,
-        subtitle: 'Weekly Muhasabah & Consistency',
+        subtitle: l10n.barakahHistoryTitle,
         showBackButton: true,
       ),
       body: SafeArea(

@@ -227,38 +227,36 @@ class _PlanScreenState extends State<PlanScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B1512) : null,
-      floatingActionButton: AppPressable(
-        onTap: () => _showCreateAction(context),
-        pressedScale: 0.90,
-        haptic: AppHapticFeedback.light,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFE9C349), Color(0xFFFFD54F)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFE9C349).withValues(alpha: 0.35),
-                blurRadius: 18,
-                offset: const Offset(0, 5),
-              ),
-            ],
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFE9C349), Color(0xFFFFD54F)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: FloatingActionButton.extended(
-            onPressed: () => _showCreateAction(context),
-            elevation: 0,
-            highlightElevation: 0,
-            backgroundColor: Colors.transparent,
-            icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
-            label: Text(
-              _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
-              style: const TextStyle(
-                color: Color(0xFF241A00),
-                fontWeight: FontWeight.bold,
-              ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE9C349).withValues(alpha: 0.35),
+              blurRadius: 18,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            AppHaptics.lightImpact();
+            _showCreateAction(context);
+          },
+          elevation: 0,
+          highlightElevation: 0,
+          backgroundColor: Colors.transparent,
+          icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
+          label: Text(
+            _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
+            style: const TextStyle(
+              color: Color(0xFF241A00),
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),

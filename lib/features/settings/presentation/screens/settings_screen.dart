@@ -513,7 +513,7 @@ class SettingsView extends StatelessWidget {
           : const Color(0xFFF8FAF9),
       appBar: ProductiveAppBar(
         title: l10n.settings,
-        subtitle: 'Preferences & Notifications',
+        subtitle: l10n.preferencesTitle,
         showBackButton: true,
       ),
       body: SafeArea(child: contentWidget),

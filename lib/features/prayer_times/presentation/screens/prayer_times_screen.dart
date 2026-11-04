@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
-import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
@@ -917,22 +919,83 @@ class _LocationRequired extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.location_off_outlined,
-              size: 64,
-              color: AppColors.primary.withValues(alpha: 0.4),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.15)
+                    : AppColors.primary.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0x3310B981)
+                      : AppColors.primary.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Icon(
+                Icons.location_off_outlined,
+                size: 40,
+                color: isDark ? AppColors.primaryLight : AppColors.primary,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.onboardingPermissionDeniedBody,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    AppHaptics.selectionClick();
+                    Geolocator.openAppSettings();
+                  },
+                  icon: const Icon(Icons.settings_outlined, size: 18),
+                  label: Text(l10n.onboardingPermissionOpenSettings),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                FilledButton.icon(
+                  onPressed: () {
+                    AppHaptics.mediumImpact();
+                    context.read<PrayerTimesBloc>().add(
+                      const PrayerTimesLoaded(),
+                    );
+                  },
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(l10n.onboardingPermissionRetry),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -947,14 +1010,56 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.error),
-          const SizedBox(height: AppSpacing.md),
-          Text(message, style: Theme.of(context).textTheme.bodyMedium),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.error.withValues(alpha: 0.12),
+                border: Border.all(
+                  color: AppColors.error.withValues(alpha: 0.25),
+                ),
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 40,
+                color: AppColors.error,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            FilledButton.icon(
+              onPressed: () {
+                AppHaptics.mediumImpact();
+                context.read<PrayerTimesBloc>().add(const PrayerTimesLoaded());
+              },
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(l10n.retry),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

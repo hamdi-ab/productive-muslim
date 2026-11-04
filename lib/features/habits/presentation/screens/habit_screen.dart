@@ -5,7 +5,6 @@ import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/bouncy_checkbox.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
@@ -43,14 +42,12 @@ class HabitScreen extends StatelessWidget {
                 : state is Error
                 ? _ErrorState(message: state.message)
                 : const Center(child: SizedBox.shrink()),
-            floatingActionButton: AppPressable(
-              onTap: () => _showCreateSheet(context),
-              pressedScale: 0.90,
-              haptic: AppHapticFeedback.light,
-              child: FloatingActionButton(
-                onPressed: () => _showCreateSheet(context),
-                child: const Icon(Icons.add),
-              ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                AppHaptics.lightImpact();
+                _showCreateSheet(context);
+              },
+              child: const Icon(Icons.add),
             ),
           );
         },

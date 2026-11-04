@@ -43,8 +43,9 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? leadingWidget = leading;
     if (leadingWidget == null && canPop) {
       final backTooltip = MaterialLocalizations.of(context).backButtonTooltip;
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
       leadingWidget = Padding(
-        padding: const EdgeInsets.only(left: 12),
+        padding: const EdgeInsetsDirectional.only(start: 12),
         child: Center(
           child: Tooltip(
             message: backTooltip,
@@ -53,27 +54,34 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
               pressedScale: 0.88,
               haptic: AppHapticFeedback.selection,
               borderRadius: BorderRadius.circular(20),
-              child: Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : AppColors.primary.withValues(alpha: 0.07),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.12)
-                        : AppColors.primary.withValues(alpha: 0.12),
-                    width: 1,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                child: Center(
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : AppColors.primary.withValues(alpha: 0.07),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : AppColors.primary.withValues(alpha: 0.12),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(
+                      isRtl
+                          ? Icons.arrow_forward_ios_rounded
+                          : Icons.arrow_back_ios_new_rounded,
+                      size: 16,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 16,
-                  color: isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.textPrimary,
                 ),
               ),
             ),
@@ -82,7 +90,7 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     } else if (leadingWidget == null && leadingIcon != null) {
       leadingWidget = Padding(
-        padding: const EdgeInsets.only(left: 16),
+        padding: const EdgeInsetsDirectional.only(start: 16),
         child: Center(
           child: Container(
             width: 36,
@@ -209,28 +217,35 @@ class ProductiveAppBarAction extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: Tooltip(
         message: tooltip,
-        child: Container(
-          width: 38,
-          height: 38,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : AppColors.primary.withValues(alpha: 0.07),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : AppColors.primary.withValues(alpha: 0.12),
-              width: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          child: Center(
+            child: Container(
+              width: 38,
+              height: 38,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : AppColors.primary.withValues(alpha: 0.07),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : AppColors.primary.withValues(alpha: 0.12),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                icon,
+                size: 19,
+                color:
+                    iconColor ??
+                    (isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary),
+              ),
             ),
-          ),
-          child: Icon(
-            icon,
-            size: 19,
-            color:
-                iconColor ??
-                (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
           ),
         ),
       ),

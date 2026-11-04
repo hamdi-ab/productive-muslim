@@ -40,14 +40,12 @@ class _TaskScreenState extends State<TaskScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.tasks)),
-            floatingActionButton: AppPressable(
-              onTap: () => _showCreateSheet(context, activeDate),
-              pressedScale: 0.90,
-              haptic: AppHapticFeedback.light,
-              child: FloatingActionButton(
-                onPressed: () => _showCreateSheet(context, activeDate),
-                child: const Icon(Icons.add),
-              ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                AppHaptics.lightImpact();
+                _showCreateSheet(context, activeDate);
+              },
+              child: const Icon(Icons.add),
             ),
             body: state is Loaded
                 ? state.tasks.isEmpty

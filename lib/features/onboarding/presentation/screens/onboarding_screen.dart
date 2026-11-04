@@ -184,42 +184,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )
             : null,
         actions: [
-          InkWell(
-            onTap: () {
-              final isAr = Localizations.localeOf(context).languageCode == 'ar';
-              _settings.setLocaleCode(isAr ? 'en' : 'ar');
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.language_rounded,
-                    size: 15,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    Localizations.localeOf(context).languageCode == 'ar'
-                        ? 'English'
-                        : 'العربية',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 4),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      final isAr =
+                          Localizations.localeOf(context).languageCode == 'ar';
+                      _settings.setLocaleCode(isAr ? 'en' : 'ar');
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.language_rounded,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? 'English'
+                                : 'العربية',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

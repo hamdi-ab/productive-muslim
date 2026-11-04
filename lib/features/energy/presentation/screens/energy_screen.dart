@@ -246,8 +246,8 @@ class _EnergyScreenState extends State<EnergyScreen> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B1512) : AppColors.background,
       appBar: ProductiveAppBar(
-        title: 'Energy & Qaylulah',
-        subtitle: 'Triple-Energy & Qaylulah Nap',
+        title: l10n.energyTitle,
+        subtitle: l10n.energySubtitle,
         showBackButton: true,
         actions: [
           Padding(
