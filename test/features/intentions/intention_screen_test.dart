@@ -141,6 +141,29 @@ void main() {
     expect(find.byType(AlertDialog), findsOneWidget);
   });
 
+  testWidgets(
+    'preset chip populates intention title and statement in elevated dialog',
+    (tester) async {
+      when(() => mockRepository.getEntriesForDate(any()))
+          .thenAnswer((_) async => []);
+
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Work as Worship'), findsWidgets);
+      await tester.tap(find.text('Work as Worship').first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('To excel in my work with Ihsan and honesty'),
+        findsOneWidget,
+      );
+    },
+  );
+
   testWidgets('renders Arabic locale correctly', (tester) async {
     when(() => mockRepository.getEntriesForDate(any()))
         .thenAnswer((_) async => [testEntries[0]]);
