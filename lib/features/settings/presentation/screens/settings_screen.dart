@@ -54,6 +54,13 @@ class SettingsView extends StatelessWidget {
       title: l10n.barakahDailyTitle,
       body: l10n.barakahReminderBody,
     );
+    final cardBorder = isDark
+        ? const Color(0x2610B981)
+        : const Color(0x1A0F4C3A);
+    final dividerColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.05);
+
     final contentWidget = BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
         final interactive = state.supported && !state.pending;
@@ -64,260 +71,635 @@ class SettingsView extends StatelessWidget {
           ReminderFailure.unavailable => l10n.barakahReminderUnsupported,
           null => null,
         };
-        return ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
+
+        return Stack(
           children: [
-            // Section 1: Preferences & Appearance
-            _SectionTitle(
-              icon: Icons.palette_rounded,
-              title: l10n.preferencesTitle,
-            ),
-            const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              color: isDark
-                  ? AppColors.darkSurfaceSubtle
-                  : AppColors.surfaceSubtle,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  children: [
-                    _ThemeModeSelector(),
-                    Divider(height: 1, indent: 16, endIndent: 16),
-                    _LocaleSelector(),
-                    Divider(height: 1, indent: 16, endIndent: 16),
-                    _ArabicTypographyTile(),
-                    Divider(height: 1, indent: 16, endIndent: 16),
-                    _HapticFeedbackToggle(),
-                  ],
+            // Subtle Islamic Geometric Watermark Lattice
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
 
-            // Section 2: Prayer Times & Location
-            _SectionTitle(icon: Icons.mosque_rounded, title: l10n.prayerTimes),
-            const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              color: isDark
-                  ? AppColors.darkSurfaceSubtle
-                  : AppColors.surfaceSubtle,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  children: [
-                    const _LocationPermissionToggle(),
-                    const Divider(height: 1, indent: 56, endIndent: 16),
-                    _AdhanNotificationToggle(),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Section 3: Smart Routine & Sunnah Reminders
-            _SectionTitle(
-              icon: Icons.wb_twilight_rounded,
-              title: l10n.smartNotificationsTitle,
-            ),
-            const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              color: isDark
-                  ? AppColors.darkSurfaceSubtle
-                  : AppColors.surfaceSubtle,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 6),
-                child: SmartRemindersSettingsCard(),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Section 4: Daily Barakah Reminders
-            _SectionTitle(
-              icon: Icons.auto_awesome_rounded,
-              title: l10n.barakahDailyTitle,
-            ),
-            const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              color: isDark
-                  ? AppColors.darkSurfaceSubtle
-                  : AppColors.surfaceSubtle,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Column(
-                  children: [
-                    SwitchListTile(
-                      key: const Key('barakah_reminder_toggle'),
-                      secondary: const Icon(
-                        Icons.auto_awesome_rounded,
-                        color: Color(0xFFF59E0B),
-                      ),
-                      title: Text(
-                        l10n.barakahReminderLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: Text(l10n.barakahReminderDescription),
-                      value: state.enabled,
-                      onChanged: interactive
-                          ? (enabled) => context.read<SettingsBloc>().add(
-                              ReminderToggled(enabled, content),
-                            )
-                          : null,
-                    ),
-                    const Divider(height: 1, indent: 56, endIndent: 16),
-                    ListTile(
-                      key: const Key('barakah_reminder_time'),
-                      contentPadding: const EdgeInsets.only(
-                        left: 56,
-                        right: 16,
-                      ),
-                      title: Text(
-                        l10n.barakahReminderTime,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
+            // Celestial Ambient Glow Auras matching Stitch Luxury System
+            Positioned(
+              top: -60,
+              left: MediaQuery.of(context).size.width / 2 - 120,
+              child: IgnorePointer(
+                child: Container(
+                  width: 240,
+                  height: 240,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primary.withValues(
+                          alpha: isDark ? 0.22 : 0.08,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                        AppColors.primary.withValues(
+                          alpha: isDark ? 0.05 : 0.02,
+                        ),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 120,
+              left: -40,
+              child: IgnorePointer(
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.secondary.withValues(
+                          alpha: isDark ? 0.12 : 0.06,
+                        ),
+                        AppColors.secondary.withValues(
+                          alpha: isDark ? 0.02 : 0.01,
+                        ),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Main Settings Feed
+            ListView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              children: [
+                // Bismillah Ribbon Pill
+                Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 5,
                       ),
-                      subtitle: Text(
-                        time.format(context),
-                        overflow: TextOverflow.ellipsis,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSurfaceSubtle
+                            : AppColors.surfaceSubtle,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isDark
+                              ? AppColors.secondary.withValues(alpha: 0.35)
+                              : AppColors.borderLight,
+                          width: 0.8,
+                        ),
                       ),
-                      trailing: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 120),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: AlignmentDirectional.centerEnd,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.schedule_rounded,
-                                  size: 16,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  time.format(context),
-                                  style: const TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                            textDirection: TextDirection.rtl,
+                            style: TextStyle(
+                              fontFamily: 'amiri',
+                              fontSize: 13,
+                              color: AppColors.secondaryDark,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 4,
+                            height: 4,
+                            decoration: const BoxDecoration(
+                              color: AppColors.secondary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'PREFERENCES & INTEGRATION',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.8,
+                              color: isDark
+                                  ? Colors.white70
+                                  : AppColors.primary,
+                            ),
+                          ),
+                        ],
                       ),
-                      enabled: interactive,
-                      onTap: interactive
-                          ? () async {
-                              final bloc = context.read<SettingsBloc>();
-                              final selected = await showTimePicker(
-                                context: context,
-                                initialTime: time,
-                              );
-                              if (selected != null && !bloc.isClosed) {
-                                bloc.add(
-                                  ReminderTimeChanged(
-                                    selected.hour,
-                                    selected.minute,
-                                    content,
-                                  ),
-                                );
-                              }
-                            }
-                          : null,
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            if (!state.supported)
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Text(l10n.barakahReminderUnsupported),
-              )
-            else if (state.pending)
-              Semantics(
-                liveRegion: true,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Text(l10n.barakahReminderPending),
-                ),
-              )
-            else if (message != null)
-              Semantics(
-                liveRegion: true,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Text(message),
-                ),
-              ),
-            const SizedBox(height: AppSpacing.lg),
 
-            // Section 5: Data Sovereignty & Local Backup
-            _SectionTitle(
-              icon: Icons.shield_rounded,
-              title: l10n.backupRestoreTitle,
-            ),
-            const SizedBox(height: 8),
-            const Card(elevation: 0, child: _BackupRestoreCard()),
-            const SizedBox(height: AppSpacing.xl),
+                // Hero Overview Card
+                _buildHeroOverviewCard(context, isDark),
+                const SizedBox(height: AppSpacing.md),
 
-            // App Footer Info
-            Center(
-              child: Text(
-                'Productive Muslim v1.0\nBuilt with intention',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? Colors.white38 : Colors.black38,
-                  height: 1.5,
+                // Section 1: Preferences & Appearance
+                _SectionTitle(
+                  icon: Icons.palette_rounded,
+                  title: l10n.preferencesTitle,
                 ),
-              ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: cardBorder, width: 1.2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      children: [
+                        const _ThemeModeSelector(),
+                        Divider(
+                          height: 1,
+                          indent: 56,
+                          endIndent: 16,
+                          color: dividerColor,
+                        ),
+                        const _LocaleSelector(),
+                        Divider(
+                          height: 1,
+                          indent: 56,
+                          endIndent: 16,
+                          color: dividerColor,
+                        ),
+                        const _ArabicTypographyTile(),
+                        Divider(
+                          height: 1,
+                          indent: 56,
+                          endIndent: 16,
+                          color: dividerColor,
+                        ),
+                        const _HapticFeedbackToggle(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 2: Prayer Times & Location
+                _SectionTitle(
+                  icon: Icons.mosque_rounded,
+                  title: l10n.prayerTimes,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: cardBorder, width: 1.2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      children: [
+                        const _LocationPermissionToggle(),
+                        Divider(
+                          height: 1,
+                          indent: 56,
+                          endIndent: 16,
+                          color: dividerColor,
+                        ),
+                        _AdhanNotificationToggle(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 3: Smart Routine & Sunnah Reminders
+                _SectionTitle(
+                  icon: Icons.wb_twilight_rounded,
+                  title: l10n.smartNotificationsTitle,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: cardBorder, width: 1.2),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: SmartRemindersSettingsCard(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 4: Daily Barakah Reminders
+                _SectionTitle(
+                  icon: Icons.auto_awesome_rounded,
+                  title: l10n.barakahDailyTitle,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: cardBorder, width: 1.2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          key: const Key('barakah_reminder_toggle'),
+                          activeThumbColor: AppColors.secondary,
+                          activeTrackColor: AppColors.primary.withValues(
+                            alpha: 0.5,
+                          ),
+                          secondary: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF59E0B)
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.auto_awesome_rounded,
+                              color: Color(0xFFF59E0B),
+                              size: 20,
+                            ),
+                          ),
+                          title: Text(
+                            l10n.barakahReminderLabel,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            l10n.barakahReminderDescription,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white60 : Colors.black54,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          value: state.enabled,
+                          onChanged: interactive
+                              ? (enabled) => context.read<SettingsBloc>().add(
+                                  ReminderToggled(enabled, content),
+                                )
+                              : null,
+                        ),
+                        Divider(
+                          height: 1,
+                          indent: 56,
+                          endIndent: 16,
+                          color: dividerColor,
+                        ),
+                        ListTile(
+                          key: const Key('barakah_reminder_time'),
+                          contentPadding: const EdgeInsets.only(
+                            left: 56,
+                            right: 16,
+                          ),
+                          title: Text(
+                            l10n.barakahReminderTime,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            time.format(context),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white60 : Colors.black54,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 120),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.25,
+                                    ),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.schedule_rounded,
+                                      size: 14,
+                                      color: AppColors.primary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      time.format(context),
+                                      style: const TextStyle(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          enabled: interactive,
+                          onTap: interactive
+                              ? () async {
+                                  final bloc = context.read<SettingsBloc>();
+                                  final selected = await showTimePicker(
+                                    context: context,
+                                    initialTime: time,
+                                  );
+                                  if (selected != null && !bloc.isClosed) {
+                                    bloc.add(
+                                      ReminderTimeChanged(
+                                        selected.hour,
+                                        selected.minute,
+                                        content,
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (!state.supported)
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Text(l10n.barakahReminderUnsupported),
+                  )
+                else if (state.pending)
+                  Semantics(
+                    liveRegion: true,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: Text(l10n.barakahReminderPending),
+                    ),
+                  )
+                else if (message != null)
+                  Semantics(
+                    liveRegion: true,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: Text(message),
+                    ),
+                  ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Section 5: Data Sovereignty & Local Backup
+                _SectionTitle(
+                  icon: Icons.shield_rounded,
+                  title: l10n.backupRestoreTitle,
+                ),
+                const SizedBox(height: 8),
+                Card(
+                  elevation: 0,
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: cardBorder, width: 1.2),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: _BackupRestoreCard(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // App Footer Info
+                _buildAppFooter(context, isDark),
+                const SizedBox(height: AppSpacing.lg),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
           ],
         );
       },
     );
 
     return Scaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF0B1512)
+          : const Color(0xFFF8FAF9),
       appBar: ProductiveAppBar(
         title: l10n.settings,
         subtitle: 'Preferences & Notifications',
         showBackButton: true,
       ),
       body: SafeArea(child: contentWidget),
+    );
+  }
+
+  Widget _buildHeroOverviewCard(BuildContext context, bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF082E23), Color(0xFF0F4C3A), Color(0xFF133E30)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.secondary.withValues(alpha: 0.35),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF082E23).withValues(alpha: 0.35),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -10,
+            bottom: -10,
+            child: IgnorePointer(
+              child: Icon(
+                Icons.tune_rounded,
+                size: 80,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.shield_moon_rounded,
+                            size: 14,
+                            color: AppColors.secondaryLight,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              'DATA SOVEREIGNTY & PRIVACY',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.8,
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.95,
+                                ),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.secondary.withValues(alpha: 0.4),
+                              width: 0.8,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_outline_rounded,
+                                size: 10,
+                                color: AppColors.secondaryLight,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                '100% Offline',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.secondaryLight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Spiritual Rhythms & Settings',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Fine-tune prayer times, Sunnah reminders, local database sovereignty, and typography.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppFooter(BuildContext context, bool isDark) {
+    return Column(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDark
+                ? AppColors.darkSurfaceSubtle
+                : AppColors.surfaceSubtle,
+            border: Border.all(
+              color: AppColors.secondary.withValues(alpha: 0.35),
+              width: 0.8,
+            ),
+          ),
+          child: const Icon(
+            Icons.star_rounded,
+            size: 18,
+            color: AppColors.secondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Productive Muslim v1.0\nBuilt with Intention & Barakah',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white60 : Colors.black54,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'All data stored locally on your device',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 10,
+            color: isDark ? Colors.white38 : Colors.black38,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -330,19 +712,43 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.primary),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.25)
+                  : AppColors.primary.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark
+                    ? AppColors.primaryLight.withValues(alpha: 0.3)
+                    : AppColors.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              icon,
+              size: 15,
+              color: isDark ? AppColors.primaryLight : AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 0.2,
+                letterSpacing: 0.3,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.95)
+                    : AppColors.primaryDark,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -468,6 +874,7 @@ class _LocationPermissionToggleState extends State<_LocationPermissionToggle> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isGranted =
         _permission == LocationPermission.whileInUse ||
         _permission == LocationPermission.always;
@@ -487,15 +894,35 @@ class _LocationPermissionToggleState extends State<_LocationPermissionToggle> {
 
     return SwitchListTile(
       key: const Key('setting_location_permission_toggle'),
-      secondary: Icon(
-        isGranted ? Icons.location_on_rounded : Icons.location_off_rounded,
-        color: isGranted ? AppColors.primary : Colors.grey,
+      activeThumbColor: AppColors.secondary,
+      activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: (isGranted ? AppColors.primary : Colors.grey).withValues(
+            alpha: 0.12,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          isGranted ? Icons.location_on_rounded : Icons.location_off_rounded,
+          color: isGranted ? AppColors.primary : Colors.grey,
+          size: 20,
+        ),
       ),
       title: const Text(
         'Location Access',
         style: TextStyle(fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(subtitleText, style: const TextStyle(fontSize: 12)),
+      subtitle: Text(
+        subtitleText,
+        style: TextStyle(
+          fontSize: 12,
+          color: isDark ? Colors.white60 : Colors.black54,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
       value: isGranted,
       onChanged: _loading ? null : _toggle,
     );
@@ -562,15 +989,37 @@ class _AdhanNotificationToggleState extends State<_AdhanNotificationToggle> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SwitchListTile(
       key: const Key('setting_adhan_notification_toggle'),
-      secondary: const Icon(Icons.mosque_rounded, color: AppColors.primary),
+      activeThumbColor: AppColors.secondary,
+      activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          Icons.mosque_rounded,
+          color: AppColors.primary,
+          size: 20,
+        ),
+      ),
       title: Text(
         l10n.adhan,
         style: const TextStyle(fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(l10n.adhanNotificationsDescription),
+      subtitle: Text(
+        l10n.adhanNotificationsDescription,
+        style: TextStyle(
+          fontSize: 12,
+          color: isDark ? Colors.white60 : Colors.black54,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
       value: _enabled,
       onChanged: _toggle,
     );
@@ -612,11 +1061,20 @@ class _BackupRestoreCard extends StatelessWidget {
 
   Future<void> _showRestoreDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController();
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF13221C) : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(
+            color: isDark ? const Color(0x3310B981) : const Color(0x260F4C3A),
+            width: 1.2,
+          ),
+        ),
         title: Row(
           children: [
             const Icon(Icons.restore_page_rounded, color: AppColors.primary),
@@ -635,7 +1093,9 @@ class _BackupRestoreCard extends StatelessWidget {
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: l10n.backupRestorePasteHint,
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 contentPadding: const EdgeInsets.all(10),
               ),
               style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
@@ -649,7 +1109,12 @@ class _BackupRestoreCard extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogCtx).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: Text(l10n.backupConfirm),
           ),
         ],
@@ -678,27 +1143,62 @@ class _BackupRestoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dividerColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.05);
 
     return Column(
       children: [
         ListTile(
           key: const Key('settings_export_backup'),
-          leading: const Icon(Icons.download_rounded, color: AppColors.primary),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.download_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
+          ),
           title: Text(
             l10n.backupExportBtn,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(l10n.backupRestoreDesc),
+          subtitle: Text(
+            l10n.backupRestoreDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
           trailing: const Icon(Icons.copy_rounded, size: 20),
           onTap: () => _exportBackup(context),
         ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
+        Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         ListTile(
           key: const Key('settings_import_backup'),
-          leading: const Icon(Icons.upload_rounded, color: AppColors.primary),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.upload_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
+          ),
           title: Text(
             l10n.backupImportBtn,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () => _showRestoreDialog(context),
@@ -739,15 +1239,37 @@ class _HapticFeedbackToggleState extends State<_HapticFeedbackToggle> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SwitchListTile(
       key: const Key('settings_haptic_feedback_toggle'),
-      secondary: const Icon(Icons.vibration_rounded, color: AppColors.primary),
+      activeThumbColor: AppColors.secondary,
+      activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          Icons.vibration_rounded,
+          color: AppColors.primary,
+          size: 20,
+        ),
+      ),
       title: Text(
         l10n.hapticFeedback,
         style: const TextStyle(fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text(l10n.hapticFeedbackDesc),
+      subtitle: Text(
+        l10n.hapticFeedbackDesc,
+        style: TextStyle(
+          fontSize: 12,
+          color: isDark ? Colors.white60 : Colors.black54,
+        ),
+        overflow: TextOverflow.ellipsis,
+      ),
       value: _enabled,
       onChanged: _toggle,
     );
@@ -760,6 +1282,7 @@ class _ThemeModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final settings = getIt.isRegistered<SettingsService>()
         ? getIt<SettingsService>()
         : null;
@@ -775,10 +1298,17 @@ class _ThemeModeSelector extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.palette_rounded,
-                    color: AppColors.primary,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.palette_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -799,6 +1329,22 @@ class _ThemeModeSelector extends StatelessWidget {
                 width: double.infinity,
                 child: SegmentedButton<ThemeMode>(
                   showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: AppColors.primary,
+                    selectedForegroundColor: Colors.white,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurfaceSubtle
+                        : AppColors.surfaceSubtle,
+                    foregroundColor: isDark ? Colors.white70 : Colors.black87,
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0x3310B981)
+                          : const Color(0x1F0F4C3A),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                   segments: [
                     ButtonSegment<ThemeMode>(
                       value: ThemeMode.system,
@@ -843,6 +1389,7 @@ class _LocaleSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final settings = getIt.isRegistered<SettingsService>()
         ? getIt<SettingsService>()
         : null;
@@ -859,10 +1406,17 @@ class _LocaleSelector extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.language_rounded,
-                    color: AppColors.primary,
-                    size: 20,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.language_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -883,6 +1437,22 @@ class _LocaleSelector extends StatelessWidget {
                 width: double.infinity,
                 child: SegmentedButton<String>(
                   showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: AppColors.primary,
+                    selectedForegroundColor: Colors.white,
+                    backgroundColor: isDark
+                        ? AppColors.darkSurfaceSubtle
+                        : AppColors.surfaceSubtle,
+                    foregroundColor: isDark ? Colors.white70 : Colors.black87,
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0x3310B981)
+                          : const Color(0x1F0F4C3A),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                   segments: [
                     ButtonSegment<String>(
                       value: 'system',
@@ -919,6 +1489,7 @@ class _ArabicTypographyTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final settings = getIt.isRegistered<SettingsService>()
         ? getIt<SettingsService>()
@@ -933,9 +1504,17 @@ class _ArabicTypographyTile extends StatelessWidget {
 
         return ListTile(
           key: const Key('settings_arabic_typography'),
-          leading: const Icon(
-            Icons.format_size_rounded,
-            color: AppColors.primary,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.format_size_rounded,
+              color: AppColors.primary,
+              size: 20,
+            ),
           ),
           title: Text(
             l10n.adhkarTypography,
@@ -944,7 +1523,10 @@ class _ArabicTypographyTile extends StatelessWidget {
           ),
           subtitle: Text(
             l10n.typographyTitle,
-            style: const TextStyle(fontSize: 12),
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
           trailing: ConstrainedBox(
@@ -960,6 +1542,10 @@ class _ArabicTypographyTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    width: 0.8,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -991,4 +1577,29 @@ class _ArabicTypographyTile extends StatelessWidget {
       },
     );
   }
+}
+
+class _IslamicLatticeBackgroundPainter extends CustomPainter {
+  final bool isDark;
+  const _IslamicLatticeBackgroundPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDark ? const Color(0xFF10B981) : AppColors.primary)
+          .withValues(alpha: isDark ? 0.025 : 0.015)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    const step = 56.0;
+    for (double x = 0; x < size.width + step; x += step) {
+      for (double y = 0; y < size.height + step; y += step) {
+        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
+      oldDelegate.isDark != isDark;
 }
