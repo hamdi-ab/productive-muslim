@@ -56,6 +56,7 @@ void main() {
     expect(find.text('Tasks'), findsWidgets);
     expect(find.text('Habits'), findsWidgets);
     expect(find.text('New Task'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 
   testWidgets('switching to Habits tab updates view and FAB label', (
@@ -70,5 +71,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('New Habit'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 }
