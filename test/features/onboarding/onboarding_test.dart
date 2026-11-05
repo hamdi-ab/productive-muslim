@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  late SettingsService settings;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    settings = SettingsService(prefs: prefs);
+  });
+
   Widget buildTestWidget({Locale? locale}) {
     return MaterialApp(
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const OnboardingScreen(),
+      home: OnboardingScreen(settings: settings),
     );
   }
 
@@ -136,8 +145,12 @@ void main() {
     await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
-    final containers = tester.widgetList<Container>(
-      find.descendant(of: find.byType(Row), matching: find.byType(Container)),
+    final indicatorRow = find.byKey(const Key('step_progress_indicator'));
+    final containers = tester.widgetList<AnimatedContainer>(
+      find.descendant(
+        of: indicatorRow,
+        matching: find.byType(AnimatedContainer),
+      ),
     );
     expect(containers.length, equals(5));
   });
@@ -147,5 +160,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ابنِ يومك حول ما يهم'), findsOneWidget);
+  });
+
+  testWidgets('language toggle switches app language', (tester) async {
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pumpAndSettle();
+
+    final arPill = find.text('العربية');
+    expect(arPill, findsOneWidget);
+
+    await tester.tap(arPill);
+    await tester.pumpAndSettle();
+
+    expect(settings.localeCode, 'ar');
+    expect(settings.localeNotifier.value, const Locale('ar'));
   });
 }

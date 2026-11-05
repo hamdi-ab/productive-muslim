@@ -10,6 +10,7 @@ import 'core/di/di.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'data/services/home_widget_sync_service.dart';
+import 'data/services/settings_service.dart';
 import 'domain/repositories/barakah_repository.dart';
 import 'domain/repositories/habit_repository.dart';
 import 'domain/repositories/intention_repository.dart';
@@ -20,7 +21,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupDi();
   runApp(
-    DevicePreview(enabled: !kReleaseMode, builder: (context) => const MyApp()),
+    DevicePreview(
+      enabled: kIsWeb && !kReleaseMode,
+      builder: (context) => const MyApp(),
+    ),
   );
 }
 
@@ -41,6 +45,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _initHomeWidgetDeepLinking() {
+    if (kIsWeb) return;
     if (getIt.isRegistered<HomeWidgetSyncService>()) {
       final service = getIt<HomeWidgetSyncService>();
       service.registerBackgroundCallback();
@@ -65,6 +70,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = getIt.isRegistered<SettingsService>()
+        ? getIt<SettingsService>()
+        : null;
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<BarakahRepository>.value(
@@ -80,21 +89,37 @@ class _MyAppState extends State<MyApp> {
           value: getIt<IntentionRepository>(),
         ),
       ],
-      child: MaterialApp.router(
-        title: 'Productive Muslim',
-        locale: DevicePreview.locale(context),
-        builder: DevicePreview.appBuilder,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('en'), Locale('ar')],
-        routerConfig: AppRouter.router,
+      child: ListenableBuilder(
+        listenable: Listenable.merge([
+          settings?.themeModeNotifier ?? ValueNotifier(ThemeMode.system),
+          settings?.localeNotifier ?? ValueNotifier<Locale?>(null),
+        ]),
+        builder: (context, _) {
+          final currentThemeMode =
+              settings?.themeModeNotifier.value ?? ThemeMode.system;
+          final currentLocale = (kIsWeb && !kReleaseMode)
+              ? (DevicePreview.locale(context) ??
+                    settings?.localeNotifier.value)
+              : settings?.localeNotifier.value;
+
+          return MaterialApp.router(
+            title: 'Productive Muslim',
+            debugShowCheckedModeBanner: false,
+            locale: currentLocale,
+            builder: DevicePreview.appBuilder,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: currentThemeMode,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('ar')],
+            routerConfig: AppRouter.router,
+          );
+        },
       ),
     );
   }

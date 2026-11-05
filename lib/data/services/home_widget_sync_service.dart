@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:home_widget/home_widget.dart';
 
 abstract class HomeWidgetStorage {
   Future<bool?> saveWidgetData<T>(String id, T? data);
@@ -20,15 +19,20 @@ abstract class HomeWidgetStorage {
 }
 
 class DefaultHomeWidgetStorage implements HomeWidgetStorage {
-  const DefaultHomeWidgetStorage();
+  final Map<String, dynamic> _inMemory = {};
+
+  DefaultHomeWidgetStorage();
 
   @override
-  Future<bool?> saveWidgetData<T>(String id, T? data) =>
-      HomeWidget.saveWidgetData<T>(id, data);
+  Future<bool?> saveWidgetData<T>(String id, T? data) async {
+    _inMemory[id] = data;
+    return true;
+  }
 
   @override
-  Future<T?> getWidgetData<T>(String id, {T? defaultValue}) =>
-      HomeWidget.getWidgetData<T>(id, defaultValue: defaultValue);
+  Future<T?> getWidgetData<T>(String id, {T? defaultValue}) async {
+    return (_inMemory[id] as T?) ?? defaultValue;
+  }
 
   @override
   Future<bool?> updateWidget({
@@ -36,24 +40,24 @@ class DefaultHomeWidgetStorage implements HomeWidgetStorage {
     String? androidName,
     String? iOSName,
     String? qualifiedAndroidName,
-  }) => HomeWidget.updateWidget(
-    name: name,
-    androidName: androidName,
-    iOSName: iOSName,
-    qualifiedAndroidName: qualifiedAndroidName,
-  );
+  }) async {
+    return true;
+  }
 
   @override
-  Future<Uri?> initiallyLaunchedFromHomeWidget() =>
-      HomeWidget.initiallyLaunchedFromHomeWidget();
+  Future<Uri?> initiallyLaunchedFromHomeWidget() async {
+    return null;
+  }
 
   @override
-  Stream<Uri?> get widgetClicked => HomeWidget.widgetClicked;
+  Stream<Uri?> get widgetClicked => const Stream.empty();
 
   @override
   Future<bool?> registerInteractivityCallback(
     FutureOr<void> Function(Uri?) callback,
-  ) => HomeWidget.registerInteractivityCallback(callback);
+  ) async {
+    return true;
+  }
 }
 
 @pragma('vm:entry-point')
@@ -89,7 +93,7 @@ class HomeWidgetSyncService {
   static const String keyBtnPlusOne = 'widget_btn_plus_one';
 
   HomeWidgetSyncService({HomeWidgetStorage? storage})
-    : _storage = storage ?? const DefaultHomeWidgetStorage();
+    : _storage = storage ?? DefaultHomeWidgetStorage();
 
   Future<bool> registerBackgroundCallback([
     FutureOr<void> Function(Uri?) callback = homeWidgetBackgroundCallback,

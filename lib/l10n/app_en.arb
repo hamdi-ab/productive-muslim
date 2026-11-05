@@ -294,6 +294,13 @@
   "adhkarNext": "Next Dhikr",
   "adhkarPrev": "Previous",
   "adhkarReset": "Reset Count",
+  "adhkarResetCategory": "Reset Category",
+  "adhkarTypography": "Arabic Calligraphy",
+  "typographyTitle": "Arabic Typography & Calligraphy",
+  "typographyFontFamily": "Calligraphy Script",
+  "typographyFontSize": "Arabic Font Size",
+  "typographyPreview": "Live Verse Preview",
+  "typographyTooltip": "Customize Arabic calligraphy and font size",
   "adhkarTransliteration": "Transliteration",
   "adhkarPillMorning": "Morning Adhkar • Light & Protection",
   "adhkarPillEvening": "Evening Adhkar • Evening Shield",
@@ -370,6 +377,20 @@
     }
   },
   "qiblaFacingKaaba": "You are facing the Kaaba",
+  "qiblaDirectionLabel": "Qibla Direction",
+  "qiblaDistanceLabel": "Distance",
+  "qiblaTurnRight": "Turn {degrees}° Right",
+  "@qiblaTurnRight": {
+    "placeholders": {
+      "degrees": {"type": "String"}
+    }
+  },
+  "qiblaTurnLeft": "Turn {degrees}° Left",
+  "@qiblaTurnLeft": {
+    "placeholders": {
+      "degrees": {"type": "String"}
+    }
+  },
   "qiblaCalibrate": "Calibrate Compass: Rotate device in a figure-8 motion away from metal interference.",
   "solarDialTitle": "Solar Prayer Arc",
   "solarCurrentWindow": "Active Window: {slot}",
@@ -483,5 +504,32 @@
   "backupConfirmMsg": "Restoring will replace all current local data with the backup contents. Are you sure you want to proceed?",
   "backupRestorePasteHint": "Paste your exported JSON backup text here...",
   "backupCancel": "Cancel",
-  "backupConfirm": "Restore Now"
+  "backupConfirm": "Restore Now",
+  "preferencesTitle": "Preferences & Touch",
+  "hapticFeedback": "Haptic Feedback",
+  "hapticFeedbackDesc": "Vibration feedback on taps, counters, and completions",
+  "language": "Language",
+  "languageDesc": "Change app display language",
+  "languageSystem": "System Default",
+  "languageEn": "English",
+  "languageAr": "العربية (Arabic)",
+  "plan": "Plan",
+  "quickToolkit": "Spiritual Toolkit",
+  "allTools": "Quick Access",
+  "focusSubtitle": "Khushu' Timer",
+  "fastingSubtitle": "Sunnah Days",
+  "energySubtitle": "Qaylulah & Battery",
+  "adhkarSubtitle": "Daily Remembrances",
+  "timeAwareMorningTitle": "Morning Barakah Window",
+  "timeAwareMorningDesc": "Start with morning adhkar & set your daily intention.",
+  "timeAwareMiddayTitle": "Midday Qaylulah & Focus",
+  "timeAwareMiddayDesc": "Recharge with a 20-min Sunnah nap or start deep work.",
+  "timeAwareEveningTitle": "Evening Adhkar & Wind-down",
+  "timeAwareEveningDesc": "Recite your evening protections and review today's progress.",
+  "timeAwareNightTitle": "Night Reflection & Muhasabah",
+  "timeAwareNightDesc": "Record your gratitude (Shukr) and recite bedtime adhkar.",
+  "startNow": "Open",
+  "fastingTitle": "Fasting & Hijri",
+  "energy": "Energy & Routines",
+  "adhkar": "Adhkar Studio"
 }

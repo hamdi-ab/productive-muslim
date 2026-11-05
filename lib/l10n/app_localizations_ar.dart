@@ -694,7 +694,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get focusTitle => 'جلسة تركيز وخشوع';
 
   @override
-  String get focusSubtitle => 'اعمل بحضور قلب ونيّة خالصة وبركة إلهية';
+  String get focusSubtitle => 'مؤقت الخشوع';
 
   @override
   String get focusNiyyahPrompt => 'بسم الله — جدد نيتك لله تعالى قبل البدء';
@@ -768,7 +768,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get energyTitle => 'طاقة اليوم وروتين السنة';
 
   @override
-  String get energySubtitle => 'وازن بين طاقتك الروحية والجسدية والذهنية';
+  String get energySubtitle => 'القيلولة وبطارية الطاقة';
 
   @override
   String get qaylulah => 'القيلولة النبوية';
@@ -853,6 +853,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarReset => 'إعادة العد';
+
+  @override
+  String get adhkarResetCategory => 'إعادة تعيين القسم';
+
+  @override
+  String get adhkarTypography => 'الخط العربي';
+
+  @override
+  String get typographyTitle => 'الخطوط العربية وتنسيق النصوص';
+
+  @override
+  String get typographyFontFamily => 'نوع الخط والخطاط';
+
+  @override
+  String get typographyFontSize => 'حجم الخط العربي';
+
+  @override
+  String get typographyPreview => 'معاينة حية للآيات والأذكار';
+
+  @override
+  String get typographyTooltip => 'تخصيص الخط العربي وحجمه';
 
   @override
   String get adhkarTransliteration => 'النطق بالحروف اللاتينية';
@@ -1006,6 +1027,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiblaFacingKaaba => 'أنت باتجاه القبلة تماماً';
+
+  @override
+  String get qiblaDirectionLabel => 'اتجاه القبلة';
+
+  @override
+  String get qiblaDistanceLabel => 'المسافة';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'استدر $degrees° يميناً';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'استدر $degrees° يساراً';
+  }
 
   @override
   String get qiblaCalibrate =>
@@ -1242,4 +1279,78 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backupConfirm => 'استعادة الآن';
+
+  @override
+  String get preferencesTitle => 'التفضيلات والتجربة';
+
+  @override
+  String get hapticFeedback => 'الاستجابة اللمسية (الاهتزاز)';
+
+  @override
+  String get hapticFeedbackDesc =>
+      'اهتزاز تفاعلي لطيف عند النقر والعد وإتمام الأوراد والمهام';
+
+  @override
+  String get languageDesc => 'تغيير لغة عرض التطبيق';
+
+  @override
+  String get languageSystem => 'تلقائي (لغة النظام)';
+
+  @override
+  String get languageEn => 'English (الإنجليزية)';
+
+  @override
+  String get languageAr => 'العربية';
+
+  @override
+  String get plan => 'الخطة';
+
+  @override
+  String get quickToolkit => 'أدوات الإنتاجية الروحية';
+
+  @override
+  String get allTools => 'وصول سريع';
+
+  @override
+  String get fastingSubtitle => 'أيام السنة والهجري';
+
+  @override
+  String get adhkarSubtitle => 'الأذكار والتلاوة';
+
+  @override
+  String get timeAwareMorningTitle => 'نافذة بركة الصباح';
+
+  @override
+  String get timeAwareMorningDesc => 'ابدأ بأذكار الصباح وحدد نيتك لهذا اليوم.';
+
+  @override
+  String get timeAwareMiddayTitle => 'القيلولة والتركيز';
+
+  @override
+  String get timeAwareMiddayDesc =>
+      'جدد طاقتك بقيلولة السنة أو ابدأ جلسة عمل عميق.';
+
+  @override
+  String get timeAwareEveningTitle => 'أذكار المساء والاستعداد';
+
+  @override
+  String get timeAwareEveningDesc => 'اقرأ أذكار المساء وراجع إنجازات اليوم.';
+
+  @override
+  String get timeAwareNightTitle => 'محاسبة النفس والنوم';
+
+  @override
+  String get timeAwareNightDesc => 'سجّل شكرك للنعم واقرأ أذكار النوم.';
+
+  @override
+  String get startNow => 'فتح';
+
+  @override
+  String get fastingTitle => 'الصيام والهجري';
+
+  @override
+  String get energy => 'الطاقة والروتين';
+
+  @override
+  String get adhkar => 'الأذكار والتلاوة';
 }

@@ -1,29 +1,190 @@
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 
 class PrayerTimeService {
+  Position? _cachedPosition;
+  PrayerTimes? _cachedPrayerTimes;
+  String? _cachedLocationName;
+  Future<Position?>? _ongoingFetch;
+
+  Position? get cachedPosition => _cachedPosition;
+  PrayerTimes? get cachedPrayerTimes {
+    final now = DateTime.now();
+    if (_cachedPrayerTimes != null &&
+        _cachedPosition != null &&
+        _cachedPrayerTimes!.fajr.day != now.day) {
+      _cachedPrayerTimes = getPrayerTimes(_cachedPosition!, date: now);
+    }
+    return _cachedPrayerTimes;
+  }
+
+  String? get cachedLocationName => _cachedLocationName;
+
   Future<Position?> getCurrentPosition() async {
+    if (_ongoingFetch != null) {
+      return await _ongoingFetch;
+    }
+
+    _ongoingFetch = _fetchPositionInternal();
+    try {
+      final pos = await _ongoingFetch;
+      return pos;
+    } finally {
+      _ongoingFetch = null;
+    }
+  }
+
+  Future<Position?> _fetchPositionInternal() async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return null;
+      if (!serviceEnabled) {
+        return _fallbackFromCacheOrStorage();
+      }
 
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return null;
+        if (permission == LocationPermission.denied) {
+          return _fallbackFromCacheOrStorage();
+        }
       }
 
-      if (permission == LocationPermission.deniedForever) return null;
+      if (permission == LocationPermission.deniedForever) {
+        return _fallbackFromCacheOrStorage();
+      }
 
-      return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
+      // First check last known position quickly
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null && _cachedPosition == null) {
+        _updateCache(lastKnown);
+      }
+
+      // Fetch fresh position with 4-second timeout to avoid hardware GPS hang
+      Position? fresh;
+      try {
+        fresh = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 4),
+          ),
+        );
+      } catch (_) {
+        fresh = lastKnown ?? _cachedPosition;
+      }
+
+      if (fresh != null) {
+        await resolvePlacemarkCity(fresh.latitude, fresh.longitude);
+        _updateCache(fresh);
+        return fresh;
+      }
+
+      return _fallbackFromCacheOrStorage();
     } catch (_) {
-      return null;
+      return _fallbackFromCacheOrStorage();
     }
+  }
+
+  Position? _fallbackFromCacheOrStorage() {
+    if (_cachedPosition != null) return _cachedPosition;
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      final coords = settings.lastCoordinates;
+      if (coords != null) {
+        final pos = Position(
+          longitude: coords.longitude,
+          latitude: coords.latitude,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          altitudeAccuracy: 0,
+          heading: 0,
+          headingAccuracy: 0,
+          speed: 0,
+          speedAccuracy: 0,
+        );
+        _updateCache(pos);
+        resolvePlacemarkCity(coords.latitude, coords.longitude);
+        return pos;
+      }
+    }
+
+    return null;
+  }
+
+  void _updateCache(Position position) {
+    _cachedPosition = position;
+    _cachedPrayerTimes = getPrayerTimes(position);
+    _cachedLocationName = getLocationName(position);
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      settings.setLastCoordinates(position.latitude, position.longitude);
+      if (_cachedLocationName != null && !_cachedLocationName!.contains('°')) {
+        settings.setLastLocationName(_cachedLocationName!);
+      }
+    }
+  }
+
+  Future<String?> resolvePlacemarkCity(
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final city = place.locality?.isNotEmpty == true
+            ? place.locality
+            : place.subAdministrativeArea?.isNotEmpty == true
+            ? place.subAdministrativeArea
+            : place.subLocality?.isNotEmpty == true
+            ? place.subLocality
+            : place.administrativeArea?.isNotEmpty == true
+            ? place.administrativeArea
+            : place.name?.isNotEmpty == true
+            ? place.name
+            : place.country;
+        if (city != null && city.isNotEmpty) {
+          _cachedLocationName = city;
+          if (getIt.isRegistered<SettingsService>()) {
+            getIt<SettingsService>().setLastLocationName(city);
+          }
+          return city;
+        }
+      }
+    } catch (_) {}
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final storedName = getIt<SettingsService>().lastLocationName;
+      if (storedName != null &&
+          storedName.isNotEmpty &&
+          storedName != 'Local' &&
+          !storedName.contains('°')) {
+        _cachedLocationName = storedName;
+        return storedName;
+      }
+    }
+
+    try {
+      final name = tz.local.name;
+      if (name.contains('/')) {
+        final city = name.split('/').last.replaceAll('_', ' ');
+        if (city.isNotEmpty &&
+            city.toUpperCase() != 'UTC' &&
+            city.toUpperCase() != 'LOCAL') {
+          _cachedLocationName = city;
+          return city;
+        }
+      }
+    } catch (_) {}
+
+    _cachedLocationName ??= 'My Location';
+    return _cachedLocationName;
   }
 
   PrayerTimes? getPrayerTimes(Position position, {DateTime? date}) {
@@ -86,23 +247,35 @@ class PrayerTimeService {
   }
 
   String getLocationName(Position? position) {
+    if (_cachedLocationName != null &&
+        _cachedLocationName!.isNotEmpty &&
+        !_cachedLocationName!.contains('°')) {
+      return _cachedLocationName!;
+    }
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final storedName = getIt<SettingsService>().lastLocationName;
+      if (storedName != null &&
+          storedName.isNotEmpty &&
+          storedName != 'Local' &&
+          !storedName.contains('°')) {
+        return storedName;
+      }
+    }
+
     try {
       final name = tz.local.name;
       if (name.contains('/')) {
         final city = name.split('/').last.replaceAll('_', ' ');
-        if (city.isNotEmpty && city.toUpperCase() != 'UTC') {
+        if (city.isNotEmpty &&
+            city.toUpperCase() != 'UTC' &&
+            city.toUpperCase() != 'LOCAL') {
           return city;
         }
       }
     } catch (_) {}
 
-    if (position != null) {
-      final lat = position.latitude.toStringAsFixed(2);
-      final lon = position.longitude.toStringAsFixed(2);
-      return '$lat°, $lon°';
-    }
-
-    return 'Local';
+    return 'My Location';
   }
 
   ({int startMinutes, int endMinutes}) getSlotMinutes(

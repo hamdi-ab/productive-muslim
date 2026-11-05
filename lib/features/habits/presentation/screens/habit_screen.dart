@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/bouncy_checkbox.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
@@ -41,7 +43,10 @@ class HabitScreen extends StatelessWidget {
                 ? _ErrorState(message: state.message)
                 : const Center(child: SizedBox.shrink()),
             floatingActionButton: FloatingActionButton(
-              onPressed: () => _showCreateSheet(context),
+              onPressed: () {
+                AppHaptics.lightImpact();
+                _showCreateSheet(context);
+              },
               child: const Icon(Icons.add),
             ),
           );
@@ -129,7 +134,7 @@ class _HabitList extends StatelessWidget {
     final categoryColors = AppLifeArea.all;
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: 88),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         _WeekHeader(l10n: l10n),
         const Divider(height: 1),
@@ -357,7 +362,7 @@ class _HabitTile extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  HapticFeedback.mediumImpact();
+                  AppHaptics.mediumImpact();
                   Navigator.pop(ctx, true);
                 },
                 child: Text(l10n.delete),
@@ -379,54 +384,22 @@ class _HabitTile extends StatelessWidget {
               : Colors.white.withValues(alpha: 0.8),
           child: Row(
             children: [
-              Semantics(
-                label: habit.name,
-                checked: completed,
-                button: true,
-                child: GestureDetector(
-                  key: Key('habit_checkbox_${habit.id}'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    context.read<HabitBloc>().add(
-                      HabitCompletionToggled(habit.id),
-                    );
-                  },
-                  child: SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Center(
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: completed ? color : Colors.transparent,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: completed
-                                ? color
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textDisabled),
-                            width: 2,
-                          ),
-                        ),
-                        child: completed
-                            ? const Icon(
-                                Icons.check_rounded,
-                                size: 18,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
-                    ),
-                  ),
-                ),
+              BouncyCheckbox(
+                key: Key('habit_checkbox_${habit.id}'),
+                value: completed,
+                activeColor: color,
+                semanticLabel: habit.name,
+                onChanged: (_) {
+                  context.read<HabitBloc>().add(
+                    HabitCompletionToggled(habit.id),
+                  );
+                },
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(
-                  habit.name,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -439,57 +412,66 @@ class _HabitTile extends StatelessWidget {
                               ? AppColors.darkTextPrimary
                               : AppColors.textPrimary),
                   ),
+                  child: Text(habit.name),
                 ),
               ),
               if (streak > 0)
-                Container(
-                  key: Key('habit_streak_${habit.id}'),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        (isDark ? AppColors.secondary : AppColors.secondaryDark)
-                            .withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
+                PulsingGlow(
+                  animate: streak >= 7,
+                  minScale: 0.96,
+                  maxScale: 1.04,
+                  duration: const Duration(milliseconds: 1600),
+                  child: Container(
+                    key: Key('habit_streak_${habit.id}'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
                       color:
                           (isDark
                                   ? AppColors.secondary
                                   : AppColors.secondaryDark)
-                              .withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                    boxShadow: streak >= 7
-                        ? [
-                            BoxShadow(
-                              color:
-                                  (isDark
-                                          ? AppColors.secondary
-                                          : AppColors.secondaryDark)
-                                      .withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Row(
-                    children: [
-                      const Text('🔥', style: TextStyle(fontSize: 12)),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$streak',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? AppColors.secondary
-                              : AppColors.secondaryDark,
-                        ),
+                              .withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color:
+                            (isDark
+                                    ? AppColors.secondary
+                                    : AppColors.secondaryDark)
+                                .withValues(alpha: 0.3),
+                        width: 1,
                       ),
-                    ],
+                      boxShadow: streak >= 7
+                          ? [
+                              BoxShadow(
+                                color:
+                                    (isDark
+                                            ? AppColors.secondary
+                                            : AppColors.secondaryDark)
+                                        .withValues(alpha: 0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('🔥', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$streak',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.secondary
+                                : AppColors.secondaryDark,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
             ],

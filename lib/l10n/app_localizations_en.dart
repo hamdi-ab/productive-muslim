@@ -700,8 +700,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusTitle => 'Khushu\' Focus Session';
 
   @override
-  String get focusSubtitle =>
-      'Work with presence, intention, and divine blessing';
+  String get focusSubtitle => 'Khushu\' Timer';
 
   @override
   String get focusNiyyahPrompt =>
@@ -778,8 +777,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get energyTitle => 'Daily Energy & Sunnah Routine';
 
   @override
-  String get energySubtitle =>
-      'Manage your spiritual, physical, and mental vitality';
+  String get energySubtitle => 'Qaylulah & Battery';
 
   @override
   String get qaylulah => 'Sunnah Qaylulah';
@@ -865,6 +863,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarReset => 'Reset Count';
+
+  @override
+  String get adhkarResetCategory => 'Reset Category';
+
+  @override
+  String get adhkarTypography => 'Arabic Calligraphy';
+
+  @override
+  String get typographyTitle => 'Arabic Typography & Calligraphy';
+
+  @override
+  String get typographyFontFamily => 'Calligraphy Script';
+
+  @override
+  String get typographyFontSize => 'Arabic Font Size';
+
+  @override
+  String get typographyPreview => 'Live Verse Preview';
+
+  @override
+  String get typographyTooltip => 'Customize Arabic calligraphy and font size';
 
   @override
   String get adhkarTransliteration => 'Transliteration';
@@ -1018,6 +1037,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiblaFacingKaaba => 'You are facing the Kaaba';
+
+  @override
+  String get qiblaDirectionLabel => 'Qibla Direction';
+
+  @override
+  String get qiblaDistanceLabel => 'Distance';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'Turn $degrees° Right';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'Turn $degrees° Left';
+  }
 
   @override
   String get qiblaCalibrate =>
@@ -1252,4 +1287,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupConfirm => 'Restore Now';
+
+  @override
+  String get preferencesTitle => 'Preferences & Touch';
+
+  @override
+  String get hapticFeedback => 'Haptic Feedback';
+
+  @override
+  String get hapticFeedbackDesc =>
+      'Vibration feedback on taps, counters, and completions';
+
+  @override
+  String get languageDesc => 'Change app display language';
+
+  @override
+  String get languageSystem => 'System Default';
+
+  @override
+  String get languageEn => 'English';
+
+  @override
+  String get languageAr => 'العربية (Arabic)';
+
+  @override
+  String get plan => 'Plan';
+
+  @override
+  String get quickToolkit => 'Spiritual Toolkit';
+
+  @override
+  String get allTools => 'Quick Access';
+
+  @override
+  String get fastingSubtitle => 'Sunnah Days';
+
+  @override
+  String get adhkarSubtitle => 'Daily Remembrances';
+
+  @override
+  String get timeAwareMorningTitle => 'Morning Barakah Window';
+
+  @override
+  String get timeAwareMorningDesc =>
+      'Start with morning adhkar & set your daily intention.';
+
+  @override
+  String get timeAwareMiddayTitle => 'Midday Qaylulah & Focus';
+
+  @override
+  String get timeAwareMiddayDesc =>
+      'Recharge with a 20-min Sunnah nap or start deep work.';
+
+  @override
+  String get timeAwareEveningTitle => 'Evening Adhkar & Wind-down';
+
+  @override
+  String get timeAwareEveningDesc =>
+      'Recite your evening protections and review today\'s progress.';
+
+  @override
+  String get timeAwareNightTitle => 'Night Reflection & Muhasabah';
+
+  @override
+  String get timeAwareNightDesc =>
+      'Record your gratitude (Shukr) and recite bedtime adhkar.';
+
+  @override
+  String get startNow => 'Open';
+
+  @override
+  String get fastingTitle => 'Fasting & Hijri';
+
+  @override
+  String get energy => 'Energy & Routines';
+
+  @override
+  String get adhkar => 'Adhkar Studio';
 }

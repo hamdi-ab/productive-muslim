@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
@@ -82,6 +83,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _toggleMorning(bool value) async {
+    AppHaptics.selectionClick();
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setMorningAdhkarNotificationEnabled(value);
     }
@@ -91,6 +93,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _toggleEvening(bool value) async {
+    AppHaptics.selectionClick();
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setEveningAdhkarNotificationEnabled(value);
     }
@@ -100,6 +103,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _toggleSleeping(bool value) async {
+    AppHaptics.selectionClick();
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setSleepingAdhkarNotificationEnabled(
         value,
@@ -111,6 +115,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _toggleFasting(bool value) async {
+    AppHaptics.selectionClick();
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setSunnahFastingNotificationEnabled(value);
     }
@@ -120,6 +125,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _toggleQaylulah(bool value) async {
+    AppHaptics.selectionClick();
     if (getIt.isRegistered<SettingsService>()) {
       await getIt<SettingsService>().setQaylulahNotificationEnabled(value);
     }
@@ -129,6 +135,7 @@ class _SmartRemindersSettingsCardState
   }
 
   Future<void> _pickBedtime(BuildContext context) async {
+    AppHaptics.selectionClick();
     final selected = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: _bedtimeHour, minute: _bedtimeMinute),
@@ -150,121 +157,204 @@ class _SmartRemindersSettingsCardState
     }
   }
 
+  Widget _buildIconContainer(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, color: color, size: 20),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bedtime = TimeOfDay(hour: _bedtimeHour, minute: _bedtimeMinute);
+    final dividerColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.05);
 
     return Column(
       children: [
         SwitchListTile(
           key: const Key('setting_morning_adhkar_toggle'),
-          secondary: const Icon(
+          activeThumbColor: AppColors.secondary,
+          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+          secondary: _buildIconContainer(
             Icons.wb_sunny_rounded,
-            color: Color(0xFFF59E0B),
+            const Color(0xFFF59E0B),
           ),
           title: Text(
             l10n.settingMorningAdhkar,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(l10n.settingMorningAdhkarDesc),
+          subtitle: Text(
+            l10n.settingMorningAdhkarDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
           value: _morning,
           onChanged: _toggleMorning,
         ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
+        Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
+        SwitchListTile(
+          key: const Key('setting_qaylulah_toggle'),
+          activeThumbColor: AppColors.secondary,
+          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+          secondary: _buildIconContainer(
+            Icons.snooze_rounded,
+            const Color(0xFF10B981),
+          ),
+          title: Text(
+            l10n.settingQaylulah,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            l10n.settingQaylulahDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          value: _qaylulah,
+          onChanged: _toggleQaylulah,
+        ),
+        Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_evening_adhkar_toggle'),
-          secondary: const Icon(
+          activeThumbColor: AppColors.secondary,
+          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+          secondary: _buildIconContainer(
             Icons.nights_stay_rounded,
-            color: Color(0xFF6366F1),
+            const Color(0xFF6366F1),
           ),
           title: Text(
             l10n.settingEveningAdhkar,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(l10n.settingEveningAdhkarDesc),
+          subtitle: Text(
+            l10n.settingEveningAdhkarDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
           value: _evening,
           onChanged: _toggleEvening,
         ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
+        Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_sleeping_adhkar_toggle'),
-          secondary: const Icon(
+          activeThumbColor: AppColors.secondary,
+          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+          secondary: _buildIconContainer(
             Icons.bedtime_rounded,
-            color: Color(0xFF8B5CF6),
+            const Color(0xFF8B5CF6),
           ),
           title: Text(
             l10n.settingBedtimeAdhkar,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(l10n.settingBedtimeAdhkarDesc),
+          subtitle: Text(
+            l10n.settingBedtimeAdhkarDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
           value: _sleeping,
           onChanged: _toggleSleeping,
         ),
         if (_sleeping) ...[
-          const Divider(height: 1, indent: 56, endIndent: 16),
+          Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
           ListTile(
             key: const Key('setting_bedtime_time_picker'),
             contentPadding: const EdgeInsets.only(left: 56, right: 16),
             title: Text(
               l10n.settingBedtimeTime,
               style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              overflow: TextOverflow.ellipsis,
             ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.schedule_rounded,
-                    size: 14,
-                    color: AppColors.primary,
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    bedtime.format(context),
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      width: 0.8,
                     ),
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        bedtime.format(context),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
             onTap: () => _pickBedtime(context),
           ),
         ],
-        const Divider(height: 1, indent: 16, endIndent: 16),
+        Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_sunnah_fasting_toggle'),
-          secondary: const Icon(
+          activeThumbColor: AppColors.secondary,
+          activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
+          secondary: _buildIconContainer(
             Icons.restaurant_rounded,
-            color: AppColors.secondary,
+            AppColors.secondary,
           ),
           title: Text(
             l10n.settingSunnahFasting,
             style: const TextStyle(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(l10n.settingSunnahFastingDesc),
+          subtitle: Text(
+            l10n.settingSunnahFastingDesc,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? Colors.white60 : Colors.black54,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
           value: _fasting,
           onChanged: _toggleFasting,
-        ),
-        const Divider(height: 1, indent: 16, endIndent: 16),
-        SwitchListTile(
-          key: const Key('setting_qaylulah_toggle'),
-          secondary: const Icon(Icons.snooze_rounded, color: Color(0xFF10B981)),
-          title: Text(
-            l10n.settingQaylulah,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text(l10n.settingQaylulahDesc),
-          value: _qaylulah,
-          onChanged: _toggleQaylulah,
         ),
       ],
     );

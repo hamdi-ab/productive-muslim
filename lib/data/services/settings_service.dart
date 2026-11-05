@@ -1,7 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsService {
-  SettingsService({required SharedPreferences prefs}) : _prefs = prefs;
+  SettingsService({required SharedPreferences prefs}) : _prefs = prefs {
+    _initThemeMode();
+    _initLocale();
+    _initArabicTypography();
+  }
 
   SettingsService._empty() : _prefs = null;
 
@@ -9,6 +14,10 @@ class SettingsService {
 
   final SharedPreferences? _prefs;
 
+  static const _themeModeKey = 'app_theme_mode';
+  static const _localeKey = 'app_locale';
+  static const _arabicFontFamilyKey = 'arabic_font_family';
+  static const _arabicFontSizeKey = 'arabic_font_size';
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
@@ -18,6 +27,118 @@ class SettingsService {
   static const _adhanNotificationsKey = 'adhan_notifications';
   static const _totalFocusMinutesKey = 'total_focus_minutes';
   static const _sunnahFastingTargetKey = 'sunnah_fasting_target';
+  static const _hapticFeedbackKey = 'haptic_feedback_enabled';
+  static const _lastLatitudeKey = 'last_latitude';
+  static const _lastLongitudeKey = 'last_longitude';
+  static const _lastLocationNameKey = 'last_location_name';
+
+  final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier<ThemeMode>(
+    ThemeMode.system,
+  );
+
+  final ValueNotifier<Locale?> localeNotifier = ValueNotifier<Locale?>(null);
+
+  final ValueNotifier<String> arabicFontFamilyNotifier = ValueNotifier<String>(
+    'amiri',
+  );
+
+  final ValueNotifier<double> arabicFontSizeNotifier = ValueNotifier<double>(
+    22.0,
+  );
+
+  void _initThemeMode() {
+    final modeStr = _prefs?.getString(_themeModeKey) ?? 'system';
+    themeModeNotifier.value = _parseThemeMode(modeStr);
+  }
+
+  void _initLocale() {
+    final code = _prefs?.getString(_localeKey);
+    localeNotifier.value = _parseLocale(code);
+  }
+
+  void _initArabicTypography() {
+    arabicFontFamilyNotifier.value =
+        _prefs?.getString(_arabicFontFamilyKey) ?? 'amiri';
+    arabicFontSizeNotifier.value =
+        _prefs?.getDouble(_arabicFontSizeKey) ?? 22.0;
+  }
+
+  static ThemeMode _parseThemeMode(String mode) {
+    switch (mode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  static Locale? _parseLocale(String? code) {
+    switch (code) {
+      case 'en':
+        return const Locale('en');
+      case 'ar':
+        return const Locale('ar');
+      default:
+        return null;
+    }
+  }
+
+  String get themeMode => _prefs?.getString(_themeModeKey) ?? 'system';
+
+  Future<void> setThemeMode(String mode) async {
+    await _prefs?.setString(_themeModeKey, mode);
+    themeModeNotifier.value = _parseThemeMode(mode);
+  }
+
+  String get localeCode => _prefs?.getString(_localeKey) ?? 'system';
+
+  Future<void> setLocaleCode(String code) async {
+    await _prefs?.setString(_localeKey, code);
+    localeNotifier.value = _parseLocale(code);
+  }
+
+  ({double latitude, double longitude})? get lastCoordinates {
+    final lat = _prefs?.getDouble(_lastLatitudeKey);
+    final lon = _prefs?.getDouble(_lastLongitudeKey);
+    if (lat != null && lon != null) {
+      return (latitude: lat, longitude: lon);
+    }
+    return null;
+  }
+
+  Future<void> setLastCoordinates(double lat, double lon) async {
+    await _prefs?.setDouble(_lastLatitudeKey, lat);
+    await _prefs?.setDouble(_lastLongitudeKey, lon);
+  }
+
+  String? get lastLocationName => _prefs?.getString(_lastLocationNameKey);
+
+  Future<void> setLastLocationName(String name) async {
+    await _prefs?.setString(_lastLocationNameKey, name);
+  }
+
+  bool get hapticFeedbackEnabled => _prefs?.getBool(_hapticFeedbackKey) ?? true;
+
+  Future<void> setHapticFeedbackEnabled(bool enabled) async =>
+      _prefs?.setBool(_hapticFeedbackKey, enabled);
+
+  String get arabicFontFamily =>
+      _prefs?.getString(_arabicFontFamilyKey) ?? 'amiri';
+
+  Future<void> setArabicFontFamily(String font) async {
+    await _prefs?.setString(_arabicFontFamilyKey, font);
+    arabicFontFamilyNotifier.value = font;
+  }
+
+  double get arabicFontSize => _prefs?.getDouble(_arabicFontSizeKey) ?? 22.0;
+
+  Future<void> setArabicFontSize(double size) async {
+    await _prefs?.setDouble(_arabicFontSizeKey, size);
+    arabicFontSizeNotifier.value = size;
+  }
 
   ({bool enabled, int hour, int minute}) get barakahReminder {
     final values = _prefs?.getStringList(_barakahReminderKey);
@@ -140,6 +261,36 @@ class SettingsService {
     if (!list.contains(dhikrId)) {
       list.add(dhikrId);
       await _prefs?.setStringList('adhkar_done_$date', list);
+    }
+  }
+
+  Future<void> removeCompletedDhikr(String date, String dhikrId) async {
+    final list = List<String>.from(
+      _prefs?.getStringList('adhkar_done_$date') ?? [],
+    );
+    if (list.contains(dhikrId)) {
+      list.remove(dhikrId);
+      await _prefs?.setStringList('adhkar_done_$date', list);
+    }
+    await _prefs?.remove('adhkar_count_${date}_$dhikrId');
+  }
+
+  int getDhikrCount(String date, String dhikrId) {
+    return _prefs?.getInt('adhkar_count_${date}_$dhikrId') ?? 0;
+  }
+
+  Future<void> setDhikrCount(String date, String dhikrId, int count) async {
+    await _prefs?.setInt('adhkar_count_${date}_$dhikrId', count);
+  }
+
+  Future<void> resetCategoryDhikrs(String date, List<String> dhikrIds) async {
+    final list = List<String>.from(
+      _prefs?.getStringList('adhkar_done_$date') ?? [],
+    );
+    list.removeWhere((id) => dhikrIds.contains(id));
+    await _prefs?.setStringList('adhkar_done_$date', list);
+    for (final id in dhikrIds) {
+      await _prefs?.remove('adhkar_count_${date}_$id');
     }
   }
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
@@ -32,21 +32,21 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
   DateTime _selectedDate = DateTime.now();
 
   void _prevMonth() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1, 1);
     });
   }
 
   void _nextMonth() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1, 1);
     });
   }
 
   void _goToToday() {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     setState(() {
       final now = DateTime.now();
       _currentMonth = DateTime(now.year, now.month, 1);
@@ -63,7 +63,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
   }
 
   void _showDayDetails(BuildContext context, HijriDateInfo info) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selectionClick();
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
@@ -87,96 +87,125 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isArabic ? info.formatAr() : info.formatEn(),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateFormat.yMMMMEEEEd(isArabic ? 'ar' : 'en')
-                              .format(info.gregorianDate),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (info.isWhiteDay)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.secondary.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.brightness_2_rounded,
-                              size: 14,
-                              color: Colors.amber,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isArabic ? info.formatAr() : info.formatEn(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              l10n.whiteDayBadge,
-                              style: const TextStyle(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            DateFormat.yMMMMEEEEd(isArabic ? 'ar' : 'en')
+                                .format(info.gregorianDate),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    if (info.isWhiteDay)
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.brightness_2_rounded,
+                                  size: 14,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n.whiteDayBadge,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else if (info.isArafah)
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(
+                                alpha: 0.25,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: const Text(
+                              'Arafah',
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    else if (info.isArafah)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondary.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.secondary.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: const Text(
-                          'Arafah',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       )
                     else if (info.isAshura)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'Ashura',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'Ashura',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -278,7 +307,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           onPressed: () async {
-                            HapticFeedback.mediumImpact();
+                            AppHaptics.mediumImpact();
                             await settings.toggleSunnahFastingTarget(dateStr);
                             if (ctx.mounted) {
                               setSheetState(() => isFasting = !isFasting);
@@ -436,7 +465,7 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
               crossAxisCount: 7,
               crossAxisSpacing: 4,
               mainAxisSpacing: 4,
-              childAspectRatio: 0.88,
+              childAspectRatio: 0.78,
             ),
             itemBuilder: (context, index) {
               if (index < leadingEmptyCount) {
@@ -479,58 +508,67 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
                     border: border,
                   ),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 2,
+                    vertical: 2,
+                    horizontal: 1,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Gregorian Day
-                      Text(
-                        '${date.day}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: isToday || isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      // Hijri Day with indicator
-                      Row(
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (info.isWhiteDay)
-                            const Icon(
-                              Icons.brightness_2_rounded,
-                              size: 9,
-                              color: Colors.amber,
-                            ),
+                          // Gregorian Day
                           Text(
-                            '${info.hDay}',
+                            '${date.day}',
                             style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: info.isWhiteDay
-                                  ? Colors.amber[800]
-                                  : (isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary),
+                              fontSize: 13,
+                              fontWeight: isToday || isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
                             ),
                           ),
+                          const SizedBox(height: 1),
+                          // Hijri Day with indicator
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (info.isWhiteDay) ...[
+                                const Icon(
+                                  Icons.brightness_2_rounded,
+                                  size: 8,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(width: 1),
+                              ],
+                              Text(
+                                '${info.hDay}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: info.isWhiteDay
+                                      ? Colors.amber[800]
+                                      : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (isFasted)
+                            Container(
+                              margin: const EdgeInsets.only(top: 2),
+                              width: 4,
+                              height: 4,
+                              decoration: const BoxDecoration(
+                                color: AppColors.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                         ],
                       ),
-                      if (isFasted)
-                        Container(
-                          margin: const EdgeInsets.only(top: 2),
-                          width: 4,
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            color: AppColors.secondary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -573,37 +611,44 @@ class _HijriCalendarViewState extends State<HijriCalendarView> {
     Color? dotColor,
     required String label,
   }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: icon != null
-              ? Icon(icon, size: 9, color: iconColor)
-              : (dotColor != null
-                    ? Center(
-                        child: Container(
-                          width: 4,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: dotColor,
-                            shape: BoxShape.circle,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 260),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 14,
+            height: 14,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: icon != null
+                ? Icon(icon, size: 9, color: iconColor)
+                : (dotColor != null
+                      ? Center(
+                          child: Container(
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: dotColor,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                      )
-                    : null),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-        ),
-      ],
+                        )
+                      : null),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

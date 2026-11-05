@@ -1301,7 +1301,7 @@ abstract class AppLocalizations {
   /// No description provided for @focusSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Work with presence, intention, and divine blessing'**
+  /// **'Khushu\' Timer'**
   String get focusSubtitle;
 
   /// No description provided for @focusNiyyahPrompt.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Manage your spiritual, physical, and mental vitality'**
+  /// **'Qaylulah & Battery'**
   String get energySubtitle;
 
   /// No description provided for @qaylulah.
@@ -1597,6 +1597,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset Count'**
   String get adhkarReset;
+
+  /// No description provided for @adhkarResetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Category'**
+  String get adhkarResetCategory;
+
+  /// No description provided for @adhkarTypography.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Calligraphy'**
+  String get adhkarTypography;
+
+  /// No description provided for @typographyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Typography & Calligraphy'**
+  String get typographyTitle;
+
+  /// No description provided for @typographyFontFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Calligraphy Script'**
+  String get typographyFontFamily;
+
+  /// No description provided for @typographyFontSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Font Size'**
+  String get typographyFontSize;
+
+  /// No description provided for @typographyPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Verse Preview'**
+  String get typographyPreview;
+
+  /// No description provided for @typographyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Arabic calligraphy and font size'**
+  String get typographyTooltip;
 
   /// No description provided for @adhkarTransliteration.
   ///
@@ -1867,6 +1909,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are facing the Kaaba'**
   String get qiblaFacingKaaba;
+
+  /// No description provided for @qiblaDirectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla Direction'**
+  String get qiblaDirectionLabel;
+
+  /// No description provided for @qiblaDistanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get qiblaDistanceLabel;
+
+  /// No description provided for @qiblaTurnRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn {degrees}° Right'**
+  String qiblaTurnRight(String degrees);
+
+  /// No description provided for @qiblaTurnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn {degrees}° Left'**
+  String qiblaTurnLeft(String degrees);
 
   /// No description provided for @qiblaCalibrate.
   ///
@@ -2275,6 +2341,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore Now'**
   String get backupConfirm;
+
+  /// No description provided for @preferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences & Touch'**
+  String get preferencesTitle;
+
+  /// No description provided for @hapticFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic Feedback'**
+  String get hapticFeedback;
+
+  /// No description provided for @hapticFeedbackDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration feedback on taps, counters, and completions'**
+  String get hapticFeedbackDesc;
+
+  /// No description provided for @languageDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change app display language'**
+  String get languageDesc;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get languageSystem;
+
+  /// No description provided for @languageEn.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEn;
+
+  /// No description provided for @languageAr.
+  ///
+  /// In en, this message translates to:
+  /// **'العربية (Arabic)'**
+  String get languageAr;
+
+  /// No description provided for @plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get plan;
+
+  /// No description provided for @quickToolkit.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Toolkit'**
+  String get quickToolkit;
+
+  /// No description provided for @allTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Access'**
+  String get allTools;
+
+  /// No description provided for @fastingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunnah Days'**
+  String get fastingSubtitle;
+
+  /// No description provided for @adhkarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Remembrances'**
+  String get adhkarSubtitle;
+
+  /// No description provided for @timeAwareMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning Barakah Window'**
+  String get timeAwareMorningTitle;
+
+  /// No description provided for @timeAwareMorningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with morning adhkar & set your daily intention.'**
+  String get timeAwareMorningDesc;
+
+  /// No description provided for @timeAwareMiddayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Midday Qaylulah & Focus'**
+  String get timeAwareMiddayTitle;
+
+  /// No description provided for @timeAwareMiddayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recharge with a 20-min Sunnah nap or start deep work.'**
+  String get timeAwareMiddayDesc;
+
+  /// No description provided for @timeAwareEveningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Adhkar & Wind-down'**
+  String get timeAwareEveningTitle;
+
+  /// No description provided for @timeAwareEveningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite your evening protections and review today\'s progress.'**
+  String get timeAwareEveningDesc;
+
+  /// No description provided for @timeAwareNightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Night Reflection & Muhasabah'**
+  String get timeAwareNightTitle;
+
+  /// No description provided for @timeAwareNightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record your gratitude (Shukr) and recite bedtime adhkar.'**
+  String get timeAwareNightDesc;
+
+  /// No description provided for @startNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get startNow;
+
+  /// No description provided for @fastingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting & Hijri'**
+  String get fastingTitle;
+
+  /// No description provided for @energy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy & Routines'**
+  String get energy;
+
+  /// No description provided for @adhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Adhkar Studio'**
+  String get adhkar;
 }
 
 class _AppLocalizationsDelegate

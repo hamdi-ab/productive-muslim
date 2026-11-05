@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class IftarDuaDialog extends StatelessWidget {
@@ -133,7 +134,7 @@ class IftarDuaDialog extends StatelessWidget {
           tooltip: l10n.copyDuaTooltip,
           icon: const Icon(Icons.copy_rounded, size: 20),
           onPressed: () {
-            HapticFeedback.lightImpact();
+            AppHaptics.lightImpact();
             Clipboard.setData(
               ClipboardData(
                 text:

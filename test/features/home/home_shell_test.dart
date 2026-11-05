@@ -64,8 +64,8 @@ void main() {
 
     expect(find.byType(FloatingGlassNavBar), findsOneWidget);
     expect(find.byIcon(Icons.grid_view_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.task_alt_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.published_with_changes_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.checklist_rtl_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.mosque_outlined), findsOneWidget);
     expect(find.byIcon(Icons.auto_awesome_outlined), findsOneWidget);
     expect(find.byIcon(Icons.menu_book_outlined), findsOneWidget);
   });

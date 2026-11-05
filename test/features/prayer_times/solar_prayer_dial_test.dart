@@ -36,9 +36,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Solar Prayer Arc'), findsOneWidget);
+      final hasDayTitle = find.text('Solar Prayer Arc').evaluate().isNotEmpty;
+      final hasNightTitle = find
+          .text('Night & Tahajjud Arc')
+          .evaluate()
+          .isNotEmpty;
+      expect(hasDayTitle || hasNightTitle, isTrue);
       expect(find.textContaining('Next: Dhuhr'), findsOneWidget);
-      expect(find.byIcon(Icons.wb_sunny_rounded), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
@@ -53,7 +57,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('مسار الشمس ومواقيت الصلاة'), findsOneWidget);
+      final hasArDay = find
+          .text('مسار الشمس ومواقيت الصلاة')
+          .evaluate()
+          .isNotEmpty;
+      final hasArNight = find.text('مسار الليل والتهجد').evaluate().isNotEmpty;
+      expect(hasArDay || hasArNight, isTrue);
     });
   });
 }

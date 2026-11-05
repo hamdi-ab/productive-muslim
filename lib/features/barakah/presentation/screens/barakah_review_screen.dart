@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/theme/app_typography_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/barakah_analytics_summary.dart';
 import 'package:productive_muslim/domain/models/barakah_daily_response.dart';
@@ -12,6 +14,7 @@ import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_review_state.dart';
+import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_analytics_cards.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -38,54 +41,88 @@ class _ReviewView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final dates = DateFormat.yMMMd(Localizations.localeOf(context).toString());
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.barakahWeeklyTitle)),
+      appBar: ProductiveAppBar(
+        title: l10n.barakahWeeklyTitle,
+        subtitle: l10n.barakahHistoryTitle,
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: BlocBuilder<BarakahReviewBloc, BarakahReviewState>(
           builder: (context, state) => Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: Row(
-                  children: [
-                    IconButton(
-                      key: const Key('review-previous'),
-                      tooltip: l10n.barakahWeeklyPrevious,
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => context.read<BarakahReviewBloc>().add(
-                        const BarakahReviewWeekSelected(-1),
-                      ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.darkSurfaceSubtle
+                        : AppColors.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.15),
                     ),
-                    Expanded(
-                      child: Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          l10n.barakahWeeklyRange(
-                            _localizedDigits(
-                              context,
-                              dates.format(state.week.start),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        key: const Key('review-previous'),
+                        tooltip: l10n.barakahWeeklyPrevious,
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.primary,
+                        ),
+                        onPressed: () {
+                          AppHaptics.lightImpact();
+                          context.read<BarakahReviewBloc>().add(
+                            const BarakahReviewWeekSelected(-1),
+                          );
+                        },
+                      ),
+                      Expanded(
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            l10n.barakahWeeklyRange(
+                              _localizedDigits(
+                                context,
+                                dates.format(state.week.start),
+                              ),
+                              _localizedDigits(
+                                context,
+                                dates.format(state.week.end),
+                              ),
                             ),
-                            _localizedDigits(
-                              context,
-                              dates.format(state.week.end),
+                            key: const Key('review-range'),
+                            textAlign: TextAlign.center,
+                            style: AppTypography.labelLarge.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          key: const Key('review-range'),
-                          textAlign: TextAlign.center,
-                          style: AppTypography.labelLarge,
                         ),
                       ),
-                    ),
-                    IconButton(
-                      key: const Key('review-next'),
-                      tooltip: l10n.barakahWeeklyNext,
-                      icon: const Icon(Icons.arrow_forward),
-                      onPressed: state.week.canGoNext
-                          ? () => context.read<BarakahReviewBloc>().add(
-                              const BarakahReviewWeekSelected(1),
-                            )
-                          : null,
-                    ),
-                  ],
+                      IconButton(
+                        key: const Key('review-next'),
+                        tooltip: l10n.barakahWeeklyNext,
+                        icon: const Icon(
+                          Icons.arrow_forward,
+                          color: AppColors.primary,
+                        ),
+                        onPressed: state.week.canGoNext
+                            ? () {
+                                AppHaptics.lightImpact();
+                                context.read<BarakahReviewBloc>().add(
+                                  const BarakahReviewWeekSelected(1),
+                                );
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
@@ -262,37 +299,91 @@ class _ReviewDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final dates = DateFormat.yMMMMEEEEd(
       Localizations.localeOf(context).toString(),
     );
     final response = day.response;
-    return Padding(
+    return Container(
       key: Key('review-day-${BarakahReviewWeek.dateKey(day.date)}'),
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceSubtle : AppColors.surfaceSubtle,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Divider(),
           Semantics(
             header: true,
             child: Text(
               _localizedDigits(context, dates.format(day.date)),
-              style: AppTypography.labelLarge,
+              style: AppTypography.labelLarge.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           if (response == null)
             Text(
               day.future ? l10n.barakahWeeklyFuture : l10n.barakahWeeklyMissing,
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+              ),
             )
           else ...[
-            Text(l10n.barakahDailyQuestion(response.promptId)),
-            Text(_answerLabel(l10n, response.answer)),
-            for (final source in day.selectedSources)
-              Text(l10n.barakahDailySource(source)),
+            Text(
+              l10n.barakahDailyQuestion(response.promptId),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.secondary.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _answerLabel(l10n, response.answer),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            if (day.selectedSources.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: [
+                  for (final source in day.selectedSources)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        l10n.barakahDailySource(source),
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                    ),
+                ],
+              ),
+            ],
             if (response.note case final note? when note.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.sm),
               Text(l10n.barakahWeeklyNote, style: AppTypography.labelMedium),
+              const SizedBox(height: 2),
               SelectableText(note),
             ],
           ],

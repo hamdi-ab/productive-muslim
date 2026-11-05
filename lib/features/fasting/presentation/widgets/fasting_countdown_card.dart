@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
@@ -68,6 +69,15 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
     if (!getIt.isRegistered<PrayerTimeService>()) return;
     try {
       final service = getIt<PrayerTimeService>();
+      if (service.cachedPrayerTimes != null) {
+        final pt = service.cachedPrayerTimes!;
+        if (mounted) {
+          setState(() {
+            _fajrTime = pt.fajr;
+            _maghribTime = pt.maghrib;
+          });
+        }
+      }
       final position = await service.getCurrentPosition();
       if (position != null) {
         final pt = service.getPrayerTimes(position);
@@ -82,7 +92,7 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
   }
 
   Future<void> _toggleFasting() async {
-    HapticFeedback.lightImpact();
+    AppHaptics.lightImpact();
     try {
       final settings = getIt<SettingsService>();
       await settings.toggleSunnahFastingTarget(_today);
@@ -178,39 +188,50 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          _isFasting
-                              ? l10n.fastingTodayActive
-                              : l10n.fastingTodayInactive,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                        Flexible(
+                          child: Text(
+                            _isFasting
+                                ? l10n.fastingTodayActive
+                                : l10n.fastingTodayInactive,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                         if (fastingStatus.isSunnah) ...[
                           const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondary.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: AppColors.secondary.withValues(
-                                  alpha: 0.5,
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.sunnahBadge,
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.amber[200]
-                                    : Colors.amber[900],
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                                decoration: BoxDecoration(
+                                  color: AppColors.secondary.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: AppColors.secondary.withValues(
+                                      alpha: 0.5,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  l10n.sunnahBadge,
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.amber[200]
+                                        : Colors.amber[900],
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -246,38 +267,48 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (_fajrTime != null && _maghribTime != null)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      timelineStatus,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        timelineStatus,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      countdownTime,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
+                      const SizedBox(height: 4),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          countdownTime,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      countdownLabel,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(height: 2),
+                      Text(
+                        countdownLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 )
               else
                 Expanded(
@@ -291,23 +322,35 @@ class _FastingCountdownCardState extends State<FastingCountdownCard> {
                     ),
                   ),
                 ),
-              FilledButton.tonalIcon(
-                onPressed: () => IftarDuaDialog.show(context),
-                icon: const Icon(Icons.menu_book_rounded, size: 16),
-                label: Text(
-                  l10n.iftarDuaTitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
+              const SizedBox(width: 8),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: AppPressable(
+                    onTap: () => IftarDuaDialog.show(context),
+                    pressedScale: 0.94,
+                    haptic: AppHapticFeedback.light,
                     borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                    child: FilledButton.tonalIcon(
+                      onPressed: () => IftarDuaDialog.show(context),
+                      icon: const Icon(Icons.menu_book_rounded, size: 16),
+                      label: Text(
+                        l10n.iftarDuaTitle,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

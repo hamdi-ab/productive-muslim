@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 
 class FloatingNavItem {
@@ -34,71 +35,101 @@ class FloatingGlassNavBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: GlassContainer(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        borderRadius: 30,
-        blur: 20,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        borderRadius: 32,
+        blur: 24,
         color: isDark
-            ? AppColors.darkSurface.withValues(alpha: 0.85)
-            : Colors.white.withValues(alpha: 0.85),
+            ? AppColors.darkSurface.withValues(alpha: 0.88)
+            : Colors.white.withValues(alpha: 0.90),
         borderColor: isDark
-            ? Colors.white.withValues(alpha: 0.15)
-            : AppColors.primary.withValues(alpha: 0.15),
+            ? Colors.white.withValues(alpha: 0.14)
+            : AppColors.primary.withValues(alpha: 0.12),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(items.length, (index) {
             final isSelected = index == currentIndex;
             final item = items[index];
 
-            return Semantics(
-              label: item.label,
-              button: true,
-              selected: isSelected,
-              excludeSemantics: true,
-              child: GestureDetector(
-                onTap: () => onTap(index),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isSelected ? 14 : 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? (isDark
-                              ? AppColors.primaryLight.withValues(alpha: 0.2)
-                              : AppColors.primary.withValues(alpha: 0.12))
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isSelected ? item.activeIcon : item.icon,
-                        size: 22,
-                        color: isSelected
-                            ? (isDark
-                                  ? AppColors.primaryLight
-                                  : AppColors.primary)
-                            : (isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.textSecondary),
-                      ),
-                      if (isSelected) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          item.label,
+            return Expanded(
+              child: Semantics(
+                label: item.label,
+                button: true,
+                selected: isSelected,
+                excludeSemantics: true,
+                child: AppPressable(
+                  onTap: () => onTap(index),
+                  pressedScale: 0.92,
+                  haptic: AppHapticFeedback.selection,
+                  borderRadius: BorderRadius.circular(24),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (isDark
+                                ? AppColors.primaryLight.withValues(alpha: 0.16)
+                                : AppColors.primary.withValues(alpha: 0.10))
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(24),
+                      border: isSelected
+                          ? Border.all(
+                              color: isDark
+                                  ? AppColors.primaryLight.withValues(
+                                      alpha: 0.28,
+                                    )
+                                  : AppColors.primary.withValues(alpha: 0.20),
+                              width: 1,
+                            )
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedScale(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutBack,
+                          scale: isSelected ? 1.08 : 1.0,
+                          child: Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            size: 21,
+                            color: isSelected
+                                ? (isDark
+                                      ? AppColors.primaryLight
+                                      : AppColors.primary)
+                                : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 180),
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? AppColors.primaryLight
-                                : AppColors.primary,
+                            fontSize: 10.5,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? (isDark
+                                      ? AppColors.primaryLight
+                                      : AppColors.primary)
+                                : (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary),
+                            letterSpacing: -0.1,
+                          ),
+                          child: Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),

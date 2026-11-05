@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -75,6 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextStep() async {
+    AppHaptics.lightImpact();
     if (_currentStep == 1 && _nameController.text.isNotEmpty) {
       await _settings.setUserName(_nameController.text);
     }
@@ -99,6 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _previousStep() {
+    AppHaptics.lightImpact();
     if (_currentStep > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 350),
@@ -154,6 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _toggleQuality(String quality) {
+    AppHaptics.selectionClick();
     setState(() {
       if (_selectedQualities.contains(quality)) {
         _selectedQualities.remove(quality);
@@ -180,6 +184,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )
             : null,
         actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 4),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      final isAr =
+                          Localizations.localeOf(context).languageCode == 'ar';
+                      _settings.setLocaleCode(isAr ? 'en' : 'ar');
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.language_rounded,
+                            size: 15,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            Localizations.localeOf(context).languageCode == 'ar'
+                                ? 'English'
+                                : 'العربية',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
           TextButton(
             onPressed: _skip,
             child: Text(
@@ -235,6 +292,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
+                    key: const Key('step_progress_indicator'),
                     children: List.generate(_steps.length, (i) {
                       final isActive = i <= _currentStep;
                       final isCurrent = i == _currentStep;
@@ -603,11 +661,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.onboardingPermissionGranted,
-                  style: TextStyle(
-                    color: isDark ? AppColors.secondary : AppColors.primary,
-                    fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Text(
+                    l10n.onboardingPermissionGranted,
+                    style: TextStyle(
+                      color: isDark ? AppColors.secondary : AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

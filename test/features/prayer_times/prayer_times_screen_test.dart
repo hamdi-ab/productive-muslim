@@ -89,6 +89,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('location'), findsOneWidget);
+    expect(find.text('Try Again'), findsOneWidget);
+    expect(find.text('Open Settings'), findsOneWidget);
   });
 
   testWidgets('shows prayer times when loaded', (tester) async {

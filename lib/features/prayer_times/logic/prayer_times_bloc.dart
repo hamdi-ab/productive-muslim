@@ -15,11 +15,28 @@ class PrayerTimesBloc extends Bloc<PrayerTimesEvent, PrayerTimesState> {
     PrayerTimesLoaded event,
     Emitter<PrayerTimesState> emit,
   ) async {
-    emit(const PrayerTimesLoading());
+    if (_service.cachedPosition != null && _service.cachedPrayerTimes != null) {
+      final cachedTimes = _service.cachedPrayerTimes!;
+      final nextPrayer = _service.getNextPrayerName(cachedTimes) ?? '--';
+      final timeUntil = _service.getTimeUntilNextPrayer(cachedTimes);
+      final locationName = _service.cachedLocationName;
+      emit(
+        PrayerTimesData(
+          prayerTimes: cachedTimes,
+          nextPrayer: nextPrayer,
+          timeUntilNextPrayer: timeUntil ?? Duration.zero,
+          locationName: locationName,
+        ),
+      );
+    } else {
+      emit(const PrayerTimesLoading());
+    }
 
     final position = await _service.getCurrentPosition();
     if (position == null) {
-      emit(const PrayerTimesLocationRequired());
+      if (state is! PrayerTimesData) {
+        emit(const PrayerTimesLocationRequired());
+      }
       return;
     }
 

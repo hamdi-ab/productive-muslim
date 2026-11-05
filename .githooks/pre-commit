@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pre-commit hook: Verify formatting and run static analysis before commit
+
+echo "Running pre-commit checks..."
+
+# Check dart format
+echo "Checking dart format..."
+dart format --output=none --set-exit-if-changed .
+if [ $? -ne 0 ]; then
+  echo "Error: Dart code is not formatted. Run 'dart format .' and stage the changes."
+  exit 1
+fi
+
+# Run flutter analyze
+echo "Checking flutter analyze..."
+flutter analyze
+if [ $? -ne 0 ]; then
+  echo "Error: flutter analyze found issues. Fix them before committing."
+  exit 1
+fi
+
+echo "Pre-commit checks passed clean."
+exit 0
