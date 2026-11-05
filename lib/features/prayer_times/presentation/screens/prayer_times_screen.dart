@@ -274,6 +274,7 @@ class _PrayerTimesList extends StatelessWidget {
     final asrTime = (prayerTimes.asr as DateTime).toLocal();
     final maghribTime = (prayerTimes.maghrib as DateTime).toLocal();
     final ishaTime = (prayerTimes.isha as DateTime).toLocal();
+    final isAfterIsha = now.isAfter(ishaTime);
 
     final entries = [
       (
@@ -607,7 +608,10 @@ class _PrayerTimesList extends StatelessWidget {
                 isPassed,
                 tag,
               ) = entry;
-              final isNext = key.toLowerCase() == nextPrayer.toLowerCase();
+              final isAstronomical = key.toLowerCase() == 'sunrise';
+              final isNext =
+                  !isAfterIsha &&
+                  (key.toLowerCase() == nextPrayer.toLowerCase());
               return _PrayerTile(
                 name: name,
                 arabicName: arabicName,
@@ -616,9 +620,27 @@ class _PrayerTimesList extends StatelessWidget {
                 time: timeFormat.format(time),
                 isNext: isNext,
                 isPassed: isPassed && !isNext,
+                isAstronomical: isAstronomical,
                 tag: tag,
               );
             }),
+
+            if (isAfterIsha) ...[
+              const SizedBox(height: 6),
+              _PrayerTile(
+                name: '${l10n.fajr} (${isAr ? "غداً" : "Tomorrow"})',
+                arabicName: 'الفجر',
+                icon: Icons.wb_twilight_rounded,
+                subtitle: isAr
+                    ? 'صلاة الفجر القادمة بمشيئة الله • غداً'
+                    : 'Upcoming Dawn Prayer • Tomorrow',
+                time: timeFormat.format(fajrTime.add(const Duration(days: 1))),
+                isNext: true,
+                isPassed: false,
+                isAstronomical: false,
+                tag: isAr ? 'غداً' : 'Tomorrow',
+              ),
+            ],
 
             const SizedBox(height: AppSpacing.lg),
           ],
@@ -636,6 +658,7 @@ class _PrayerTile extends StatelessWidget {
   final String time;
   final bool isNext;
   final bool isPassed;
+  final bool isAstronomical;
   final String? tag;
 
   const _PrayerTile({
@@ -646,6 +669,7 @@ class _PrayerTile extends StatelessWidget {
     required this.time,
     required this.isNext,
     required this.isPassed,
+    this.isAstronomical = false,
     this.tag,
   });
 
@@ -701,7 +725,7 @@ class _PrayerTile extends StatelessWidget {
                     ? (isDark
                           ? AppColors.secondary.withValues(alpha: 0.22)
                           : AppColors.primary.withValues(alpha: 0.18))
-                    : isPassed
+                    : (isPassed && !isAstronomical)
                     ? const Color(0xFF10B981).withValues(alpha: 0.15)
                     : (isDark
                           ? AppColors.darkSurfaceSubtle
@@ -712,19 +736,26 @@ class _PrayerTile extends StatelessWidget {
                         color: isDark ? AppColors.secondary : AppColors.primary,
                         width: 1.2,
                       )
-                    : isPassed
+                    : (isPassed && !isAstronomical)
                     ? Border.all(
                         color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                        width: 0.8,
+                      )
+                    : (isPassed && isAstronomical)
+                    ? Border.all(
+                        color: isDark
+                            ? AppColors.borderDark.withValues(alpha: 0.4)
+                            : AppColors.borderLight.withValues(alpha: 0.5),
                         width: 0.8,
                       )
                     : null,
               ),
               child: Icon(
-                isPassed ? Icons.check_rounded : icon,
+                (isPassed && !isAstronomical) ? Icons.check_rounded : icon,
                 size: 16,
                 color: isNext
                     ? (isDark ? AppColors.secondary : AppColors.primary)
-                    : isPassed
+                    : (isPassed && !isAstronomical)
                     ? const Color(0xFF10B981)
                     : (isDark
                           ? AppColors.darkTextSecondary
@@ -780,7 +811,7 @@ class _PrayerTile extends StatelessWidget {
                                         )),
                           ),
                         ),
-                      if (isPassed)
+                      if (isPassed && !isAstronomical)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 5,
@@ -797,7 +828,7 @@ class _PrayerTile extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            isAr ? 'مكتمل' : 'Completed',
+                            isAr ? 'انقضى' : 'Past',
                             style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
@@ -894,13 +925,15 @@ class _PrayerTile extends StatelessWidget {
             Icon(
               isNext
                   ? Icons.notifications_active_rounded
-                  : isPassed
+                  : (isPassed && !isAstronomical)
                   ? Icons.check_circle_outline_rounded
+                  : isAstronomical
+                  ? Icons.wb_sunny_outlined
                   : Icons.notifications_none_rounded,
               size: 15,
               color: isNext
                   ? (isDark ? AppColors.secondary : AppColors.primary)
-                  : isPassed
+                  : (isPassed && !isAstronomical)
                   ? const Color(0xFF10B981).withValues(alpha: 0.6)
                   : (isDark
                         ? AppColors.darkTextSecondary.withValues(alpha: 0.4)

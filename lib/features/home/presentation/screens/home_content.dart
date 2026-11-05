@@ -835,6 +835,13 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isAfterIsha =
+        _cachedPrayerTimes != null &&
+        DateTime.now().isAfter(_cachedPrayerTimes!.isha);
+    final displayNextName = (isAfterIsha && _nextPrayer.toLowerCase() == 'fajr')
+        ? (isAr ? 'الفجر (غداً)' : 'Fajr (Tomorrow)')
+        : _getLocalizedPrayerName(_nextPrayer, l10n);
 
     return AppPressable(
       onTap: () => context.push('/prayer-times'),
@@ -950,7 +957,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                     children: [
                       Text.rich(
                         TextSpan(
-                          text: _getLocalizedPrayerName(_nextPrayer, l10n),
+                          text: displayNextName,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
@@ -1095,11 +1102,12 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       (key: 'isha', name: l10n.isha, time: prayerTimes.isha),
     ];
 
+    final isAfterIsha = now.isAfter(prayerTimes.isha);
     final nextKey = nextPrayer.toLowerCase();
 
     return Row(
       children: prayers.map((p) {
-        final isNext = p.key == nextKey;
+        final isNext = !isAfterIsha && p.key == nextKey;
         final isPast = p.time.isBefore(now) && !isNext;
 
         return Expanded(

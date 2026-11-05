@@ -52,7 +52,16 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
     };
   }
 
-  String _getSunnahAdvice(String nextPrayer, bool isAr) {
+  String _getSunnahAdvice(
+    String nextPrayer,
+    bool isAr, {
+    bool isAfterIsha = false,
+  }) {
+    if (isAfterIsha && nextPrayer.toLowerCase() == 'fajr') {
+      return isAr
+          ? 'قيام الليل والوتر: أفضل الصلاة بعد الفريضة صلاة الليل'
+          : 'Qiyam & Witr: The best prayer after obligatory prayers is the night prayer';
+    }
     return switch (nextPrayer.toLowerCase()) {
       'fajr' => isAr ? 'سنة الفجر: ركعتان خير من الدنيا وما فيها' : 'Sunnah: 2 Rakat before Fajr is better than the world and all in it',
       'dhuhr' =>
@@ -158,7 +167,12 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
       currentSlotName = l10n.slotNight;
     }
 
-    final localizedNext = _localizePrayerName(widget.nextPrayer, l10n);
+    final isAfterIsha = now.isAfter(isha);
+    final isTomorrowFajr =
+        isAfterIsha && widget.nextPrayer.toLowerCase() == 'fajr';
+    final localizedNext = isTomorrowFajr
+        ? (isAr ? 'الفجر (غداً)' : 'Fajr (Tomorrow)')
+        : _localizePrayerName(widget.nextPrayer, l10n);
 
     // Remaining duration to next prayer
     DateTime? nextTime;
@@ -473,7 +487,11 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _getSunnahAdvice(widget.nextPrayer, isAr),
+                      _getSunnahAdvice(
+                        widget.nextPrayer,
+                        isAr,
+                        isAfterIsha: isAfterIsha,
+                      ),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
