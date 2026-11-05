@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -829,13 +830,17 @@ class _LocationPermissionToggleState extends State<_LocationPermissionToggle> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(
-                  'Location permission permanently denied. Open settings to grant.',
+                content: Text(
+                  kIsWeb
+                      ? 'Please allow location in your browser site settings (address bar icon).'
+                      : 'Location permission permanently denied. Open settings to grant.',
                 ),
-                action: SnackBarAction(
-                  label: 'Settings',
-                  onPressed: () => Geolocator.openAppSettings(),
-                ),
+                action: !kIsWeb
+                    ? SnackBarAction(
+                        label: 'Settings',
+                        onPressed: () => Geolocator.openAppSettings(),
+                      )
+                    : null,
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -850,13 +855,17 @@ class _LocationPermissionToggleState extends State<_LocationPermissionToggle> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'To revoke location access, adjust permissions in device settings.',
+              content: Text(
+                kIsWeb
+                    ? 'To revoke location access, adjust permissions in your browser address bar.'
+                    : 'To revoke location access, adjust permissions in device settings.',
               ),
-              action: SnackBarAction(
-                label: 'Settings',
-                onPressed: () => Geolocator.openAppSettings(),
-              ),
+              action: !kIsWeb
+                  ? SnackBarAction(
+                      label: 'Settings',
+                      onPressed: () => Geolocator.openAppSettings(),
+                    )
+                  : null,
               behavior: SnackBarBehavior.floating,
             ),
           );

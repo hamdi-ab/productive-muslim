@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -985,6 +986,22 @@ class _LocationRequired extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            if (kIsWeb)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'ملاحظة للمتصفح: اضغط على أيقونة القفل أو الإعدادات في شريط العنوان للسماح بالموقع.'
+                      : 'Web Tip: Click the padlock or settings icon in your browser address bar to allow location.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ),
             const SizedBox(height: AppSpacing.lg),
             Wrap(
               spacing: 12,
@@ -994,7 +1011,22 @@ class _LocationRequired extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () {
                     AppHaptics.selectionClick();
-                    Geolocator.openAppSettings();
+                    if (!kIsWeb) {
+                      Geolocator.openAppSettings();
+                    } else {
+                      final isAr =
+                          Localizations.localeOf(context).languageCode == 'ar';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isAr
+                                ? 'يرجى السماح بالوصول للموقع عبر أيقونة القفل أو الإعدادات في شريط عنوان المتصفح ثم الضغط على إعادة المحاولة.'
+                                : 'Please allow location in your browser site settings (address bar icon) and click Retry.',
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   },
                   icon: const Icon(Icons.settings_outlined, size: 18),
                   label: Text(l10n.onboardingPermissionOpenSettings),

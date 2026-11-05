@@ -1,4 +1,5 @@
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -45,9 +46,15 @@ class PrayerTimeService {
         return _fallbackFromCacheOrStorage();
       }
 
-      var permission = await Geolocator.checkPermission();
+      var permission = LocationPermission.unableToDetermine;
+      try {
+        permission = await Geolocator.checkPermission();
+      } catch (_) {}
+
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+        try {
+          permission = await Geolocator.requestPermission();
+        } catch (_) {}
         if (permission == LocationPermission.denied) {
           return _fallbackFromCacheOrStorage();
         }
@@ -57,19 +64,24 @@ class PrayerTimeService {
         return _fallbackFromCacheOrStorage();
       }
 
-      // First check last known position quickly
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null && _cachedPosition == null) {
-        _updateCache(lastKnown);
+      // Check last known position quickly (not supported on Web)
+      Position? lastKnown;
+      if (!kIsWeb) {
+        try {
+          lastKnown = await Geolocator.getLastKnownPosition();
+          if (lastKnown != null && _cachedPosition == null) {
+            _updateCache(lastKnown);
+          }
+        } catch (_) {}
       }
 
-      // Fetch fresh position with 4-second timeout to avoid hardware GPS hang
+      // Fetch fresh position with adaptive timeout (web browser geolocation needs more headroom)
       Position? fresh;
       try {
         fresh = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
+          locationSettings: LocationSettings(
             accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 4),
+            timeLimit: Duration(seconds: kIsWeb ? 15 : 5),
           ),
         );
       } catch (_) {
@@ -134,30 +146,32 @@ class PrayerTimeService {
     double latitude,
     double longitude,
   ) async {
-    try {
-      final placemarks = await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        final city = place.locality?.isNotEmpty == true
-            ? place.locality
-            : place.subAdministrativeArea?.isNotEmpty == true
-            ? place.subAdministrativeArea
-            : place.subLocality?.isNotEmpty == true
-            ? place.subLocality
-            : place.administrativeArea?.isNotEmpty == true
-            ? place.administrativeArea
-            : place.name?.isNotEmpty == true
-            ? place.name
-            : place.country;
-        if (city != null && city.isNotEmpty) {
-          _cachedLocationName = city;
-          if (getIt.isRegistered<SettingsService>()) {
-            getIt<SettingsService>().setLastLocationName(city);
+    if (!kIsWeb) {
+      try {
+        final placemarks = await placemarkFromCoordinates(latitude, longitude);
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+          final city = place.locality?.isNotEmpty == true
+              ? place.locality
+              : place.subAdministrativeArea?.isNotEmpty == true
+              ? place.subAdministrativeArea
+              : place.subLocality?.isNotEmpty == true
+              ? place.subLocality
+              : place.administrativeArea?.isNotEmpty == true
+              ? place.administrativeArea
+              : place.name?.isNotEmpty == true
+              ? place.name
+              : place.country;
+          if (city != null && city.isNotEmpty) {
+            _cachedLocationName = city;
+            if (getIt.isRegistered<SettingsService>()) {
+              getIt<SettingsService>().setLastLocationName(city);
+            }
+            return city;
           }
-          return city;
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     if (getIt.isRegistered<SettingsService>()) {
       final storedName = getIt<SettingsService>().lastLocationName;

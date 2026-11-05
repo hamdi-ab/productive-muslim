@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -146,7 +147,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _openSettings() async {
-    await Geolocator.openAppSettings();
+    if (!kIsWeb) {
+      await Geolocator.openAppSettings();
+    }
   }
 
   bool get _canProceed {
