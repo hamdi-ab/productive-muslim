@@ -2,11 +2,19 @@ import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/utils/platform_timezone.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 
 class PrayerTimeService {
+  PrayerTimeService() {
+    try {
+      tz_data.initializeTimeZones();
+    } catch (_) {}
+  }
+
   Position? _cachedPosition;
   PrayerTimes? _cachedPrayerTimes;
   String? _cachedLocationName;
@@ -88,8 +96,9 @@ class PrayerTimeService {
         fresh = await Geolocator.getCurrentPosition(
           locationSettings: LocationSettings(
             accuracy: kIsWeb ? LocationAccuracy.low : LocationAccuracy.medium,
+            timeLimit: Duration(seconds: kIsWeb ? 6 : 4),
           ),
-        ).timeout(Duration(seconds: kIsWeb ? 5 : 4));
+        ).timeout(Duration(seconds: kIsWeb ? 7 : 5));
       } catch (_) {
         fresh = lastKnown ?? _cachedPosition;
       }
@@ -106,8 +115,8 @@ class PrayerTimeService {
     }
   }
 
-  Position? _fallbackFromCacheOrStorage() {
-    if (_cachedPosition != null) return _cachedPosition;
+  Position _fallbackFromCacheOrStorage() {
+    if (_cachedPosition != null) return _cachedPosition!;
 
     if (getIt.isRegistered<SettingsService>()) {
       final settings = getIt<SettingsService>();
@@ -131,48 +140,58 @@ class PrayerTimeService {
       }
     }
 
-    // Timezone-based fallback (especially critical on Web / Desktop where GPS is absent)
+    // Timezone / UTC offset heuristic fallback (critical on Web / Desktop where GPS is absent)
     final tzFallback = _getPositionFromTimezone();
-    if (tzFallback != null) {
-      _updateCache(tzFallback);
-      return tzFallback;
+    _updateCache(tzFallback);
+    return tzFallback;
+  }
+
+  Position _getPositionFromTimezone() {
+    String? name;
+    try {
+      name = getPlatformTimeZone();
+    } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
     }
 
-    return null;
-  }
-
-  Position? _getPositionFromTimezone() {
-    try {
-      final name = tz.local.name;
-      final coords = _lookupTimezoneCoordinates(name);
-      if (coords != null) {
-        final (lat, lng, cityName) = coords;
-        final pos = Position(
-          latitude: lat,
-          longitude: lng,
-          timestamp: DateTime.now(),
-          accuracy: 1000,
-          altitude: 0,
-          altitudeAccuracy: 0,
-          heading: 0,
-          headingAccuracy: 0,
-          speed: 0,
-          speedAccuracy: 0,
-        );
-        _cachedLocationName = cityName;
-        if (getIt.isRegistered<SettingsService>()) {
-          final settings = getIt<SettingsService>();
-          settings.setLastCoordinates(lat, lng);
-          settings.setLastLocationName(cityName);
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        final tzName = DateTime.now().timeZoneName;
+        if (tzName.isNotEmpty && tzName != 'UTC' && tzName != 'local') {
+          name = tzName;
         }
-        return pos;
-      }
-    } catch (_) {}
-    return null;
+      } catch (_) {}
+    }
+
+    final (lat, lng, cityName) = _lookupTimezoneCoordinates(name ?? '');
+    final pos = Position(
+      latitude: lat,
+      longitude: lng,
+      timestamp: DateTime.now(),
+      accuracy: 1000,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+    _cachedLocationName = cityName;
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      settings.setLastCoordinates(lat, lng);
+      settings.setLastLocationName(cityName);
+    }
+    return pos;
   }
 
-  (double, double, String)? _lookupTimezoneCoordinates(String tzName) {
+  (double, double, String) _lookupTimezoneCoordinates(String tzName) {
     final key = tzName.trim().replaceAll(' ', '_');
+    final lowerKey = key.toLowerCase();
 
     const tzMap = <String, (double, double, String)>{
       'Africa/Cairo': (30.0444, 31.2357, 'Cairo'),
@@ -234,15 +253,41 @@ class PrayerTimeService {
       'Australia/Melbourne': (-37.8136, 144.9631, 'Melbourne'),
       'Asia/Tokyo': (35.6762, 139.6503, 'Tokyo'),
       'Asia/Seoul': (37.5665, 126.9780, 'Seoul'),
+      'AST': (24.7136, 46.6753, 'Riyadh'),
+      'Arabian_Standard_Time': (24.7136, 46.6753, 'Riyadh'),
+      'Saudi_Arabia_Standard_Time': (24.7136, 46.6753, 'Riyadh'),
+      'EEST': (30.0444, 31.2357, 'Cairo'),
+      'EET': (30.0444, 31.2357, 'Cairo'),
+      'Egypt_Standard_Time': (30.0444, 31.2357, 'Cairo'),
+      'GST': (25.2048, 55.2708, 'Dubai'),
+      'Gulf_Standard_Time': (25.2048, 55.2708, 'Dubai'),
+      'PKT': (24.8607, 67.0011, 'Karachi'),
+      'Pakistan_Standard_Time': (24.8607, 67.0011, 'Karachi'),
+      'BST': (23.8103, 90.4125, 'Dhaka'),
+      'Bangladesh_Standard_Time': (23.8103, 90.4125, 'Dhaka'),
+      'WIB': (-6.2088, 106.8456, 'Jakarta'),
+      'GMT': (51.5074, -0.1278, 'London'),
+      'CET': (48.8566, 2.3522, 'Paris'),
+      'CEST': (48.8566, 2.3522, 'Paris'),
+      'EST': (40.7128, -74.0060, 'New York'),
+      'EDT': (40.7128, -74.0060, 'New York'),
+      'Eastern_Standard_Time': (40.7128, -74.0060, 'New York'),
+      'PST': (34.0522, -118.2437, 'Los Angeles'),
+      'PDT': (34.0522, -118.2437, 'Los Angeles'),
+      'Pacific_Standard_Time': (34.0522, -118.2437, 'Los Angeles'),
     };
 
-    if (tzMap.containsKey(key)) {
-      return tzMap[key];
+    if (key.isNotEmpty && tzMap.containsKey(key)) {
+      return tzMap[key]!;
     }
 
-    for (final entry in tzMap.entries) {
-      if (key.endsWith(entry.key.split('/').last)) {
-        return entry.value;
+    if (lowerKey.isNotEmpty) {
+      for (final entry in tzMap.entries) {
+        if (entry.key.toLowerCase() == lowerKey ||
+            entry.key.split('/').last.toLowerCase() == lowerKey ||
+            lowerKey.endsWith(entry.key.split('/').last.toLowerCase())) {
+          return entry.value;
+        }
       }
     }
 
@@ -318,18 +363,26 @@ class PrayerTimeService {
       }
     }
 
+    String? name;
     try {
-      final name = tz.local.name;
-      if (name.contains('/')) {
-        final city = name.split('/').last.replaceAll('_', ' ');
-        if (city.isNotEmpty &&
-            city.toUpperCase() != 'UTC' &&
-            city.toUpperCase() != 'LOCAL') {
-          _cachedLocationName = city;
-          return city;
-        }
-      }
+      name = getPlatformTimeZone();
     } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
+    }
+
+    if (name != null && name.contains('/')) {
+      final city = name.split('/').last.replaceAll('_', ' ');
+      if (city.isNotEmpty &&
+          city.toUpperCase() != 'UTC' &&
+          city.toUpperCase() != 'LOCAL') {
+        _cachedLocationName = city;
+        return city;
+      }
+    }
 
     _cachedLocationName ??= 'My Location';
     return _cachedLocationName;
@@ -411,17 +464,25 @@ class PrayerTimeService {
       }
     }
 
+    String? name;
     try {
-      final name = tz.local.name;
-      if (name.contains('/')) {
-        final city = name.split('/').last.replaceAll('_', ' ');
-        if (city.isNotEmpty &&
-            city.toUpperCase() != 'UTC' &&
-            city.toUpperCase() != 'LOCAL') {
-          return city;
-        }
-      }
+      name = getPlatformTimeZone();
     } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
+    }
+
+    if (name != null && name.contains('/')) {
+      final city = name.split('/').last.replaceAll('_', ' ');
+      if (city.isNotEmpty &&
+          city.toUpperCase() != 'UTC' &&
+          city.toUpperCase() != 'LOCAL') {
+        return city;
+      }
+    }
 
     return 'My Location';
   }
