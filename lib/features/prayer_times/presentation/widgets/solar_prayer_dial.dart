@@ -201,7 +201,6 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         nextTime = null;
     }
 
-    String countdownString = '';
     String countdownMinutesSeconds = '';
     if (nextTime != null) {
       final diff = nextTime.difference(now);
@@ -210,10 +209,8 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         final minutes = diff.inMinutes % 60;
         final seconds = diff.inSeconds % 60;
         if (hours > 0) {
-          countdownString = '${hours}h ${minutes}m ${seconds}s';
           countdownMinutesSeconds = '${hours}h ${minutes}m';
         } else {
-          countdownString = '${minutes}m ${seconds}s';
           countdownMinutesSeconds = '${minutes}m ${seconds}s';
         }
       }
@@ -339,54 +336,74 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 36),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          countdownString.isNotEmpty
-                              ? '${l10n.solarNext(localizedNext)} • $countdownString'
-                              : l10n.solarNext(localizedNext),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? AppColors.secondary
-                                : AppColors.secondaryDark,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 175),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                l10n.solarNext(localizedNext),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? AppColors.secondary
+                                      : AppColors.secondaryDark,
+                                ),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          countdownMinutesSeconds.isNotEmpty
-                              ? countdownMinutesSeconds
-                              : DateFormat.jm().format(now),
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.textPrimary,
-                            letterSpacing: -0.5,
+                          const SizedBox(height: 2),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                countdownMinutesSeconds.isNotEmpty
+                                    ? countdownMinutesSeconds
+                                    : DateFormat.jm().format(now),
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
+                                  letterSpacing: -0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          isNight
-                              ? (isAr
-                                    ? 'مسار الليل والتهجد'
-                                    : 'Night arc • Tahajjud time')
-                              : (isAr
-                                    ? 'مسار الشمس: مدار نهاري'
-                                    : 'Solar zenith • Declining arc'),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isDark
-                                ? AppColors.primaryLight
-                                : AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(height: 1),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                isNight
+                                    ? (isAr
+                                          ? 'مسار الليل والتهجد'
+                                          : 'Night arc • Tahajjud time')
+                                    : (isAr
+                                          ? 'مسار الشمس: مدار نهاري'
+                                          : 'Solar zenith • Declining arc'),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: isDark
+                                      ? AppColors.primaryLight
+                                      : AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

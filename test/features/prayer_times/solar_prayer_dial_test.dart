@@ -64,5 +64,54 @@ void main() {
       final hasArNight = find.text('مسار الليل والتهجد').evaluate().isNotEmpty;
       expect(hasArDay || hasArNight, isTrue);
     });
+
+    testWidgets('renders post-Isha tomorrow Fajr within arc constraints', (
+      tester,
+    ) async {
+      // Create prayer times in the past to simulate after Isha
+      final params = CalculationMethodParameters.muslimWorldLeague();
+      final pastPrayerTimes = PrayerTimes(
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        coordinates: Coordinates(30.0444, 31.2357),
+        calculationParameters: params,
+      );
+
+      await tester.pumpWidget(
+        buildWidget(
+          child: SolarPrayerDial(
+            prayerTimes: pastPrayerTimes,
+            nextPrayer: 'Fajr',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Next: Fajr (Tomorrow)'), findsOneWidget);
+    });
+
+    testWidgets(
+      'renders post-Isha tomorrow Fajr in Arabic within arc constraints',
+      (tester) async {
+        final params = CalculationMethodParameters.muslimWorldLeague();
+        final pastPrayerTimes = PrayerTimes(
+          date: DateTime.now().subtract(const Duration(days: 1)),
+          coordinates: Coordinates(30.0444, 31.2357),
+          calculationParameters: params,
+        );
+
+        await tester.pumpWidget(
+          buildWidget(
+            language: 'ar',
+            child: SolarPrayerDial(
+              prayerTimes: pastPrayerTimes,
+              nextPrayer: 'Fajr',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('التالي: الفجر (غداً)'), findsOneWidget);
+      },
+    );
   });
 }
