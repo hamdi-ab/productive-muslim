@@ -2150,6 +2150,7 @@ class _SolarArcDiagram extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return SizedBox(
       height: 90,
       width: double.infinity,
@@ -2158,6 +2159,7 @@ class _SolarArcDiagram extends StatelessWidget {
           prayerTimes: prayerTimes,
           nextPrayer: nextPrayer,
           isDark: isDark,
+          isAr: isAr,
         ),
       ),
     );
@@ -2168,11 +2170,13 @@ class _SolarArcPainter extends CustomPainter {
   final PrayerTimes? prayerTimes;
   final String nextPrayer;
   final bool isDark;
+  final bool isAr;
 
   _SolarArcPainter({
     required this.prayerTimes,
     required this.nextPrayer,
     required this.isDark,
+    required this.isAr,
   });
 
   @override
@@ -2263,44 +2267,81 @@ class _SolarArcPainter extends CustomPainter {
 
     canvas.drawPath(progressArcPath, gradientPaint);
 
-    // Helper to draw fixed nodes
-    void drawNode(double t, Color color, String label, {bool isAbove = false}) {
+    // Helper to draw fixed milestone and active nodes
+    void drawNode(
+      double t,
+      Color color,
+      String label, {
+      bool isAbove = false,
+      bool isActive = false,
+    }) {
       final pt = _evalCubic(p0, p1, p2, p3, t);
       final nodePaint = Paint()
-        ..color = color
+        ..color = isActive ? const Color(0xFFF59E0B) : color
         ..style = PaintingStyle.fill;
       final borderPaint = Paint()
         ..color = Colors.white
-        ..strokeWidth = 1.8
+        ..strokeWidth = isActive ? 2.0 : 1.8
         ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(pt, 4.0, nodePaint);
-      canvas.drawCircle(pt, 4.0, borderPaint);
+      canvas.drawCircle(pt, isActive ? 4.5 : 4.0, nodePaint);
+      canvas.drawCircle(pt, isActive ? 4.5 : 4.0, borderPaint);
 
       final textSpan = TextSpan(
         text: label,
         style: TextStyle(
-          color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
-          fontSize: 8.5,
-          fontWeight: FontWeight.w600,
+          color: isActive
+              ? (isDark ? AppColors.secondary : const Color(0xFFD97706))
+              : (isDark
+                    ? AppColors.darkTextSecondary
+                    : const Color(0xFF64748B)),
+          fontSize: isActive ? 9.5 : 8.5,
+          fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
         ),
       );
       final textPainter = TextPainter(
         text: textSpan,
-        textDirection: TextDirection.ltr,
+        textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
       )..layout();
       final textOffset = isAbove
-          ? Offset(pt.dx - textPainter.width / 2, pt.dy - 14)
+          ? Offset(pt.dx - textPainter.width / 2, pt.dy - 15)
           : Offset(pt.dx - textPainter.width / 2, pt.dy + 7);
       textPainter.paint(canvas, textOffset);
     }
 
-    // Draw Fajr, Dhuhr zenith, and Maghrib nodes
-    drawNode(0.08, const Color(0xFF10B981), 'Fajr');
-    drawNode(0.50, const Color(0xFF10B981), 'Dhuhr', isAbove: true);
-    drawNode(0.88, const Color(0xFFCBD5E1), 'Maghrib');
+    final fajrLabel = isAr ? 'الفجر' : 'Fajr';
+    final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
+    final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
 
-    // 5. Active glowing sun position node
+    // Draw Fajr, Dhuhr zenith, and Maghrib milestone nodes
+    drawNode(0.08, const Color(0xFF10B981), fajrLabel, isActive: key == 'fajr');
+    drawNode(
+      0.50,
+      const Color(0xFF10B981),
+      dhuhrLabel,
+      isAbove: true,
+      isActive: key == 'dhuhr',
+    );
+    drawNode(
+      0.88,
+      const Color(0xFFCBD5E1),
+      maghribLabel,
+      isActive: key == 'maghrib',
+    );
+
+    // If active prayer is between milestones (Sunrise, Asr, Isha), draw its active node
+    if (key == 'sunrise') {
+      final sunriseLabel = isAr ? 'الشروق' : 'Sunrise';
+      drawNode(0.28, const Color(0xFFF59E0B), sunriseLabel, isActive: true);
+    } else if (key == 'asr') {
+      final asrLabel = isAr ? 'العصر' : 'Asr';
+      drawNode(0.68, const Color(0xFFF59E0B), asrLabel, isActive: true);
+    } else if (key == 'isha') {
+      final ishaLabel = isAr ? 'العشاء' : 'Isha';
+      drawNode(0.96, const Color(0xFFF59E0B), ishaLabel, isActive: true);
+    }
+
+    // 5. Active glowing sun position node (illuminates the active prayer node on the arc)
     final sunPos = _evalCubic(p0, p1, p2, p3, progressT);
 
     // Outer halo
@@ -2320,24 +2361,6 @@ class _SolarArcPainter extends CustomPainter {
       ..color = Colors.white
       ..style = PaintingStyle.fill;
     canvas.drawCircle(sunPos, 3.5, corePaint);
-
-    // Label under sun node
-    final labelSpan = TextSpan(
-      text: '${nextPrayer.toUpperCase()} NOW',
-      style: const TextStyle(
-        color: Color(0xFF92600E),
-        fontSize: 9,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-    final labelPainter = TextPainter(
-      text: labelSpan,
-      textDirection: TextDirection.ltr,
-    )..layout();
-    labelPainter.paint(
-      canvas,
-      Offset(sunPos.dx - labelPainter.width / 2, sunPos.dy + 12),
-    );
   }
 
   Offset _evalCubic(Offset p0, Offset p1, Offset p2, Offset p3, double t) {
@@ -2358,6 +2381,7 @@ class _SolarArcPainter extends CustomPainter {
   bool shouldRepaint(covariant _SolarArcPainter oldDelegate) {
     return oldDelegate.nextPrayer != nextPrayer ||
         oldDelegate.isDark != isDark ||
+        oldDelegate.isAr != isAr ||
         oldDelegate.prayerTimes != prayerTimes;
   }
 }
