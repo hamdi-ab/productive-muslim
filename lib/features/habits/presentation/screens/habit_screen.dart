@@ -61,6 +61,7 @@ class HabitScreen extends StatelessWidget {
   void _showCreateSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => BlocProvider.value(

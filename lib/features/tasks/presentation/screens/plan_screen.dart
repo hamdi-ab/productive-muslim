@@ -104,7 +104,9 @@ class _PlanScreenState extends State<PlanScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
@@ -212,6 +214,7 @@ class _PlanScreenState extends State<PlanScreen> {
     AppHaptics.lightImpact();
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -234,6 +237,7 @@ class _PlanScreenState extends State<PlanScreen> {
     AppHaptics.lightImpact();
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,

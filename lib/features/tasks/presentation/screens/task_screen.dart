@@ -70,6 +70,7 @@ class _TaskScreenState extends State<TaskScreen> {
   void _showCreateSheet(BuildContext context, String today) {
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
