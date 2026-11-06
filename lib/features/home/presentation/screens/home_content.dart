@@ -1066,34 +1066,11 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
               ],
             ),
             const SizedBox(height: 4),
-            // Subtitle Row: Scheduled Time & Location Status
+            // Subtitle Row: Location Status (Left) & Scheduled Time (Right)
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (_cachedPrayerTimes != null) ...[
-                  Text(
-                    'at ${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 7),
-                    child: Container(
-                      width: 3.5,
-                      height: 3.5,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDark
-                            ? AppColors.darkTextSecondary.withValues(alpha: 0.5)
-                            : AppColors.textSecondary.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ),
-                ],
                 Expanded(
                   child: Text(
                     _locationName != null && _locationName!.isNotEmpty
@@ -1109,6 +1086,19 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                     ),
                   ),
                 ),
+                if (_cachedPrayerTimes != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '${isAr ? 'في ' : 'at '}${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 8),
