@@ -276,6 +276,39 @@ void main() {
         expect(progressDhuhr, equals(tDhuhr));
       },
     );
+
+    test('verifies progressArcPath terminates exactly at celestial body position (progressT)', () {
+      const p0 = Offset(18, 71.44);
+      const p1 = Offset(79.2, 15.04);
+      const p2 = Offset(280.8, 15.04);
+      const p3 = Offset(342, 71.44);
+
+      Offset evalCubic(double t) {
+        final u = 1 - t;
+        final tt = t * t;
+        final uu = u * u;
+        final uuu = uu * u;
+        final ttt = tt * t;
+        return Offset(
+          uuu * p0.dx + 3 * uu * t * p1.dx + 3 * u * tt * p2.dx + ttt * p3.dx,
+          uuu * p0.dy + 3 * uu * t * p1.dy + 3 * u * tt * p2.dy + ttt * p3.dy,
+        );
+      }
+
+      for (final progressT in [0.15, 0.40, 0.65, 0.88]) {
+        const int steps = 48;
+        Offset? lastPt;
+        for (int i = 1; i <= steps; i++) {
+          final t = (i / steps) * progressT;
+          lastPt = evalCubic(t);
+        }
+
+        final expectedCelestialPos = evalCubic(progressT);
+        expect(lastPt, isNotNull);
+        expect(lastPt!.dx, closeTo(expectedCelestialPos.dx, 0.001));
+        expect(lastPt.dy, closeTo(expectedCelestialPos.dy, 0.001));
+      }
+    });
   });
 }
 

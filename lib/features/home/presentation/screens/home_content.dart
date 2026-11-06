@@ -2433,11 +2433,10 @@ class _SolarArcPainter extends CustomPainter {
       }
     }
 
-    // 4. Draw active illuminated progress arc
+    // 4. Draw active illuminated progress arc directly leading to the celestial body
     final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
-    const int steps = 40;
-    final int maxSteps = (steps * progressT).round().clamp(1, steps);
-    for (int i = 1; i <= maxSteps; i++) {
+    const int steps = 48;
+    for (int i = 1; i <= steps; i++) {
       final t = (i / steps) * progressT;
       final pt = _evalCubic(p0, p1, p2, p3, t);
       progressArcPath.lineTo(pt.dx, pt.dy);
