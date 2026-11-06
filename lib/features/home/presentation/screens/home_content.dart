@@ -14,7 +14,6 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
-import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/task.dart';
@@ -1008,57 +1007,50 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: PulsingGlow(
-                      animate: true,
-                      minScale: 0.96,
-                      maxScale: 1.04,
-                      duration: const Duration(milliseconds: 2400),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 5,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                         ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: const Color(0xFFF59E0B)
-                                .withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_loading)
-                              const SizedBox(
-                                width: 12,
-                                height: 12,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFFD97706),
-                                  ),
-                                ),
-                              )
-                            else ...[
-                              const Icon(
-                                Icons.schedule_rounded,
-                                size: 13,
-                                color: Color(0xFFD97706),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'in $_countdown',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF92400E),
-                                  fontFeatures: [FontFeature.tabularFigures()],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_loading)
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFD97706),
                                 ),
                               ),
-                            ],
+                            )
+                          else ...[
+                            const Icon(
+                              Icons.schedule_rounded,
+                              size: 13,
+                              color: Color(0xFFD97706),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'in $_countdown',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF92400E),
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
                   ),
