@@ -136,7 +136,8 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           ),
         ],
       ),
-      child: Center(
+      child: Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: 600,
@@ -145,25 +146,10 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Ambient Spiritual Top Accent Hairline
-              Container(
-                height: 2,
-                margin: const EdgeInsets.symmetric(horizontal: 48),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      const Color(0xFFE9C349).withValues(alpha: 0.8),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-
               // Drag Handle
               Center(
                 child: Container(
-                  width: 44,
+                  width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(
                     top: AppSpacing.sm,
@@ -251,6 +237,21 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              // Ambient Spiritual Divider Hairline
+              Container(
+                height: 1,
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      const Color(0xFFE9C349).withValues(alpha: 0.5),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
 
