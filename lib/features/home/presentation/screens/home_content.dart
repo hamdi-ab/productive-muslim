@@ -2249,7 +2249,20 @@ class _SolarArcPainter extends CustomPainter {
       startX += dashWidth + dashSpace;
     }
 
-    // 2. Solar curve path (cubic bezier)
+    // 2. Compute day/night cycle and prayer boundary times
+    final fajr = prayerTimes?.fajr;
+    final sunrise = prayerTimes?.sunrise;
+    final dhuhr = prayerTimes?.dhuhr;
+    final asr = prayerTimes?.asr;
+    final maghrib = prayerTimes?.maghrib;
+    final isha = prayerTimes?.isha;
+
+    // Islamic day/night cycle: night begins at Maghrib (sunset) and ends at Fajr (dawn)
+    final isNight =
+        (maghrib != null && now.isAfter(maghrib)) ||
+        (fajr != null && now.isBefore(fajr));
+
+    // 3. Solar curve path (cubic bezier)
     final p0 = Offset(18, horizonY);
     final p1 = Offset(w * 0.22, size.height * 0.16);
     final p2 = Offset(w * 0.78, size.height * 0.16);
@@ -2260,143 +2273,177 @@ class _SolarArcPainter extends CustomPainter {
       ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
 
     final bgArcPaint = Paint()
-      ..color = isDark ? Colors.white24 : const Color(0xFFCBD5E1)
+      ..color = isDark
+          ? (isNight ? Colors.indigo.withValues(alpha: 0.25) : Colors.white24)
+          : (isNight
+                ? Colors.indigo.withValues(alpha: 0.12)
+                : const Color(0xFFCBD5E1))
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
     canvas.drawPath(bgArcPath, bgArcPaint);
 
-    // 3. Compute dynamic duration-proportional milestone points for the 5 prayers
-    final fajr = prayerTimes?.fajr;
-    final sunrise = prayerTimes?.sunrise;
-    final dhuhr = prayerTimes?.dhuhr;
-    final asr = prayerTimes?.asr;
-    final maghrib = prayerTimes?.maghrib;
-    final isha = prayerTimes?.isha;
-
     const tStart = 0.08;
-    const tEnd = 0.93;
-    const tSpan = tEnd - tStart; // 0.85
-
-    // Default aesthetic spacing
-    double tFajr = tStart;
-    double tDhuhr = 0.50;
-    double tAsr = 0.71;
-    double tMaghrib = 0.86;
-    double tIsha = tEnd;
-    double? tSunrise;
-
-    if (fajr != null &&
-        dhuhr != null &&
-        asr != null &&
-        maghrib != null &&
-        isha != null) {
-      final totalDaySeconds = isha.difference(fajr).inSeconds;
-      if (totalDaySeconds > 0) {
-        final dhuhrRatio = dhuhr.difference(fajr).inSeconds / totalDaySeconds;
-        final asrRatio = asr.difference(fajr).inSeconds / totalDaySeconds;
-        final maghribRatio =
-            maghrib.difference(fajr).inSeconds / totalDaySeconds;
-
-        tFajr = tStart;
-        // Fajr -> Dhuhr is the longest duration (~7h), Dhuhr peaks around zenith
-        tDhuhr = (tStart + dhuhrRatio * tSpan).clamp(0.38, 0.56);
-        // Dhuhr -> Asr (~3.5h)
-        tAsr = (tStart + asrRatio * tSpan).clamp(tDhuhr + 0.12, 0.78);
-        // Asr -> Maghrib (~2.5h)
-        tMaghrib = (tStart + maghribRatio * tSpan).clamp(tAsr + 0.08, 0.88);
-        // Maghrib -> Isha (~1.25h) is the shortest duration
-        tIsha = tEnd;
-
-        if (sunrise != null &&
-            sunrise.isAfter(fajr) &&
-            sunrise.isBefore(dhuhr)) {
-          final sunriseRatio =
-              sunrise.difference(fajr).inSeconds / totalDaySeconds;
-          tSunrise = (tStart + sunriseRatio * tSpan).clamp(
-            tFajr + 0.08,
-            tDhuhr - 0.06,
-          );
-        }
-      }
-    }
+    const tEnd = 0.92;
+    const tSpan = tEnd - tStart; // 0.84
 
     final key = nextPrayer.toLowerCase();
-    final isAfterMaghrib = maghrib != null && now.isAfter(maghrib);
-    final isAfterIsha = isha != null && now.isAfter(isha);
-    final isBeforeFajr = fajr != null && now.isBefore(fajr);
-    final isTomorrowFajr = isAfterIsha && key == 'fajr';
-    // Islamic nighttime begins at Maghrib (sunset) and extends until dawn (Fajr)
-    final isNight = isAfterMaghrib || isBeforeFajr;
+    double progressT = tStart;
 
-    // 4. Compute active celestial progress t (0.0 to 1.0)
-    double progressT = tFajr;
-    if (isAfterIsha) {
-      // Nighttime after Isha: resting at the night horizon (Isha)
-      progressT = tIsha;
-    } else if (isAfterMaghrib && isha != null) {
-      // Twilight dusk between Maghrib and Isha: moves forward from Maghrib toward Isha
-      final spanSec = isha.difference(maghrib).inSeconds;
-      final elapsedSec = now.difference(maghrib).inSeconds;
-      final ratio = (elapsedSec / (spanSec > 0 ? spanSec : 1)).clamp(0.0, 1.0);
-      progressT = (tMaghrib + ratio * (tIsha - tMaghrib)).clamp(
-        tMaghrib,
-        tIsha,
-      );
-    } else if (asr != null &&
-        maghrib != null &&
-        now.isAfter(asr) &&
-        now.isBefore(maghrib)) {
-      // Late afternoon between Asr and Maghrib: Sun descends toward sunset
-      final span = maghrib.difference(asr).inSeconds;
-      final elapsed = now.difference(asr).inSeconds;
-      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
-      progressT = (tAsr + ratio * (tMaghrib - tAsr)).clamp(tAsr, tMaghrib);
-    } else if (dhuhr != null &&
-        asr != null &&
-        now.isAfter(dhuhr) &&
-        now.isBefore(asr)) {
-      // Early afternoon between Dhuhr and Asr: Sun moves from zenith peak toward Asr
-      final span = asr.difference(dhuhr).inSeconds;
-      final elapsed = now.difference(dhuhr).inSeconds;
-      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
-      progressT = (tDhuhr + ratio * (tAsr - tDhuhr)).clamp(tDhuhr, tAsr);
-    } else if (fajr != null &&
-        dhuhr != null &&
-        now.isAfter(fajr) &&
-        now.isBefore(dhuhr)) {
-      // Morning between Fajr and Dhuhr: Sun ascends continuously toward zenith peak
-      final span = dhuhr.difference(fajr).inSeconds;
-      final elapsed = now.difference(fajr).inSeconds;
-      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
-      progressT = (tFajr + ratio * (tDhuhr - tFajr)).clamp(tFajr, tDhuhr);
-    } else if (isBeforeFajr) {
-      // Pre-dawn Tahajjud before Fajr: resting at the dawn horizon
-      progressT = tFajr;
-    } else {
-      progressT = switch (key) {
-        'fajr' => tFajr,
-        'sunrise' => tSunrise ?? (tFajr + 0.15),
-        'dhuhr' => tDhuhr,
-        'asr' => tAsr,
-        'maghrib' => tMaghrib,
-        'isha' => tIsha,
-        _ => tDhuhr,
-      };
-    }
+    // Milestone fractions for Day Arc vs Night Arc
+    double tFajrDay = tStart;
+    double tSunriseDay = 0.24;
+    double tDhuhrDay = 0.50;
+    double tAsrDay = 0.74;
+    double tMaghribDay = tEnd;
 
-    // 5. Draw active daylight progress arc or nocturnal celestial path
+    double tMaghribNight = tStart;
+    double tIshaNight = 0.26;
+    double tTahajjudNight = 0.64;
+    double tFajrNight = tEnd;
+
+    DateTime? fajrNext;
+    DateTime? maghribPrev;
+    DateTime? ishaPrev;
+    DateTime? tahajjudTime;
+
     if (!isNight) {
-      final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
-      const int steps = 40;
-      final int maxSteps = (steps * progressT).round().clamp(1, steps);
-      for (int i = 1; i <= maxSteps; i++) {
-        final t = (i / steps) * progressT;
-        final pt = _evalCubic(p0, p1, p2, p3, t);
-        progressArcPath.lineTo(pt.dx, pt.dy);
+      // ----------------- DAY ARC (Fajr -> Maghrib) -----------------
+      final dayDuration = (fajr != null && maghrib != null)
+          ? maghrib.difference(fajr).inSeconds
+          : 12 * 3600;
+
+      if (fajr != null && sunrise != null && dayDuration > 0) {
+        tSunriseDay =
+            (tStart +
+                    (sunrise.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.20, 0.28);
+      }
+      if (fajr != null && dhuhr != null && dayDuration > 0) {
+        tDhuhrDay =
+            (tStart + (dhuhr.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.46, 0.54);
+      }
+      if (fajr != null && asr != null && dayDuration > 0) {
+        tAsrDay =
+            (tStart + (asr.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.70, 0.78);
       }
 
+      // Compute continuous piecewise progress along Day Arc
+      if (fajr != null && now.isBefore(fajr)) {
+        progressT = tFajrDay;
+      } else if (fajr != null && sunrise != null && now.isBefore(sunrise)) {
+        final span = sunrise.difference(fajr).inSeconds;
+        final elapsed = now.difference(fajr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tFajrDay + ratio * (tSunriseDay - tFajrDay)).clamp(
+          tFajrDay,
+          tSunriseDay,
+        );
+      } else if (sunrise != null && dhuhr != null && now.isBefore(dhuhr)) {
+        final span = dhuhr.difference(sunrise).inSeconds;
+        final elapsed = now.difference(sunrise).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tSunriseDay + ratio * (tDhuhrDay - tSunriseDay)).clamp(
+          tSunriseDay,
+          tDhuhrDay,
+        );
+      } else if (dhuhr != null && asr != null && now.isBefore(asr)) {
+        final span = asr.difference(dhuhr).inSeconds;
+        final elapsed = now.difference(dhuhr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tDhuhrDay + ratio * (tAsrDay - tDhuhrDay)).clamp(
+          tDhuhrDay,
+          tAsrDay,
+        );
+      } else if (asr != null && maghrib != null && now.isBefore(maghrib)) {
+        final span = maghrib.difference(asr).inSeconds;
+        final elapsed = now.difference(asr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tAsrDay + ratio * (tMaghribDay - tAsrDay)).clamp(
+          tAsrDay,
+          tMaghribDay,
+        );
+      } else {
+        progressT = switch (key) {
+          'fajr' => tFajrDay,
+          'sunrise' => tSunriseDay,
+          'dhuhr' => tDhuhrDay,
+          'asr' => tAsrDay,
+          'maghrib' => tMaghribDay,
+          _ => tDhuhrDay,
+        };
+      }
+    } else {
+      // ----------------- NIGHT ARC (Maghrib -> Fajr) -----------------
+      fajrNext = (fajr != null && now.isBefore(fajr))
+          ? fajr
+          : (fajr?.add(const Duration(days: 1)) ??
+                now.add(const Duration(hours: 8)));
+      maghribPrev = (maghrib != null && now.isAfter(maghrib))
+          ? maghrib
+          : (maghrib?.subtract(const Duration(days: 1)) ??
+                now.subtract(const Duration(hours: 4)));
+      ishaPrev = (isha != null && now.isAfter(isha))
+          ? isha
+          : (isha != null && fajr != null && now.isBefore(fajr)
+                ? isha.subtract(const Duration(days: 1))
+                : isha ??
+                      maghribPrev.add(const Duration(hours: 1, minutes: 30)));
+
+      final nightDuration = fajrNext.difference(maghribPrev).inSeconds;
+      tahajjudTime = fajrNext.subtract(
+        Duration(seconds: (nightDuration / 3).round()),
+      );
+
+      if (nightDuration > 0) {
+        final ishaSec = ishaPrev.difference(maghribPrev).inSeconds;
+        tIshaNight = (tStart + (ishaSec / nightDuration) * tSpan).clamp(
+          0.22,
+          0.32,
+        );
+        tTahajjudNight = (tStart + (2 / 3) * tSpan).clamp(0.60, 0.72);
+      }
+
+      // Compute continuous piecewise progress along Night Arc
+      if (now.isBefore(ishaPrev)) {
+        final span = ishaPrev.difference(maghribPrev).inSeconds;
+        final elapsed = now.difference(maghribPrev).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tMaghribNight + ratio * (tIshaNight - tMaghribNight))
+            .clamp(tMaghribNight, tIshaNight);
+      } else if (now.isBefore(tahajjudTime)) {
+        final span = tahajjudTime.difference(ishaPrev).inSeconds;
+        final elapsed = now.difference(ishaPrev).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tIshaNight + ratio * (tTahajjudNight - tIshaNight)).clamp(
+          tIshaNight,
+          tTahajjudNight,
+        );
+      } else if (now.isBefore(fajrNext)) {
+        final span = fajrNext.difference(tahajjudTime).inSeconds;
+        final elapsed = now.difference(tahajjudTime).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tTahajjudNight + ratio * (tFajrNight - tTahajjudNight))
+            .clamp(tTahajjudNight, tFajrNight);
+      } else {
+        progressT = tFajrNight;
+      }
+    }
+
+    // 4. Draw active illuminated progress arc
+    final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
+    const int steps = 40;
+    final int maxSteps = (steps * progressT).round().clamp(1, steps);
+    for (int i = 1; i <= maxSteps; i++) {
+      final t = (i / steps) * progressT;
+      final pt = _evalCubic(p0, p1, p2, p3, t);
+      progressArcPath.lineTo(pt.dx, pt.dy);
+    }
+
+    if (!isNight) {
       final gradientPaint = Paint()
         ..shader = const LinearGradient(
           colors: [Color(0xFF10B981), Color(0xFF0F4C3A), Color(0xFFD4AF37)],
@@ -2407,19 +2454,19 @@ class _SolarArcPainter extends CustomPainter {
 
       canvas.drawPath(progressArcPath, gradientPaint);
     } else {
-      final nightArcPaint = Paint()
+      final nightProgressPaint = Paint()
         ..shader = const LinearGradient(
           colors: [
-            Color(0xFF38BDF8), // dawn cyan
-            Color(0xFF6366F1), // celestial indigo
             Color(0xFF8B5CF6), // dusk violet
+            Color(0xFF6366F1), // celestial indigo
+            Color(0xFF38BDF8), // dawn cyan
           ],
         ).createShader(Rect.fromLTWH(0, 0, w, size.height))
-        ..strokeWidth = 2.5
+        ..strokeWidth = 3.5
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round;
 
-      canvas.drawPath(bgArcPath, nightArcPaint);
+      canvas.drawPath(progressArcPath, nightProgressPaint);
 
       // Faint ambient stars in the nocturnal sky
       final starPaint = Paint()
@@ -2487,96 +2534,134 @@ class _SolarArcPainter extends CustomPainter {
       textPainter.paint(canvas, textOffset);
     }
 
-    final fajrLabel = isAr ? 'الفجر' : 'Fajr';
-    final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
-    final asrLabel = isAr ? 'العصر' : 'Asr';
-    final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
-    final ishaLabel = isAr ? 'العشاء' : 'Isha';
-
-    final isFajrActive = !isTomorrowFajr && key == 'fajr';
-    final isDhuhrActive = key == 'dhuhr';
-    final isAsrActive = key == 'asr';
-    final isMaghribActive = key == 'maghrib';
-    final isIshaActive = key == 'isha';
-
-    final isFajrPast =
-        isAfterIsha || (fajr != null && now.isAfter(fajr) && !isFajrActive);
-    final isDhuhrPast =
-        isAfterIsha || (dhuhr != null && now.isAfter(dhuhr) && !isDhuhrActive);
-    final isAsrPast =
-        isAfterIsha || (asr != null && now.isAfter(asr) && !isAsrActive);
-    final isMaghribPast =
-        isAfterIsha ||
-        (maghrib != null && now.isAfter(maghrib) && !isMaghribActive);
-    final isIshaPast = isAfterIsha;
-
     final defaultNodeColor = isDark ? Colors.white38 : const Color(0xFF94A3B8);
 
-    // Render all 5 daily prayer milestones with duration-proportional spacing
-    // 1. Fajr (Horizon level, label below)
-    drawNode(
-      tFajr,
-      defaultNodeColor,
-      fajrLabel,
-      isAbove: false,
-      isActive: isFajrActive,
-      isCompleted: isFajrPast,
-    );
-
-    // 2. Dhuhr (Zenith peak, label above)
-    drawNode(
-      tDhuhr,
-      defaultNodeColor,
-      dhuhrLabel,
-      isAbove: true,
-      isActive: isDhuhrActive,
-      isCompleted: isDhuhrPast,
-    );
-
-    // 3. Asr (Upper slope, label above)
-    drawNode(
-      tAsr,
-      defaultNodeColor,
-      asrLabel,
-      isAbove: true,
-      isActive: isAsrActive,
-      isCompleted: isAsrPast,
-    );
-
-    // 4. Maghrib (Lower slope, label above - prevents overlap with Isha below)
-    drawNode(
-      tMaghrib,
-      defaultNodeColor,
-      maghribLabel,
-      isAbove: true,
-      isActive: isMaghribActive,
-      isCompleted: isMaghribPast,
-    );
-
-    // 5. Isha (Horizon level, label below)
-    drawNode(
-      tIsha,
-      defaultNodeColor,
-      ishaLabel,
-      isAbove: false,
-      isActive: isIshaActive,
-      isCompleted: isIshaPast,
-    );
-
-    // Active Sunrise transition milestone (if active prayer is sunrise)
-    if (key == 'sunrise' && tSunrise != null) {
+    if (!isNight) {
+      // 5 Milestones on Day Arc: Fajr, Sunrise, Dhuhr, Asr, Maghrib
+      final fajrLabel = isAr ? 'الفجر' : 'Fajr';
       final sunriseLabel = isAr ? 'الشروق' : 'Sunrise';
+      final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
+      final asrLabel = isAr ? 'العصر' : 'Asr';
+      final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
+
+      final isFajrActive = key == 'fajr';
+      final isSunriseActive = key == 'sunrise';
+      final isDhuhrActive = key == 'dhuhr';
+      final isAsrActive = key == 'asr';
+      final isMaghribActive = key == 'maghrib';
+
+      final isFajrPast = fajr != null && now.isAfter(fajr) && !isFajrActive;
+      final isSunrisePast =
+          sunrise != null && now.isAfter(sunrise) && !isSunriseActive;
+      final isDhuhrPast = dhuhr != null && now.isAfter(dhuhr) && !isDhuhrActive;
+      final isAsrPast = asr != null && now.isAfter(asr) && !isAsrActive;
+
+      // 1. Fajr (Dawn horizon, label below)
       drawNode(
-        tSunrise,
-        const Color(0xFFF59E0B),
+        tFajrDay,
+        defaultNodeColor,
+        fajrLabel,
+        isAbove: false,
+        isActive: isFajrActive,
+        isCompleted: isFajrPast,
+      );
+      // 2. Sunrise (Ascending slope, label above)
+      drawNode(
+        tSunriseDay,
+        defaultNodeColor,
         sunriseLabel,
         isAbove: true,
-        isActive: true,
+        isActive: isSunriseActive,
+        isCompleted: isSunrisePast,
+      );
+      // 3. Dhuhr (Zenith peak, label above)
+      drawNode(
+        tDhuhrDay,
+        defaultNodeColor,
+        dhuhrLabel,
+        isAbove: true,
+        isActive: isDhuhrActive,
+        isCompleted: isDhuhrPast,
+      );
+      // 4. Asr (Afternoon slope, label above)
+      drawNode(
+        tAsrDay,
+        defaultNodeColor,
+        asrLabel,
+        isAbove: true,
+        isActive: isAsrActive,
+        isCompleted: isAsrPast,
+      );
+      // 5. Maghrib (Sunset horizon, label below)
+      drawNode(
+        tMaghribDay,
+        defaultNodeColor,
+        maghribLabel,
+        isAbove: false,
+        isActive: isMaghribActive,
+        isCompleted: false,
+      );
+    } else {
+      // 4 Milestones on Night Arc: Maghrib, Isha, Tahajjud, Fajr
+      final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
+      final ishaLabel = isAr ? 'العشاء' : 'Isha';
+      final tahajjudLabel = isAr ? 'التهجد' : 'Tahajjud';
+      final fajrLabel = isAr ? 'الفجر' : 'Fajr';
+
+      final isIshaActive = key == 'isha';
+      final isTahajjudActive =
+          tahajjudTime != null &&
+          fajrNext != null &&
+          now.isAfter(tahajjudTime) &&
+          now.isBefore(fajrNext);
+      final isFajrActive = key == 'fajr';
+
+      final isIshaPast =
+          ishaPrev != null && now.isAfter(ishaPrev) && !isIshaActive;
+      final isTahajjudPast =
+          tahajjudTime != null &&
+          now.isAfter(tahajjudTime) &&
+          !isTahajjudActive;
+
+      // 1. Maghrib (Sunset horizon, label below)
+      drawNode(
+        tMaghribNight,
+        defaultNodeColor,
+        maghribLabel,
+        isAbove: false,
+        isActive: false,
+        isCompleted: true,
+      );
+      // 2. Isha (Nightfall slope, label above)
+      drawNode(
+        tIshaNight,
+        defaultNodeColor,
+        ishaLabel,
+        isAbove: true,
+        isActive: isIshaActive,
+        isCompleted: isIshaPast,
+      );
+      // 3. Tahajjud (Night zenith / Last third, label above)
+      drawNode(
+        tTahajjudNight,
+        defaultNodeColor,
+        tahajjudLabel,
+        isAbove: true,
+        isActive: isTahajjudActive,
+        isCompleted: isTahajjudPast,
+      );
+      // 4. Fajr (Dawn horizon, label below)
+      drawNode(
+        tFajrNight,
+        defaultNodeColor,
+        fajrLabel,
+        isAbove: false,
+        isActive: isFajrActive,
         isCompleted: false,
       );
     }
 
-    // 6. Draw Celestial Body: Sun during daytime, Crescent Moon (Hilal) during night
+    // 5. Draw Celestial Body: Sun during daytime, Crescent Moon (Hilal) during night
     final celestialPos = _evalCubic(p0, p1, p2, p3, progressT);
 
     if (!isNight) {

@@ -93,7 +93,7 @@ void main() {
       },
     );
 
-    test('verifies mathematical duration proportionality: Fajr->Dhuhr > Dhuhr->Asr > Asr->Maghrib > Maghrib->Isha', () {
+    test('verifies mathematical duration proportionality on Day Arc: Fajr->Dhuhr > Dhuhr->Asr > Asr->Maghrib', () {
       final baseDate = DateTime(2026, 11, 5, 12, 0);
       final coordinates = Coordinates(21.4225, 39.8262); // Makkah
       final params = CalculationMethodParameters.muslimWorldLeague();
@@ -103,89 +103,118 @@ void main() {
         calculationParameters: params,
       );
 
-      final totalSeconds = pt.isha.difference(pt.fajr).inSeconds;
-      expect(totalSeconds, greaterThan(0));
+      final dayDuration = pt.maghrib.difference(pt.fajr).inSeconds;
+      expect(dayDuration, greaterThan(0));
 
       const tStart = 0.08;
-      const tEnd = 0.93;
-      const tSpan = tEnd - tStart;
-
-      final dhuhrRatio = pt.dhuhr.difference(pt.fajr).inSeconds / totalSeconds;
-      final asrRatio = pt.asr.difference(pt.fajr).inSeconds / totalSeconds;
-      final maghribRatio =
-          pt.maghrib.difference(pt.fajr).inSeconds / totalSeconds;
+      const tEnd = 0.92;
+      const tSpan = tEnd - tStart; // 0.84
 
       final tFajr = tStart;
-      final tDhuhr = (tStart + dhuhrRatio * tSpan).clamp(0.38, 0.56);
-      final tAsr = (tStart + asrRatio * tSpan).clamp(tDhuhr + 0.12, 0.78);
-      final tMaghrib = (tStart + maghribRatio * tSpan).clamp(tAsr + 0.08, 0.88);
-      final tIsha = tEnd;
-
-      final seg1 = tDhuhr - tFajr; // Fajr -> Dhuhr
-      final seg2 = tAsr - tDhuhr; // Dhuhr -> Asr
-      final seg3 = tMaghrib - tAsr; // Asr -> Maghrib
-      final seg4 = tIsha - tMaghrib; // Maghrib -> Isha
-
-      // Verify that Fajr to Dhuhr is the largest segment
-      expect(seg1, greaterThan(seg2));
-      // Verify that Dhuhr to Asr is larger than Asr to Maghrib
-      expect(seg2, greaterThan(seg3));
-      // Verify that Asr to Maghrib is larger than Maghrib to Isha
-      expect(seg3, greaterThan(seg4));
-      // Verify that Maghrib to Isha is the shortest segment
-      expect(seg4, lessThan(seg1));
-      expect(seg4, lessThan(seg2));
-      expect(seg4, lessThan(seg3));
-    });
-
-    test('verifies celestial position is >= tMaghrib and never at Asr after sunset', () {
-      final baseDate = DateTime(2026, 11, 5, 12, 0);
-      final coordinates = Coordinates(21.4225, 39.8262); // Makkah
-      final params = CalculationMethodParameters.muslimWorldLeague();
-      final pt = PrayerTimes(
-        date: baseDate,
-        coordinates: coordinates,
-        calculationParameters: params,
-      );
-
-      final totalSeconds = pt.isha.difference(pt.fajr).inSeconds;
-      const tStart = 0.08;
-      const tEnd = 0.93;
-      const tSpan = tEnd - tStart;
-
-      final asrRatio = pt.asr.difference(pt.fajr).inSeconds / totalSeconds;
-      final maghribRatio =
-          pt.maghrib.difference(pt.fajr).inSeconds / totalSeconds;
-
+      final tSunrise =
+          (tStart +
+                  (pt.sunrise.difference(pt.fajr).inSeconds / dayDuration) *
+                      tSpan)
+              .clamp(0.20, 0.28);
       final tDhuhr =
           (tStart +
-                  (pt.dhuhr.difference(pt.fajr).inSeconds / totalSeconds) *
+                  (pt.dhuhr.difference(pt.fajr).inSeconds / dayDuration) *
                       tSpan)
-              .clamp(0.38, 0.56);
-      final tAsr = (tStart + asrRatio * tSpan).clamp(tDhuhr + 0.12, 0.78);
-      final tMaghrib = (tStart + maghribRatio * tSpan).clamp(tAsr + 0.08, 0.88);
-      final tIsha = tEnd;
+              .clamp(0.46, 0.54);
+      final tAsr =
+          (tStart +
+                  (pt.asr.difference(pt.fajr).inSeconds / dayDuration) * tSpan)
+              .clamp(0.70, 0.78);
+      final tMaghrib = tEnd;
 
-      // 1. Time right after Maghrib (e.g., 20 mins after Maghrib)
-      final postMaghribNow = pt.maghrib.add(const Duration(minutes: 20));
-      final spanSec = pt.isha.difference(pt.maghrib).inSeconds;
-      final elapsedSec = postMaghribNow.difference(pt.maghrib).inSeconds;
-      final ratio = (elapsedSec / (spanSec > 0 ? spanSec : 1)).clamp(0.0, 1.0);
-      final postMaghribT = (tMaghrib + ratio * (tIsha - tMaghrib)).clamp(
-        tMaghrib,
-        tIsha,
-      );
+      final segMorning = tDhuhr - tFajr; // Fajr -> Dhuhr (~6.5h)
+      final segEarlyAfternoon = tAsr - tDhuhr; // Dhuhr -> Asr (~3.5h)
+      final segLateAfternoon = tMaghrib - tAsr; // Asr -> Maghrib (~2.5h)
 
-      // Verify that postMaghribT is between tMaghrib and tIsha, well past Asr
-      expect(postMaghribT, greaterThanOrEqualTo(tMaghrib));
-      expect(postMaghribT, lessThanOrEqualTo(tIsha));
-      expect(postMaghribT, greaterThan(tAsr));
+      // Spacing order: Morning > Early Afternoon > Late Afternoon
+      expect(segMorning, greaterThan(segEarlyAfternoon));
+      expect(segEarlyAfternoon, greaterThan(segLateAfternoon));
 
-      // 2. Time after Isha (night)
-      final postIshaT = tIsha;
-      expect(postIshaT, equals(tIsha));
-      expect(postIshaT, greaterThan(tAsr));
+      // Also verify sunrise is positioned cleanly between Fajr and Dhuhr
+      expect(tSunrise, greaterThan(tFajr));
+      expect(tSunrise, lessThan(tDhuhr));
     });
+
+    test(
+      'verifies 12-hour Night Arc spacing and Tahajjud at Last Third of Night',
+      () {
+        final baseDate = DateTime(2026, 11, 5, 23, 0); // 11:00 PM
+        final coordinates = Coordinates(21.4225, 39.8262); // Makkah
+        final params = CalculationMethodParameters.muslimWorldLeague();
+        final pt = PrayerTimes(
+          date: baseDate,
+          coordinates: coordinates,
+          calculationParameters: params,
+        );
+
+        final maghrib = pt.maghrib;
+        final isha = pt.isha;
+        final tomorrowFajr = pt.fajr.add(const Duration(days: 1));
+
+        final nightDuration = tomorrowFajr.difference(maghrib).inSeconds;
+        expect(nightDuration, greaterThan(0));
+
+        const tStart = 0.08;
+        const tEnd = 0.92;
+        const tSpan = tEnd - tStart; // 0.84
+
+        final ishaRatio = isha.difference(maghrib).inSeconds / nightDuration;
+        final tMaghribNight = tStart;
+        final tIshaNight = (tStart + ishaRatio * tSpan).clamp(0.22, 0.32);
+        final tTahajjudNight = (tStart + (2 / 3) * tSpan).clamp(0.60, 0.72);
+        final tFajrNight = tEnd;
+
+        // Spacing assertions
+        expect(tMaghribNight, equals(0.08));
+        expect(tIshaNight, greaterThan(tMaghribNight + 0.12));
+        expect(tTahajjudNight, greaterThan(tIshaNight + 0.25));
+        expect(tFajrNight, greaterThan(tTahajjudNight + 0.15));
+
+        // 1. Twilight dusk (between Maghrib and Isha)
+        final midDusk = maghrib.add(const Duration(minutes: 35));
+        final duskSpan = isha.difference(maghrib).inSeconds;
+        final duskElapsed = midDusk.difference(maghrib).inSeconds;
+        final duskRatio = (duskElapsed / duskSpan).clamp(0.0, 1.0);
+        final progressDusk =
+            tMaghribNight + duskRatio * (tIshaNight - tMaghribNight);
+        expect(progressDusk, greaterThan(tMaghribNight));
+        expect(progressDusk, lessThan(tIshaNight));
+
+        // 2. Midnight (between Isha and Tahajjud)
+        final tahajjudTime = tomorrowFajr.subtract(
+          Duration(seconds: (nightDuration / 3).round()),
+        );
+        final midnight = DateTime(
+          baseDate.year,
+          baseDate.month,
+          baseDate.day,
+          23,
+          59,
+        );
+        final nightMidSpan = tahajjudTime.difference(isha).inSeconds;
+        final nightMidElapsed = midnight.difference(isha).inSeconds;
+        final nightMidRatio = (nightMidElapsed / nightMidSpan).clamp(0.0, 1.0);
+        final progressMidnight =
+            tIshaNight + nightMidRatio * (tTahajjudNight - tIshaNight);
+        expect(progressMidnight, greaterThan(tIshaNight));
+        expect(progressMidnight, lessThan(tTahajjudNight));
+
+        // 3. Tahajjud window (between Tahajjud and Fajr)
+        final preFajr = tomorrowFajr.subtract(const Duration(minutes: 45));
+        final tahajjudSpan = tomorrowFajr.difference(tahajjudTime).inSeconds;
+        final tahajjudElapsed = preFajr.difference(tahajjudTime).inSeconds;
+        final tahajjudRatio = (tahajjudElapsed / tahajjudSpan).clamp(0.0, 1.0);
+        final progressTahajjud =
+            tTahajjudNight + tahajjudRatio * (tFajrNight - tTahajjudNight);
+        expect(progressTahajjud, greaterThan(tTahajjudNight));
+        expect(progressTahajjud, lessThanOrEqualTo(tFajrNight));
+      },
+    );
 
     test(
       'verifies sun moves dynamically closer to Dhuhr as morning progresses',
