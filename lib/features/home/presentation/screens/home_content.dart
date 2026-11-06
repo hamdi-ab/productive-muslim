@@ -1066,17 +1066,36 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
               ],
             ),
             const SizedBox(height: 4),
-            // Subtitle Row: Location Status (Left) & Scheduled Time (Right)
+            // Subtitle Row: Scheduled Time (Left) & Location Status (Right)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                if (_cachedPrayerTimes != null)
+                  Flexible(
+                    child: Text(
+                      '${isAr ? 'في ' : 'at '}${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     _locationName != null && _locationName!.isNotEmpty
                         ? '📍 $_locationName • Iqamah scheduled'
                         : 'Iqamah scheduled • Clean for Salah',
                     maxLines: 1,
+                    textAlign: _cachedPrayerTimes != null
+                        ? TextAlign.end
+                        : TextAlign.start,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
@@ -1086,24 +1105,12 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                     ),
                   ),
                 ),
-                if (_cachedPrayerTimes != null) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    '${isAr ? 'في ' : 'at '}${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ],
               ],
             ),
             const SizedBox(height: 8),
             // Celestial Sun Arc Canvas Diagram
             _SolarArcDiagram(
+              key: const ValueKey('hero_solar_arc_diagram'),
               prayerTimes: _cachedPrayerTimes,
               nextPrayer: _nextPrayer,
               isDark: isDark,
@@ -2185,6 +2192,7 @@ class _SolarArcDiagram extends StatelessWidget {
   final bool isDark;
 
   const _SolarArcDiagram({
+    super.key,
     required this.prayerTimes,
     required this.nextPrayer,
     required this.isDark,
@@ -2197,6 +2205,7 @@ class _SolarArcDiagram extends StatelessWidget {
       height: 94,
       width: double.infinity,
       child: CustomPaint(
+        key: const ValueKey('solar_arc_custom_paint'),
         painter: _SolarArcPainter(
           prayerTimes: prayerTimes,
           nextPrayer: nextPrayer,
@@ -2322,25 +2331,40 @@ class _SolarArcPainter extends CustomPainter {
     }
 
     final key = nextPrayer.toLowerCase();
+    final isAfterMaghrib = maghrib != null && now.isAfter(maghrib);
     final isAfterIsha = isha != null && now.isAfter(isha);
     final isBeforeFajr = fajr != null && now.isBefore(fajr);
     final isTomorrowFajr = isAfterIsha && key == 'fajr';
-    final isNight = isAfterIsha || isBeforeFajr;
+    // Islamic nighttime begins at Maghrib (sunset) and extends until dawn (Fajr)
+    final isNight = isAfterMaghrib || isBeforeFajr;
 
     // 4. Compute active celestial progress t (0.0 to 1.0)
     double progressT = tFajr;
-    if (isNight) {
-      progressT = 1.0;
-    } else if (fajr != null &&
-        isha != null &&
-        now.isAfter(fajr) &&
-        now.isBefore(isha)) {
-      final totalDaySeconds = isha.difference(fajr).inSeconds;
-      final elapsedSec = now.difference(fajr).inSeconds;
-      progressT = (tStart + (elapsedSec / totalDaySeconds) * tSpan).clamp(
-        tStart,
-        tEnd,
+    if (isAfterIsha) {
+      // Nighttime after Isha: resting at the night horizon (Isha)
+      progressT = tIsha;
+    } else if (isAfterMaghrib && isha != null) {
+      // Twilight dusk between Maghrib and Isha: moves forward from Maghrib toward Isha
+      final spanSec = isha.difference(maghrib).inSeconds;
+      final elapsedSec = now.difference(maghrib).inSeconds;
+      final ratio = (elapsedSec / (spanSec > 0 ? spanSec : 1)).clamp(0.0, 1.0);
+      progressT = (tMaghrib + ratio * (tIsha - tMaghrib)).clamp(
+        tMaghrib,
+        tIsha,
       );
+    } else if (fajr != null &&
+        maghrib != null &&
+        now.isAfter(fajr) &&
+        now.isBefore(maghrib)) {
+      // Daytime between Fajr and Maghrib: Sun travels from Fajr to Maghrib
+      final daylightTotal = maghrib.difference(fajr).inSeconds;
+      final elapsedSec = now.difference(fajr).inSeconds;
+      final ratio = (elapsedSec / (daylightTotal > 0 ? daylightTotal : 1))
+          .clamp(0.0, 1.0);
+      progressT = (tFajr + ratio * (tMaghrib - tFajr)).clamp(tFajr, tMaghrib);
+    } else if (isBeforeFajr) {
+      // Pre-dawn Tahajjud before Fajr: resting at the dawn horizon
+      progressT = tFajr;
     } else {
       progressT = switch (key) {
         'fajr' => tFajr,
@@ -2544,63 +2568,42 @@ class _SolarArcPainter extends CustomPainter {
     }
 
     // 6. Draw Celestial Body: Sun during daytime, Crescent Moon (Hilal) during night
-    if (!isNight) {
-      final sunPos = _evalCubic(p0, p1, p2, p3, progressT);
+    final celestialPos = _evalCubic(p0, p1, p2, p3, progressT);
 
+    if (!isNight) {
       // Outer halo
       final haloPaint = Paint()
         ..color = const Color(0xFFFEF3C7).withValues(alpha: 0.5)
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(sunPos, 11.0, haloPaint);
+      canvas.drawCircle(celestialPos, 11.0, haloPaint);
 
       // Glowing sun disk
       final sunPaint = Paint()
         ..color = const Color(0xFFF59E0B)
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(sunPos, 7.5, sunPaint);
+      canvas.drawCircle(celestialPos, 7.5, sunPaint);
 
       // Core white center
       final corePaint = Paint()
         ..color = Colors.white
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(sunPos, 3.5, corePaint);
+      canvas.drawCircle(celestialPos, 3.5, corePaint);
     } else {
-      // Crescent Moon calculation along nocturnal sky
-      double moonT = 0.5;
-      if (isAfterIsha && fajr != null) {
-        final tomorrowFajr = fajr.add(const Duration(days: 1));
-        final nightTotal = tomorrowFajr.difference(isha).inSeconds;
-        final nightElapsed = now.difference(isha).inSeconds;
-        final ratio = (nightElapsed / (nightTotal > 0 ? nightTotal : 1)).clamp(
-          0.0,
-          1.0,
-        );
-        moonT = (0.86 - ratio * 0.68).clamp(0.18, 0.86);
-      } else if (isBeforeFajr && isha != null) {
-        final yesterdayIsha = isha.subtract(const Duration(days: 1));
-        final nightTotal = fajr.difference(yesterdayIsha).inSeconds;
-        final nightElapsed = now.difference(yesterdayIsha).inSeconds;
-        final ratio = (nightElapsed / (nightTotal > 0 ? nightTotal : 1)).clamp(
-          0.0,
-          1.0,
-        );
-        moonT = (0.86 - ratio * 0.68).clamp(0.18, 0.86);
-      }
-
-      final moonPos = _evalCubic(p0, p1, p2, p3, moonT);
-
       // Soft nocturnal lunar aura
       final moonAuraPaint = Paint()
         ..color = const Color(0xFF818CF8).withValues(alpha: 0.28)
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(moonPos, 12.0, moonAuraPaint);
+      canvas.drawCircle(celestialPos, 12.0, moonAuraPaint);
 
       // Luminous Crescent Moon (Hilal)
       final moonPath = Path()
-        ..addOval(Rect.fromCircle(center: moonPos, radius: 7.5));
+        ..addOval(Rect.fromCircle(center: celestialPos, radius: 7.5));
       final cutPath = Path()
         ..addOval(
-          Rect.fromCircle(center: moonPos.translate(3.5, -2.0), radius: 6.2),
+          Rect.fromCircle(
+            center: celestialPos.translate(3.5, -2.0),
+            radius: 6.2,
+          ),
         );
       final crescent = Path.combine(
         PathOperation.difference,

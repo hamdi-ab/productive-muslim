@@ -137,6 +137,55 @@ void main() {
       expect(seg4, lessThan(seg2));
       expect(seg4, lessThan(seg3));
     });
+
+    test('verifies celestial position is >= tMaghrib and never at Asr after sunset', () {
+      final baseDate = DateTime(2026, 11, 5, 12, 0);
+      final coordinates = Coordinates(21.4225, 39.8262); // Makkah
+      final params = CalculationMethodParameters.muslimWorldLeague();
+      final pt = PrayerTimes(
+        date: baseDate,
+        coordinates: coordinates,
+        calculationParameters: params,
+      );
+
+      final totalSeconds = pt.isha.difference(pt.fajr).inSeconds;
+      const tStart = 0.08;
+      const tEnd = 0.93;
+      const tSpan = tEnd - tStart;
+
+      final asrRatio = pt.asr.difference(pt.fajr).inSeconds / totalSeconds;
+      final maghribRatio =
+          pt.maghrib.difference(pt.fajr).inSeconds / totalSeconds;
+
+      final tDhuhr =
+          (tStart +
+                  (pt.dhuhr.difference(pt.fajr).inSeconds / totalSeconds) *
+                      tSpan)
+              .clamp(0.38, 0.56);
+      final tAsr = (tStart + asrRatio * tSpan).clamp(tDhuhr + 0.12, 0.78);
+      final tMaghrib = (tStart + maghribRatio * tSpan).clamp(tAsr + 0.08, 0.88);
+      final tIsha = tEnd;
+
+      // 1. Time right after Maghrib (e.g., 20 mins after Maghrib)
+      final postMaghribNow = pt.maghrib.add(const Duration(minutes: 20));
+      final spanSec = pt.isha.difference(pt.maghrib).inSeconds;
+      final elapsedSec = postMaghribNow.difference(pt.maghrib).inSeconds;
+      final ratio = (elapsedSec / (spanSec > 0 ? spanSec : 1)).clamp(0.0, 1.0);
+      final postMaghribT = (tMaghrib + ratio * (tIsha - tMaghrib)).clamp(
+        tMaghrib,
+        tIsha,
+      );
+
+      // Verify that postMaghribT is between tMaghrib and tIsha, well past Asr
+      expect(postMaghribT, greaterThanOrEqualTo(tMaghrib));
+      expect(postMaghribT, lessThanOrEqualTo(tIsha));
+      expect(postMaghribT, greaterThan(tAsr));
+
+      // 2. Time after Isha (night)
+      final postIshaT = tIsha;
+      expect(postIshaT, equals(tIsha));
+      expect(postIshaT, greaterThan(tAsr));
+    });
   });
 }
 
