@@ -2204,7 +2204,7 @@ class _SolarArcDiagram extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return SizedBox(
-      height: 90,
+      height: 94,
       width: double.infinity,
       child: CustomPaint(
         painter: _SolarArcPainter(
@@ -2212,6 +2212,7 @@ class _SolarArcDiagram extends StatelessWidget {
           nextPrayer: nextPrayer,
           isDark: isDark,
           isAr: isAr,
+          now: DateTime.now(),
         ),
       ),
     );
@@ -2223,12 +2224,14 @@ class _SolarArcPainter extends CustomPainter {
   final String nextPrayer;
   final bool isDark;
   final bool isAr;
+  final DateTime now;
 
   _SolarArcPainter({
     required this.prayerTimes,
     required this.nextPrayer,
     required this.isDark,
     required this.isAr,
+    required this.now,
   });
 
   @override
@@ -2273,51 +2276,137 @@ class _SolarArcPainter extends CustomPainter {
 
     canvas.drawPath(bgArcPath, bgArcPaint);
 
-    // 3. Compute active sun progress t (0.0 to 1.0)
-    double progressT = 0.64;
+    // 3. Compute dynamic duration-proportional milestone points for the 5 prayers
+    final fajr = prayerTimes?.fajr;
+    final sunrise = prayerTimes?.sunrise;
+    final dhuhr = prayerTimes?.dhuhr;
+    final asr = prayerTimes?.asr;
+    final maghrib = prayerTimes?.maghrib;
+    final isha = prayerTimes?.isha;
+
+    const tStart = 0.08;
+    const tEnd = 0.93;
+    const tSpan = tEnd - tStart; // 0.85
+
+    // Default aesthetic spacing
+    double tFajr = tStart;
+    double tDhuhr = 0.50;
+    double tAsr = 0.71;
+    double tMaghrib = 0.86;
+    double tIsha = tEnd;
+    double? tSunrise;
+
+    if (fajr != null &&
+        dhuhr != null &&
+        asr != null &&
+        maghrib != null &&
+        isha != null) {
+      final totalDaySeconds = isha.difference(fajr).inSeconds;
+      if (totalDaySeconds > 0) {
+        final dhuhrRatio = dhuhr.difference(fajr).inSeconds / totalDaySeconds;
+        final asrRatio = asr.difference(fajr).inSeconds / totalDaySeconds;
+        final maghribRatio =
+            maghrib.difference(fajr).inSeconds / totalDaySeconds;
+
+        tFajr = tStart;
+        // Fajr -> Dhuhr is the longest duration (~7h), Dhuhr peaks around zenith
+        tDhuhr = (tStart + dhuhrRatio * tSpan).clamp(0.38, 0.56);
+        // Dhuhr -> Asr (~3.5h)
+        tAsr = (tStart + asrRatio * tSpan).clamp(tDhuhr + 0.12, 0.78);
+        // Asr -> Maghrib (~2.5h)
+        tMaghrib = (tStart + maghribRatio * tSpan).clamp(tAsr + 0.08, 0.88);
+        // Maghrib -> Isha (~1.25h) is the shortest duration
+        tIsha = tEnd;
+
+        if (sunrise != null &&
+            sunrise.isAfter(fajr) &&
+            sunrise.isBefore(dhuhr)) {
+          final sunriseRatio =
+              sunrise.difference(fajr).inSeconds / totalDaySeconds;
+          tSunrise = (tStart + sunriseRatio * tSpan).clamp(
+            tFajr + 0.08,
+            tDhuhr - 0.06,
+          );
+        }
+      }
+    }
+
     final key = nextPrayer.toLowerCase();
-    switch (key) {
-      case 'fajr':
-        progressT = 0.08;
-        break;
-      case 'sunrise':
-        progressT = 0.28;
-        break;
-      case 'dhuhr':
-        progressT = 0.48;
-        break;
-      case 'asr':
-        progressT = 0.70;
-        break;
-      case 'maghrib':
-        progressT = 0.88;
-        break;
-      case 'isha':
-        progressT = 0.96;
-        break;
-      default:
-        progressT = 0.64;
+    final isAfterIsha = isha != null && now.isAfter(isha);
+    final isBeforeFajr = fajr != null && now.isBefore(fajr);
+    final isTomorrowFajr = isAfterIsha && key == 'fajr';
+    final isNight = isAfterIsha || isBeforeFajr;
+
+    // 4. Compute active celestial progress t (0.0 to 1.0)
+    double progressT = tFajr;
+    if (isNight) {
+      progressT = 1.0;
+    } else if (fajr != null &&
+        isha != null &&
+        now.isAfter(fajr) &&
+        now.isBefore(isha)) {
+      final totalDaySeconds = isha.difference(fajr).inSeconds;
+      final elapsedSec = now.difference(fajr).inSeconds;
+      progressT = (tStart + (elapsedSec / totalDaySeconds) * tSpan).clamp(
+        tStart,
+        tEnd,
+      );
+    } else {
+      progressT = switch (key) {
+        'fajr' => tFajr,
+        'sunrise' => tSunrise ?? (tFajr + 0.15),
+        'dhuhr' => tDhuhr,
+        'asr' => tAsr,
+        'maghrib' => tMaghrib,
+        'isha' => tIsha,
+        _ => tDhuhr,
+      };
     }
 
-    // 4. Draw active daylight progress arc with gradient
-    final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
-    const int steps = 40;
-    final int maxSteps = (steps * progressT).round().clamp(1, steps);
-    for (int i = 1; i <= maxSteps; i++) {
-      final t = (i / steps) * progressT;
-      final pt = _evalCubic(p0, p1, p2, p3, t);
-      progressArcPath.lineTo(pt.dx, pt.dy);
+    // 5. Draw active daylight progress arc or nocturnal celestial path
+    if (!isNight) {
+      final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
+      const int steps = 40;
+      final int maxSteps = (steps * progressT).round().clamp(1, steps);
+      for (int i = 1; i <= maxSteps; i++) {
+        final t = (i / steps) * progressT;
+        final pt = _evalCubic(p0, p1, p2, p3, t);
+        progressArcPath.lineTo(pt.dx, pt.dy);
+      }
+
+      final gradientPaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFF10B981), Color(0xFF0F4C3A), Color(0xFFD4AF37)],
+        ).createShader(Rect.fromLTWH(0, 0, w, size.height))
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(progressArcPath, gradientPaint);
+    } else {
+      final nightArcPaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [
+            Color(0xFF38BDF8), // dawn cyan
+            Color(0xFF6366F1), // celestial indigo
+            Color(0xFF8B5CF6), // dusk violet
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, w, size.height))
+        ..strokeWidth = 2.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawPath(bgArcPath, nightArcPaint);
+
+      // Faint ambient stars in the nocturnal sky
+      final starPaint = Paint()
+        ..color = Colors.white.withValues(alpha: isDark ? 0.6 : 0.45)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(w * 0.16, size.height * 0.22), 1.2, starPaint);
+      canvas.drawCircle(Offset(w * 0.38, size.height * 0.14), 1.5, starPaint);
+      canvas.drawCircle(Offset(w * 0.64, size.height * 0.12), 1.2, starPaint);
+      canvas.drawCircle(Offset(w * 0.84, size.height * 0.24), 1.4, starPaint);
     }
-
-    final gradientPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF10B981), Color(0xFF0F4C3A), Color(0xFFD4AF37)],
-      ).createShader(Rect.fromLTWH(0, 0, w, size.height))
-      ..strokeWidth = 3.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(progressArcPath, gradientPaint);
 
     // Helper to draw fixed milestone and active nodes
     void drawNode(
@@ -2326,27 +2415,41 @@ class _SolarArcPainter extends CustomPainter {
       String label, {
       bool isAbove = false,
       bool isActive = false,
+      bool isCompleted = false,
     }) {
       final pt = _evalCubic(p0, p1, p2, p3, t);
       final nodePaint = Paint()
-        ..color = isActive ? const Color(0xFFF59E0B) : color
+        ..color = isActive
+            ? const Color(0xFFF59E0B)
+            : (isCompleted ? const Color(0xFF10B981) : color)
         ..style = PaintingStyle.fill;
       final borderPaint = Paint()
         ..color = Colors.white
-        ..strokeWidth = isActive ? 2.0 : 1.8
+        ..strokeWidth = isActive ? 2.2 : 1.6
         ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(pt, isActive ? 4.5 : 4.0, nodePaint);
-      canvas.drawCircle(pt, isActive ? 4.5 : 4.0, borderPaint);
+      if (isActive) {
+        final haloPaint = Paint()
+          ..color = const Color(0xFFF59E0B).withValues(alpha: 0.25)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(pt, 8.0, haloPaint);
+      }
+
+      canvas.drawCircle(pt, isActive ? 5.0 : 4.0, nodePaint);
+      canvas.drawCircle(pt, isActive ? 5.0 : 4.0, borderPaint);
 
       final textSpan = TextSpan(
         text: label,
         style: TextStyle(
           color: isActive
               ? (isDark ? AppColors.secondary : const Color(0xFFD97706))
-              : (isDark
-                    ? AppColors.darkTextSecondary
-                    : const Color(0xFF64748B)),
+              : (isCompleted
+                    ? (isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669))
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : const Color(0xFF64748B))),
           fontSize: isActive ? 9.5 : 8.5,
           fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
         ),
@@ -2365,65 +2468,161 @@ class _SolarArcPainter extends CustomPainter {
     final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
     final asrLabel = isAr ? 'العصر' : 'Asr';
     final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
+    final ishaLabel = isAr ? 'العشاء' : 'Isha';
 
-    // Draw all 4 daytime solar prayer milestone nodes: Fajr, Dhuhr, Asr, Maghrib
-    drawNode(0.08, const Color(0xFF10B981), fajrLabel, isActive: key == 'fajr');
+    final isFajrActive = !isTomorrowFajr && key == 'fajr';
+    final isDhuhrActive = key == 'dhuhr';
+    final isAsrActive = key == 'asr';
+    final isMaghribActive = key == 'maghrib';
+    final isIshaActive = key == 'isha';
+
+    final isFajrPast =
+        isAfterIsha || (fajr != null && now.isAfter(fajr) && !isFajrActive);
+    final isDhuhrPast =
+        isAfterIsha || (dhuhr != null && now.isAfter(dhuhr) && !isDhuhrActive);
+    final isAsrPast =
+        isAfterIsha || (asr != null && now.isAfter(asr) && !isAsrActive);
+    final isMaghribPast =
+        isAfterIsha ||
+        (maghrib != null && now.isAfter(maghrib) && !isMaghribActive);
+    final isIshaPast = isAfterIsha;
+
+    final defaultNodeColor = isDark ? Colors.white38 : const Color(0xFF94A3B8);
+
+    // Render all 5 daily prayer milestones with duration-proportional spacing
+    // 1. Fajr (Horizon level, label below)
     drawNode(
-      0.48,
-      const Color(0xFF10B981),
+      tFajr,
+      defaultNodeColor,
+      fajrLabel,
+      isAbove: false,
+      isActive: isFajrActive,
+      isCompleted: isFajrPast,
+    );
+
+    // 2. Dhuhr (Zenith peak, label above)
+    drawNode(
+      tDhuhr,
+      defaultNodeColor,
       dhuhrLabel,
       isAbove: true,
-      isActive: key == 'dhuhr',
-    );
-    drawNode(
-      0.70,
-      const Color(0xFF10B981),
-      asrLabel,
-      isAbove: true,
-      isActive: key == 'asr',
-    );
-    drawNode(
-      0.88,
-      const Color(0xFFCBD5E1),
-      maghribLabel,
-      isActive: key == 'maghrib',
+      isActive: isDhuhrActive,
+      isCompleted: isDhuhrPast,
     );
 
-    // If active prayer is Sunrise or Isha, draw its active milestone node
-    if (key == 'sunrise') {
+    // 3. Asr (Upper slope, label above)
+    drawNode(
+      tAsr,
+      defaultNodeColor,
+      asrLabel,
+      isAbove: true,
+      isActive: isAsrActive,
+      isCompleted: isAsrPast,
+    );
+
+    // 4. Maghrib (Lower slope, label above - prevents overlap with Isha below)
+    drawNode(
+      tMaghrib,
+      defaultNodeColor,
+      maghribLabel,
+      isAbove: true,
+      isActive: isMaghribActive,
+      isCompleted: isMaghribPast,
+    );
+
+    // 5. Isha (Horizon level, label below)
+    drawNode(
+      tIsha,
+      defaultNodeColor,
+      ishaLabel,
+      isAbove: false,
+      isActive: isIshaActive,
+      isCompleted: isIshaPast,
+    );
+
+    // Active Sunrise transition milestone (if active prayer is sunrise)
+    if (key == 'sunrise' && tSunrise != null) {
       final sunriseLabel = isAr ? 'الشروق' : 'Sunrise';
       drawNode(
-        0.28,
+        tSunrise,
         const Color(0xFFF59E0B),
         sunriseLabel,
         isAbove: true,
         isActive: true,
+        isCompleted: false,
       );
-    } else if (key == 'isha') {
-      final ishaLabel = isAr ? 'العشاء' : 'Isha';
-      drawNode(0.96, const Color(0xFFF59E0B), ishaLabel, isActive: true);
     }
 
-    // 5. Active glowing sun position node (illuminates the active prayer node on the arc)
-    final sunPos = _evalCubic(p0, p1, p2, p3, progressT);
+    // 6. Draw Celestial Body: Sun during daytime, Crescent Moon (Hilal) during night
+    if (!isNight) {
+      final sunPos = _evalCubic(p0, p1, p2, p3, progressT);
 
-    // Outer halo
-    final haloPaint = Paint()
-      ..color = const Color(0xFFFEF3C7).withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 11.0, haloPaint);
+      // Outer halo
+      final haloPaint = Paint()
+        ..color = const Color(0xFFFEF3C7).withValues(alpha: 0.5)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(sunPos, 11.0, haloPaint);
 
-    // Glowing sun circle
-    final sunPaint = Paint()
-      ..color = const Color(0xFFF59E0B)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 7.5, sunPaint);
+      // Glowing sun disk
+      final sunPaint = Paint()
+        ..color = const Color(0xFFF59E0B)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(sunPos, 7.5, sunPaint);
 
-    // Core white center
-    final corePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 3.5, corePaint);
+      // Core white center
+      final corePaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(sunPos, 3.5, corePaint);
+    } else {
+      // Crescent Moon calculation along nocturnal sky
+      double moonT = 0.5;
+      if (isAfterIsha && fajr != null) {
+        final tomorrowFajr = fajr.add(const Duration(days: 1));
+        final nightTotal = tomorrowFajr.difference(isha).inSeconds;
+        final nightElapsed = now.difference(isha).inSeconds;
+        final ratio = (nightElapsed / (nightTotal > 0 ? nightTotal : 1)).clamp(
+          0.0,
+          1.0,
+        );
+        moonT = (0.86 - ratio * 0.68).clamp(0.18, 0.86);
+      } else if (isBeforeFajr && isha != null) {
+        final yesterdayIsha = isha.subtract(const Duration(days: 1));
+        final nightTotal = fajr.difference(yesterdayIsha).inSeconds;
+        final nightElapsed = now.difference(yesterdayIsha).inSeconds;
+        final ratio = (nightElapsed / (nightTotal > 0 ? nightTotal : 1)).clamp(
+          0.0,
+          1.0,
+        );
+        moonT = (0.86 - ratio * 0.68).clamp(0.18, 0.86);
+      }
+
+      final moonPos = _evalCubic(p0, p1, p2, p3, moonT);
+
+      // Soft nocturnal lunar aura
+      final moonAuraPaint = Paint()
+        ..color = const Color(0xFF818CF8).withValues(alpha: 0.28)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(moonPos, 12.0, moonAuraPaint);
+
+      // Luminous Crescent Moon (Hilal)
+      final moonPath = Path()
+        ..addOval(Rect.fromCircle(center: moonPos, radius: 7.5));
+      final cutPath = Path()
+        ..addOval(
+          Rect.fromCircle(center: moonPos.translate(3.5, -2.0), radius: 6.2),
+        );
+      final crescent = Path.combine(
+        PathOperation.difference,
+        moonPath,
+        cutPath,
+      );
+
+      final moonFillPaint = Paint()
+        ..color = const Color(0xFFFDE68A)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(crescent, moonFillPaint);
+    }
   }
 
   Offset _evalCubic(Offset p0, Offset p1, Offset p2, Offset p3, double t) {
@@ -2445,7 +2644,8 @@ class _SolarArcPainter extends CustomPainter {
     return oldDelegate.nextPrayer != nextPrayer ||
         oldDelegate.isDark != isDark ||
         oldDelegate.isAr != isAr ||
-        oldDelegate.prayerTimes != prayerTimes;
+        oldDelegate.prayerTimes != prayerTimes ||
+        oldDelegate.now.minute != now.minute;
   }
 }
 
