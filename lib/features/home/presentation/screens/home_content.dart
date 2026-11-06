@@ -2352,16 +2352,33 @@ class _SolarArcPainter extends CustomPainter {
         tMaghrib,
         tIsha,
       );
-    } else if (fajr != null &&
+    } else if (asr != null &&
         maghrib != null &&
-        now.isAfter(fajr) &&
+        now.isAfter(asr) &&
         now.isBefore(maghrib)) {
-      // Daytime between Fajr and Maghrib: Sun travels from Fajr to Maghrib
-      final daylightTotal = maghrib.difference(fajr).inSeconds;
-      final elapsedSec = now.difference(fajr).inSeconds;
-      final ratio = (elapsedSec / (daylightTotal > 0 ? daylightTotal : 1))
-          .clamp(0.0, 1.0);
-      progressT = (tFajr + ratio * (tMaghrib - tFajr)).clamp(tFajr, tMaghrib);
+      // Late afternoon between Asr and Maghrib: Sun descends toward sunset
+      final span = maghrib.difference(asr).inSeconds;
+      final elapsed = now.difference(asr).inSeconds;
+      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+      progressT = (tAsr + ratio * (tMaghrib - tAsr)).clamp(tAsr, tMaghrib);
+    } else if (dhuhr != null &&
+        asr != null &&
+        now.isAfter(dhuhr) &&
+        now.isBefore(asr)) {
+      // Early afternoon between Dhuhr and Asr: Sun moves from zenith peak toward Asr
+      final span = asr.difference(dhuhr).inSeconds;
+      final elapsed = now.difference(dhuhr).inSeconds;
+      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+      progressT = (tDhuhr + ratio * (tAsr - tDhuhr)).clamp(tDhuhr, tAsr);
+    } else if (fajr != null &&
+        dhuhr != null &&
+        now.isAfter(fajr) &&
+        now.isBefore(dhuhr)) {
+      // Morning between Fajr and Dhuhr: Sun ascends continuously toward zenith peak
+      final span = dhuhr.difference(fajr).inSeconds;
+      final elapsed = now.difference(fajr).inSeconds;
+      final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+      progressT = (tFajr + ratio * (tDhuhr - tFajr)).clamp(tFajr, tDhuhr);
     } else if (isBeforeFajr) {
       // Pre-dawn Tahajjud before Fajr: resting at the dawn horizon
       progressT = tFajr;

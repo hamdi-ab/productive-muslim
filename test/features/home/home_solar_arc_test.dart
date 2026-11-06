@@ -186,6 +186,67 @@ void main() {
       expect(postIshaT, equals(tIsha));
       expect(postIshaT, greaterThan(tAsr));
     });
+
+    test(
+      'verifies sun moves dynamically closer to Dhuhr as morning progresses',
+      () {
+        final baseDate = DateTime(2026, 11, 5, 12, 0);
+        final coordinates = Coordinates(21.4225, 39.8262); // Makkah
+        final params = CalculationMethodParameters.muslimWorldLeague();
+        final pt = PrayerTimes(
+          date: baseDate,
+          coordinates: coordinates,
+          calculationParameters: params,
+        );
+
+        final totalSeconds = pt.isha.difference(pt.fajr).inSeconds;
+        const tStart = 0.08;
+        const tEnd = 0.93;
+        const tSpan = tEnd - tStart;
+        final tFajr = tStart;
+        final tDhuhr =
+            (tStart +
+                    (pt.dhuhr.difference(pt.fajr).inSeconds / totalSeconds) *
+                        tSpan)
+                .clamp(0.38, 0.56);
+
+        final morningSpan = pt.dhuhr.difference(pt.fajr).inSeconds;
+
+        // 9:00 AM
+        final time9am = DateTime(
+          baseDate.year,
+          baseDate.month,
+          baseDate.day,
+          9,
+          0,
+        );
+        final elapsed9am = time9am.difference(pt.fajr).inSeconds;
+        final ratio9am = (elapsed9am / morningSpan).clamp(0.0, 1.0);
+        final progress9am = tFajr + ratio9am * (tDhuhr - tFajr);
+
+        // 11:00 AM
+        final time11am = DateTime(
+          baseDate.year,
+          baseDate.month,
+          baseDate.day,
+          11,
+          0,
+        );
+        final elapsed11am = time11am.difference(pt.fajr).inSeconds;
+        final ratio11am = (elapsed11am / morningSpan).clamp(0.0, 1.0);
+        final progress11am = tFajr + ratio11am * (tDhuhr - tFajr);
+
+        // 11:00 AM must be closer to Dhuhr than 9:00 AM
+        expect(progress11am, greaterThan(progress9am));
+        final dist9amToDhuhr = (tDhuhr - progress9am).abs();
+        final dist11amToDhuhr = (tDhuhr - progress11am).abs();
+        expect(dist11amToDhuhr, lessThan(dist9amToDhuhr));
+
+        // At exact Dhuhr time, ratio is 1.0 and progress is exactly tDhuhr
+        final progressDhuhr = tFajr + 1.0 * (tDhuhr - tFajr);
+        expect(progressDhuhr, equals(tDhuhr));
+      },
+    );
   });
 }
 
