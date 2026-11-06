@@ -839,9 +839,8 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
     final isAfterIsha =
         _cachedPrayerTimes != null &&
         DateTime.now().isAfter(_cachedPrayerTimes!.isha);
-    final displayNextName = (isAfterIsha && _nextPrayer.toLowerCase() == 'fajr')
-        ? (isAr ? 'الفجر (غداً)' : 'Fajr (Tomorrow)')
-        : _getLocalizedPrayerName(_nextPrayer, l10n);
+    final isTomorrowFajr = isAfterIsha && _nextPrayer.toLowerCase() == 'fajr';
+    final prayerName = _getLocalizedPrayerName(_nextPrayer, l10n);
 
     return AppPressable(
       onTap: () => context.push('/prayer-times'),
@@ -945,60 +944,67 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
               ],
             ),
             const SizedBox(height: 12),
-            // Header: Upcoming Prayer Countdown & Subtitle
+            // Header: Upcoming Prayer Title & Countdown Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text.rich(
-                        TextSpan(
-                          text: displayNextName,
+                      Flexible(
+                        child: Text(
+                          prayerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
                             color: isDark
                                 ? AppColors.darkTextPrimary
                                 : AppColors.textPrimary,
                           ),
-                          children: [
-                            if (_cachedPrayerTimes != null) ...[
-                              const TextSpan(text: ' '),
-                              TextSpan(
-                                text:
-                                    'at ${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                ),
+                        ),
+                      ),
+                      if (isTomorrowFajr) ...[
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF59E0B)
+                                  .withValues(alpha: isDark ? 0.22 : 0.14),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.4),
+                                width: 0.8,
                               ),
-                            ],
-                          ],
+                            ),
+                            child: Text(
+                              isAr ? 'غداً' : 'Tomorrow',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? const Color(0xFFFBBF24)
+                                    : const Color(0xFFD97706),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _locationName != null && _locationName!.isNotEmpty
-                            ? '📍 $_locationName • Iqamah scheduled'
-                            : 'Iqamah scheduled • Clean for Salah',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -1054,6 +1060,52 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
                           ],
                         ),
                       ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            // Subtitle Row: Scheduled Time & Location Status
+            Row(
+              children: [
+                if (_cachedPrayerTimes != null) ...[
+                  Text(
+                    'at ${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7),
+                    child: Container(
+                      width: 3.5,
+                      height: 3.5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark
+                            ? AppColors.darkTextSecondary.withValues(alpha: 0.5)
+                            : AppColors.textSecondary.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                ],
+                Expanded(
+                  child: Text(
+                    _locationName != null && _locationName!.isNotEmpty
+                        ? '📍 $_locationName • Iqamah scheduled'
+                        : 'Iqamah scheduled • Clean for Salah',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -2232,10 +2284,10 @@ class _SolarArcPainter extends CustomPainter {
         progressT = 0.28;
         break;
       case 'dhuhr':
-        progressT = 0.50;
+        progressT = 0.48;
         break;
       case 'asr':
-        progressT = 0.68;
+        progressT = 0.70;
         break;
       case 'maghrib':
         progressT = 0.88;
@@ -2311,16 +2363,24 @@ class _SolarArcPainter extends CustomPainter {
 
     final fajrLabel = isAr ? 'الفجر' : 'Fajr';
     final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
+    final asrLabel = isAr ? 'العصر' : 'Asr';
     final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
 
-    // Draw Fajr, Dhuhr zenith, and Maghrib milestone nodes
+    // Draw all 4 daytime solar prayer milestone nodes: Fajr, Dhuhr, Asr, Maghrib
     drawNode(0.08, const Color(0xFF10B981), fajrLabel, isActive: key == 'fajr');
     drawNode(
-      0.50,
+      0.48,
       const Color(0xFF10B981),
       dhuhrLabel,
       isAbove: true,
       isActive: key == 'dhuhr',
+    );
+    drawNode(
+      0.70,
+      const Color(0xFF10B981),
+      asrLabel,
+      isAbove: true,
+      isActive: key == 'asr',
     );
     drawNode(
       0.88,
@@ -2329,13 +2389,16 @@ class _SolarArcPainter extends CustomPainter {
       isActive: key == 'maghrib',
     );
 
-    // If active prayer is between milestones (Sunrise, Asr, Isha), draw its active node
+    // If active prayer is Sunrise or Isha, draw its active milestone node
     if (key == 'sunrise') {
       final sunriseLabel = isAr ? 'الشروق' : 'Sunrise';
-      drawNode(0.28, const Color(0xFFF59E0B), sunriseLabel, isActive: true);
-    } else if (key == 'asr') {
-      final asrLabel = isAr ? 'العصر' : 'Asr';
-      drawNode(0.68, const Color(0xFFF59E0B), asrLabel, isActive: true);
+      drawNode(
+        0.28,
+        const Color(0xFFF59E0B),
+        sunriseLabel,
+        isAbove: true,
+        isActive: true,
+      );
     } else if (key == 'isha') {
       final ishaLabel = isAr ? 'العشاء' : 'Isha';
       drawNode(0.96, const Color(0xFFF59E0B), ishaLabel, isActive: true);

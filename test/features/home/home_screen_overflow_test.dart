@@ -217,5 +217,20 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'HomeContent renders solar arc and prayer card cleanly without overflow',
+      (tester) async {
+        await pumpAndCheckOverflow(
+          tester,
+          child: buildSubject(),
+          locale: const Locale('en'),
+          textScale: 1.2,
+          isDark: true,
+          screenSize: const Size(360, 780),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }
