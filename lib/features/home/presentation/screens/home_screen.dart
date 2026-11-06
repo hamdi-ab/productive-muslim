@@ -61,68 +61,86 @@ class HomeScreen extends StatelessWidget {
     final headerInfo = _getHeaderInfo(location, l10n);
     final isHome = location == '/';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    String hijriSubtitle = '';
+    String? subtitle;
     if (isHome) {
       if (getIt.isRegistered<HijriService>()) {
         final hijri = getIt<HijriService>().getHijriDate(DateTime.now());
-        final isAr = Localizations.localeOf(context).languageCode == 'ar';
         final hijriStr = isAr
             ? '${hijri.hDay} ${hijri.monthNameAr}'
             : '${hijri.hDay} ${hijri.monthNameEn}';
-        final loc = prayerService?.cachedLocationName;
-        hijriSubtitle = loc != null && loc.isNotEmpty
-            ? '$hijriStr • 📍 $loc'
-            : hijriStr;
+        if (hijri.isSunnahFastingDay) {
+          final badge = hijri.isWhiteDay
+              ? l10n.whiteDayBadge
+              : (hijri.isArafah
+                    ? (isAr ? 'عرفة' : 'Arafah')
+                    : (hijri.isAshura
+                          ? (isAr ? 'عاشوراء' : 'Ashura')
+                          : l10n.sunnahBadge));
+          subtitle = '$hijriStr • 🌙 $badge';
+        } else {
+          subtitle = hijriStr;
+        }
       }
+    } else {
+      subtitle = _getSubtitleForLocation(location, l10n, prayerService, isAr);
     }
 
     final Widget? homeLeading = isHome
         ? Padding(
-            padding: const EdgeInsets.only(left: 12),
+            padding: const EdgeInsetsDirectional.only(start: 12),
             child: Center(
-              child: Stack(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [AppColors.primary, Color(0xFFD4AF37)],
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      backgroundColor: isDark
-                          ? AppColors.darkSurface
-                          : Colors.white,
-                      child: const Icon(
-                        Icons.spa_rounded,
-                        size: 18,
-                        color: Color(0xFFD4AF37),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      width: 9,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark
-                              ? const Color(0xFF0B1512)
+              child: Tooltip(
+                message: l10n.barakah,
+                child: AppPressable(
+                  onTap: () => context.push('/barakah'),
+                  pressedScale: 0.92,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary, Color(0xFFD4AF37)],
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          backgroundColor: isDark
+                              ? AppColors.darkSurface
                               : Colors.white,
-                          width: 1.5,
+                          child: const Icon(
+                            Icons.spa_rounded,
+                            size: 18,
+                            color: Color(0xFFD4AF37),
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 9,
+                          height: 9,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF0B1512)
+                                  : Colors.white,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           )
@@ -132,18 +150,18 @@ class HomeScreen extends StatelessWidget {
       extendBody: true,
       appBar: ProductiveAppBar(
         title: headerInfo.title,
-        subtitle: isHome ? hijriSubtitle : null,
+        subtitle: subtitle,
         leading: homeLeading,
         leadingIcon: isHome ? null : headerInfo.icon,
         showBackButton: false,
         actions: [
-          if (isHome)
+          if (isHome) ...[
             AppPressable(
               onTap: () => context.push('/barakah'),
               pressedScale: 0.92,
               borderRadius: BorderRadius.circular(14),
               child: Container(
-                margin: const EdgeInsets.only(right: 6),
+                margin: const EdgeInsetsDirectional.only(end: 4),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isDark
@@ -177,28 +195,53 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-          _PrayerHeaderChip(service: prayerService),
-          if (location == '/barakah')
+            ProductiveAppBarAction(
+              icon: Icons.settings_outlined,
+              tooltip: l10n.settings,
+              onTap: () => context.push('/settings'),
+            ),
+          ] else if (location == '/barakah') ...[
             ProductiveAppBarAction(
               key: const Key('open-review'),
               tooltip: l10n.barakahWeeklyTitle,
               icon: Icons.calendar_month_outlined,
               onTap: () => context.push('/barakah/review'),
             ),
-          ProductiveAppBarAction(
-            icon: Icons.settings_outlined,
-            tooltip: l10n.settings,
-            onTap: () => context.push('/settings'),
-          ),
+          ],
         ],
       ),
-      body: Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
+      body: Stack(
+        children: [
+          _HomeWidgetSyncWatcher(service: prayerService),
+          Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
+        ],
+      ),
       bottomNavigationBar: FloatingGlassNavBar(
         currentIndex: currentIndex,
         onTap: (index) => _navigateToIndex(context, index),
         items: navItems,
       ),
     );
+  }
+
+  static String? _getSubtitleForLocation(
+    String location,
+    AppLocalizations l10n,
+    PrayerTimeService? prayerService,
+    bool isAr,
+  ) {
+    return switch (location) {
+      '/plan' || '/tasks' || '/habits' =>
+        isAr ? '${l10n.tasks} والعادات' : '${l10n.tasks} & ${l10n.habits}',
+      '/prayer-times' =>
+        prayerService?.cachedLocationName != null &&
+                prayerService!.cachedLocationName!.isNotEmpty
+            ? '📍 ${prayerService.cachedLocationName}'
+            : null,
+      '/barakah' => isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
+      '/journal' => isAr ? 'النيات والخواطر' : 'Intentions & Reflections',
+      _ => null,
+    };
   }
 
   static ({String title, IconData icon}) _getHeaderInfo(
@@ -249,20 +292,16 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _PrayerHeaderChip extends StatefulWidget {
+class _HomeWidgetSyncWatcher extends StatefulWidget {
   final PrayerTimeService? service;
 
-  const _PrayerHeaderChip({required this.service});
+  const _HomeWidgetSyncWatcher({required this.service});
 
   @override
-  State<_PrayerHeaderChip> createState() => _PrayerHeaderChipState();
+  State<_HomeWidgetSyncWatcher> createState() => _HomeWidgetSyncWatcherState();
 }
 
-class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
-  String _nextPrayer = '';
-  String _countdown = '';
-  String? _locationName;
-  bool _loading = true;
+class _HomeWidgetSyncWatcherState extends State<_HomeWidgetSyncWatcher> {
   Timer? _timer;
   PrayerTimes? _cachedPrayerTimes;
 
@@ -271,9 +310,6 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
     super.initState();
     if (widget.service != null && widget.service!.cachedPrayerTimes != null) {
       _cachedPrayerTimes = widget.service!.cachedPrayerTimes;
-      _locationName = widget.service!.cachedLocationName;
-      _loading = false;
-      _updatePrayerCountdown();
       _startTimer();
     }
     _loadPrayerTimes();
@@ -286,33 +322,12 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   }
 
   Future<void> _loadPrayerTimes() async {
-    if (widget.service == null) {
-      if (mounted) {
-        setState(() {
-          _nextPrayer = '--';
-          _countdown = '--:--';
-          _loading = false;
-        });
-      }
-      return;
-    }
+    if (widget.service == null) return;
 
     final position = await widget.service!.getCurrentPosition();
-    if (!mounted) return;
-    if (position == null) {
-      if (_cachedPrayerTimes == null) {
-        setState(() {
-          _nextPrayer = '--';
-          _countdown = '--:--';
-          _loading = false;
-        });
-      }
-      return;
-    }
+    if (!mounted || position == null) return;
 
     _cachedPrayerTimes = widget.service!.getPrayerTimes(position);
-    _locationName = widget.service!.getLocationName(position);
-    _updatePrayerCountdown();
     _startTimer();
     _syncHomeWidget();
   }
@@ -325,9 +340,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
   }
 
   void _updatePrayerCountdown() {
-    if (widget.service == null) {
-      return;
-    }
+    if (widget.service == null) return;
 
     final now = DateTime.now();
 
@@ -338,26 +351,11 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
           widget.service!.cachedPosition!,
           date: now,
         );
+        _syncHomeWidget();
       } else if (widget.service!.cachedPrayerTimes != null) {
         _cachedPrayerTimes = widget.service!.cachedPrayerTimes;
+        _syncHomeWidget();
       }
-    }
-
-    if (_cachedPrayerTimes == null) {
-      return;
-    }
-
-    final nextPrayer = widget.service!.getNextPrayerName(_cachedPrayerTimes!);
-    final timeUntil = widget.service!.getTimeUntilNextPrayer(
-      _cachedPrayerTimes!,
-    );
-
-    if (mounted) {
-      setState(() {
-        _nextPrayer = nextPrayer ?? '--';
-        _countdown = timeUntil != null ? _formatDuration(timeUntil) : '--:--';
-        _loading = false;
-      });
     }
   }
 
@@ -445,46 +443,7 @@ class _PrayerHeaderChipState extends State<_PrayerHeaderChip> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final locSuffix = _locationName != null && _locationName!.isNotEmpty
-        ? ' • 📍 $_locationName'
-        : '';
-    final prayerDesc = _cachedPrayerTimes != null && _nextPrayer != '--'
-        ? ': ${_getLocalizedPrayerName(_nextPrayer, l10n)} ($_countdown)'
-        : '';
-    final tooltipText = '${l10n.nextPrayer}$prayerDesc$locSuffix';
-
-    return ProductiveAppBarAction(
-      tooltip: _cachedPrayerTimes == null ? l10n.nextPrayer : tooltipText,
-      icon: Icons.mosque_rounded,
-      iconColor: isDark ? AppColors.secondary : AppColors.primary,
-      onTap: () => context.push('/prayer-times'),
-      badge: _loading
-          ? SizedBox(
-              width: 10,
-              height: 10,
-              child: CircularProgressIndicator(
-                strokeWidth: 1.5,
-                color: isDark ? AppColors.secondary : AppColors.primary,
-              ),
-            )
-          : (_cachedPrayerTimes != null && _nextPrayer != '--'
-                ? Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isDark ? const Color(0xFF0B1512) : Colors.white,
-                        width: 1.5,
-                      ),
-                    ),
-                  )
-                : null),
-    );
+    return const SizedBox.shrink();
   }
 }
 
