@@ -76,5 +76,28 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'CreateTaskSheet expanded advanced options has zero overflow at 1.5x scale',
+      (tester) async {
+        await pumpAndCheckOverflow(
+          tester,
+          child: buildSubject(),
+          locale: const Locale('ar'),
+          textScale: 1.5,
+          isDark: true,
+          screenSize: const Size(360, 780),
+        );
+
+        // Tap the progressive disclosure accordion to expand advanced options
+        final accordionFinder = find.byIcon(Icons.tune_rounded);
+        expect(accordionFinder, findsOneWidget);
+        await tester.tap(accordionFinder);
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.text("Khushu' Focus Sprint"), findsOneWidget);
+      },
+    );
   });
 }

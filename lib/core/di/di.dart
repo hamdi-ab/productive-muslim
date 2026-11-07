@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
 
 import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
@@ -33,6 +34,11 @@ import 'package:productive_muslim/domain/repositories/task_repository.dart';
 final getIt = GetIt.instance;
 
 Future<void> setupDi() async {
+  // Initialize timezone database for adhan and schedule conversions
+  try {
+    tz_data.initializeTimeZones();
+  } catch (_) {}
+
   // SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(prefs);

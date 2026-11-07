@@ -61,12 +61,52 @@ class _PlanScreenState extends State<PlanScreen> {
     });
   }
 
+  void _goToToday() {
+    AppHaptics.selectionClick();
+    setState(() {
+      _selectedDate = DateTime.now();
+    });
+  }
+
+  Future<void> _pickDate(BuildContext context) async {
+    AppHaptics.lightImpact();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primary,
+              brightness: isDark ? Brightness.dark : Brightness.light,
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              surface: isDark ? const Color(0xFF141E1A) : Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      AppHaptics.selectionClick();
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
   void _showRenewNiyyahSheet(BuildContext context) {
     AppHaptics.lightImpact();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
@@ -174,6 +214,7 @@ class _PlanScreenState extends State<PlanScreen> {
     AppHaptics.lightImpact();
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -196,6 +237,7 @@ class _PlanScreenState extends State<PlanScreen> {
     AppHaptics.lightImpact();
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -355,7 +397,8 @@ class _PlanScreenState extends State<PlanScreen> {
         _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final locale = Localizations.localeOf(context).toString();
+    final isAr = locale.startsWith('ar');
 
     String hijriText = '';
     if (getIt.isRegistered<HijriService>()) {
@@ -365,8 +408,7 @@ class _PlanScreenState extends State<PlanScreen> {
           : '${hijri.hDay} ${hijri.monthNameEn} ${hijri.hYear} AH';
     }
 
-    String prayerTimesSub = DateFormat('EEEE, d MMMM yyyy')
-        .format(_selectedDate);
+    String prayerTimesBounds = '';
     if (getIt.isRegistered<PrayerTimeService>()) {
       final prayerService = getIt<PrayerTimeService>();
       if (prayerService.cachedPrayerTimes != null) {
@@ -375,284 +417,237 @@ class _PlanScreenState extends State<PlanScreen> {
             '${pt.fajr.hour.toString().padLeft(2, '0')}:${pt.fajr.minute.toString().padLeft(2, '0')}';
         final sunsetStr =
             '${pt.maghrib.hour.toString().padLeft(2, '0')}:${pt.maghrib.minute.toString().padLeft(2, '0')}';
-        prayerTimesSub += ' • Fajr $fajrStr • Sunset $sunsetStr';
+        prayerTimesBounds = isAr
+            ? 'الفجر $fajrStr • المغرب $sunsetStr'
+            : 'Fajr $fajrStr • Sunset $sunsetStr';
       }
     }
 
-    final dayOfYear =
-        _selectedDate.difference(DateTime(_selectedDate.year, 1, 1)).inDays + 1;
-    final dayProgressStr = isAr
-        ? 'اليوم $dayOfYear من ٣٥٤'
-        : 'Day $dayOfYear of 354';
+    final datePattern = isAr ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMM yyyy';
+    final dateDisplay = DateFormat(datePattern, locale).format(_selectedDate);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.xs,
+        AppSpacing.sm,
         AppSpacing.md,
         0,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Hijri Date Anchor & Day Pill Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF141E1A) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isDark
+                ? const Color(0xFF404944).withValues(alpha: 0.4)
+                : AppColors.primary.withValues(alpha: 0.12),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
+                  .withValues(alpha: isDark ? 0.2 : 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Previous Day Chevron
+            AppPressable(
+              onTap: () => _changeDate(-1),
+              pressedScale: 0.88,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.black.withValues(alpha: 0.04),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isAr
+                      ? Icons.chevron_right_rounded
+                      : Icons.chevron_left_rounded,
+                  size: 22,
+                  color: isDark
+                      ? const Color(0xFFDAE5E0)
+                      : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Center (Tappable Date Selector)
+            Expanded(
+              child: AppPressable(
+                onTap: () => _pickDate(context),
+                pressedScale: 0.98,
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFE9C349),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        hijriText.isNotEmpty
-                            ? hijriText
-                            : DateFormat('EEEE, d MMMM yyyy')
-                                  .format(_selectedDate),
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.calendar_month_rounded,
+                          size: 15,
                           color: Color(0xFFE9C349),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF141E1A)
-                      : Colors.black.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF404944).withValues(alpha: 0.4)
-                        : Colors.black.withValues(alpha: 0.08),
-                  ),
-                ),
-                child: Text(
-                  dayProgressStr,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    color: isDark
-                        ? const Color(0xFFBFC9C3)
-                        : AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-
-          // Daily Plan Screen Title & Barakah Focus Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  isAr ? 'الخطة اليومية' : 'Daily Plan',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                    color: isDark
-                        ? const Color(0xFFDAE5E0)
-                        : AppColors.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF004D33).withValues(alpha: 0.5)
-                      : AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: const Color(0xFF4EDEA3).withValues(alpha: 0.3),
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.energy_savings_leaf_rounded,
-                      size: 13,
-                      color: Color(0xFF4EDEA3),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isAr ? 'تركيز البركة' : 'Barakah Focus',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? const Color(0xFF4EDEA3)
-                            : AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Date Switcher Box
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF141E1A) : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: isDark
-                    ? const Color(0xFF404944).withValues(alpha: 0.4)
-                    : AppColors.primary.withValues(alpha: 0.12),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: (isDark ? const Color(0xFF0F4C3A) : Colors.black)
-                      .withValues(alpha: isDark ? 0.2 : 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                AppPressable(
-                  onTap: () => _changeDate(-1),
-                  pressedScale: 0.88,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : Colors.black.withValues(alpha: 0.04),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.chevron_left_rounded,
-                      size: 20,
-                      color: isDark
-                          ? const Color(0xFFDAE5E0)
-                          : AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.calendar_month_rounded,
-                            size: 15,
-                            color: Color(0xFFE9C349),
-                          ),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              DateFormat('d MMMM yyyy').format(_selectedDate),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            dateDisplay,
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? const Color(0xFFDAE5E0)
+                                  : AppColors.textPrimary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          if (isToday) ...[
-                            const SizedBox(width: 6),
-                            Container(
+                        ),
+                        const SizedBox(width: 6),
+                        if (isToday)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF004D33)
+                                  .withValues(alpha: isDark ? 0.6 : 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFF4EDEA3)
+                                    .withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              isAr ? 'اليوم' : 'Today',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4EDEA3),
+                              ),
+                            ),
+                          )
+                        else
+                          AppPressable(
+                            onTap: _goToToday,
+                            pressedScale: 0.9,
+                            child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 6,
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF004D33)
-                                    .withValues(alpha: isDark ? 0.6 : 0.15),
+                                color: const Color(0xFFE9C349)
+                                    .withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: const Color(0xFF4EDEA3)
-                                      .withValues(alpha: 0.3),
+                                  color: const Color(0xFFE9C349)
+                                      .withValues(alpha: 0.4),
                                   width: 1,
                                 ),
                               ),
-                              child: const Text(
-                                'Today',
-                                style: TextStyle(
+                              child: Text(
+                                isAr ? 'اليوم' : 'Today',
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF4EDEA3),
+                                  color: Color(0xFFE9C349),
                                 ),
                               ),
                             ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (hijriText.isNotEmpty) ...[
+                              Text(
+                                hijriText,
+                                style: const TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFE9C349),
+                                ),
+                              ),
+                              if (prayerTimesBounds.isNotEmpty) ...[
+                                const SizedBox(width: 6),
+                                Text(
+                                  '•',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: isDark
+                                        ? Colors.white38
+                                        : Colors.black38,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
+                            ],
+                            if (prayerTimesBounds.isNotEmpty)
+                              Text(
+                                prayerTimesBounds,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  color: isDark
+                                      ? const Color(0xFFBFC9C3)
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
                           ],
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        prayerTimesSub,
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          color: isDark
-                              ? const Color(0xFFBFC9C3)
-                              : AppColors.textSecondary,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
-                ),
-                AppPressable(
-                  onTap: () => _changeDate(1),
-                  pressedScale: 0.88,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : Colors.black.withValues(alpha: 0.04),
-                      shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: isDark
-                          ? const Color(0xFFDAE5E0)
-                          : AppColors.textPrimary,
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+
+            // Next Day Chevron
+            AppPressable(
+              onTap: () => _changeDate(1),
+              pressedScale: 0.88,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.black.withValues(alpha: 0.04),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isAr
+                      ? Icons.chevron_left_rounded
+                      : Icons.chevron_right_rounded,
+                  size: 22,
+                  color: isDark
+                      ? const Color(0xFFDAE5E0)
+                      : AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

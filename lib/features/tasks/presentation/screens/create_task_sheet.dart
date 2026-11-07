@@ -35,6 +35,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
   final Set<String> _selectedQualities = {'Ihsan', 'Ikhlas'};
   bool _repeatDaily = false;
   bool _repeatWeekly = false;
+  bool _showAdvanced = false;
 
   @override
   void dispose() {
@@ -200,7 +201,8 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
           ),
         ],
       ),
-      child: Center(
+      child: Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: 600,
@@ -209,25 +211,10 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Ambient Spiritual Top Accent Hairline
-              Container(
-                height: 2,
-                margin: const EdgeInsets.symmetric(horizontal: 48),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      const Color(0xFFE9C349).withValues(alpha: 0.8),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-
               // Drag Handle
               Center(
                 child: Container(
-                  width: 44,
+                  width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(
                     top: AppSpacing.sm,
@@ -266,7 +253,7 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                                   'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
                                   textDirection: TextDirection.rtl,
                                   style: ArabicFontFamily.amiri.getTextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xFFE9C349),
                                     height: 1.2,
@@ -285,29 +272,17 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.verified_rounded,
-                                size: 13,
-                                color: Color(0xFF4EDEA3),
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  'Purify your intention before action',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? const Color(0xFFBFC9C3)
-                                        : AppColors.textSecondary,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            l10n.newTask,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? const Color(0xFFDAE5E0)
+                                  : AppColors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -330,147 +305,16 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                 ),
               ),
 
-              // Segmented Switcher Pill (Dual Mode: New Task | New Habit)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF141E1A)
-                        : AppColors.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF404944).withValues(alpha: 0.4)
-                          : AppColors.borderLight,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      // Active: New Task
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF0F4C3A), Color(0xFF004D33)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color(0xFFE9C349)
-                                  .withValues(alpha: 0.5),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF4EDEA3)
-                                    .withValues(alpha: 0.22),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.task_alt_rounded,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l10n.newTask,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Inactive: New Habit
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            AppHaptics.lightImpact();
-                            if (widget.onSwitchToHabit != null) {
-                              widget.onSwitchToHabit!();
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.repeat_rounded,
-                                    size: 16,
-                                    color: isDark
-                                        ? const Color(0xFFBFC9C3)
-                                        : AppColors.textSecondary,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    l10n.newHabit,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? const Color(0xFFBFC9C3)
-                                          : AppColors.textSecondary,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 5,
-                                      vertical: 1.5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE9C349)
-                                          .withValues(alpha: 0.18),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: const Color(0xFFE9C349)
-                                            .withValues(alpha: 0.4),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Sunnah',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE9C349),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+              // Ambient Spiritual Divider Hairline
+              Container(
+                height: 1,
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      const Color(0xFFE9C349).withValues(alpha: 0.5),
+                      Colors.transparent,
                     ],
                   ),
                 ),
@@ -492,83 +336,29 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Task Title Input with Niyyah trigger
+                      // Task Title Input
                       Row(
                         children: [
-                          Expanded(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    l10n.taskTitle,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: isDark
-                                              ? AppColors.darkTextPrimary
-                                              : AppColors.textPrimary,
-                                        ),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  '*',
-                                  style: TextStyle(
-                                    color: AppColors.secondary,
+                          Flexible(
+                            child: Text(
+                              l10n.taskTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.textPrimary,
                                   ),
-                                ),
-                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: InkWell(
-                              onTap: _renewIntentionPrompt,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.12,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.auto_awesome_rounded,
-                                      size: 11,
-                                      color: AppColors.secondary,
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Renew Niyyah',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryLight,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            '*',
+                            style: TextStyle(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -820,59 +610,6 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       ),
                       const SizedBox(height: AppSpacing.md),
 
-                      // Khushu' Focus Sprints
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Khushu' Focus Sprint",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? AppColors.darkTextPrimary
-                                        : AppColors.textPrimary,
-                                  ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              'Mindful Single-Tasking',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.end,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: AppColors.primaryLight,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Row(
-                        children: [
-                          _buildSprintChip(15, '15m', 'Micro', isDark),
-                          const SizedBox(width: 8),
-                          _buildSprintChip(
-                            25,
-                            '25m',
-                            'Barakah',
-                            isDark,
-                            isIdeal: true,
-                          ),
-                          const SizedBox(width: 8),
-                          _buildSprintChip(45, '45m', 'Deep', isDark),
-                          const SizedBox(width: 8),
-                          _buildSprintChip(90, '90m', 'Mastery', isDark),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-
                       // Scheduled Time Section
                       Row(
                         children: [
@@ -892,21 +629,26 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           ),
                           if (_startTime != null || _endTime != null) ...[
                             const SizedBox(width: 8),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: TextButton.icon(
-                                onPressed: _clearTime,
-                                icon: const Icon(Icons.close_rounded, size: 14),
-                                label: Text(
-                                  l10n.cancel,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                style: TextButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: TextButton.icon(
+                                  onPressed: _clearTime,
+                                  icon: const Icon(
+                                    Icons.close_rounded,
+                                    size: 14,
                                   ),
-                                  foregroundColor: AppColors.textSecondary,
+                                  label: Text(
+                                    l10n.cancel,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    foregroundColor: AppColors.textSecondary,
+                                  ),
                                 ),
                               ),
                             ),
@@ -935,142 +677,6 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                       ),
                       const SizedBox(height: AppSpacing.md),
 
-                      // Barakah Quality Alignment (9 Qualities framework)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Barakah Quality Alignment',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? AppColors.darkTextPrimary
-                                        : AppColors.textPrimary,
-                                  ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              'Spiritual Fuel',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: AppColors.secondary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          _buildQualityChip(
-                            'Ihsan',
-                            l10n.qualityIhsan,
-                            Icons.star_rounded,
-                            isDark,
-                          ),
-                          _buildQualityChip(
-                            'Ikhlas',
-                            l10n.qualityIkhlas,
-                            Icons.favorite_rounded,
-                            isDark,
-                          ),
-                          _buildQualityChip(
-                            'Sabr',
-                            l10n.qualitySabr,
-                            Icons.spa_rounded,
-                            isDark,
-                          ),
-                          _buildQualityChip(
-                            'Tawakkul',
-                            l10n.qualityTawakkul,
-                            Icons.shield_rounded,
-                            isDark,
-                          ),
-                          _buildQualityChip(
-                            'Istiqamah',
-                            'Istiqamah',
-                            Icons.trending_up_rounded,
-                            isDark,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-
-                      // Repeat Section
-                      Text(
-                        l10n.taskRepeat,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? AppColors.darkTextPrimary
-                                  : AppColors.textPrimary,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Wrap(
-                        spacing: AppSpacing.sm,
-                        runSpacing: 6,
-                        children: [
-                          FilterChip(
-                            avatar: Icon(
-                              Icons.repeat_rounded,
-                              size: 15,
-                              color: _repeatDaily
-                                  ? AppColors.primaryLight
-                                  : (isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary),
-                            ),
-                            label: Text(l10n.taskRepeatDaily),
-                            selected: _repeatDaily,
-                            selectedColor: AppColors.primary.withValues(
-                              alpha: 0.2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            onSelected: (selected) {
-                              AppHaptics.selectionClick();
-                              setState(() => _repeatDaily = selected);
-                            },
-                          ),
-                          FilterChip(
-                            avatar: Icon(
-                              Icons.calendar_view_week_rounded,
-                              size: 15,
-                              color: _repeatWeekly
-                                  ? AppColors.primaryLight
-                                  : (isDark
-                                        ? AppColors.darkTextSecondary
-                                        : AppColors.textSecondary),
-                            ),
-                            label: Text(l10n.taskRepeatWeekly),
-                            selected: _repeatWeekly,
-                            selectedColor: AppColors.primary.withValues(
-                              alpha: 0.2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            onSelected: (selected) {
-                              AppHaptics.selectionClick();
-                              setState(() => _repeatWeekly = selected);
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-
                       // Notes & Intention Dua input (TextField 2 of 2)
                       Row(
                         children: [
@@ -1092,6 +698,53 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                                         ? AppColors.darkTextPrimary
                                         : AppColors.textPrimary,
                                   ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: InkWell(
+                                onTap: _renewIntentionPrompt,
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.12,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.auto_awesome_rounded,
+                                        size: 11,
+                                        color: AppColors.secondary,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Auto-fill Niyyah',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -1154,6 +807,285 @@ class _CreateTaskSheetState extends State<CreateTaskSheet> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Progressive Disclosure Accordion: Focus Sprint, Qualities & Repeat
+                      InkWell(
+                        onTap: () {
+                          AppHaptics.lightImpact();
+                          setState(() => _showAdvanced = !_showAdvanced);
+                        },
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF141E1A)
+                                : AppColors.surfaceSubtle,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF404944)
+                                        .withValues(alpha: 0.4)
+                                  : AppColors.borderLight,
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.tune_rounded,
+                                size: 16,
+                                color: isDark
+                                    ? AppColors.secondary
+                                    : AppColors.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Focus Sprint, Qualities & Repeat',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark
+                                            ? AppColors.darkTextPrimary
+                                            : AppColors.textPrimary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _showAdvanced
+                                          ? 'Tap to collapse options'
+                                          : 'Khushu sprints, Barakah qualities, repeat rules',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                _showAdvanced
+                                    ? Icons.expand_less_rounded
+                                    : Icons.expand_more_rounded,
+                                size: 20,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      if (_showAdvanced) ...[
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Khushu' Focus Sprints
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Khushu' Focus Sprint",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'Mindful Single-Tasking',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.primaryLight,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Row(
+                          children: [
+                            _buildSprintChip(15, '15m', 'Micro', isDark),
+                            const SizedBox(width: 8),
+                            _buildSprintChip(
+                              25,
+                              '25m',
+                              'Barakah',
+                              isDark,
+                              isIdeal: true,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildSprintChip(45, '45m', 'Deep', isDark),
+                            const SizedBox(width: 8),
+                            _buildSprintChip(90, '90m', 'Mastery', isDark),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Barakah Quality Alignment (9 Qualities framework)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Barakah Quality Alignment',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? AppColors.darkTextPrimary
+                                          : AppColors.textPrimary,
+                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Spiritual Fuel',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.secondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            _buildQualityChip(
+                              'Ihsan',
+                              l10n.qualityIhsan,
+                              Icons.star_rounded,
+                              isDark,
+                            ),
+                            _buildQualityChip(
+                              'Ikhlas',
+                              l10n.qualityIkhlas,
+                              Icons.favorite_rounded,
+                              isDark,
+                            ),
+                            _buildQualityChip(
+                              'Sabr',
+                              l10n.qualitySabr,
+                              Icons.spa_rounded,
+                              isDark,
+                            ),
+                            _buildQualityChip(
+                              'Tawakkul',
+                              l10n.qualityTawakkul,
+                              Icons.shield_rounded,
+                              isDark,
+                            ),
+                            _buildQualityChip(
+                              'Istiqamah',
+                              'Istiqamah',
+                              Icons.trending_up_rounded,
+                              isDark,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Repeat Section
+                        Text(
+                          l10n.taskRepeat,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary,
+                              ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Wrap(
+                          spacing: AppSpacing.sm,
+                          runSpacing: 6,
+                          children: [
+                            FilterChip(
+                              avatar: Icon(
+                                Icons.repeat_rounded,
+                                size: 15,
+                                color: _repeatDaily
+                                    ? AppColors.primaryLight
+                                    : (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.textSecondary),
+                              ),
+                              label: Text(l10n.taskRepeatDaily),
+                              selected: _repeatDaily,
+                              selectedColor: AppColors.primary.withValues(
+                                alpha: 0.2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onSelected: (selected) {
+                                AppHaptics.selectionClick();
+                                setState(() => _repeatDaily = selected);
+                              },
+                            ),
+                            FilterChip(
+                              avatar: Icon(
+                                Icons.calendar_view_week_rounded,
+                                size: 15,
+                                color: _repeatWeekly
+                                    ? AppColors.primaryLight
+                                    : (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.textSecondary),
+                              ),
+                              label: Text(l10n.taskRepeatWeekly),
+                              selected: _repeatWeekly,
+                              selectedColor: AppColors.primary.withValues(
+                                alpha: 0.2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onSelected: (selected) {
+                                AppHaptics.selectionClick();
+                                setState(() => _repeatWeekly = selected);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.lg),
 
                       // Primary CTA Button: Bismillah — Create Task

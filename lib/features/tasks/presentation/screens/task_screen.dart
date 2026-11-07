@@ -39,14 +39,17 @@ class _TaskScreenState extends State<TaskScreen> {
       child: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Scaffold(
+            backgroundColor: hasParentScaffold ? Colors.transparent : null,
             appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.tasks)),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                AppHaptics.lightImpact();
-                _showCreateSheet(context, activeDate);
-              },
-              child: const Icon(Icons.add),
-            ),
+            floatingActionButton: hasParentScaffold
+                ? null
+                : FloatingActionButton(
+                    onPressed: () {
+                      AppHaptics.lightImpact();
+                      _showCreateSheet(context, activeDate);
+                    },
+                    child: const Icon(Icons.add),
+                  ),
             body: state is Loaded
                 ? state.tasks.isEmpty
                       ? _EmptyState(l10n: l10n)
@@ -67,6 +70,7 @@ class _TaskScreenState extends State<TaskScreen> {
   void _showCreateSheet(BuildContext context, String today) {
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,

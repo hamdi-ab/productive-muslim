@@ -30,6 +30,7 @@ class HabitScreen extends StatelessWidget {
       child: BlocBuilder<HabitBloc, HabitState>(
         builder: (context, state) {
           return Scaffold(
+            backgroundColor: hasParentScaffold ? Colors.transparent : null,
             appBar: hasParentScaffold ? null : AppBar(title: Text(l10n.habits)),
             body: state is Loaded
                 ? state.habits.isEmpty
@@ -42,13 +43,15 @@ class HabitScreen extends StatelessWidget {
                 : state is Error
                 ? _ErrorState(message: state.message)
                 : const Center(child: SizedBox.shrink()),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                AppHaptics.lightImpact();
-                _showCreateSheet(context);
-              },
-              child: const Icon(Icons.add),
-            ),
+            floatingActionButton: hasParentScaffold
+                ? null
+                : FloatingActionButton(
+                    onPressed: () {
+                      AppHaptics.lightImpact();
+                      _showCreateSheet(context);
+                    },
+                    child: const Icon(Icons.add),
+                  ),
           );
         },
       ),
@@ -58,6 +61,7 @@ class HabitScreen extends StatelessWidget {
   void _showCreateSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => BlocProvider.value(

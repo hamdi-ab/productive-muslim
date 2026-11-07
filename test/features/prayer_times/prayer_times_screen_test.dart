@@ -68,10 +68,10 @@ void main() {
     );
   }
 
-  PrayerTimes createPrayerTimes() {
+  PrayerTimes createPrayerTimes({DateTime? date}) {
     final params = CalculationMethodParameters.muslimWorldLeague();
     return PrayerTimes(
-      date: DateTime.now(),
+      date: date ?? DateTime.now(),
       coordinates: Coordinates(40.7128, -74.0060),
       calculationParameters: params,
     );
@@ -194,5 +194,79 @@ void main() {
 
     expect(find.text('الفجر'), findsOneWidget);
     expect(find.byType(GlassContainer), findsWidgets);
+  });
+
+  testWidgets(
+    'post-Isha treats today prayers as Past and displays Tomorrow Fajr tile',
+    (tester) async {
+      final position = Position(
+        latitude: 40.7128,
+        longitude: -74.0060,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        heading: 0,
+        speed: 0,
+        speedAccuracy: 0,
+        altitudeAccuracy: 0,
+        headingAccuracy: 0,
+      );
+      mockService.setPosition(position);
+      // Simulate past prayer times (all before now)
+      mockService.setPrayerTimes(
+        createPrayerTimes(
+          date: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      );
+
+      await tester.pumpWidget(buildScreen(language: 'en'));
+      await tester.pumpAndSettle();
+
+      // Verify 'Past' badge exists and 'Completed' is not displayed
+      expect(find.text('Past'), findsWidgets);
+      expect(find.text('Completed'), findsNothing);
+
+      // Scroll down to reveal Tomorrow's Fajr upcoming tile
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      // Verify Tomorrow's Fajr upcoming tile is displayed
+      expect(find.text('Fajr (Tomorrow)'), findsOneWidget);
+      expect(find.text('Tomorrow'), findsOneWidget);
+    },
+  );
+
+  testWidgets('post-Isha in Arabic shows انقضى and الفجر (غداً)', (
+    tester,
+  ) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(
+      createPrayerTimes(date: DateTime.now().subtract(const Duration(days: 1))),
+    );
+
+    await tester.pumpWidget(buildScreen(language: 'ar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('انقضى'), findsWidgets);
+    expect(find.text('مكتمل'), findsNothing);
+
+    // Scroll down to reveal Tomorrow's Fajr upcoming tile
+    await tester.drag(find.byType(ListView), const Offset(0, -600));
+    await tester.pumpAndSettle();
+
+    expect(find.text('الفجر (غداً)'), findsOneWidget);
+    expect(find.text('غداً'), findsOneWidget);
   });
 }

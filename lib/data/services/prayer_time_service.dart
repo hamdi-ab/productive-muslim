@@ -1,11 +1,20 @@
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/utils/platform_timezone.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 
 class PrayerTimeService {
+  PrayerTimeService() {
+    try {
+      tz_data.initializeTimeZones();
+    } catch (_) {}
+  }
+
   Position? _cachedPosition;
   PrayerTimes? _cachedPrayerTimes;
   String? _cachedLocationName;
@@ -40,14 +49,25 @@ class PrayerTimeService {
 
   Future<Position?> _fetchPositionInternal() async {
     try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled()
+          .timeout(const Duration(seconds: 2), onTimeout: () => true);
       if (!serviceEnabled) {
         return _fallbackFromCacheOrStorage();
       }
 
-      var permission = await Geolocator.checkPermission();
+      var permission = LocationPermission.unableToDetermine;
+      try {
+        permission = await Geolocator.checkPermission().timeout(
+          const Duration(seconds: 2),
+        );
+      } catch (_) {}
+
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+        try {
+          permission = await Geolocator.requestPermission().timeout(
+            const Duration(seconds: 4),
+          );
+        } catch (_) {}
         if (permission == LocationPermission.denied) {
           return _fallbackFromCacheOrStorage();
         }
@@ -57,21 +77,28 @@ class PrayerTimeService {
         return _fallbackFromCacheOrStorage();
       }
 
-      // First check last known position quickly
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null && _cachedPosition == null) {
-        _updateCache(lastKnown);
+      // Check last known position quickly (not supported on Web)
+      Position? lastKnown;
+      if (!kIsWeb) {
+        try {
+          lastKnown = await Geolocator.getLastKnownPosition().timeout(
+            const Duration(seconds: 2),
+          );
+          if (lastKnown != null && _cachedPosition == null) {
+            _updateCache(lastKnown);
+          }
+        } catch (_) {}
       }
 
-      // Fetch fresh position with 4-second timeout to avoid hardware GPS hang
+      // Fetch fresh position with bounded Dart timeout so it never hangs indefinitely
       Position? fresh;
       try {
         fresh = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 4),
+          locationSettings: LocationSettings(
+            accuracy: kIsWeb ? LocationAccuracy.low : LocationAccuracy.medium,
+            timeLimit: Duration(seconds: kIsWeb ? 6 : 4),
           ),
-        );
+        ).timeout(Duration(seconds: kIsWeb ? 7 : 5));
       } catch (_) {
         fresh = lastKnown ?? _cachedPosition;
       }
@@ -88,8 +115,8 @@ class PrayerTimeService {
     }
   }
 
-  Position? _fallbackFromCacheOrStorage() {
-    if (_cachedPosition != null) return _cachedPosition;
+  Position _fallbackFromCacheOrStorage() {
+    if (_cachedPosition != null) return _cachedPosition!;
 
     if (getIt.isRegistered<SettingsService>()) {
       final settings = getIt<SettingsService>();
@@ -113,7 +140,171 @@ class PrayerTimeService {
       }
     }
 
-    return null;
+    // Timezone / UTC offset heuristic fallback (critical on Web / Desktop where GPS is absent)
+    final tzFallback = _getPositionFromTimezone();
+    _updateCache(tzFallback);
+    return tzFallback;
+  }
+
+  Position _getPositionFromTimezone() {
+    String? name;
+    try {
+      name = getPlatformTimeZone();
+    } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
+    }
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        final tzName = DateTime.now().timeZoneName;
+        if (tzName.isNotEmpty && tzName != 'UTC' && tzName != 'local') {
+          name = tzName;
+        }
+      } catch (_) {}
+    }
+
+    final (lat, lng, cityName) = _lookupTimezoneCoordinates(name ?? '');
+    final pos = Position(
+      latitude: lat,
+      longitude: lng,
+      timestamp: DateTime.now(),
+      accuracy: 1000,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+    _cachedLocationName = cityName;
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      settings.setLastCoordinates(lat, lng);
+      settings.setLastLocationName(cityName);
+    }
+    return pos;
+  }
+
+  (double, double, String) _lookupTimezoneCoordinates(String tzName) {
+    final key = tzName.trim().replaceAll(' ', '_');
+    final lowerKey = key.toLowerCase();
+
+    const tzMap = <String, (double, double, String)>{
+      'Africa/Cairo': (30.0444, 31.2357, 'Cairo'),
+      'Africa/Alexandria': (31.2001, 29.9187, 'Alexandria'),
+      'Asia/Riyadh': (24.7136, 46.6753, 'Riyadh'),
+      'Asia/Makkah': (21.4225, 39.8262, 'Makkah'),
+      'Asia/Jeddah': (21.5433, 39.1728, 'Jeddah'),
+      'Asia/Madinah': (24.5247, 39.5692, 'Madinah'),
+      'Asia/Dubai': (25.2048, 55.2708, 'Dubai'),
+      'Asia/Abu_Dhabi': (24.4539, 54.3773, 'Abu Dhabi'),
+      'Asia/Muscat': (23.5880, 58.3829, 'Muscat'),
+      'Asia/Kuwait': (29.3759, 47.9774, 'Kuwait City'),
+      'Asia/Qatar': (25.2854, 51.5310, 'Doha'),
+      'Asia/Bahrain': (26.2285, 50.5860, 'Manama'),
+      'Asia/Amman': (31.9454, 35.9284, 'Amman'),
+      'Asia/Baghdad': (33.3152, 44.3661, 'Baghdad'),
+      'Asia/Beirut': (33.8938, 35.5018, 'Beirut'),
+      'Asia/Jerusalem': (31.7683, 35.2137, 'Jerusalem'),
+      'Asia/Gaza': (31.5017, 34.4668, 'Gaza'),
+      'Asia/Hebron': (31.5326, 35.0998, 'Hebron'),
+      'Asia/Damascus': (33.5138, 36.2765, 'Damascus'),
+      'Africa/Casablanca': (33.5731, -7.5898, 'Casablanca'),
+      'Africa/Rabat': (34.0209, -6.8416, 'Rabat'),
+      'Africa/Algiers': (36.7538, 3.0588, 'Algiers'),
+      'Africa/Tunis': (36.8065, 10.1815, 'Tunis'),
+      'Africa/Tripoli': (32.8872, 13.1913, 'Tripoli'),
+      'Africa/Khartoum': (15.5007, 32.5599, 'Khartoum'),
+      'Asia/Karachi': (24.8607, 67.0011, 'Karachi'),
+      'Asia/Lahore': (31.5204, 74.3587, 'Lahore'),
+      'Asia/Islamabad': (33.6844, 73.0479, 'Islamabad'),
+      'Asia/Dhaka': (23.8103, 90.4125, 'Dhaka'),
+      'Asia/Jakarta': (-6.2088, 106.8456, 'Jakarta'),
+      'Asia/Kuala_Lumpur': (3.1390, 101.6869, 'Kuala Lumpur'),
+      'Asia/Singapore': (1.3521, 103.8198, 'Singapore'),
+      'Asia/Kolkata': (28.6139, 77.2090, 'New Delhi'),
+      'Asia/Colombo': (6.9271, 79.8612, 'Colombo'),
+      'Asia/Tashkent': (41.2995, 69.2401, 'Tashkent'),
+      'Asia/Baku': (40.4093, 49.8671, 'Baku'),
+      'Asia/Kabul': (34.5553, 69.2075, 'Kabul'),
+      'Asia/Tehran': (35.6892, 51.3890, 'Tehran'),
+      'Europe/Istanbul': (41.0082, 28.9784, 'Istanbul'),
+      'Europe/London': (51.5074, -0.1278, 'London'),
+      'Europe/Paris': (48.8566, 2.3522, 'Paris'),
+      'Europe/Berlin': (52.5200, 13.4050, 'Berlin'),
+      'Europe/Madrid': (40.4168, -3.7038, 'Madrid'),
+      'Europe/Rome': (41.9028, 12.4964, 'Rome'),
+      'Europe/Amsterdam': (52.3676, 4.9041, 'Amsterdam'),
+      'Europe/Brussels': (50.8503, 4.3517, 'Brussels'),
+      'Europe/Stockholm': (59.3293, 18.0686, 'Stockholm'),
+      'Europe/Oslo': (59.9139, 10.7522, 'Oslo'),
+      'Europe/Moscow': (55.7558, 37.6173, 'Moscow'),
+      'America/New_York': (40.7128, -74.0060, 'New York'),
+      'America/Chicago': (41.8781, -87.6298, 'Chicago'),
+      'America/Toronto': (43.6532, -79.3832, 'Toronto'),
+      'America/Los_Angeles': (34.0522, -118.2437, 'Los Angeles'),
+      'America/Denver': (39.7392, -104.9903, 'Denver'),
+      'America/Phoenix': (33.4484, -112.0740, 'Phoenix'),
+      'Australia/Sydney': (-33.8688, 151.2093, 'Sydney'),
+      'Australia/Melbourne': (-37.8136, 144.9631, 'Melbourne'),
+      'Asia/Tokyo': (35.6762, 139.6503, 'Tokyo'),
+      'Asia/Seoul': (37.5665, 126.9780, 'Seoul'),
+      'AST': (24.7136, 46.6753, 'Riyadh'),
+      'Arabian_Standard_Time': (24.7136, 46.6753, 'Riyadh'),
+      'Saudi_Arabia_Standard_Time': (24.7136, 46.6753, 'Riyadh'),
+      'EEST': (30.0444, 31.2357, 'Cairo'),
+      'EET': (30.0444, 31.2357, 'Cairo'),
+      'Egypt_Standard_Time': (30.0444, 31.2357, 'Cairo'),
+      'GST': (25.2048, 55.2708, 'Dubai'),
+      'Gulf_Standard_Time': (25.2048, 55.2708, 'Dubai'),
+      'PKT': (24.8607, 67.0011, 'Karachi'),
+      'Pakistan_Standard_Time': (24.8607, 67.0011, 'Karachi'),
+      'BST': (23.8103, 90.4125, 'Dhaka'),
+      'Bangladesh_Standard_Time': (23.8103, 90.4125, 'Dhaka'),
+      'WIB': (-6.2088, 106.8456, 'Jakarta'),
+      'GMT': (51.5074, -0.1278, 'London'),
+      'CET': (48.8566, 2.3522, 'Paris'),
+      'CEST': (48.8566, 2.3522, 'Paris'),
+      'EST': (40.7128, -74.0060, 'New York'),
+      'EDT': (40.7128, -74.0060, 'New York'),
+      'Eastern_Standard_Time': (40.7128, -74.0060, 'New York'),
+      'PST': (34.0522, -118.2437, 'Los Angeles'),
+      'PDT': (34.0522, -118.2437, 'Los Angeles'),
+      'Pacific_Standard_Time': (34.0522, -118.2437, 'Los Angeles'),
+    };
+
+    if (key.isNotEmpty && tzMap.containsKey(key)) {
+      return tzMap[key]!;
+    }
+
+    if (lowerKey.isNotEmpty) {
+      for (final entry in tzMap.entries) {
+        if (entry.key.toLowerCase() == lowerKey ||
+            entry.key.split('/').last.toLowerCase() == lowerKey ||
+            lowerKey.endsWith(entry.key.split('/').last.toLowerCase())) {
+          return entry.value;
+        }
+      }
+    }
+
+    // Default UTC-offset heuristics
+    final offsetHours = DateTime.now().timeZoneOffset.inHours;
+    return switch (offsetHours) {
+      3 => (21.4225, 39.8262, 'Makkah'),
+      2 => (30.0444, 31.2357, 'Cairo'),
+      4 => (25.2048, 55.2708, 'Dubai'),
+      5 => (24.8607, 67.0011, 'Karachi'),
+      6 => (23.8103, 90.4125, 'Dhaka'),
+      7 || 8 => (-6.2088, 106.8456, 'Jakarta'),
+      0 || 1 => (51.5074, -0.1278, 'London'),
+      -4 || -5 => (40.7128, -74.0060, 'New York'),
+      -7 || -8 => (34.0522, -118.2437, 'Los Angeles'),
+      _ => (21.4225, 39.8262, 'Makkah'),
+    };
   }
 
   void _updateCache(Position position) {
@@ -134,30 +325,32 @@ class PrayerTimeService {
     double latitude,
     double longitude,
   ) async {
-    try {
-      final placemarks = await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        final city = place.locality?.isNotEmpty == true
-            ? place.locality
-            : place.subAdministrativeArea?.isNotEmpty == true
-            ? place.subAdministrativeArea
-            : place.subLocality?.isNotEmpty == true
-            ? place.subLocality
-            : place.administrativeArea?.isNotEmpty == true
-            ? place.administrativeArea
-            : place.name?.isNotEmpty == true
-            ? place.name
-            : place.country;
-        if (city != null && city.isNotEmpty) {
-          _cachedLocationName = city;
-          if (getIt.isRegistered<SettingsService>()) {
-            getIt<SettingsService>().setLastLocationName(city);
+    if (!kIsWeb) {
+      try {
+        final placemarks = await placemarkFromCoordinates(latitude, longitude);
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+          final city = place.locality?.isNotEmpty == true
+              ? place.locality
+              : place.subAdministrativeArea?.isNotEmpty == true
+              ? place.subAdministrativeArea
+              : place.subLocality?.isNotEmpty == true
+              ? place.subLocality
+              : place.administrativeArea?.isNotEmpty == true
+              ? place.administrativeArea
+              : place.name?.isNotEmpty == true
+              ? place.name
+              : place.country;
+          if (city != null && city.isNotEmpty) {
+            _cachedLocationName = city;
+            if (getIt.isRegistered<SettingsService>()) {
+              getIt<SettingsService>().setLastLocationName(city);
+            }
+            return city;
           }
-          return city;
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     if (getIt.isRegistered<SettingsService>()) {
       final storedName = getIt<SettingsService>().lastLocationName;
@@ -170,18 +363,26 @@ class PrayerTimeService {
       }
     }
 
+    String? name;
     try {
-      final name = tz.local.name;
-      if (name.contains('/')) {
-        final city = name.split('/').last.replaceAll('_', ' ');
-        if (city.isNotEmpty &&
-            city.toUpperCase() != 'UTC' &&
-            city.toUpperCase() != 'LOCAL') {
-          _cachedLocationName = city;
-          return city;
-        }
-      }
+      name = getPlatformTimeZone();
     } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
+    }
+
+    if (name != null && name.contains('/')) {
+      final city = name.split('/').last.replaceAll('_', ' ');
+      if (city.isNotEmpty &&
+          city.toUpperCase() != 'UTC' &&
+          city.toUpperCase() != 'LOCAL') {
+        _cachedLocationName = city;
+        return city;
+      }
+    }
 
     _cachedLocationName ??= 'My Location';
     return _cachedLocationName;
@@ -263,17 +464,25 @@ class PrayerTimeService {
       }
     }
 
+    String? name;
     try {
-      final name = tz.local.name;
-      if (name.contains('/')) {
-        final city = name.split('/').last.replaceAll('_', ' ');
-        if (city.isNotEmpty &&
-            city.toUpperCase() != 'UTC' &&
-            city.toUpperCase() != 'LOCAL') {
-          return city;
-        }
-      }
+      name = getPlatformTimeZone();
     } catch (_) {}
+
+    if (name == null || name.isEmpty || name == 'UTC' || name == 'local') {
+      try {
+        name = tz.local.name;
+      } catch (_) {}
+    }
+
+    if (name != null && name.contains('/')) {
+      final city = name.split('/').last.replaceAll('_', ' ');
+      if (city.isNotEmpty &&
+          city.toUpperCase() != 'UTC' &&
+          city.toUpperCase() != 'LOCAL') {
+        return city;
+      }
+    }
 
     return 'My Location';
   }

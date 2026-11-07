@@ -59,73 +59,93 @@ class FloatingGlassNavBar extends StatelessWidget {
                   onTap: () => onTap(index),
                   pressedScale: 0.92,
                   haptic: AppHapticFeedback.selection,
-                  borderRadius: BorderRadius.circular(24),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (isDark
-                                ? AppColors.primaryLight.withValues(alpha: 0.16)
-                                : AppColors.primary.withValues(alpha: 0.10))
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(24),
-                      border: isSelected
-                          ? Border.all(
-                              color: isDark
-                                  ? AppColors.primaryLight.withValues(
-                                      alpha: 0.28,
-                                    )
-                                  : AppColors.primary.withValues(alpha: 0.20),
-                              width: 1,
-                            )
-                          : null,
-                    ),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        AnimatedScale(
+                        // Indicator pill around the icon
+                        AnimatedContainer(
                           duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutBack,
-                          scale: isSelected ? 1.08 : 1.0,
-                          child: Icon(
-                            isSelected ? item.activeIcon : item.icon,
-                            size: 21,
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
                             color: isSelected
                                 ? (isDark
-                                      ? AppColors.primaryLight
-                                      : AppColors.primary)
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary),
+                                      ? AppColors.primaryLight.withValues(
+                                          alpha: 0.16,
+                                        )
+                                      : AppColors.primary.withValues(
+                                          alpha: 0.12,
+                                        ))
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                            border: isSelected
+                                ? Border.all(
+                                    color: isDark
+                                        ? AppColors.primaryLight.withValues(
+                                            alpha: 0.28,
+                                          )
+                                        : AppColors.primary.withValues(
+                                            alpha: 0.20,
+                                          ),
+                                    width: 1,
+                                  )
+                                : null,
+                          ),
+                          child: AnimatedScale(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOutBack,
+                            scale: isSelected ? 1.08 : 1.0,
+                            child: Icon(
+                              isSelected ? item.activeIcon : item.icon,
+                              size: 21,
+                              color: isSelected
+                                  ? (isDark
+                                        ? AppColors.primaryLight
+                                        : AppColors.primary)
+                                  : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 3),
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 180),
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? (isDark
-                                      ? AppColors.primaryLight
-                                      : AppColors.primary)
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary),
-                            letterSpacing: -0.1,
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                              ),
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 180),
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? (isDark
+                                            ? AppColors.primaryLight
+                                            : AppColors.primary)
+                                      : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary),
+                                  letterSpacing: -0.1,
+                                ),
+                                child: Text(
+                                  item.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],

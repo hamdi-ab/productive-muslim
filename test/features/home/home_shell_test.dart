@@ -14,12 +14,16 @@ class MockPrayerTimeService extends PrayerTimeService {
   Future<Position?> getCurrentPosition() async => null;
 }
 
-GoRouter _testRouter({required Widget child}) {
+GoRouter _testRouter({required Widget child, String initialLocation = '/'}) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: initialLocation,
     routes: [
       GoRoute(
         path: '/',
+        builder: (context, state) => HomeScreen(child: child),
+      ),
+      GoRoute(
+        path: '/prayer-times',
         builder: (context, state) => HomeScreen(child: child),
       ),
     ],
@@ -70,7 +74,9 @@ void main() {
     expect(find.byIcon(Icons.menu_book_outlined), findsOneWidget);
   });
 
-  testWidgets('renders prayer header chip in app bar', (tester) async {
+  testWidgets('renders streak badge and avatar on home app bar', (
+    tester,
+  ) async {
     final router = _testRouter(child: const Center(child: Text('Home')));
     await tester.pumpWidget(
       MaterialApp.router(
@@ -81,10 +87,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Next Prayer'), findsOneWidget);
+    expect(find.text('12d'), findsOneWidget);
+    expect(find.byIcon(Icons.local_fire_department_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.spa_rounded), findsOneWidget);
   });
 
-  testWidgets('settings button is rendered', (tester) async {
+  testWidgets('settings button is rendered on home app bar', (tester) async {
     final router = _testRouter(child: const Center(child: Text('Home')));
     await tester.pumpWidget(
       MaterialApp.router(
@@ -96,5 +104,24 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+  });
+
+  testWidgets('secondary tab (prayer-times) does not render settings button', (
+    tester,
+  ) async {
+    final router = _testRouter(
+      child: const Center(child: Text('Prayer Times')),
+      initialLocation: '/prayer-times',
+    );
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.settings_outlined), findsNothing);
   });
 }

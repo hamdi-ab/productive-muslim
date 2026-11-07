@@ -14,7 +14,6 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/animated_progress_ring.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
-import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/task.dart';
@@ -835,6 +834,12 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final isAfterIsha =
+        _cachedPrayerTimes != null &&
+        DateTime.now().isAfter(_cachedPrayerTimes!.isha);
+    final isTomorrowFajr = isAfterIsha && _nextPrayer.toLowerCase() == 'fajr';
+    final prayerName = _getLocalizedPrayerName(_nextPrayer, l10n);
 
     return AppPressable(
       onTap: () => context.push('/prayer-times'),
@@ -938,115 +943,157 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
               ],
             ),
             const SizedBox(height: 12),
-            // Header: Upcoming Prayer Countdown & Subtitle
+            // Header: Upcoming Prayer Title & Countdown Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text.rich(
-                        TextSpan(
-                          text: _getLocalizedPrayerName(_nextPrayer, l10n),
+                      Flexible(
+                        child: Text(
+                          prayerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
                             color: isDark
                                 ? AppColors.darkTextPrimary
                                 : AppColors.textPrimary,
                           ),
-                          children: [
-                            if (_cachedPrayerTimes != null) ...[
-                              const TextSpan(text: ' '),
-                              TextSpan(
-                                text:
-                                    'at ${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                ),
+                        ),
+                      ),
+                      if (isTomorrowFajr) ...[
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF59E0B)
+                                  .withValues(alpha: isDark ? 0.22 : 0.14),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.4),
+                                width: 0.8,
                               ),
-                            ],
-                          ],
+                            ),
+                            child: Text(
+                              isAr ? 'غداً' : 'Tomorrow',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? const Color(0xFFFBBF24)
+                                    : const Color(0xFFD97706),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _locationName != null && _locationName!.isNotEmpty
-                            ? '📍 $_locationName • Iqamah scheduled'
-                            : 'Iqamah scheduled • Clean for Salah',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: isDark
-                              ? AppColors.darkTextSecondary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: PulsingGlow(
-                      animate: true,
-                      minScale: 0.96,
-                      maxScale: 1.04,
-                      duration: const Duration(milliseconds: 2400),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: const Color(0xFFF59E0B)
-                                .withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_loading)
-                              const SizedBox(
-                                width: 12,
-                                height: 12,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xFFD97706),
-                                  ),
-                                ),
-                              )
-                            else ...[
-                              const Icon(
-                                Icons.schedule_rounded,
-                                size: 13,
-                                color: Color(0xFFD97706),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'in $_countdown',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF92400E),
-                                  fontFeatures: [FontFeature.tabularFigures()],
-                                ),
-                              ),
-                            ],
-                          ],
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                         ),
                       ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_loading)
+                            const SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFD97706),
+                                ),
+                              ),
+                            )
+                          else ...[
+                            const Icon(
+                              Icons.schedule_rounded,
+                              size: 13,
+                              color: Color(0xFFD97706),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'in $_countdown',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF92400E),
+                                fontFeatures: [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            // Subtitle Row: Scheduled Time (Left) & Location Status (Right)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (_cachedPrayerTimes != null)
+                  Flexible(
+                    child: Text(
+                      '${isAr ? 'في ' : 'at '}${_formatPrayerTime(_cachedPrayerTimes!, _nextPrayer, context)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _locationName != null && _locationName!.isNotEmpty
+                        ? '📍 $_locationName • Iqamah scheduled'
+                        : 'Iqamah scheduled • Clean for Salah',
+                    maxLines: 1,
+                    textAlign: _cachedPrayerTimes != null
+                        ? TextAlign.end
+                        : TextAlign.start,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -1055,6 +1102,7 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
             const SizedBox(height: 8),
             // Celestial Sun Arc Canvas Diagram
             _SolarArcDiagram(
+              key: const ValueKey('hero_solar_arc_diagram'),
               prayerTimes: _cachedPrayerTimes,
               nextPrayer: _nextPrayer,
               isDark: isDark,
@@ -1095,11 +1143,12 @@ class _HomePrayerCardState extends State<_HomePrayerCard> {
       (key: 'isha', name: l10n.isha, time: prayerTimes.isha),
     ];
 
+    final isAfterIsha = now.isAfter(prayerTimes.isha);
     final nextKey = nextPrayer.toLowerCase();
 
     return Row(
       children: prayers.map((p) {
-        final isNext = p.key == nextKey;
+        final isNext = !isAfterIsha && p.key == nextKey;
         final isPast = p.time.isBefore(now) && !isNext;
 
         return Expanded(
@@ -2135,6 +2184,7 @@ class _SolarArcDiagram extends StatelessWidget {
   final bool isDark;
 
   const _SolarArcDiagram({
+    super.key,
     required this.prayerTimes,
     required this.nextPrayer,
     required this.isDark,
@@ -2142,14 +2192,18 @@ class _SolarArcDiagram extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return SizedBox(
-      height: 90,
+      height: 94,
       width: double.infinity,
       child: CustomPaint(
+        key: const ValueKey('solar_arc_custom_paint'),
         painter: _SolarArcPainter(
           prayerTimes: prayerTimes,
           nextPrayer: nextPrayer,
           isDark: isDark,
+          isAr: isAr,
+          now: DateTime.now(),
         ),
       ),
     );
@@ -2160,11 +2214,15 @@ class _SolarArcPainter extends CustomPainter {
   final PrayerTimes? prayerTimes;
   final String nextPrayer;
   final bool isDark;
+  final bool isAr;
+  final DateTime now;
 
   _SolarArcPainter({
     required this.prayerTimes,
     required this.nextPrayer,
     required this.isDark,
+    required this.isAr,
+    required this.now,
   });
 
   @override
@@ -2191,7 +2249,20 @@ class _SolarArcPainter extends CustomPainter {
       startX += dashWidth + dashSpace;
     }
 
-    // 2. Solar curve path (cubic bezier)
+    // 2. Compute day/night cycle and prayer boundary times
+    final fajr = prayerTimes?.fajr;
+    final sunrise = prayerTimes?.sunrise;
+    final dhuhr = prayerTimes?.dhuhr;
+    final asr = prayerTimes?.asr;
+    final maghrib = prayerTimes?.maghrib;
+    final isha = prayerTimes?.isha;
+
+    // Islamic day/night cycle: night begins at Maghrib (sunset) and ends at Fajr (dawn)
+    final isNight =
+        (maghrib != null && now.isAfter(maghrib)) ||
+        (fajr != null && now.isBefore(fajr));
+
+    // 3. Solar curve path (cubic bezier)
     final p0 = Offset(18, horizonY);
     final p1 = Offset(w * 0.22, size.height * 0.16);
     final p2 = Offset(w * 0.78, size.height * 0.16);
@@ -2202,134 +2273,442 @@ class _SolarArcPainter extends CustomPainter {
       ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
 
     final bgArcPaint = Paint()
-      ..color = isDark ? Colors.white24 : const Color(0xFFCBD5E1)
+      ..color = isDark
+          ? (isNight ? Colors.indigo.withValues(alpha: 0.25) : Colors.white24)
+          : (isNight
+                ? Colors.indigo.withValues(alpha: 0.12)
+                : const Color(0xFFCBD5E1))
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
     canvas.drawPath(bgArcPath, bgArcPaint);
 
-    // 3. Compute active sun progress t (0.0 to 1.0)
-    double progressT = 0.64;
+    const tStart = 0.08;
+    const tEnd = 0.92;
+    const tSpan = tEnd - tStart; // 0.84
+
     final key = nextPrayer.toLowerCase();
-    switch (key) {
-      case 'fajr':
-        progressT = 0.08;
-        break;
-      case 'sunrise':
-        progressT = 0.28;
-        break;
-      case 'dhuhr':
-        progressT = 0.50;
-        break;
-      case 'asr':
-        progressT = 0.68;
-        break;
-      case 'maghrib':
-        progressT = 0.88;
-        break;
-      case 'isha':
-        progressT = 0.96;
-        break;
-      default:
-        progressT = 0.64;
+    double progressT = tStart;
+
+    // Milestone fractions for Day Arc vs Night Arc
+    double tFajrDay = tStart;
+    double tSunriseDay = 0.24;
+    double tDhuhrDay = 0.50;
+    double tAsrDay = 0.74;
+    double tMaghribDay = tEnd;
+
+    double tMaghribNight = tStart;
+    double tIshaNight = 0.26;
+    double tTahajjudNight = 0.64;
+    double tFajrNight = tEnd;
+
+    DateTime? fajrNext;
+    DateTime? maghribPrev;
+    DateTime? ishaPrev;
+    DateTime? tahajjudTime;
+
+    if (!isNight) {
+      // ----------------- DAY ARC (Fajr -> Maghrib) -----------------
+      final dayDuration = (fajr != null && maghrib != null)
+          ? maghrib.difference(fajr).inSeconds
+          : 12 * 3600;
+
+      if (fajr != null && sunrise != null && dayDuration > 0) {
+        tSunriseDay =
+            (tStart +
+                    (sunrise.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.20, 0.28);
+      }
+      if (fajr != null && dhuhr != null && dayDuration > 0) {
+        tDhuhrDay =
+            (tStart + (dhuhr.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.46, 0.54);
+      }
+      if (fajr != null && asr != null && dayDuration > 0) {
+        tAsrDay =
+            (tStart + (asr.difference(fajr).inSeconds / dayDuration) * tSpan)
+                .clamp(0.70, 0.78);
+      }
+
+      // Compute continuous piecewise progress along Day Arc
+      if (fajr != null && now.isBefore(fajr)) {
+        progressT = tFajrDay;
+      } else if (fajr != null && sunrise != null && now.isBefore(sunrise)) {
+        final span = sunrise.difference(fajr).inSeconds;
+        final elapsed = now.difference(fajr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tFajrDay + ratio * (tSunriseDay - tFajrDay)).clamp(
+          tFajrDay,
+          tSunriseDay,
+        );
+      } else if (sunrise != null && dhuhr != null && now.isBefore(dhuhr)) {
+        final span = dhuhr.difference(sunrise).inSeconds;
+        final elapsed = now.difference(sunrise).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tSunriseDay + ratio * (tDhuhrDay - tSunriseDay)).clamp(
+          tSunriseDay,
+          tDhuhrDay,
+        );
+      } else if (dhuhr != null && asr != null && now.isBefore(asr)) {
+        final span = asr.difference(dhuhr).inSeconds;
+        final elapsed = now.difference(dhuhr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tDhuhrDay + ratio * (tAsrDay - tDhuhrDay)).clamp(
+          tDhuhrDay,
+          tAsrDay,
+        );
+      } else if (asr != null && maghrib != null && now.isBefore(maghrib)) {
+        final span = maghrib.difference(asr).inSeconds;
+        final elapsed = now.difference(asr).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tAsrDay + ratio * (tMaghribDay - tAsrDay)).clamp(
+          tAsrDay,
+          tMaghribDay,
+        );
+      } else {
+        progressT = switch (key) {
+          'fajr' => tFajrDay,
+          'sunrise' => tSunriseDay,
+          'dhuhr' => tDhuhrDay,
+          'asr' => tAsrDay,
+          'maghrib' => tMaghribDay,
+          _ => tDhuhrDay,
+        };
+      }
+    } else {
+      // ----------------- NIGHT ARC (Maghrib -> Fajr) -----------------
+      fajrNext = (fajr != null && now.isBefore(fajr))
+          ? fajr
+          : (fajr?.add(const Duration(days: 1)) ??
+                now.add(const Duration(hours: 8)));
+      maghribPrev = (maghrib != null && now.isAfter(maghrib))
+          ? maghrib
+          : (maghrib?.subtract(const Duration(days: 1)) ??
+                now.subtract(const Duration(hours: 4)));
+      ishaPrev = (isha != null && now.isAfter(isha))
+          ? isha
+          : (isha != null && fajr != null && now.isBefore(fajr)
+                ? isha.subtract(const Duration(days: 1))
+                : isha ??
+                      maghribPrev.add(const Duration(hours: 1, minutes: 30)));
+
+      final nightDuration = fajrNext.difference(maghribPrev).inSeconds;
+      tahajjudTime = fajrNext.subtract(
+        Duration(seconds: (nightDuration / 3).round()),
+      );
+
+      if (nightDuration > 0) {
+        final ishaSec = ishaPrev.difference(maghribPrev).inSeconds;
+        tIshaNight = (tStart + (ishaSec / nightDuration) * tSpan).clamp(
+          0.22,
+          0.32,
+        );
+        tTahajjudNight = (tStart + (2 / 3) * tSpan).clamp(0.60, 0.72);
+      }
+
+      // Compute continuous piecewise progress along Night Arc
+      if (now.isBefore(ishaPrev)) {
+        final span = ishaPrev.difference(maghribPrev).inSeconds;
+        final elapsed = now.difference(maghribPrev).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tMaghribNight + ratio * (tIshaNight - tMaghribNight))
+            .clamp(tMaghribNight, tIshaNight);
+      } else if (now.isBefore(tahajjudTime)) {
+        final span = tahajjudTime.difference(ishaPrev).inSeconds;
+        final elapsed = now.difference(ishaPrev).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tIshaNight + ratio * (tTahajjudNight - tIshaNight)).clamp(
+          tIshaNight,
+          tTahajjudNight,
+        );
+      } else if (now.isBefore(fajrNext)) {
+        final span = fajrNext.difference(tahajjudTime).inSeconds;
+        final elapsed = now.difference(tahajjudTime).inSeconds;
+        final ratio = (elapsed / (span > 0 ? span : 1)).clamp(0.0, 1.0);
+        progressT = (tTahajjudNight + ratio * (tFajrNight - tTahajjudNight))
+            .clamp(tTahajjudNight, tFajrNight);
+      } else {
+        progressT = tFajrNight;
+      }
     }
 
-    // 4. Draw active daylight progress arc with gradient
+    // 4. Draw active illuminated progress arc directly leading to the celestial body
     final progressArcPath = Path()..moveTo(p0.dx, p0.dy);
-    const int steps = 40;
-    final int maxSteps = (steps * progressT).round().clamp(1, steps);
-    for (int i = 1; i <= maxSteps; i++) {
+    const int steps = 48;
+    for (int i = 1; i <= steps; i++) {
       final t = (i / steps) * progressT;
       final pt = _evalCubic(p0, p1, p2, p3, t);
       progressArcPath.lineTo(pt.dx, pt.dy);
     }
 
-    final gradientPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF10B981), Color(0xFF0F4C3A), Color(0xFFD4AF37)],
-      ).createShader(Rect.fromLTWH(0, 0, w, size.height))
-      ..strokeWidth = 3.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    if (!isNight) {
+      final gradientPaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFF10B981), Color(0xFF0F4C3A), Color(0xFFD4AF37)],
+        ).createShader(Rect.fromLTWH(0, 0, w, size.height))
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
 
-    canvas.drawPath(progressArcPath, gradientPaint);
+      canvas.drawPath(progressArcPath, gradientPaint);
+    } else {
+      final nightProgressPaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [
+            Color(0xFF8B5CF6), // dusk violet
+            Color(0xFF6366F1), // celestial indigo
+            Color(0xFF38BDF8), // dawn cyan
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, w, size.height))
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
 
-    // Helper to draw fixed nodes
-    void drawNode(double t, Color color, String label, {bool isAbove = false}) {
+      canvas.drawPath(progressArcPath, nightProgressPaint);
+
+      // Faint ambient stars in the nocturnal sky
+      final starPaint = Paint()
+        ..color = Colors.white.withValues(alpha: isDark ? 0.6 : 0.45)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(w * 0.16, size.height * 0.22), 1.2, starPaint);
+      canvas.drawCircle(Offset(w * 0.38, size.height * 0.14), 1.5, starPaint);
+      canvas.drawCircle(Offset(w * 0.64, size.height * 0.12), 1.2, starPaint);
+      canvas.drawCircle(Offset(w * 0.84, size.height * 0.24), 1.4, starPaint);
+    }
+
+    // Helper to draw fixed milestone and active nodes
+    void drawNode(
+      double t,
+      Color color,
+      String label, {
+      bool isAbove = false,
+      bool isActive = false,
+      bool isCompleted = false,
+    }) {
       final pt = _evalCubic(p0, p1, p2, p3, t);
       final nodePaint = Paint()
-        ..color = color
+        ..color = isActive
+            ? const Color(0xFFF59E0B)
+            : (isCompleted ? const Color(0xFF10B981) : color)
         ..style = PaintingStyle.fill;
       final borderPaint = Paint()
         ..color = Colors.white
-        ..strokeWidth = 1.8
+        ..strokeWidth = isActive ? 2.2 : 1.6
         ..style = PaintingStyle.stroke;
 
-      canvas.drawCircle(pt, 4.0, nodePaint);
-      canvas.drawCircle(pt, 4.0, borderPaint);
+      if (isActive) {
+        final haloPaint = Paint()
+          ..color = const Color(0xFFF59E0B).withValues(alpha: 0.25)
+          ..style = PaintingStyle.fill;
+        canvas.drawCircle(pt, 8.0, haloPaint);
+      }
+
+      canvas.drawCircle(pt, isActive ? 5.0 : 4.0, nodePaint);
+      canvas.drawCircle(pt, isActive ? 5.0 : 4.0, borderPaint);
 
       final textSpan = TextSpan(
         text: label,
         style: TextStyle(
-          color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
-          fontSize: 8.5,
-          fontWeight: FontWeight.w600,
+          color: isActive
+              ? (isDark ? AppColors.secondary : const Color(0xFFD97706))
+              : (isCompleted
+                    ? (isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669))
+                    : (isDark
+                          ? AppColors.darkTextSecondary
+                          : const Color(0xFF64748B))),
+          fontSize: isActive ? 9.5 : 8.5,
+          fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
         ),
       );
       final textPainter = TextPainter(
         text: textSpan,
-        textDirection: TextDirection.ltr,
+        textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
       )..layout();
       final textOffset = isAbove
-          ? Offset(pt.dx - textPainter.width / 2, pt.dy - 14)
+          ? Offset(pt.dx - textPainter.width / 2, pt.dy - 15)
           : Offset(pt.dx - textPainter.width / 2, pt.dy + 7);
       textPainter.paint(canvas, textOffset);
     }
 
-    // Draw Fajr, Dhuhr zenith, and Maghrib nodes
-    drawNode(0.08, const Color(0xFF10B981), 'Fajr');
-    drawNode(0.50, const Color(0xFF10B981), 'Dhuhr', isAbove: true);
-    drawNode(0.88, const Color(0xFFCBD5E1), 'Maghrib');
+    final defaultNodeColor = isDark ? Colors.white38 : const Color(0xFF94A3B8);
 
-    // 5. Active glowing sun position node
-    final sunPos = _evalCubic(p0, p1, p2, p3, progressT);
+    if (!isNight) {
+      // 5 Milestones on Day Arc: Fajr, Sunrise, Dhuhr, Asr, Maghrib
+      final fajrLabel = isAr ? 'الفجر' : 'Fajr';
+      final sunriseLabel = isAr ? 'الشروق' : 'Sunrise';
+      final dhuhrLabel = isAr ? 'الظهر' : 'Dhuhr';
+      final asrLabel = isAr ? 'العصر' : 'Asr';
+      final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
 
-    // Outer halo
-    final haloPaint = Paint()
-      ..color = const Color(0xFFFEF3C7).withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 11.0, haloPaint);
+      final isFajrActive = key == 'fajr';
+      final isSunriseActive = key == 'sunrise';
+      final isDhuhrActive = key == 'dhuhr';
+      final isAsrActive = key == 'asr';
+      final isMaghribActive = key == 'maghrib';
 
-    // Glowing sun circle
-    final sunPaint = Paint()
-      ..color = const Color(0xFFF59E0B)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 7.5, sunPaint);
+      final isFajrPast = fajr != null && now.isAfter(fajr) && !isFajrActive;
+      final isSunrisePast =
+          sunrise != null && now.isAfter(sunrise) && !isSunriseActive;
+      final isDhuhrPast = dhuhr != null && now.isAfter(dhuhr) && !isDhuhrActive;
+      final isAsrPast = asr != null && now.isAfter(asr) && !isAsrActive;
 
-    // Core white center
-    final corePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(sunPos, 3.5, corePaint);
+      // 1. Fajr (Dawn horizon, label below)
+      drawNode(
+        tFajrDay,
+        defaultNodeColor,
+        fajrLabel,
+        isAbove: false,
+        isActive: isFajrActive,
+        isCompleted: isFajrPast,
+      );
+      // 2. Sunrise (Ascending slope, label above)
+      drawNode(
+        tSunriseDay,
+        defaultNodeColor,
+        sunriseLabel,
+        isAbove: true,
+        isActive: isSunriseActive,
+        isCompleted: isSunrisePast,
+      );
+      // 3. Dhuhr (Zenith peak, label above)
+      drawNode(
+        tDhuhrDay,
+        defaultNodeColor,
+        dhuhrLabel,
+        isAbove: true,
+        isActive: isDhuhrActive,
+        isCompleted: isDhuhrPast,
+      );
+      // 4. Asr (Afternoon slope, label above)
+      drawNode(
+        tAsrDay,
+        defaultNodeColor,
+        asrLabel,
+        isAbove: true,
+        isActive: isAsrActive,
+        isCompleted: isAsrPast,
+      );
+      // 5. Maghrib (Sunset horizon, label below)
+      drawNode(
+        tMaghribDay,
+        defaultNodeColor,
+        maghribLabel,
+        isAbove: false,
+        isActive: isMaghribActive,
+        isCompleted: false,
+      );
+    } else {
+      // 4 Milestones on Night Arc: Maghrib, Isha, Tahajjud, Fajr
+      final maghribLabel = isAr ? 'المغرب' : 'Maghrib';
+      final ishaLabel = isAr ? 'العشاء' : 'Isha';
+      final tahajjudLabel = isAr ? 'التهجد' : 'Tahajjud';
+      final fajrLabel = isAr ? 'الفجر' : 'Fajr';
 
-    // Label under sun node
-    final labelSpan = TextSpan(
-      text: '${nextPrayer.toUpperCase()} NOW',
-      style: const TextStyle(
-        color: Color(0xFF92600E),
-        fontSize: 9,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-    final labelPainter = TextPainter(
-      text: labelSpan,
-      textDirection: TextDirection.ltr,
-    )..layout();
-    labelPainter.paint(
-      canvas,
-      Offset(sunPos.dx - labelPainter.width / 2, sunPos.dy + 12),
-    );
+      final isIshaActive = key == 'isha';
+      final isTahajjudActive =
+          tahajjudTime != null &&
+          fajrNext != null &&
+          now.isAfter(tahajjudTime) &&
+          now.isBefore(fajrNext);
+      final isFajrActive = key == 'fajr';
+
+      final isIshaPast =
+          ishaPrev != null && now.isAfter(ishaPrev) && !isIshaActive;
+      final isTahajjudPast =
+          tahajjudTime != null &&
+          now.isAfter(tahajjudTime) &&
+          !isTahajjudActive;
+
+      // 1. Maghrib (Sunset horizon, label below)
+      drawNode(
+        tMaghribNight,
+        defaultNodeColor,
+        maghribLabel,
+        isAbove: false,
+        isActive: false,
+        isCompleted: true,
+      );
+      // 2. Isha (Nightfall slope, label above)
+      drawNode(
+        tIshaNight,
+        defaultNodeColor,
+        ishaLabel,
+        isAbove: true,
+        isActive: isIshaActive,
+        isCompleted: isIshaPast,
+      );
+      // 3. Tahajjud (Night zenith / Last third, label above)
+      drawNode(
+        tTahajjudNight,
+        defaultNodeColor,
+        tahajjudLabel,
+        isAbove: true,
+        isActive: isTahajjudActive,
+        isCompleted: isTahajjudPast,
+      );
+      // 4. Fajr (Dawn horizon, label below)
+      drawNode(
+        tFajrNight,
+        defaultNodeColor,
+        fajrLabel,
+        isAbove: false,
+        isActive: isFajrActive,
+        isCompleted: false,
+      );
+    }
+
+    // 5. Draw Celestial Body: Sun during daytime, Crescent Moon (Hilal) during night
+    final celestialPos = _evalCubic(p0, p1, p2, p3, progressT);
+
+    if (!isNight) {
+      // Outer halo
+      final haloPaint = Paint()
+        ..color = const Color(0xFFFEF3C7).withValues(alpha: 0.5)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(celestialPos, 11.0, haloPaint);
+
+      // Glowing sun disk
+      final sunPaint = Paint()
+        ..color = const Color(0xFFF59E0B)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(celestialPos, 7.5, sunPaint);
+
+      // Core white center
+      final corePaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(celestialPos, 3.5, corePaint);
+    } else {
+      // Soft nocturnal lunar aura
+      final moonAuraPaint = Paint()
+        ..color = const Color(0xFF818CF8).withValues(alpha: 0.28)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(celestialPos, 12.0, moonAuraPaint);
+
+      // Luminous Crescent Moon (Hilal)
+      final moonPath = Path()
+        ..addOval(Rect.fromCircle(center: celestialPos, radius: 7.5));
+      final cutPath = Path()
+        ..addOval(
+          Rect.fromCircle(
+            center: celestialPos.translate(3.5, -2.0),
+            radius: 6.2,
+          ),
+        );
+      final crescent = Path.combine(
+        PathOperation.difference,
+        moonPath,
+        cutPath,
+      );
+
+      final moonFillPaint = Paint()
+        ..color = const Color(0xFFFDE68A)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(crescent, moonFillPaint);
+    }
   }
 
   Offset _evalCubic(Offset p0, Offset p1, Offset p2, Offset p3, double t) {
@@ -2350,7 +2729,9 @@ class _SolarArcPainter extends CustomPainter {
   bool shouldRepaint(covariant _SolarArcPainter oldDelegate) {
     return oldDelegate.nextPrayer != nextPrayer ||
         oldDelegate.isDark != isDark ||
-        oldDelegate.prayerTimes != prayerTimes;
+        oldDelegate.isAr != isAr ||
+        oldDelegate.prayerTimes != prayerTimes ||
+        oldDelegate.now.minute != now.minute;
   }
 }
 

@@ -52,7 +52,16 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
     };
   }
 
-  String _getSunnahAdvice(String nextPrayer, bool isAr) {
+  String _getSunnahAdvice(
+    String nextPrayer,
+    bool isAr, {
+    bool isAfterIsha = false,
+  }) {
+    if (isAfterIsha && nextPrayer.toLowerCase() == 'fajr') {
+      return isAr
+          ? 'قيام الليل والوتر: أفضل الصلاة بعد الفريضة صلاة الليل'
+          : 'Qiyam & Witr: The best prayer after obligatory prayers is the night prayer';
+    }
     return switch (nextPrayer.toLowerCase()) {
       'fajr' => isAr ? 'سنة الفجر: ركعتان خير من الدنيا وما فيها' : 'Sunnah: 2 Rakat before Fajr is better than the world and all in it',
       'dhuhr' =>
@@ -158,7 +167,12 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
       currentSlotName = l10n.slotNight;
     }
 
-    final localizedNext = _localizePrayerName(widget.nextPrayer, l10n);
+    final isAfterIsha = now.isAfter(isha);
+    final isTomorrowFajr =
+        isAfterIsha && widget.nextPrayer.toLowerCase() == 'fajr';
+    final localizedNext = isTomorrowFajr
+        ? (isAr ? 'الفجر (غداً)' : 'Fajr (Tomorrow)')
+        : _localizePrayerName(widget.nextPrayer, l10n);
 
     // Remaining duration to next prayer
     DateTime? nextTime;
@@ -187,7 +201,6 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         nextTime = null;
     }
 
-    String countdownString = '';
     String countdownMinutesSeconds = '';
     if (nextTime != null) {
       final diff = nextTime.difference(now);
@@ -196,10 +209,8 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
         final minutes = diff.inMinutes % 60;
         final seconds = diff.inSeconds % 60;
         if (hours > 0) {
-          countdownString = '${hours}h ${minutes}m ${seconds}s';
           countdownMinutesSeconds = '${hours}h ${minutes}m';
         } else {
-          countdownString = '${minutes}m ${seconds}s';
           countdownMinutesSeconds = '${minutes}m ${seconds}s';
         }
       }
@@ -325,54 +336,74 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 36),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          countdownString.isNotEmpty
-                              ? '${l10n.solarNext(localizedNext)} • $countdownString'
-                              : l10n.solarNext(localizedNext),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? AppColors.secondary
-                                : AppColors.secondaryDark,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 175),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                l10n.solarNext(localizedNext),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? AppColors.secondary
+                                      : AppColors.secondaryDark,
+                                ),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          countdownMinutesSeconds.isNotEmpty
-                              ? countdownMinutesSeconds
-                              : DateFormat.jm().format(now),
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: isDark
-                                ? AppColors.darkTextPrimary
-                                : AppColors.textPrimary,
-                            letterSpacing: -0.5,
+                          const SizedBox(height: 2),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                countdownMinutesSeconds.isNotEmpty
+                                    ? countdownMinutesSeconds
+                                    : DateFormat.jm().format(now),
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
+                                  letterSpacing: -0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          isNight
-                              ? (isAr
-                                    ? 'مسار الليل والتهجد'
-                                    : 'Night arc • Tahajjud time')
-                              : (isAr
-                                    ? 'مسار الشمس: مدار نهاري'
-                                    : 'Solar zenith • Declining arc'),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isDark
-                                ? AppColors.primaryLight
-                                : AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(height: 1),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                isNight
+                                    ? (isAr
+                                          ? 'مسار الليل والتهجد'
+                                          : 'Night arc • Tahajjud time')
+                                    : (isAr
+                                          ? 'مسار الشمس: مدار نهاري'
+                                          : 'Solar zenith • Declining arc'),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: isDark
+                                      ? AppColors.primaryLight
+                                      : AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -473,7 +504,11 @@ class _SolarPrayerDialState extends State<SolarPrayerDial> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _getSunnahAdvice(widget.nextPrayer, isAr),
+                      _getSunnahAdvice(
+                        widget.nextPrayer,
+                        isAr,
+                        isAfterIsha: isAfterIsha,
+                      ),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,

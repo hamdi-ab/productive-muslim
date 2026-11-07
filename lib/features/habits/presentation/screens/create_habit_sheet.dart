@@ -136,7 +136,8 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           ),
         ],
       ),
-      child: Center(
+      child: Align(
+        alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: 600,
@@ -145,25 +146,10 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Ambient Spiritual Top Accent Hairline
-              Container(
-                height: 2,
-                margin: const EdgeInsets.symmetric(horizontal: 48),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      const Color(0xFFE9C349).withValues(alpha: 0.8),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-
               // Drag Handle
               Center(
                 child: Container(
-                  width: 44,
+                  width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(
                     top: AppSpacing.sm,
@@ -221,29 +207,17 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.auto_awesome_rounded,
-                                size: 12,
-                                color: Color(0xFFE9C349),
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  "Continuous Deeds (Ahabbul A'mal)",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? const Color(0xFFBFC9C3)
-                                        : AppColors.textSecondary,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            l10n.newHabit,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? const Color(0xFFDAE5E0)
+                                  : AppColors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -266,149 +240,16 @@ class _CreateHabitSheetState extends State<CreateHabitSheet> {
                 ),
               ),
 
-              // Segmented Switcher Pill (Dual Mode: New Task | New Habit)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF141E1A)
-                        : AppColors.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF404944).withValues(alpha: 0.4)
-                          : AppColors.borderLight,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      // Inactive: New Task
-                      Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            AppHaptics.lightImpact();
-                            if (widget.onSwitchToTask != null) {
-                              widget.onSwitchToTask!();
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.task_alt_rounded,
-                                    size: 16,
-                                    color: isDark
-                                        ? const Color(0xFFBFC9C3)
-                                        : AppColors.textSecondary,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    l10n.newTask,
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? const Color(0xFFBFC9C3)
-                                          : AppColors.textSecondary,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Active: New Habit
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF0F4C3A), Color(0xFF004D33)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: const Color(0xFFE9C349)
-                                  .withValues(alpha: 0.5),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF4EDEA3)
-                                    .withValues(alpha: 0.22),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.repeat_rounded,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  l10n.newHabit,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5,
-                                    vertical: 1.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.25,
-                                    ),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: AppColors.secondary.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Sunnah',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.secondary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+              // Ambient Spiritual Divider Hairline
+              Container(
+                height: 1,
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      const Color(0xFFE9C349).withValues(alpha: 0.5),
+                      Colors.transparent,
                     ],
                   ),
                 ),
