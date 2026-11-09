@@ -9,6 +9,7 @@ import 'package:productive_muslim/domain/repositories/intention_repository.dart'
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
+import 'package:productive_muslim/features/intentions/presentation/widgets/intention_adhkar_bookend_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class MockIntentionRepository extends Mock implements IntentionRepository {}
@@ -193,5 +194,52 @@ void main() {
 
     expect(find.text('يومية'), findsOneWidget);
     expect(find.text('نيات اليوم'), findsOneWidget);
+  });
+
+  testWidgets(
+    'displays Dhikr recitation chip when intention is Dhikr-related',
+    (tester) async {
+      final dhikrEntry = IntentionEntry(
+        id: 3,
+        date: todayStr,
+        title: 'Morning Adhkar & Duas',
+        statement: 'Start day in Allahs protection',
+        completed: false,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      when(() => mockRepository.getEntriesForDate(any()))
+          .thenAnswer((_) async => [dhikrEntry]);
+
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recite Dhikr Now'), findsOneWidget);
+      expect(find.byIcon(Icons.menu_book_rounded), findsWidgets);
+    },
+  );
+
+  testWidgets('displays Bookend Adhkar card in intention journal', (
+    tester,
+  ) async {
+    when(() => mockRepository.getEntriesForDate(any()))
+        .thenAnswer((_) async => []);
+
+    await tester.pumpWidget(buildScreen());
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.byType(IntentionAdhkarBookendCard),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(IntentionAdhkarBookendCard), findsOneWidget);
   });
 }

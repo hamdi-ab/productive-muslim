@@ -10,6 +10,7 @@ import 'package:productive_muslim/domain/repositories/intention_repository.dart'
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_state.dart';
+import 'package:productive_muslim/features/intentions/presentation/widgets/intention_adhkar_bookend_card.dart';
 import 'package:productive_muslim/features/intentions/presentation/widgets/intention_atmosphere_background.dart';
 import 'package:productive_muslim/features/intentions/presentation/widgets/intention_ayah_card.dart';
 import 'package:productive_muslim/features/intentions/presentation/widgets/intention_create_dialog.dart';
@@ -106,6 +107,10 @@ class IntentionScreen extends StatelessWidget {
                         entries: state.entries,
                         isDark: isDark,
                       ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Bookend Adhkar & Intention Card
+                      IntentionAdhkarBookendCard(isDark: isDark),
                       const SizedBox(height: AppSpacing.md),
 
                       // Ayah of Barakah Callout
