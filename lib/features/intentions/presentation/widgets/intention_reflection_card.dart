@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
+import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/models/intention_entry.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
@@ -130,7 +132,9 @@ class _IntentionReflectionCardState extends State<IntentionReflectionCard> {
               children: [
                 _buildTagChip('#Tawakkul'),
                 _buildTagChip('#Ihsan'),
+                _buildTagChip('#Istighfar'),
                 _buildTagChip('#WorkAsWorship'),
+                _buildTagChip('#Shukr'),
                 _buildTagChip('#Sadaqah'),
                 _buildTagChip('#Gratitude'),
               ],
@@ -197,6 +201,60 @@ class _IntentionReflectionCardState extends State<IntentionReflectionCard> {
                         }
                       },
                 label: Text(l10n.saveReflection),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppPressable(
+              onTap: () {
+                AppHaptics.lightImpact();
+                context.push('/adhkar', extra: DhikrCategory.evening);
+              },
+              pressedScale: 0.96,
+              haptic: AppHapticFeedback.light,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  color: widget.isDark
+                      ? const Color(0xFF1E281F)
+                      : const Color(0xFFFAF8F0),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.secondary.withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.nights_stay_rounded,
+                      size: 15,
+                      color: AppColors.secondaryDark,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Seal today with Istighfar & Evening Adhkar',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: widget.isDark
+                              ? Colors.white70
+                              : Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 11,
+                      color: AppColors.secondaryDark,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

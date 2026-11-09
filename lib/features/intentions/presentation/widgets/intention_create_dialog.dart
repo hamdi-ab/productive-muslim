@@ -311,6 +311,48 @@ class _AddIntentionDialogState extends State<AddIntentionDialog> {
                       });
                     },
                   ),
+                  _buildElevatedDialogChip(
+                    icon: Icons.wb_sunny_outlined,
+                    text: 'Morning Adhkar',
+                    isSelected: selectedPreset == 'Morning Adhkar',
+                    isDark: isDark,
+                    onTap: () {
+                      setState(() {
+                        _titleController.text = 'Morning Adhkar';
+                        if (_statementController.text.isEmpty) {
+                          _statementController.text = 'To begin my day in protection and remembrance of Allah';
+                        }
+                      });
+                    },
+                  ),
+                  _buildElevatedDialogChip(
+                    icon: Icons.repeat_rounded,
+                    text: '100x Istighfar',
+                    isSelected: selectedPreset == '100x Istighfar',
+                    isDark: isDark,
+                    onTap: () {
+                      setState(() {
+                        _titleController.text = '100x Istighfar';
+                        if (_statementController.text.isEmpty) {
+                          _statementController.text = 'To purify my heart and seek divine barakah during pauses';
+                        }
+                      });
+                    },
+                  ),
+                  _buildElevatedDialogChip(
+                    icon: Icons.nights_stay_outlined,
+                    text: 'Evening Adhkar',
+                    isSelected: selectedPreset == 'Evening Adhkar',
+                    isDark: isDark,
+                    onTap: () {
+                      setState(() {
+                        _titleController.text = 'Evening Adhkar';
+                        if (_statementController.text.isEmpty) {
+                          _statementController.text = 'To seal my day in gratitude and prophetic remembrance';
+                        }
+                      });
+                    },
+                  ),
                 ],
               ),
               const SizedBox(height: 16),

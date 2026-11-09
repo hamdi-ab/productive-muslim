@@ -166,7 +166,9 @@ class IntentionTodayCard extends StatelessWidget {
             children: [
               _buildPresetChip(context, today, '🕋 Fajr on Time'),
               _buildPresetChip(context, today, '💼 Work as Worship'),
+              _buildPresetChip(context, today, '📿 Morning Adhkar'),
               _buildPresetChip(context, today, '🤝 Mercy to Family'),
+              _buildPresetChip(context, today, '🤲 100x Istighfar'),
               _buildPresetChip(context, today, '📖 Quran Reflection'),
             ],
           ),
