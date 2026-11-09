@@ -13,6 +13,7 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
+import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
@@ -55,6 +56,8 @@ class AppRouter {
       router.go('/focus');
     } else if (host == 'fasting' || path == '/fasting') {
       router.go('/fasting');
+    } else if (host == 'profile' || path == '/profile') {
+      router.go('/profile');
     } else if (host == 'barakah' || path == '/barakah') {
       router.go('/barakah');
     } else if (host == 'tasks' || path == '/tasks') {
@@ -144,12 +147,16 @@ class AppRouter {
                 builder: (context, state) => const PrayerTimesScreen(),
               ),
               GoRoute(
-                path: '/barakah',
-                builder: (context, state) => const BarakahScreen(),
-              ),
-              GoRoute(
                 path: '/journal',
                 builder: (context, state) => const IntentionScreen(),
+              ),
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+              GoRoute(
+                path: '/barakah',
+                builder: (context, state) => const BarakahScreen(),
               ),
             ],
           ),
