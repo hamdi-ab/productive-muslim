@@ -2485,6 +2485,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adhkar Studio'**
   String get adhkar;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @profileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Growth & 9 Qualities'**
+  String get profileSubtitle;
 }
 
 class _AppLocalizationsDelegate

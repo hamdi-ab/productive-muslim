@@ -1364,4 +1364,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkar => 'Adhkar Studio';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get profileSubtitle => 'Spiritual Growth & 9 Qualities';
 }

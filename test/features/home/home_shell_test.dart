@@ -70,8 +70,8 @@ void main() {
     expect(find.byIcon(Icons.grid_view_rounded), findsOneWidget);
     expect(find.byIcon(Icons.checklist_rtl_outlined), findsOneWidget);
     expect(find.byIcon(Icons.mosque_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.auto_awesome_outlined), findsOneWidget);
     expect(find.byIcon(Icons.menu_book_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
   });
 
   testWidgets('renders streak badge and avatar on home app bar', (

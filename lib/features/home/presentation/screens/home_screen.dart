@@ -46,14 +46,14 @@ class HomeScreen extends StatelessWidget {
         label: l10n.prayerTimes,
       ),
       FloatingNavItem(
-        icon: Icons.auto_awesome_outlined,
-        activeIcon: Icons.auto_awesome_rounded,
-        label: l10n.barakah,
-      ),
-      FloatingNavItem(
         icon: Icons.menu_book_outlined,
         activeIcon: Icons.menu_book_rounded,
         label: l10n.journal,
+      ),
+      FloatingNavItem(
+        icon: Icons.person_outline_rounded,
+        activeIcon: Icons.person_rounded,
+        label: l10n.profile,
       ),
     ];
 
@@ -92,9 +92,9 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsetsDirectional.only(start: 12),
             child: Center(
               child: Tooltip(
-                message: l10n.barakah,
+                message: l10n.profile,
                 child: AppPressable(
-                  onTap: () => context.push('/barakah'),
+                  onTap: () => context.go('/profile'),
                   pressedScale: 0.92,
                   borderRadius: BorderRadius.circular(20),
                   child: Stack(
@@ -157,7 +157,7 @@ class HomeScreen extends StatelessWidget {
         actions: [
           if (isHome) ...[
             AppPressable(
-              onTap: () => context.push('/barakah'),
+              onTap: () => context.go('/profile'),
               pressedScale: 0.92,
               borderRadius: BorderRadius.circular(14),
               child: Container(
@@ -238,8 +238,9 @@ class HomeScreen extends StatelessWidget {
                 prayerService!.cachedLocationName!.isNotEmpty
             ? '📍 ${prayerService.cachedLocationName}'
             : null,
-      '/barakah' => isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
       '/journal' => isAr ? 'النيات والخواطر' : 'Intentions & Reflections',
+      '/profile' => l10n.profileSubtitle,
+      '/barakah' => isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
       _ => null,
     };
   }
@@ -254,8 +255,9 @@ class HomeScreen extends StatelessWidget {
       '/tasks' ||
       '/habits' => (title: l10n.plan, icon: Icons.checklist_rtl_rounded),
       '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
-      '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
       '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
+      '/profile' => (title: l10n.profile, icon: Icons.person_rounded),
+      '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
       _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
     };
   }
@@ -265,8 +267,8 @@ class HomeScreen extends StatelessWidget {
       '/' => 0,
       '/plan' || '/tasks' || '/habits' => 1,
       '/prayer-times' => 2,
-      '/barakah' => 3,
-      '/journal' => 4,
+      '/journal' => 3,
+      '/profile' || '/barakah' => 4,
       _ => 0,
     };
   }
@@ -283,10 +285,10 @@ class HomeScreen extends StatelessWidget {
         context.go('/prayer-times');
         break;
       case 3:
-        context.go('/barakah');
+        context.go('/journal');
         break;
       case 4:
-        context.go('/journal');
+        context.go('/profile');
         break;
     }
   }

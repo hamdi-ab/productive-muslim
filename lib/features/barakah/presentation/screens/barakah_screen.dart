@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/theme/arabic_typography.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
-import 'package:productive_muslim/domain/models/barakah_entry.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
@@ -15,9 +17,7 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_atmosphere_background.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_daily_prompt_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_entry_form_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_muhasabah_audit_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_radar_chart_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_weekly_review_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -101,21 +101,17 @@ class _BarakahScreenState extends State<BarakahScreen> {
                                 today: today,
                                 entries: state.entries,
                               ),
-                              const SizedBox(height: AppSpacing.lg),
-
-                              // 4. 9-Qualities Radar / Spider Chart Card
-                              const BarakahRadarChartCard(),
                               const SizedBox(height: AppSpacing.md),
 
-                              // 5. 12-Week Activity & Barakah Heatmap
-                              _buildHeatmapSection(state.entries, today),
+                              // 4. Dedicated 9-Qualities Radar & Profile Callout
+                              _buildProfileRadarCallout(context, isDark, isAr),
                               const SizedBox(height: AppSpacing.md),
 
-                              // 6. Spiritual Focus & Khushu' Audit Card
+                              // 5. Spiritual Focus & Khushu' Audit Card
                               const BarakahMuhasabahAuditCard(),
                               const SizedBox(height: AppSpacing.md),
 
-                              // 7. Weekly Muhasabah Review Launchpad Card
+                              // 6. Weekly Muhasabah Review Launchpad Card
                               const BarakahWeeklyReviewCard(),
                               const SizedBox(height: AppSpacing.xl),
                             ],
@@ -131,6 +127,108 @@ class _BarakahScreenState extends State<BarakahScreen> {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildProfileRadarCallout(
+    BuildContext context,
+    bool isDark,
+    bool isAr,
+  ) {
+    return AppPressable(
+      onTap: () {
+        AppHaptics.lightImpact();
+        final router = GoRouter.maybeOf(context);
+        if (router != null) {
+          context.go('/profile');
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark
+                ? AppColors.primary.withValues(alpha: 0.25)
+                : AppColors.primary.withValues(alpha: 0.15),
+          ),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    AppColors.primary.withValues(alpha: 0.12),
+                    AppColors.darkSurface,
+                  ]
+                : [
+                    AppColors.primary.withValues(alpha: 0.06),
+                    AppColors.surface,
+                  ],
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.primary.withValues(alpha: 0.2)
+                    : AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.radar_rounded,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isAr
+                        ? 'مخطط الصفات التسع ومعدل الاستمرارية'
+                        : '9-Qualities Radar & Momentum',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isAr
+                        ? 'انتقل إلى ملفك الشخصي لعرض توازن الصفات ومحاسبة الأداء'
+                        : 'View qualities balance & consistency momentum in Profile',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              isAr ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -192,20 +290,5 @@ class _BarakahScreenState extends State<BarakahScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildHeatmapSection(List<BarakahEntry> entries, String today) {
-    final Map<String, int> activity = {};
-    for (final e in entries) {
-      activity[e.date] = (activity[e.date] ?? 0) + 1;
-    }
-    activity[today] = (activity[today] ?? 0) + 1;
-
-    DateTime? refDate;
-    try {
-      refDate = DateTime.parse(today);
-    } catch (_) {}
-
-    return BarakahHeatmapCard(activityByDate: activity, referenceDate: refDate);
   }
 }
