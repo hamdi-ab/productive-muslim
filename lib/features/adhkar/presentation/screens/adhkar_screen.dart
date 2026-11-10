@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
-import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_background_atmosphere.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_category_tabs.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_session_dock.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -98,7 +101,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     if (next == item.targetCount) {
       AppHaptics.heavyImpact();
-      // Record completion
       try {
         if (getIt.isRegistered<AdhkarService>()) {
           final adhkarService = getIt<AdhkarService>();
@@ -112,7 +114,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         }
       } catch (_) {}
 
-      // Auto advance to next card after brief delay if not last and category hasn't changed
       final scheduledVersion = _categoryVersion;
       if (_currentPageIndex < _currentItems.length - 1) {
         Future.delayed(const Duration(milliseconds: 600), () {
@@ -165,309 +166,11 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     if (mounted) setState(() {});
   }
 
-  String _getCategoryLabel(DhikrCategory category, AppLocalizations l10n) {
-    switch (category) {
-      case DhikrCategory.morning:
-        return l10n.adhkarTabMorning;
-      case DhikrCategory.evening:
-        return l10n.adhkarTabEvening;
-      case DhikrCategory.wakingUp:
-        return l10n.adhkarTabWaking;
-      case DhikrCategory.sleeping:
-        return l10n.adhkarTabBedtime;
-      case DhikrCategory.postPrayer:
-        return l10n.adhkarTabPostSalah;
-      case DhikrCategory.dailySunnah:
-        return l10n.adhkarTabSunnah;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _currentItems;
-    final completedCount = items
-        .where((item) => (_counts[item.id] ?? 0) >= item.targetCount)
-        .length;
-    final progressPercent = items.isNotEmpty
-        ? (completedCount / items.length).clamp(0.0, 1.0)
-        : 0.0;
-
-    final content = Column(
-      children: [
-        // Category Tabs (Horizontal Pill Selector matching Stitch)
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          child: Row(
-            children: DhikrCategory.values.map((cat) {
-              final isSelected = cat == _selectedCategory;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: AppPressable(
-                  onTap: () => _onCategorySelected(cat),
-                  pressedScale: 0.95,
-                  borderRadius: BorderRadius.circular(20),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (isDark
-                                ? AppColors.primary.withValues(alpha: 0.35)
-                                : AppColors.primary.withValues(alpha: 0.12))
-                          : (isDark
-                                ? Colors.white.withValues(alpha: 0.04)
-                                : Colors.black.withValues(alpha: 0.03)),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isSelected
-                            ? (isDark
-                                  ? AppColors.secondary.withValues(alpha: 0.6)
-                                  : AppColors.primary.withValues(alpha: 0.4))
-                            : (isDark
-                                  ? Colors.white.withValues(alpha: 0.08)
-                                  : Colors.black.withValues(alpha: 0.06)),
-                        width: isSelected ? 1.2 : 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isSelected) ...[
-                          Container(
-                            width: 6,
-                            height: 6,
-                            margin: const EdgeInsets.only(right: 6),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.secondary,
-                            ),
-                          ),
-                        ],
-                        Text(
-                          _getCategoryLabel(cat, l10n),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? (isDark ? Colors.white : AppColors.primary)
-                                : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.xs),
-
-        // Card Carousel Viewport
-        Expanded(
-          child: items.isEmpty
-              ? Center(child: Text(l10n.adhkarEmptyState))
-              : PageView.builder(
-                  controller: _pageController,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: items.length,
-                  onPageChanged: (idx) {
-                    setState(() => _currentPageIndex = idx);
-                  },
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final count = _counts[item.id] ?? 0;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: DhikrCard(
-                        item: item,
-                        count: count,
-                        index: index + 1,
-                        total: items.length,
-                        onTap: () => _incrementCount(item),
-                        onReset: () => _resetCount(item),
-                      ),
-                    );
-                  },
-                ),
-        ),
-
-        // Bottom Session Completion & Action Dock (matching Stitch fixed panel)
-        if (items.isNotEmpty) ...[
-          Container(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              10,
-              AppSpacing.md,
-              12,
-            ),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF0D1714).withValues(alpha: 0.95)
-                  : Colors.white.withValues(alpha: 0.95),
-              border: Border(
-                top: BorderSide(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.06),
-                ),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Session Progress Header & Bar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.fact_check_rounded,
-                            size: 14,
-                            color: isDark
-                                ? AppColors.secondary
-                                : AppColors.secondaryDark,
-                          ),
-                          const SizedBox(width: 5),
-                          Flexible(
-                            child: Text(
-                              'Session Progress',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '$completedCount of ${items.length} completed (${(progressPercent * 100).round()}%)',
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? AppColors.secondary
-                              : AppColors.secondaryDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: progressPercent,
-                    minHeight: 4,
-                    backgroundColor: isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : Colors.black.withValues(alpha: 0.06),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      progressPercent == 1.0
-                          ? const Color(0xFF10B981)
-                          : AppColors.secondary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Controls Row (Prev / Dots / Next) wrapped in FittedBox
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton.icon(
-                        onPressed: _currentPageIndex > 0
-                            ? () {
-                                _pageController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            : null,
-                        icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                        label: Text(l10n.adhkarPrev),
-                      ),
-                      const SizedBox(width: 8),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(items.length, (index) {
-                          final isCurrent = _currentPageIndex == index;
-                          final isItemDone =
-                              (_counts[items[index].id] ?? 0) >=
-                              items[index].targetCount;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: isCurrent ? 14 : 6,
-                            height: 6,
-                            margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3),
-                              color: isCurrent
-                                  ? AppColors.secondary
-                                  : (isItemDone
-                                        ? const Color(0xFF10B981)
-                                              .withValues(alpha: 0.6)
-                                        : (isDark
-                                              ? Colors.white24
-                                              : Colors.black12)),
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        onPressed: _currentPageIndex < items.length - 1
-                            ? () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            : null,
-                        label: Text(l10n.adhkarNext),
-                        icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -519,109 +222,75 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       ),
       body: Stack(
         children: [
-          // Background Islamic Rosette Lattice Watermark (matching Stitch obsidian/emerald design)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _IslamicLatticeBackgroundPainter(isDark: isDark),
-              ),
+          AdhkarBackgroundAtmosphere(isDark: isDark),
+          SafeArea(
+            child: Column(
+              children: [
+                AdhkarCategoryTabs(
+                  selectedCategory: _selectedCategory,
+                  onCategorySelected: _onCategorySelected,
+                  l10n: l10n,
+                  isDark: isDark,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Expanded(
+                  child: items.isEmpty
+                      ? Center(child: Text(l10n.adhkarEmptyState))
+                      : PageView.builder(
+                          controller: _pageController,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: items.length,
+                          onPageChanged: (idx) {
+                            setState(() => _currentPageIndex = idx);
+                          },
+                          itemBuilder: (context, index) {
+                            final item = items[index];
+                            final count = _counts[item.id] ?? 0;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                                vertical: AppSpacing.xs,
+                              ),
+                              child: DhikrCard(
+                                item: item,
+                                count: count,
+                                index: index + 1,
+                                total: items.length,
+                                onTap: () => _incrementCount(item),
+                                onReset: () => _resetCount(item),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+                AdhkarSessionDock(
+                  items: items,
+                  counts: _counts,
+                  currentPageIndex: _currentPageIndex,
+                  onPrevious: _currentPageIndex > 0
+                      ? () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                  onNext: _currentPageIndex < items.length - 1
+                      ? () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                  l10n: l10n,
+                  isDark: isDark,
+                ),
+              ],
             ),
           ),
-
-          // Ambient Sacred Atmosphere Aura matching Stitch
-          if (isDark) ...[
-            Positioned(
-              top: -80,
-              left: MediaQuery.of(context).size.width / 2 - 120,
-              child: IgnorePointer(
-                child: Container(
-                  width: 240,
-                  height: 240,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        const Color(0xFF10B981).withValues(alpha: 0.18),
-                        const Color(0xFF0F4C3A).withValues(alpha: 0.06),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.5, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 280,
-              right: -70,
-              child: IgnorePointer(
-                child: Container(
-                  width: 220,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.secondary.withValues(alpha: 0.10),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 80,
-              left: -70,
-              child: IgnorePointer(
-                child: Container(
-                  width: 220,
-                  height: 220,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.primaryLight.withValues(alpha: 0.10),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-          SafeArea(child: content),
         ],
       ),
     );
   }
-}
-
-/// Subtle Islamic geometric lattice watermark painter for background ambiance
-class _IslamicLatticeBackgroundPainter extends CustomPainter {
-  final bool isDark;
-
-  const _IslamicLatticeBackgroundPainter({required this.isDark});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = (isDark ? const Color(0xFF10B981) : AppColors.primary)
-          .withValues(alpha: isDark ? 0.025 : 0.015)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    const step = 56.0;
-    for (double x = 0; x < size.width + step; x += step) {
-      for (double y = 0; y < size.height + step; y += step) {
-        canvas.drawCircle(Offset(x, y), step * 0.35, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _IslamicLatticeBackgroundPainter oldDelegate) =>
-      oldDelegate.isDark != isDark;
 }
