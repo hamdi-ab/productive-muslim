@@ -4,21 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
+import 'package:productive_muslim/data/services/barakah_score_service.dart'
+    show BarakahQualityDimension;
 
-class BarakahQualityDimension {
-  final String key;
-  final String nameEn;
-  final String nameAr;
-  final double score; // 0.0 to 100.0
-  final Color color;
+export 'package:productive_muslim/data/services/barakah_score_service.dart'
+    show BarakahQualityDimension;
 
-  const BarakahQualityDimension({
-    required this.key,
-    required this.nameEn,
-    required this.nameAr,
-    required this.score,
-    required this.color,
-  });
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
 }
 
 class BarakahRadarChartCard extends StatefulWidget {
@@ -116,6 +114,14 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
   }
 
   @override
+  void didUpdateWidget(covariant BarakahRadarChartCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.dimensions != oldWidget.dimensions) {
+      _animController.forward(from: 0.0);
+    }
+  }
+
+  @override
   void dispose() {
     _animController.dispose();
     super.dispose();
@@ -126,6 +132,27 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final items = widget.dimensions ?? defaultDimensions;
+
+    final sorted = List<BarakahQualityDimension>.from(items)
+      ..sort((a, b) => b.score.compareTo(a.score));
+    final topStrength = sorted.first;
+    final growthFocus = sorted.last;
+
+    final topName = isAr ? topStrength.nameAr : topStrength.nameEn;
+    final topScore = topStrength.score.toInt();
+    final topScoreStr = isAr ? _toArabicDigits('$topScore') : '$topScore';
+    final topText = isAr
+        ? 'أعلى نقطة قوة: $topName • $topScoreStr٪'
+        : 'Top Strength: $topName • $topScore%';
+
+    final growthName = isAr ? growthFocus.nameAr : growthFocus.nameEn;
+    final growthScore = growthFocus.score.toInt();
+    final growthScoreStr = isAr
+        ? _toArabicDigits('$growthScore')
+        : '$growthScore';
+    final growthText = isAr
+        ? 'فرصة النمو: $growthName • $growthScoreStr٪'
+        : 'Growth Focus: $growthName • $growthScore%';
 
     return Container(
       decoration: BoxDecoration(
@@ -288,9 +315,7 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                 const SizedBox(width: 7),
                 Expanded(
                   child: Text(
-                    isAr
-                        ? 'أعلى نقطة قوة: الاستقامة • ٩٤٪'
-                        : 'Top Strength: Consistency (Istiqaamah) • 94%',
+                    topText,
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,
@@ -327,9 +352,7 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                 const SizedBox(width: 7),
                 Expanded(
                   child: Text(
-                    isAr
-                        ? 'فرصة النمو: الخشوع • ٧٢٪'
-                        : "Growth Focus: Khushu' (Focus) • 72%",
+                    growthText,
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,

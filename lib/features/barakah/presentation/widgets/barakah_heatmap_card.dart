@@ -311,25 +311,60 @@ class BarakahHeatmapCard extends StatelessWidget {
     bool isAr,
     DateTime now,
   ) {
-    final days = isAr
-        ? [
-            ('إث', '88%', Icons.check_rounded, false, false),
-            ('ثل', '76%', Icons.check_rounded, false, false),
-            ('أر', '92%', Icons.check_rounded, false, false),
-            ('خم', '94%', Icons.star_rounded, false, false),
-            ('جمعة', '98%', Icons.hotel_class_rounded, true, false),
-            ('سبت', '86%', Icons.check_rounded, false, false),
-            ('اليوم', '92%', null, false, true),
-          ]
-        : [
-            ('Mon', '88%', Icons.check_rounded, false, false),
-            ('Tue', '76%', Icons.check_rounded, false, false),
-            ('Wed', '92%', Icons.check_rounded, false, false),
-            ('Thu', '94%', Icons.star_rounded, false, false),
-            ('Fri', '98%', Icons.hotel_class_rounded, true, false),
-            ('Sat', '86%', Icons.check_rounded, false, false),
-            ('Today', '92%', null, false, true),
-          ];
+    final dayNamesAr = {
+      DateTime.monday: 'إث',
+      DateTime.tuesday: 'ثل',
+      DateTime.wednesday: 'أر',
+      DateTime.thursday: 'خم',
+      DateTime.friday: 'جمعة',
+      DateTime.saturday: 'سبت',
+      DateTime.sunday: 'أحد',
+    };
+    final dayNamesEn = {
+      DateTime.monday: 'Mon',
+      DateTime.tuesday: 'Tue',
+      DateTime.wednesday: 'Wed',
+      DateTime.thursday: 'Thu',
+      DateTime.friday: 'Fri',
+      DateTime.saturday: 'Sat',
+      DateTime.sunday: 'Sun',
+    };
+
+    final List<(String, String, IconData?, bool, bool)> days = [];
+    for (int offset = 6; offset >= 0; offset--) {
+      final date = DateTime(now.year, now.month, now.day - offset);
+      final isToday = offset == 0;
+      final isJumuah = date.weekday == DateTime.friday;
+      final isThursday = date.weekday == DateTime.thursday;
+      final dateKey = _formatDateKey(date);
+      final count = activityByDate[dateKey] ?? 0;
+
+      final int scoreVal;
+      final IconData? icon;
+      if (count <= 0) {
+        scoreVal = isToday ? (activityByDate.isNotEmpty ? 60 : 0) : 0;
+        icon = null;
+      } else if (count == 1) {
+        scoreVal = 70;
+        icon = Icons.check_rounded;
+      } else {
+        scoreVal = (75 + count * 8).clamp(0, 100);
+        icon = isJumuah
+            ? Icons.hotel_class_rounded
+            : (isThursday ? Icons.star_rounded : Icons.check_rounded);
+      }
+
+      final label = isToday
+          ? (isAr ? 'اليوم' : 'Today')
+          : (isAr
+                ? (dayNamesAr[date.weekday] ?? '')
+                : (dayNamesEn[date.weekday] ?? ''));
+
+      final scoreStr = isAr
+          ? '${_locDigits(context, '$scoreVal')}٪'
+          : '$scoreVal%';
+      days.add((label, scoreStr, icon, isJumuah, isToday));
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

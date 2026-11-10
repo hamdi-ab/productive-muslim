@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/data/services/hijri_service.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeProductivityToolkit extends StatefulWidget {
@@ -15,21 +20,77 @@ class HomeProductivityToolkit extends StatefulWidget {
 }
 
 class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
-  int _tasbihCount = 23;
+  int _tasbihCount = 0;
   final int _tasbihTarget = 33;
-  bool _isFasting = true;
+  bool _isFasting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadState();
+  }
+
+  void _loadState() {
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    if (getIt.isRegistered<SettingsService>()) {
+      _isFasting = getIt<SettingsService>().isSunnahFastingTarget(today);
+    }
+    if (getIt.isRegistered<AdhkarService>()) {
+      final saved = getIt<AdhkarService>().getDhikrCount('subhanallah_33');
+      _tasbihCount = saved > 0 ? saved : 0;
+    }
+  }
 
   void _incrementTasbih() {
     HapticFeedback.lightImpact();
     setState(() {
       _tasbihCount = (_tasbihCount % _tasbihTarget) + 1;
     });
+    if (getIt.isRegistered<AdhkarService>()) {
+      getIt<AdhkarService>().recordDhikrCount(
+        dhikrId: 'subhanallah_33',
+        count: _tasbihCount,
+      );
+    }
+  }
+
+  void _toggleFasting() {
+    HapticFeedback.selectionClick();
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    setState(() {
+      _isFasting = !_isFasting;
+    });
+    if (getIt.isRegistered<SettingsService>()) {
+      getIt<SettingsService>().toggleSunnahFastingTarget(today);
+    }
+  }
+
+  String _getFastingSubtitle(bool isAr) {
+    if (getIt.isRegistered<HijriService>()) {
+      final hijri = getIt<HijriService>();
+      final now = DateTime.now();
+      final todayStatus = hijri.getSunnahFastingStatus(now);
+      if (todayStatus.isSunnah) {
+        return isAr
+            ? (todayStatus.reasonAr ?? 'صيام مسنون اليوم')
+            : (todayStatus.reasonEn ?? 'Sunnah Fasting Today');
+      }
+      final tomorrow = now.add(const Duration(days: 1));
+      final tomorrowStatus = hijri.getSunnahFastingStatus(tomorrow);
+      if (tomorrowStatus.isSunnah) {
+        return isAr
+            ? 'غداً: ${tomorrowStatus.reasonAr ?? 'صيام مسنون'}'
+            : 'Tomorrow: ${tomorrowStatus.reasonEn ?? 'Sunnah Fast'}';
+      }
+    }
+    return isAr ? 'صيام الإثنين والخميس' : 'Mon & Thu Sunnah Fast';
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,12 +193,9 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                 pillLabel: 'Sunnah',
                 pillColor: const Color(0xFFD4AF37),
                 title: l10n.fastingTitle,
-                subtitle: 'Tomorrow: Thursday Fast',
+                subtitle: _getFastingSubtitle(isAr),
                 bottomAction: InkWell(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    setState(() => _isFasting = !_isFasting);
-                  },
+                  onTap: _toggleFasting,
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -160,7 +218,7 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                       children: [
                         Expanded(
                           child: Text(
-                            "I'm Fasting",
+                            isAr ? 'أنا صائم' : "I'm Fasting",
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -178,10 +236,7 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                           height: 18,
                           child: Checkbox(
                             value: _isFasting,
-                            onChanged: (val) {
-                              HapticFeedback.selectionClick();
-                              setState(() => _isFasting = val ?? false);
-                            },
+                            onChanged: (val) => _toggleFasting(),
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                             activeColor: const Color(0xFF10B981),

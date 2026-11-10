@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
+import 'package:productive_muslim/data/services/barakah_score_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
+import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
@@ -34,51 +37,84 @@ class ProfileScreen extends StatelessWidget {
     final Widget content = BlocBuilder<BarakahBloc, BarakahState>(
       builder: (context, state) {
         final entries = state is Loaded ? state.entries : const [];
-        final Map<String, int> activityByDate = {};
+        final Map<String, int> entriesByDate = {};
         for (final e in entries) {
-          activityByDate[e.date] = (activityByDate[e.date] ?? 0) + 1;
+          entriesByDate[e.date] = (entriesByDate[e.date] ?? 0) + 1;
         }
 
-        return ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          children: [
-            // Bismillah Sacred Purpose Pill
-            _buildBismillahPill(isDark, isAr),
-            const SizedBox(height: AppSpacing.sm),
+        return FutureBuilder<(BarakahScores?, Map<String, int>)>(
+          future: () async {
+            BarakahScores? scores;
+            if (getIt.isRegistered<BarakahScoreService>()) {
+              scores = await getIt<BarakahScoreService>().calculateLiveScores(
+                date: today,
+              );
+            }
+            Map<String, int> habitCounts = const {};
+            if (getIt.isRegistered<HabitRepository>()) {
+              habitCounts = await getIt<HabitRepository>()
+                  .getCompletionsCountByDate(days: 84);
+            }
+            return (scores, habitCounts);
+          }(),
+          builder: (context, snapshot) {
+            final scores = snapshot.data?.$1;
+            final habitCounts = snapshot.data?.$2 ?? const {};
+            final Map<String, int> totalActivity = Map<String, int>.from(
+              habitCounts,
+            );
+            for (final entry in entriesByDate.entries) {
+              totalActivity[entry.key] =
+                  (totalActivity[entry.key] ?? 0) + entry.value;
+            }
 
-            // In-Page Header when hosted inside bottom navigation shell
-            if (hasParentScaffold) ...[
-              _buildInPageHeader(context, l10n, isDark),
-              const SizedBox(height: AppSpacing.sm),
-            ],
+            return ListView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              children: [
+                // Bismillah Sacred Purpose Pill
+                _buildBismillahPill(isDark, isAr),
+                const SizedBox(height: AppSpacing.sm),
 
-            // 1. User Spiritual Identity Header Card
-            ProfileHeaderCard(isDark: isDark, isAr: isAr),
-            const SizedBox(height: AppSpacing.md),
+                // In-Page Header when hosted inside bottom navigation shell
+                if (hasParentScaffold) ...[
+                  _buildInPageHeader(context, l10n, isDark),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
 
-            // 2. Barakah Capacity & Score Header Card
-            BarakahScoreHeaderCard(isDark: isDark, isAr: isAr),
-            const SizedBox(height: AppSpacing.md),
+                // 1. User Spiritual Identity Header Card
+                ProfileHeaderCard(isDark: isDark, isAr: isAr),
+                const SizedBox(height: AppSpacing.md),
 
-            // 3. 9-Qualities Radar / Spider Chart Card
-            const BarakahRadarChartCard(),
-            const SizedBox(height: AppSpacing.md),
+                // 2. Barakah Capacity & Score Header Card
+                BarakahScoreHeaderCard(
+                  isDark: isDark,
+                  isAr: isAr,
+                  scorePercent: scores?.scorePercent ?? 0.85,
+                  scorePoints: scores?.scorePoints ?? 85,
+                ),
+                const SizedBox(height: AppSpacing.md),
 
-            // 4. 12-Week Consistency & Growth Momentum Heatmap
-            BarakahHeatmapCard(activityByDate: activityByDate),
-            const SizedBox(height: AppSpacing.md),
+                // 3. 9-Qualities Radar / Spider Chart Card
+                BarakahRadarChartCard(dimensions: scores?.dimensions),
+                const SizedBox(height: AppSpacing.md),
 
-            // 5. Weekly Muhasabah Milestone Launcher
-            const BarakahWeeklyReviewCard(),
-            const SizedBox(height: AppSpacing.md),
+                // 4. 12-Week Consistency & Growth Momentum Heatmap
+                BarakahHeatmapCard(activityByDate: totalActivity),
+                const SizedBox(height: AppSpacing.md),
 
-            // 6. Quick Preferences & Touch Settings
-            ProfilePreferencesCard(isDark: isDark, isAr: isAr),
-            const SizedBox(height: AppSpacing.xl),
-          ],
+                // 5. Weekly Muhasabah Milestone Launcher
+                const BarakahWeeklyReviewCard(),
+                const SizedBox(height: AppSpacing.md),
+
+                // 6. Quick Preferences & Touch Settings
+                ProfilePreferencesCard(isDark: isDark, isAr: isAr),
+                const SizedBox(height: AppSpacing.xl),
+              ],
+            );
+          },
         );
       },
     );
