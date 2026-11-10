@@ -25,6 +25,7 @@ import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/backup_service.dart';
+import 'package:productive_muslim/data/services/barakah_score_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -116,6 +117,16 @@ Future<void> setupDi() async {
     () => BackupService(
       db: getIt<AppDatabase>(),
       settingsService: getIt<SettingsService>(),
+    ),
+  );
+  getIt.registerLazySingleton<BarakahScoreService>(
+    () => BarakahScoreService(
+      habitRepo: getIt<HabitRepository>(),
+      taskRepo: getIt<TaskRepository>(),
+      barakahRepo: getIt<BarakahRepository>(),
+      settingsService: getIt<SettingsService>(),
+      adhkarService: getIt<AdhkarService>(),
+      hijriService: getIt<HijriService>(),
     ),
   );
 

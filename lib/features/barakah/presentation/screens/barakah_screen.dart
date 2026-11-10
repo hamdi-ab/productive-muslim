@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/theme/arabic_typography.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
+import 'package:productive_muslim/data/services/barakah_score_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
@@ -84,9 +86,21 @@ class _BarakahScreenState extends State<BarakahScreen> {
                               _buildBismillahPill(isDark, isAr),
 
                               // 1. Live Barakah Capacity & Score Badge
-                              BarakahScoreHeaderCard(
-                                isDark: isDark,
-                                isAr: isAr,
+                              FutureBuilder<BarakahScores>(
+                                future:
+                                    getIt.isRegistered<BarakahScoreService>()
+                                    ? getIt<BarakahScoreService>()
+                                          .calculateLiveScores(date: today)
+                                    : null,
+                                builder: (context, scoreSnapshot) {
+                                  final scores = scoreSnapshot.data;
+                                  return BarakahScoreHeaderCard(
+                                    isDark: isDark,
+                                    isAr: isAr,
+                                    scorePercent: scores?.scorePercent ?? 0.85,
+                                    scorePoints: scores?.scorePoints ?? 85,
+                                  );
+                                },
                               ),
                               const SizedBox(height: AppSpacing.md),
 

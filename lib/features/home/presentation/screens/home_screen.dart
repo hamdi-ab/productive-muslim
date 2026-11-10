@@ -13,6 +13,7 @@ import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
+import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -156,44 +157,57 @@ class HomeScreen extends StatelessWidget {
         showBackButton: false,
         actions: [
           if (isHome) ...[
-            AppPressable(
-              onTap: () => context.go('/profile'),
-              pressedScale: 0.92,
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                margin: const EdgeInsetsDirectional.only(end: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
-                      : const Color(0xFFFEF3C7),
+            StreamBuilder<int>(
+              stream: getIt.isRegistered<HabitRepository>()
+                  ? getIt<HabitRepository>().watchOverallStreak()
+                  : null,
+              initialData: 0,
+              builder: (context, snapshot) {
+                final streak = snapshot.data ?? 0;
+                return AppPressable(
+                  onTap: () => context.go('/profile'),
+                  pressedScale: 0.92,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.local_fire_department_rounded,
-                      color: Color(0xFFD97706),
-                      size: 14,
+                  child: Container(
+                    key: const Key('home_streak_badge'),
+                    margin: const EdgeInsetsDirectional.only(end: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '12d',
-                      style: TextStyle(
-                        color: isDark
-                            ? const Color(0xFFFBBF24)
-                            : const Color(0xFF92400E),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                          : const Color(0xFFFEF3C7),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
                       ),
                     ),
-                  ],
-                ),
-              ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.local_fire_department_rounded,
+                          color: Color(0xFFD97706),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${streak}d',
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFFFBBF24)
+                                : const Color(0xFF92400E),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             ProductiveAppBarAction(
               icon: Icons.settings_outlined,

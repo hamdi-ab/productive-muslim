@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 
 class DailyEnergyKhushuMeter extends StatelessWidget {
   const DailyEnergyKhushuMeter({super.key});
@@ -11,6 +14,22 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    int physicalPct = 80;
+    int khushuPct = 75;
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      final energy = settings.getDailyEnergy(today);
+      physicalPct = ((energy.physical / 5.0) * 100).round();
+      final focusMins = settings.totalFocusMinutes;
+      khushuPct = (50 + (focusMins.clamp(0, 60) / 60.0 * 50)).round();
+    }
+
+    final optimalPct = ((physicalPct + khushuPct) / 2).round().clamp(10, 100);
+    final widthFactor = (optimalPct / 100.0).clamp(0.05, 1.0);
 
     return AppPressable(
       onTap: () => context.push('/energy'),
@@ -70,9 +89,9 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                           color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                         ),
                       ),
-                      child: const Text(
-                        '84% Optimal',
-                        style: TextStyle(
+                      child: Text(
+                        '$optimalPct% Optimal',
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF92400E),
@@ -95,7 +114,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
               ),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
-                widthFactor: 0.84,
+                widthFactor: widthFactor,
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -137,7 +156,9 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          'Physical Energy 88%',
+                          isAr
+                              ? 'الطاقة البدنية $physicalPct٪'
+                              : 'Physical Energy $physicalPct%',
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w500,
@@ -174,7 +195,9 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          'Spiritual Focus 80%',
+                          isAr
+                              ? 'التركيز الروحي $khushuPct٪'
+                              : 'Spiritual Focus $khushuPct%',
                           style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w500,

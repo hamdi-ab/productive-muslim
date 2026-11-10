@@ -133,6 +133,11 @@ void main() {
 
     when(() => mockHabitRepo.watchActiveHabits())
         .thenAnswer((_) => Stream.value(sampleHabits));
+    when(() => mockHabitRepo.watchCompletionsForDate(any()))
+        .thenAnswer((_) => Stream.value(<int, bool>{1: true}));
+    when(() => mockHabitRepo.watchOverallStreak())
+        .thenAnswer((_) => Stream.value(5));
+    when(() => mockHabitRepo.getOverallStreak()).thenAnswer((_) async => 5);
     when(() => mockHabitRepo.getCompletionsForDateMap(any()))
         .thenAnswer((_) async => <int, bool>{1: true});
     when(() => mockHabitRepo.getStreak(any())).thenAnswer((_) async => 5);

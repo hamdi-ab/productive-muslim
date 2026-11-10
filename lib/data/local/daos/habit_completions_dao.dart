@@ -87,4 +87,79 @@ class HabitCompletionsDao extends DatabaseAccessor<AppDatabase>
     final rows = await getCompletionsForDate(date);
     return {for (final row in rows) row.habitId: row.completed == 1};
   }
+
+  Future<int> getOverallStreak({DateTime? now}) async {
+    final rows =
+        await (select(habitCompletions)
+              ..where((c) => c.completed.equals(1))
+              ..orderBy([(c) => OrderingTerm.desc(c.date)]))
+            .get();
+
+    if (rows.isEmpty) return 0;
+
+    final uniqueDates = rows.map((r) => r.date).toSet().toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    if (uniqueDates.isEmpty) return 0;
+
+    int streak = 0;
+    DateTime? expectedDate;
+    final today = now ?? DateTime.now();
+    final todayStr =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final yesterday = today.subtract(const Duration(days: 1));
+    final yesterdayStr =
+        '${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
+
+    for (final dateStr in uniqueDates) {
+      final rowDate = DateTime.parse(dateStr);
+      if (expectedDate == null) {
+        if (dateStr != todayStr && dateStr != yesterdayStr) break;
+        expectedDate = rowDate;
+        streak = 1;
+      } else {
+        final diff = expectedDate.difference(rowDate).inDays;
+        if (diff == 1) {
+          streak++;
+          expectedDate = rowDate;
+        } else if (diff == 0) {
+          continue;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return streak;
+  }
+
+  Stream<int> watchOverallStreak({DateTime? now}) {
+    return select(habitCompletions)
+        .watch()
+        .asyncMap((_) => getOverallStreak(now: now));
+  }
+
+  Future<Map<String, int>> getCompletionsCountByDate({
+    int days = 84,
+    DateTime? now,
+  }) async {
+    final reference = now ?? DateTime.now();
+    final cutoff = reference.subtract(Duration(days: days));
+    final cutoffStr =
+        '${cutoff.year}-${cutoff.month.toString().padLeft(2, '0')}-${cutoff.day.toString().padLeft(2, '0')}';
+
+    final rows =
+        await (select(habitCompletions)..where(
+              (c) =>
+                  c.date.isBiggerOrEqualValue(cutoffStr) &
+                  c.completed.equals(1),
+            ))
+            .get();
+
+    final counts = <String, int>{};
+    for (final row in rows) {
+      counts[row.date] = (counts[row.date] ?? 0) + 1;
+    }
+    return counts;
+  }
 }

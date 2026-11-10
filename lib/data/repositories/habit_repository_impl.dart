@@ -84,7 +84,31 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
+  Stream<Map<int, bool>> watchCompletionsForDate(String date) {
+    return _completionsDao
+        .watchCompletionsForDate(date)
+        .map(
+          (rows) => {for (final row in rows) row.habitId: row.completed == 1},
+        );
+  }
+
+  @override
   Future<int> getStreak(int habitId) {
     return _completionsDao.getStreak(habitId);
+  }
+
+  @override
+  Future<int> getOverallStreak() {
+    return _completionsDao.getOverallStreak();
+  }
+
+  @override
+  Stream<int> watchOverallStreak() {
+    return _completionsDao.watchOverallStreak();
+  }
+
+  @override
+  Future<Map<String, int>> getCompletionsCountByDate({int days = 84}) {
+    return _completionsDao.getCompletionsCountByDate(days: days);
   }
 }
