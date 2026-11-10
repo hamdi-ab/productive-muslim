@@ -5,8 +5,15 @@ import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
-import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_background_decorations.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_intention_chips.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_name_input.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_permission_card.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_qualities_selector.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_step_header.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_step_indicator.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_step_model.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -24,37 +31,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _selectedIntention = '';
   final List<String> _selectedQualities = [];
   final _nameController = TextEditingController();
-  _PermissionState _permissionState = _PermissionState.initial;
+  OnboardingPermissionState _permissionState =
+      OnboardingPermissionState.initial;
 
   SettingsService get _settings => widget.settings ?? SettingsService.empty();
 
   static const _maxQualities = 3;
 
-  final List<OnboardingStep> _steps = [
-    const OnboardingStep(
+  static const List<OnboardingStep> _steps = [
+    OnboardingStep(
       titleKey: 'onboardingWelcomeTitle',
       subtitleKey: 'onboardingWelcomeSubtitle',
       icon: Icons.nights_stay_rounded,
     ),
-    const OnboardingStep(
+    OnboardingStep(
       titleKey: 'onboardingNameTitle',
       subtitleKey: 'onboardingNameSubtitle',
       icon: Icons.person_rounded,
       hasInput: true,
     ),
-    const OnboardingStep(
+    OnboardingStep(
       titleKey: 'onboardingIntentionTitle',
       subtitleKey: 'onboardingIntentionSubtitle',
       icon: Icons.flag_rounded,
       hasChips: true,
     ),
-    const OnboardingStep(
+    OnboardingStep(
       titleKey: 'onboardingQualitiesTitle',
       subtitleKey: 'onboardingQualitiesSubtitle',
       icon: Icons.star_rounded,
       hasQualities: true,
     ),
-    const OnboardingStep(
+    OnboardingStep(
       titleKey: 'onboardingPermissionTitle',
       subtitleKey: 'onboardingPermissionSubtitle',
       icon: Icons.location_on_rounded,
@@ -117,12 +125,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _requestLocationPermission() async {
-    setState(() => _permissionState = _PermissionState.requesting);
+    setState(() => _permissionState = OnboardingPermissionState.requesting);
 
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        setState(() => _permissionState = _PermissionState.serviceOff);
+        setState(() => _permissionState = OnboardingPermissionState.serviceOff);
         return;
       }
 
@@ -133,16 +141,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       if (permission == LocationPermission.denied) {
         await _settings.setLocationPermission('denied');
-        setState(() => _permissionState = _PermissionState.denied);
+        setState(() => _permissionState = OnboardingPermissionState.denied);
       } else if (permission == LocationPermission.deniedForever) {
         await _settings.setLocationPermission('denied_forever');
-        setState(() => _permissionState = _PermissionState.deniedForever);
+        setState(
+          () => _permissionState = OnboardingPermissionState.deniedForever,
+        );
       } else {
         await _settings.setLocationPermission('granted');
-        setState(() => _permissionState = _PermissionState.granted);
+        setState(() => _permissionState = OnboardingPermissionState.granted);
       }
     } catch (_) {
-      setState(() => _permissionState = _PermissionState.denied);
+      setState(() => _permissionState = OnboardingPermissionState.denied);
     }
   }
 
@@ -252,84 +262,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
       body: Stack(
         children: [
-          // Subtle background gradient decorative circles
-          IgnorePointer(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: -100,
-                  right: -100,
-                  child: Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.primary.withValues(
-                        alpha: isDark ? 0.15 : 0.08,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: -80,
-                  left: -80,
-                  child: Container(
-                    width: 250,
-                    height: 250,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.secondary.withValues(
-                        alpha: isDark ? 0.12 : 0.06,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          OnboardingBackgroundDecorations(isDark: isDark),
           SafeArea(
             child: Column(
               children: [
                 const SizedBox(height: 12),
-                // Step Progress Indicator
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    key: const Key('step_progress_indicator'),
-                    children: List.generate(_steps.length, (i) {
-                      final isActive = i <= _currentStep;
-                      final isCurrent = i == _currentStep;
-                      return Expanded(
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          height: isCurrent ? 6 : 4,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? AppColors.primary
-                                : (isDark
-                                      ? AppColors.darkSurfaceSubtle
-                                      : AppColors.surfaceSubtle),
-                            borderRadius: BorderRadius.circular(3),
-                            boxShadow: isCurrent
-                                ? [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
+                OnboardingStepIndicator(
+                  totalSteps: _steps.length,
+                  currentStep: _currentStep,
+                  isDark: isDark,
                 ),
                 const SizedBox(height: 16),
-                // PageView content
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
@@ -344,61 +287,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
-                            const SizedBox(height: 32),
-                            // Hero Icon Badge with glowing effect
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                gradient: AppColors.primaryGradient,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.35,
-                                    ),
-                                    blurRadius: 24,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                step.icon,
-                                size: 48,
-                                color: Colors.white,
-                              ),
+                            OnboardingStepHeader(
+                              step: step,
+                              isDark: isDark,
+                              l10n: l10n,
                             ),
-                            const SizedBox(height: 32),
-                            Text(
-                              step.titleKey.tr(l10n),
-                              style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                height: 1.25,
+                            if (step.hasInput)
+                              OnboardingNameInput(
+                                controller: _nameController,
+                                l10n: l10n,
+                                isDark: isDark,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 12),
-                            if (step.subtitleKey != null)
-                              Text(
-                                step.subtitleKey!.tr(l10n),
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                  height: 1.45,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            const SizedBox(height: 36),
-                            if (step.hasInput) _buildNameInput(l10n, isDark),
                             if (step.hasChips)
-                              _buildIntentionChips(l10n, isDark),
+                              OnboardingIntentionChips(
+                                selectedIntention: _selectedIntention,
+                                onSelected: (val) {
+                                  setState(() => _selectedIntention = val);
+                                },
+                                l10n: l10n,
+                                isDark: isDark,
+                              ),
                             if (step.hasQualities)
-                              _buildQualitiesSelection(isDark),
+                              OnboardingQualitiesSelector(
+                                selectedQualities: _selectedQualities,
+                                onToggle: _toggleQuality,
+                                isDark: isDark,
+                              ),
                             if (step.hasPermission)
-                              _buildPermissionWidget(l10n, isDark),
+                              OnboardingPermissionCard(
+                                state: _permissionState,
+                                onRequestPermission: _requestLocationPermission,
+                                onOpenSettings: _openSettings,
+                                l10n: l10n,
+                                isDark: isDark,
+                              ),
                             const SizedBox(height: 24),
                           ],
                         ),
@@ -406,7 +328,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     },
                   ),
                 ),
-                // Bottom Button Action Area
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: SizedBox(
@@ -442,327 +363,5 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ],
       ),
     );
-  }
-
-  Widget _buildNameInput(AppLocalizations l10n, bool isDark) {
-    return GlassContainer(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      borderRadius: 20,
-      child: TextField(
-        controller: _nameController,
-        textCapitalization: TextCapitalization.words,
-        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-        decoration: InputDecoration(
-          hintText: l10n.enterYourName,
-          hintStyle: TextStyle(
-            color: isDark
-                ? AppColors.darkTextSecondary.withValues(alpha: 0.7)
-                : AppColors.textSecondary.withValues(alpha: 0.7),
-          ),
-          border: InputBorder.none,
-          icon: const Icon(
-            Icons.edit_rounded,
-            color: AppColors.primary,
-            size: 24,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntentionChips(AppLocalizations l10n, bool isDark) {
-    final intentions = [
-      ('barakah', l10n.seekingBarakah, Icons.auto_awesome_rounded),
-      ('worship', l10n.consistentWorship, Icons.mosque_rounded),
-      ('productivity', l10n.mindfulProductivity, Icons.bolt_rounded),
-    ];
-
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      alignment: WrapAlignment.center,
-      children: intentions.map((item) {
-        final selected = _selectedIntention == item.$1;
-        return InkWell(
-          onTap: () =>
-              setState(() => _selectedIntention = selected ? '' : item.$1),
-          borderRadius: BorderRadius.circular(20),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            decoration: BoxDecoration(
-              color: selected
-                  ? AppColors.primary.withValues(alpha: 0.15)
-                  : (isDark
-                        ? AppColors.darkSurfaceSubtle
-                        : AppColors.surfaceSubtle),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected ? AppColors.primary : Colors.transparent,
-                width: 2,
-              ),
-              boxShadow: selected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  item.$3,
-                  size: 20,
-                  color: selected ? AppColors.primary : AppColors.textSecondary,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  item.$2,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                    color: selected
-                        ? AppColors.primary
-                        : (isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildQualitiesSelection(bool isDark) {
-    final l10n = AppLocalizations.of(context)!;
-    final qualities = [
-      (id: 'taqwa', label: l10n.qualityTaqwa, icon: Icons.mosque_outlined),
-      (id: 'ikhlas', label: l10n.qualityIkhlas, icon: Icons.favorite_outline),
-      (
-        id: 'sabr',
-        label: l10n.qualitySabr,
-        icon: Icons.hourglass_empty_outlined,
-      ),
-      (id: 'shukr', label: l10n.qualityShukr, icon: Icons.thumb_up_outlined),
-      (
-        id: 'tawakkul',
-        label: l10n.qualityTawakkul,
-        icon: Icons.shield_outlined,
-      ),
-      (id: 'ihsan', label: l10n.qualityIhsan, icon: Icons.star_outline),
-      (id: 'ilm', label: l10n.qualityIlm, icon: Icons.menu_book_outlined),
-      (id: 'dawah', label: l10n.qualityDawah, icon: Icons.campaign_outlined),
-      (id: 'ummah', label: l10n.qualityUmmah, icon: Icons.groups_outlined),
-    ];
-
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      alignment: WrapAlignment.center,
-      children: qualities.map((q) {
-        final selected = _selectedQualities.contains(q.id);
-        return InkWell(
-          onTap: () => _toggleQuality(q.id),
-          borderRadius: BorderRadius.circular(16),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: selected
-                  ? (isDark
-                        ? AppColors.secondary.withValues(alpha: 0.2)
-                        : AppColors.primary.withValues(alpha: 0.12))
-                  : (isDark
-                        ? AppColors.darkSurfaceSubtle
-                        : AppColors.surfaceSubtle),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: selected
-                    ? (isDark ? AppColors.secondary : AppColors.primary)
-                    : Colors.transparent,
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  q.icon,
-                  size: 18,
-                  color: selected
-                      ? (isDark ? AppColors.secondary : AppColors.primary)
-                      : AppColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  q.label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                    color: selected
-                        ? (isDark ? AppColors.secondary : AppColors.primary)
-                        : (isDark
-                              ? AppColors.darkTextPrimary
-                              : AppColors.textPrimary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildPermissionWidget(AppLocalizations l10n, bool isDark) {
-    return GlassContainer(
-      padding: const EdgeInsets.all(24),
-      borderRadius: 24,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _permissionState == _PermissionState.granted
-                  ? Icons.check_circle_rounded
-                  : Icons.location_on_rounded,
-              size: 40,
-              color: _permissionState == _PermissionState.granted
-                  ? (isDark ? AppColors.secondary : AppColors.primary)
-                  : AppColors.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _permissionState == _PermissionState.granted
-                ? l10n.onboardingPermissionGranted
-                : l10n.onboardingPermissionBody,
-            style: const TextStyle(fontSize: 14, height: 1.45),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          if (_permissionState == _PermissionState.requesting)
-            const CircularProgressIndicator()
-          else if (_permissionState == _PermissionState.granted)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  color: isDark ? AppColors.secondary : AppColors.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    l10n.onboardingPermissionGranted,
-                    style: TextStyle(
-                      color: isDark ? AppColors.secondary : AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            )
-          else if (_permissionState == _PermissionState.deniedForever ||
-              _permissionState == _PermissionState.serviceOff)
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondary,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: _openSettings,
-              icon: const Icon(Icons.settings_rounded, size: 18),
-              label: Text(l10n.onboardingPermissionOpenSettings),
-            )
-          else
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: _requestLocationPermission,
-              icon: const Icon(Icons.check_circle_rounded, size: 18),
-              label: Text(l10n.onboardingPermissionGrant),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-enum _PermissionState {
-  initial,
-  requesting,
-  granted,
-  denied,
-  deniedForever,
-  serviceOff,
-}
-
-class OnboardingStep {
-  final String titleKey;
-  final String? subtitleKey;
-  final IconData icon;
-  final bool hasInput;
-  final bool hasChips;
-  final bool hasQualities;
-  final bool hasPermission;
-
-  const OnboardingStep({
-    required this.titleKey,
-    this.subtitleKey,
-    required this.icon,
-    this.hasInput = false,
-    this.hasChips = false,
-    this.hasQualities = false,
-    this.hasPermission = false,
-  });
-}
-
-extension _StringTr on String {
-  String tr(AppLocalizations l10n) {
-    switch (this) {
-      case 'onboardingWelcomeTitle':
-        return l10n.onboardingWelcomeTitle;
-      case 'onboardingWelcomeSubtitle':
-        return l10n.onboardingWelcomeSubtitle;
-      case 'onboardingNameTitle':
-        return l10n.onboardingNameTitle;
-      case 'onboardingNameSubtitle':
-        return l10n.onboardingNameSubtitle;
-      case 'onboardingIntentionTitle':
-        return l10n.onboardingIntentionTitle;
-      case 'onboardingIntentionSubtitle':
-        return l10n.onboardingIntentionSubtitle;
-      case 'onboardingQualitiesTitle':
-        return l10n.onboardingQualitiesTitle;
-      case 'onboardingQualitiesSubtitle':
-        return l10n.onboardingQualitiesSubtitle;
-      case 'onboardingPermissionTitle':
-        return l10n.onboardingPermissionTitle;
-      case 'onboardingPermissionSubtitle':
-        return l10n.onboardingPermissionSubtitle;
-      default:
-        return this;
-    }
   }
 }
