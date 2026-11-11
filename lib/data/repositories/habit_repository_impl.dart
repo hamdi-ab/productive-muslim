@@ -108,7 +108,17 @@ class HabitRepositoryImpl implements HabitRepository {
   }
 
   @override
+  Future<int> getLongestStreak() {
+    return _completionsDao.getLongestStreak();
+  }
+
+  @override
   Future<Map<String, int>> getCompletionsCountByDate({int days = 84}) {
     return _completionsDao.getCompletionsCountByDate(days: days);
+  }
+
+  @override
+  Stream<Map<String, int>> watchCompletionsCountByDate({int days = 84}) {
+    return _completionsDao.watchCompletionsCountByDate(days: days);
   }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' hide TextDirection;
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 
 import 'package:productive_muslim/core/constants/app_life_areas.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/bouncy_checkbox.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
@@ -12,6 +15,7 @@ import 'package:productive_muslim/features/habits/logic/habit_bloc.dart';
 import 'package:productive_muslim/features/habits/logic/habit_event.dart';
 import 'package:productive_muslim/features/habits/logic/habit_state.dart';
 import 'package:productive_muslim/features/habits/presentation/screens/create_habit_sheet.dart';
+import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -199,121 +203,201 @@ class _WeekHeader extends StatelessWidget {
     final weekday = now.weekday;
     final startOfWeek = now.subtract(Duration(days: weekday - 1));
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final dayLabels = isAr
+        ? ['ن', 'ث', 'ر', 'خ', 'ج', 'س', 'ح']
+        : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-    final dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    final habitRepo = getIt.isRegistered<HabitRepository>()
+        ? getIt<HabitRepository>()
+        : null;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GlassContainer(
-        padding: const EdgeInsets.all(16),
-        borderRadius: 24,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.habitToday,
-                  style: Theme.of(context).textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        (isDark ? AppColors.secondary : AppColors.secondaryDark)
-                            .withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.local_fire_department_rounded,
-                        size: 14,
-                        color: isDark
-                            ? AppColors.secondary
-                            : AppColors.secondaryDark,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.weeklyTrack,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? AppColors.secondary
-                              : AppColors.secondaryDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: List.generate(7, (i) {
-                final day = startOfWeek.add(Duration(days: i));
-                final isToday =
-                    day.day == now.day &&
-                    day.month == now.month &&
-                    day.year == now.year;
+    return StreamBuilder<int>(
+      stream: habitRepo?.watchOverallStreak() ?? Stream.value(0),
+      initialData: 0,
+      builder: (context, streakSnapshot) {
+        final streak = streakSnapshot.data ?? 0;
 
-                return Expanded(
+        return StreamBuilder<Map<String, int>>(
+          stream:
+              habitRepo?.watchCompletionsCountByDate(days: 14) ??
+              Stream.value(const {}),
+          initialData: const {},
+          builder: (context, activitySnapshot) {
+            final activityByDate = activitySnapshot.data ?? const {};
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: AppPressable(
+                onTap: () {
+                  AppHaptics.lightImpact();
+                  IstiqamahStreakSheet.show(context);
+                },
+                pressedScale: 0.98,
+                child: GlassContainer(
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 24,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        dayLabels[i],
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isToday
-                              ? AppColors.primary
-                              : (isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: isToday
-                              ? AppColors.primary
-                              : (isDark
-                                    ? AppColors.darkSurfaceSubtle
-                                    : AppColors.surfaceSubtle),
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '${day.day}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isToday
-                                ? Colors.white
-                                : (isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.textPrimary),
-                            fontWeight: isToday
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Text(
+                                  l10n.habitToday,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 14,
+                                  color: AppColors.secondary,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Container(
+                                key: const Key('habit_screen_streak_pill'),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      (isDark
+                                              ? AppColors.secondary
+                                              : AppColors.secondaryDark)
+                                          .withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color:
+                                        (isDark
+                                                ? AppColors.secondary
+                                                : AppColors.secondaryDark)
+                                            .withValues(alpha: 0.35),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.local_fire_department_rounded,
+                                      size: 14,
+                                      color: Color(0xFFD97706),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      streak > 0
+                                          ? l10n.streak(streak)
+                                          : l10n.weeklyTrack,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark
+                                            ? const Color(0xFFFBBF24)
+                                            : const Color(0xFF92400E),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: List.generate(7, (i) {
+                          final day = startOfWeek.add(Duration(days: i));
+                          final dateStr = DateFormat('yyyy-MM-dd').format(day);
+                          final isToday =
+                              day.day == now.day &&
+                              day.month == now.month &&
+                              day.year == now.year;
+                          final isCompleted =
+                              (activityByDate[dateStr] ?? 0) > 0;
+
+                          return Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  dayLabels[i],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isToday
+                                        ? FontWeight.bold
+                                        : FontWeight.w600,
+                                    color: isToday
+                                        ? AppColors.primary
+                                        : (isDark
+                                              ? AppColors.darkTextSecondary
+                                              : AppColors.textSecondary),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: isCompleted
+                                        ? const Color(0xFF10B981)
+                                        : isToday
+                                        ? AppColors.primary
+                                        : (isDark
+                                              ? AppColors.darkSurfaceSubtle
+                                              : AppColors.surfaceSubtle),
+                                    shape: BoxShape.circle,
+                                    border: isCompleted
+                                        ? Border.all(
+                                            color: const Color(0xFF059669),
+                                            width: 1.2,
+                                          )
+                                        : null,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: isCompleted
+                                      ? const Icon(
+                                          Icons.check_rounded,
+                                          size: 16,
+                                          color: Colors.white,
+                                        )
+                                      : Text(
+                                          '${day.day}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: (isCompleted || isToday)
+                                                ? Colors.white
+                                                : (isDark
+                                                      ? AppColors
+                                                            .darkTextPrimary
+                                                      : AppColors.textPrimary),
+                                            fontWeight: isToday
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
                       ),
                     ],
                   ),
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

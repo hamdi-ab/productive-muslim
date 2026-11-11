@@ -8,6 +8,7 @@ import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
+import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Hero identity card for the user's spiritual profile, showcasing avatar,
@@ -33,9 +34,6 @@ class ProfileHeaderCard extends StatelessWidget {
     final displayName = (userName != null && userName.trim().isNotEmpty)
         ? userName.trim()
         : (isAr ? 'طالب البركة' : 'Productive Seeker');
-
-    final levelTitle = isAr ? 'الـمُبـارك' : 'Al-Mubarak';
-    final levelRank = isAr ? 'المستوى ٤' : 'Level 4';
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -123,13 +121,24 @@ class ProfileHeaderCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Container(
+                    StreamBuilder<int>(
+                      stream: getIt.isRegistered<HabitRepository>()
+                          ? getIt<HabitRepository>().watchOverallStreak()
+                          : null,
+                      initialData: 0,
+                      builder: (context, snapshot) {
+                        final streak = snapshot.data ?? 0;
+                        final (levelTitle, levelRank) = _computeSpiritualLevel(
+                          streak,
+                          isAr,
+                        );
+
+                        return Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
                                 vertical: 2.5,
@@ -155,60 +164,54 @@ class ProfileHeaderCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        StreamBuilder<int>(
-                          stream: getIt.isRegistered<HabitRepository>()
-                              ? getIt<HabitRepository>().watchOverallStreak()
-                              : null,
-                          initialData: 0,
-                          builder: (context, snapshot) {
-                            final streak = snapshot.data ?? 0;
-                            return Flexible(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Container(
-                                  key: const Key('profile_streak_badge'),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2.5,
-                                  ),
-                                  decoration: BoxDecoration(
+                            AppPressable(
+                              onTap: () => IstiqamahStreakSheet.show(context),
+                              pressedScale: 0.92,
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                key: const Key('profile_streak_badge'),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B)
+                                      .withValues(alpha: 0.16),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
                                     color: const Color(0xFFF59E0B)
-                                        .withValues(alpha: 0.16),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: const Color(0xFFF59E0B)
-                                          .withValues(alpha: 0.35),
-                                      width: 0.8,
-                                    ),
+                                        .withValues(alpha: 0.35),
+                                    width: 0.8,
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.local_fire_department_rounded,
-                                        size: 12,
-                                        color: Color(0xFFD97706),
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text(
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.local_fire_department_rounded,
+                                      size: 12,
+                                      color: Color(0xFFD97706),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Flexible(
+                                      child: Text(
                                         l10n.streak(streak),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.bold,
                                           color: Color(0xFFD97706),
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -289,5 +292,34 @@ class ProfileHeaderCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static (String, String) _computeSpiritualLevel(int streak, bool isAr) {
+    if (streak >= 40) {
+      return (
+        isAr ? 'الـمُقـرّب' : 'Al-Muqarrab',
+        isAr ? 'المستوى ٥' : 'Level 5',
+      );
+    } else if (streak >= 21) {
+      return (
+        isAr ? 'الـمُبـارك' : 'Al-Mubarak',
+        isAr ? 'المستوى ٤' : 'Level 4',
+      );
+    } else if (streak >= 7) {
+      return (
+        isAr ? 'الـثّـابـت' : 'Al-Thabit',
+        isAr ? 'المستوى ٣' : 'Level 3',
+      );
+    } else if (streak >= 3) {
+      return (
+        isAr ? 'الـمُجـاهـد' : 'Al-Mujahid',
+        isAr ? 'المستوى ٢' : 'Level 2',
+      );
+    } else {
+      return (
+        isAr ? 'الـسَّـاعِـي' : 'Al-Sa\'i',
+        isAr ? 'المستوى ١' : 'Level 1',
+      );
+    }
   }
 }

@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 class BarakahScoreHeaderCard extends StatelessWidget {
   final bool isDark;
   final bool isAr;
@@ -129,35 +138,48 @@ class BarakahScoreHeaderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Progress Bar with Al-Ihsan Tier
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  isAr
-                      ? 'درجة الإحسان ($scorePoints/100 نقطة)'
-                      : 'Al-Ihsan Tier ($scorePoints/100 points)',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    color: Colors.white70,
-                    fontWeight: FontWeight.w600,
+          // Progress Bar with dynamic Spiritual Tier
+          () {
+            final tierName = scorePoints >= 90
+                ? (isAr ? 'رتبة المقربين' : 'Al-Muqarraboon Tier')
+                : scorePoints >= 80
+                ? (isAr ? 'رتبة الإحسان' : 'Al-Ihsan Tier')
+                : scorePoints >= 70
+                ? (isAr ? 'رتبة المقتصد' : 'Al-Muqtased Tier')
+                : (isAr ? 'رتبة الساعين' : 'Sabiqun Tier');
+            final scorePointsStr = isAr
+                ? _toArabicDigits('$scorePoints')
+                : '$scorePoints';
+            final totalPointsStr = isAr ? '١٠٠' : '100';
+            final pointsWord = isAr ? 'نقطة' : 'points';
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '$tierName ($scorePointsStr/$totalPointsStr $pointsWord)',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '$scorePoints%',
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  color: AppColors.secondary,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(width: 8),
+                Text(
+                  isAr ? '$scorePointsStr٪' : '$scorePoints%',
+                  style: const TextStyle(
+                    fontSize: 10.5,
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }(),
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(6),

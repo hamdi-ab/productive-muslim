@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
@@ -133,6 +134,20 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final items = widget.dimensions ?? defaultDimensions;
 
+    final avgScore = items.isEmpty
+        ? 85
+        : (items.fold<double>(0, (sum, e) => sum + e.score) / items.length)
+              .round()
+              .clamp(0, 100);
+    final avgScoreStr = isAr ? _toArabicDigits('$avgScore') : '$avgScore';
+    final tierName = avgScore >= 90
+        ? (isAr ? 'رتبة المقربين' : 'Al-Muqarraboon Tier')
+        : avgScore >= 80
+        ? (isAr ? 'رتبة الإحسان' : 'Al-Ihsan Tier')
+        : avgScore >= 70
+        ? (isAr ? 'رتبة المقتصد' : 'Al-Muqtased Tier')
+        : (isAr ? 'رتبة الساعين' : 'Sabiqun Tier');
+
     final sorted = List<BarakahQualityDimension>.from(items)
       ..sort((a, b) => b.score.compareTo(a.score));
     final topStrength = sorted.first;
@@ -243,8 +258,8 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                         const SizedBox(width: 4),
                         Text(
                           isAr
-                              ? '٨٤/١٠٠ • رتبة الإحسان'
-                              : '84 / 100 • Al-Ihsan Tier',
+                              ? '$avgScoreStr/١٠٠ • $tierName'
+                              : '$avgScore / 100 • $tierName',
                           style: const TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.bold,
@@ -364,9 +379,7 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    AppHaptics.selectionClick();
-                  },
+                  onTap: () => _navigateForGrowth(context, growthFocus.key),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -393,6 +406,36 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
         ],
       ),
     );
+  }
+
+  void _navigateForGrowth(BuildContext context, String key) {
+    AppHaptics.mediumImpact();
+    switch (key) {
+      case 'ruh':
+        context.push('/adhkar');
+        break;
+      case 'jism':
+        context.push('/energy');
+        break;
+      case 'ummah':
+        context.push('/tasks');
+        break;
+      case 'aql':
+      case 'khushu':
+        context.push('/focus');
+        break;
+      case 'istiqamah':
+        context.push('/habits');
+        break;
+      case 'niyyah':
+      case 'shukr':
+        context.push('/journal');
+        break;
+      case 'ihsan':
+      default:
+        context.push('/barakah');
+        break;
+    }
   }
 }
 
@@ -543,9 +586,12 @@ class _NonagonRadarPainter extends CustomPainter {
         center.dy + labelDist * math.sin(angle),
       );
 
+      final scoreDigits = isAr
+          ? _toArabicDigits('${item.score.toInt()}')
+          : '${item.score.toInt()}';
       final labelText = isAr
-          ? '${item.nameAr} ${item.score.toInt()}%'
-          : '${item.key.toUpperCase()} ${item.score.toInt()}%';
+          ? '${item.nameAr} $scoreDigits٪'
+          : '${item.key.toUpperCase()} $scoreDigits%';
       final textSpan = TextSpan(
         text: labelText,
         style: TextStyle(

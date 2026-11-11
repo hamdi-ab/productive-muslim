@@ -139,6 +139,38 @@ class HabitCompletionsDao extends DatabaseAccessor<AppDatabase>
         .asyncMap((_) => getOverallStreak(now: now));
   }
 
+  Future<int> getLongestStreak() async {
+    final rows =
+        await (select(habitCompletions)
+              ..where((c) => c.completed.equals(1))
+              ..orderBy([(c) => OrderingTerm.desc(c.date)]))
+            .get();
+
+    if (rows.isEmpty) return 0;
+
+    final uniqueDates = rows.map((r) => r.date).toSet().toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    if (uniqueDates.isEmpty) return 0;
+
+    int maxStreak = 1;
+    int currentRun = 1;
+    DateTime prevDate = DateTime.parse(uniqueDates.first);
+
+    for (int i = 1; i < uniqueDates.length; i++) {
+      final curDate = DateTime.parse(uniqueDates[i]);
+      final diff = prevDate.difference(curDate).inDays;
+      if (diff == 1) {
+        currentRun++;
+        if (currentRun > maxStreak) maxStreak = currentRun;
+      } else if (diff > 1) {
+        currentRun = 1;
+      }
+      prevDate = curDate;
+    }
+    return maxStreak;
+  }
+
   Future<Map<String, int>> getCompletionsCountByDate({
     int days = 84,
     DateTime? now,
@@ -161,5 +193,14 @@ class HabitCompletionsDao extends DatabaseAccessor<AppDatabase>
       counts[row.date] = (counts[row.date] ?? 0) + 1;
     }
     return counts;
+  }
+
+  Stream<Map<String, int>> watchCompletionsCountByDate({
+    int days = 84,
+    DateTime? now,
+  }) {
+    return select(habitCompletions)
+        .watch()
+        .asyncMap((_) => getCompletionsCountByDate(days: days, now: now));
   }
 }
