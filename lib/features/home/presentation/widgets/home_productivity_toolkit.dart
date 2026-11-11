@@ -11,6 +11,15 @@ import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 class HomeProductivityToolkit extends StatefulWidget {
   const HomeProductivityToolkit({super.key});
 
@@ -92,6 +101,13 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
+    final tasbihPill = isAr
+        ? '${_toArabicDigits('$_tasbihCount')}/${_toArabicDigits('$_tasbihTarget')}'
+        : '$_tasbihCount/$_tasbihTarget';
+    final tasbihButtonLabel = isAr
+        ? 'تسبيح: ${_toArabicDigits('$_tasbihCount')}'
+        : 'Tap: $_tasbihCount';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -151,7 +167,7 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                 icon: Icons.timer_rounded,
                 iconColor: AppColors.primary,
                 bgColor: AppColors.primary.withValues(alpha: 0.15),
-                pillLabel: '25m Block',
+                pillLabel: isAr ? '٢٥ د' : '25m Block',
                 pillColor: AppColors.primary,
                 title: l10n.focus,
                 subtitle: l10n.focusSubtitle,
@@ -170,9 +186,9 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                       ),
                     ),
                     icon: const Icon(Icons.play_arrow_rounded, size: 15),
-                    label: const Text(
-                      'Start Timer',
-                      style: TextStyle(
+                    label: Text(
+                      isAr ? 'بدء المؤقت' : 'Start Timer',
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -190,7 +206,7 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                 icon: Icons.restaurant_rounded,
                 iconColor: const Color(0xFFD4AF37),
                 bgColor: const Color(0xFFD4AF37).withValues(alpha: 0.15),
-                pillLabel: 'Sunnah',
+                pillLabel: isAr ? 'سُنّة' : 'Sunnah',
                 pillColor: const Color(0xFFD4AF37),
                 title: l10n.fastingTitle,
                 subtitle: _getFastingSubtitle(isAr),
@@ -261,10 +277,10 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                 icon: Icons.nights_stay_rounded,
                 iconColor: AppColors.secondary,
                 bgColor: AppColors.secondary.withValues(alpha: 0.2),
-                pillLabel: 'Qaylulah',
+                pillLabel: isAr ? 'قيلولة' : 'Qaylulah',
                 pillColor: AppColors.secondary,
                 title: l10n.energy,
-                subtitle: 'Forest soundscape',
+                subtitle: isAr ? 'أصوات طبيعية مهدئة' : 'Forest soundscape',
                 bottomAction: Row(
                   children: [
                     Expanded(
@@ -280,9 +296,9 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                                 : Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            '15 min',
-                            style: TextStyle(
+                          child: Text(
+                            isAr ? '١٥ د' : '15 min',
+                            style: const TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.bold,
                             ),
@@ -304,9 +320,9 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                                 : Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            '20 min',
-                            style: TextStyle(
+                          child: Text(
+                            isAr ? '٢٠ د' : '20 min',
+                            style: const TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.bold,
                             ),
@@ -327,9 +343,9 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                 icon: Icons.fingerprint_rounded,
                 iconColor: const Color(0xFFD4AF37),
                 bgColor: const Color(0xFFD4AF37).withValues(alpha: 0.18),
-                pillLabel: '$_tasbihCount/$_tasbihTarget',
+                pillLabel: tasbihPill,
                 pillColor: const Color(0xFFD4AF37),
-                title: 'SubhanAllah',
+                title: isAr ? 'سُبْحَانَ اللَّهِ' : 'SubhanAllah',
                 subtitle: l10n.adhkarSubtitle,
                 bottomAction: SizedBox(
                   width: double.infinity,
@@ -341,14 +357,14 @@ class _HomeProductivityToolkitState extends State<HomeProductivityToolkit> {
                       padding: const EdgeInsets.symmetric(vertical: 7),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                          color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                        ),
+                      ),
+                      side: BorderSide(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
                       ),
                     ),
                     icon: const Icon(Icons.touch_app_rounded, size: 14),
                     label: Text(
-                      'Tap: $_tasbihCount',
+                      tasbihButtonLabel,
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,

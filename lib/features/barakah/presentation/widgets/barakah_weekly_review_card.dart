@@ -135,7 +135,10 @@ class BarakahWeeklyReviewCard extends StatelessWidget {
               child: FilledButton.icon(
                 key: const Key('open-review'),
                 onPressed: () => _navigateToReview(context),
-                icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                icon: Transform.flip(
+                  flipX: isAr,
+                  child: const Icon(Icons.arrow_forward_rounded, size: 16),
+                ),
                 label: Text(
                   isAr ? 'بدء المراجعة الأسبوعية' : 'Open Weekly Review',
                   style: const TextStyle(

@@ -10,6 +10,15 @@ import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 class HomeDailyProgressSection extends StatelessWidget {
   final String today;
   final AppLocalizations l10n;
@@ -23,6 +32,7 @@ class HomeDailyProgressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final secondaryText = isDark
         ? AppColors.darkTextSecondary
         : AppColors.textSecondary;
@@ -36,6 +46,16 @@ class HomeDailyProgressSection extends StatelessWidget {
               final tasks = snapshot.data ?? [];
               final completed = tasks.where((t) => t.completed).length;
               final progress = tasks.isEmpty ? 0.0 : completed / tasks.length;
+              final pct = (progress * 100).toInt();
+
+              final progressLabel = isAr
+                  ? '${_toArabicDigits('$pct')}٪'
+                  : '$pct%';
+              final taskSubtitle = isAr
+                  ? (tasks.isEmpty
+                        ? 'لا توجد مهام اليوم'
+                        : 'تم إنجاز ${_toArabicDigits('$completed')} من ${_toArabicDigits('${tasks.length}')}')
+                  : '$completed / ${tasks.length} done';
 
               return GlassContainer(
                 padding: const EdgeInsets.all(16),
@@ -48,7 +68,7 @@ class HomeDailyProgressSection extends StatelessWidget {
                       strokeWidth: 6,
                       color: AppColors.primary,
                       child: Text(
-                        '${(progress * 100).toInt()}%',
+                        progressLabel,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -65,11 +85,15 @@ class HomeDailyProgressSection extends StatelessWidget {
                             ? AppColors.darkTextPrimary
                             : AppColors.textPrimary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$completed / ${tasks.length} done',
+                      taskSubtitle,
                       style: TextStyle(fontSize: 12, color: secondaryText),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -103,6 +127,14 @@ class HomeDailyProgressSection extends StatelessWidget {
                       ? 0.0
                       : (completedCount / total).clamp(0.0, 1.0);
 
+                  final habitSubtitle = isAr
+                      ? (total == 0
+                            ? 'لا توجد عادات نشطة'
+                            : 'تم إنجاز ${_toArabicDigits('$completedCount')} من ${_toArabicDigits('$total')}')
+                      : (total == 0
+                            ? '$total active habits'
+                            : '$completedCount / $total done');
+
                   return GlassContainer(
                     padding: const EdgeInsets.all(16),
                     borderRadius: 24,
@@ -129,13 +161,15 @@ class HomeDailyProgressSection extends StatelessWidget {
                                 ? AppColors.darkTextPrimary
                                 : AppColors.textPrimary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          total == 0
-                              ? '$total active habits'
-                              : '$completedCount / $total done',
+                          habitSubtitle,
                           style: TextStyle(fontSize: 12, color: secondaryText),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
