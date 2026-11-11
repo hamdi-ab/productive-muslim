@@ -9,6 +9,15 @@ import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/pulsing_glow.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 /// Interactive Qaylulah (Sunnah midday nap) card with presets,
 /// countdown timer, soundscape picker, and waking Sunnah remembrance.
 class QaylulahNapCard extends StatefulWidget {
@@ -23,7 +32,14 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
   int _napTotalSeconds = 20 * 60;
   int _napSeconds = 20 * 60;
   Timer? _napTimer;
-  String _selectedSoundscape = "Rain on Prophet's Rawdah";
+  String _selectedSoundscapeKey = 'rawdah';
+
+  static const _soundscapes = [
+    ('rawdah', "Rain on Prophet's Rawdah", 'مطر الروضة الشريفة'),
+    ('madinah', 'Gentle Madinah Breeze', 'نسيم المدينة المنورة'),
+    ('desert', 'Desert Night Whisp', 'سكينة ليل الصحراء'),
+    ('silence', 'Pure Silence', 'سكون تام'),
+  ];
 
   @override
   void dispose() {
@@ -73,6 +89,7 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
 
   void _onNapComplete() {
     AppHaptics.heavyImpact();
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -84,16 +101,16 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
             width: 1,
           ),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.wb_sunny_rounded, color: Color(0xFFE9C349)),
-            SizedBox(width: 8),
-            Flexible(
+            const Icon(Icons.wb_sunny_rounded, color: Color(0xFFE9C349)),
+            const SizedBox(width: 8),
+            Expanded(
               child: Text(
-                'Qaylulah Complete',
-                style: TextStyle(
+                isAr ? 'اكتملت القيلولة المباركة' : 'Qaylulah Complete',
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 17,
                   color: Color(0xFFE9C349),
                 ),
                 maxLines: 1,
@@ -106,9 +123,9 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Sunnah Power Nap completed. Wake up refreshed and remember Allah:',
-              style: TextStyle(fontSize: 13, color: Color(0xFFDAE5E0)),
+            Text(
+              isAr ? 'تمت قيلولة السنة بنجاح. استيقظ نشيطاً واذكر الله تعالى:' : 'Sunnah Power Nap completed. Wake up refreshed and remember Allah:',
+              style: const TextStyle(fontSize: 13, color: Color(0xFFDAE5E0)),
             ),
             const SizedBox(height: 12),
             Container(
@@ -135,10 +152,15 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    '"All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection."',
+                  Text(
+                    isAr
+                        ? '«الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور»'
+                        : '"All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection."',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, color: Color(0xFF4EDEA3)),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF4EDEA3),
+                    ),
                   ),
                 ],
               ),
@@ -148,9 +170,9 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'Alhamdulillah',
-              style: TextStyle(
+            child: Text(
+              isAr ? 'الحمد لله' : 'Alhamdulillah',
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFE9C349),
               ),
@@ -161,16 +183,27 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
     );
   }
 
-  String _formatNap(int sec) {
+  String _formatNap(int sec, bool isAr) {
     final m = sec ~/ 60;
     final s = sec % 60;
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    final formatted =
+        '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    return isAr ? _toArabicDigits(formatted) : formatted;
+  }
+
+  String _getSoundscapeName(String key, bool isAr) {
+    final found = _soundscapes.firstWhere(
+      (element) => element.$1 == key,
+      orElse: () => _soundscapes.first,
+    );
+    return isAr ? found.$3 : found.$2;
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -239,9 +272,9 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                         width: 0.8,
                       ),
                     ),
-                    child: const Text(
-                      'Sunnah Power Nap',
-                      style: TextStyle(
+                    child: Text(
+                      isAr ? 'قيلولة السنة النبوية' : 'Sunnah Power Nap',
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF4EDEA3),
@@ -274,20 +307,25 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '"Take a midday nap (Qaylulah), for indeed the Shaytan does not nap."',
+                  isAr ? '«قِيلُوا فَإِنَّ الشَّيَاطِينَ لَا تَقِيلُ»' : '"Take a midday nap (Qaylulah), for indeed the devils do not nap."',
+                  textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
                   style: TextStyle(
-                    fontSize: 11,
-                    fontStyle: FontStyle.italic,
+                    fontFamily: isAr ? 'amiri' : null,
+                    fontSize: isAr ? 13 : 11,
+                    fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
+                    fontWeight: isAr ? FontWeight.bold : FontWeight.normal,
                     color: isDark
                         ? const Color(0xFFDAE5E0)
                         : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  '— Al-Mu\'jam al-Awsat li-l-Tabarani',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(fontSize: 9, color: Color(0xFF8A938D)),
+                Text(
+                  isAr
+                      ? '— رواه الطبراني في المعجم الأوسط'
+                      : '— Al-Mu\'jam al-Awsat li-l-Tabarani',
+                  textAlign: isAr ? TextAlign.start : TextAlign.end,
+                  style: const TextStyle(fontSize: 9, color: Color(0xFF8A938D)),
                 ),
               ],
             ),
@@ -298,17 +336,28 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
           // Nap Timer Preset Chips
           Row(
             children: [
-              _buildNapDurationChip(15, '15 min', 'Micro-Recharge', isDark),
+              _buildNapDurationChip(
+                15,
+                isAr ? '١٥ د' : '15 min',
+                isAr ? 'شحن سريع' : 'Micro-Recharge',
+                isDark,
+              ),
               const SizedBox(width: 8),
               _buildNapDurationChip(
                 20,
-                '20 min',
-                'Sunnah Optimal',
+                isAr ? '٢٠ د' : '20 min',
+                isAr ? 'سنة مثالية' : 'Sunnah Optimal',
                 isDark,
                 isIdeal: true,
+                optimalLabel: isAr ? 'مثالي' : 'OPTIMAL',
               ),
               const SizedBox(width: 8),
-              _buildNapDurationChip(30, '30 min', 'Deep Cycle', isDark),
+              _buildNapDurationChip(
+                30,
+                isAr ? '٣٠ د' : '30 min',
+                isAr ? 'دورة عميقة' : 'Deep Cycle',
+                isDark,
+              ),
             ],
           ),
 
@@ -350,9 +399,9 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              'Post-Dhuhr Window',
-                              style: TextStyle(
+                            Text(
+                              isAr ? 'نافذة ما بعد الظهر' : 'Post-Dhuhr Window',
+                              style: const TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF4EDEA3),
@@ -364,7 +413,7 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
-                                  _formatNap(_napSeconds),
+                                  _formatNap(_napSeconds, isAr),
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.w900,
@@ -398,8 +447,10 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                                     const SizedBox(width: 4),
                                     Text(
                                       _isNapRunning
-                                          ? 'Recharging'
-                                          : 'Cerebral Reset',
+                                          ? (isAr ? 'جاري الشحن' : 'Recharging')
+                                          : (isAr
+                                                ? 'تجديد النشاط'
+                                                : 'Cerebral Reset'),
                                       style: const TextStyle(
                                         fontSize: 9,
                                         color: Color(0xFF8A938D),
@@ -486,8 +537,10 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                                 const SizedBox(width: 6),
                                 Text(
                                   _isNapRunning
-                                      ? 'Pause'
-                                      : 'Start Qaylulah Nap',
+                                      ? (isAr ? 'إيقاف مؤقت' : 'Pause')
+                                      : (isAr
+                                            ? 'بدء قيلولة السنة'
+                                            : 'Start Qaylulah Nap'),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
@@ -534,15 +587,17 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Barakah Soundscape',
-                        style: TextStyle(
+                      Text(
+                        isAr
+                            ? 'أصوات السكينة والاسترخاء'
+                            : 'Barakah Soundscape',
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        _selectedSoundscape,
+                        _getSoundscapeName(_selectedSoundscapeKey, isAr),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -554,19 +609,18 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                   ),
                 ),
                 PopupMenuButton<String>(
-                  initialValue: _selectedSoundscape,
+                  initialValue: _selectedSoundscapeKey,
                   icon: const Icon(Icons.arrow_drop_down_rounded),
                   onSelected: (val) =>
-                      setState(() => _selectedSoundscape = val),
-                  itemBuilder: (ctx) =>
-                      [
-                            "Rain on Prophet's Rawdah",
-                            'Gentle Madinah Breeze',
-                            'Desert Night Whisp',
-                            'Pure Silence',
-                          ]
-                          .map((s) => PopupMenuItem(value: s, child: Text(s)))
-                          .toList(),
+                      setState(() => _selectedSoundscapeKey = val),
+                  itemBuilder: (ctx) => _soundscapes
+                      .map(
+                        (s) => PopupMenuItem(
+                          value: s.$1,
+                          child: Text(isAr ? s.$3 : s.$2),
+                        ),
+                      )
+                      .toList(),
                 ),
               ],
             ),
@@ -588,20 +642,22 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.auto_stories_rounded,
                       size: 13,
                       color: Color(0xFFE9C349),
                     ),
-                    SizedBox(width: 4),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        'WAKING SUNNAH REMEMBRANCE',
+                        isAr
+                            ? 'دعاء الاستيقاظ من السنة'
+                            : 'WAKING SUNNAH REMEMBRANCE',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFE9C349),
@@ -635,7 +691,7 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '"All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection."',
+                  isAr ? '«الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور»' : '"All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection."',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10,
@@ -658,6 +714,7 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
     String subtitle,
     bool isDark, {
     bool isIdeal = false,
+    String optimalLabel = 'OPTIMAL',
   }) {
     final isSelected = _napTotalSeconds == minutes * 60;
     return Expanded(
@@ -694,9 +751,9 @@ class _QaylulahNapCardState extends State<QaylulahNapCard> {
                     color: const Color(0xFFE9C349),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    'OPTIMAL',
-                    style: TextStyle(
+                  child: Text(
+                    optimalLabel,
+                    style: const TextStyle(
                       fontSize: 7,
                       fontWeight: FontWeight.w900,
                       color: Colors.black,

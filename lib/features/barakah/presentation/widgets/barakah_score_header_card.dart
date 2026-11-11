@@ -122,7 +122,7 @@ class BarakahScoreHeaderCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           isAr
-                              ? '$scoreStr٪ مقياس البركة'
+                              ? '${_toArabicDigits('$scoreStr')}٪ مقياس البركة'
                               : '$scoreStr% Barakah Score',
                           style: const TextStyle(
                             fontSize: 11,
