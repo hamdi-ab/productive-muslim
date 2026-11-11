@@ -7,11 +7,23 @@ import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
+import 'package:productive_muslim/data/services/adhan_notification_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_celestial_arc.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
 
 class HomePrayerCard extends StatefulWidget {
   const HomePrayerCard({super.key});
@@ -25,12 +37,16 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
   String _countdown = '--:--';
   String? _locationName;
   bool _loading = true;
+  bool _adhanEnabled = false;
   Timer? _timer;
   PrayerTimes? _cachedPrayerTimes;
 
   @override
   void initState() {
     super.initState();
+    if (getIt.isRegistered<SettingsService>()) {
+      _adhanEnabled = getIt<SettingsService>().adhanNotificationsEnabled;
+    }
     if (getIt.isRegistered<PrayerTimeService>()) {
       final service = getIt<PrayerTimeService>();
       if (service.cachedPrayerTimes != null) {
@@ -149,6 +165,81 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
     return dt != null ? format.format(dt) : '';
   }
 
+  Future<void> _toggleAdhan() async {
+    AppHaptics.selectionClick();
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final newValue = !_adhanEnabled;
+
+    if (!getIt.isRegistered<SettingsService>()) {
+      setState(() => _adhanEnabled = newValue);
+      return;
+    }
+
+    final settings = getIt<SettingsService>();
+    AdhanNotificationService? adhanService;
+    if (getIt.isRegistered<AdhanNotificationService>()) {
+      adhanService = getIt<AdhanNotificationService>();
+    }
+
+    if (newValue && adhanService != null) {
+      final granted = await adhanService.requestPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                isAr
+                    ? 'يرجى تفعيل إذن الإشعارات لتلقي تنبيهات الأذان'
+                    : 'Please enable notifications permission for Adhan alerts',
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    await settings.setAdhanNotificationsEnabled(newValue);
+
+    if (adhanService != null) {
+      if (newValue) {
+        if (_cachedPrayerTimes != null) {
+          await adhanService.initialize();
+          await adhanService.schedulePrayerNotifications(
+            fajr: _cachedPrayerTimes!.fajr,
+            dhuhr: _cachedPrayerTimes!.dhuhr,
+            asr: _cachedPrayerTimes!.asr,
+            maghrib: _cachedPrayerTimes!.maghrib,
+            isha: _cachedPrayerTimes!.isha,
+          );
+        }
+      } else {
+        await adhanService.cancelAll();
+      }
+    }
+
+    if (mounted) {
+      setState(() => _adhanEnabled = newValue);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newValue
+                ? (isAr
+                      ? 'تم تفعيل تنبيهات الأذان'
+                      : 'Adhan notifications enabled')
+                : (isAr
+                      ? 'تم كتم تنبيهات الأذان'
+                      : 'Adhan notifications muted'),
+          ),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -204,9 +295,9 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
                             ),
                           ),
                           const SizedBox(width: 5),
-                          const Text(
-                            'SUNNAH ALIGNMENT',
-                            style: TextStyle(
+                          Text(
+                            isAr ? 'هدي السنة النبوية' : 'SUNNAH ALIGNMENT',
+                            style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.8,
@@ -222,39 +313,67 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.12)
-                              : Colors.black.withValues(alpha: 0.08),
+                    child: AppPressable(
+                      onTap: _toggleAdhan,
+                      pressedScale: 0.92,
+                      haptic: AppHapticFeedback.none,
+                      borderRadius: BorderRadius.circular(16),
+                      child: AnimatedContainer(
+                        key: const Key('home_hero_adhan_toggle_badge'),
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
                         ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.volume_up_rounded,
-                            size: 13,
-                            color: AppColors.primary,
+                        decoration: BoxDecoration(
+                          color: _adhanEnabled
+                              ? (isDark
+                                    ? const Color(0xFF10281E)
+                                    : const Color(0xFFE8F5E9))
+                              : (isDark
+                                    ? Colors.white.withValues(alpha: 0.06)
+                                    : Colors.black.withValues(alpha: 0.04)),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: _adhanEnabled
+                                ? const Color(0xFF10B981)
+                                      .withValues(alpha: isDark ? 0.45 : 0.6)
+                                : (isDark
+                                      ? Colors.white.withValues(alpha: 0.12)
+                                      : Colors.black.withValues(alpha: 0.08)),
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            'Adhan: Mishary',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _adhanEnabled
+                                  ? Icons.notifications_active_rounded
+                                  : Icons.notifications_off_rounded,
+                              size: 13,
+                              color: _adhanEnabled
+                                  ? const Color(0xFF10B981)
+                                  : (isDark ? Colors.white60 : Colors.black45),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              _adhanEnabled
+                                  ? (isAr ? 'الأذان: مفعّل' : 'Adhan: On')
+                                  : (isAr ? 'الأذان: صامت' : 'Adhan: Muted'),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: _adhanEnabled
+                                    ? (isDark
+                                          ? const Color(0xFF4EDEA3)
+                                          : const Color(0xFF1B5E20))
+                                    : (isDark
+                                          ? Colors.white60
+                                          : Colors.black54),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -360,7 +479,9 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'in $_countdown',
+                              isAr
+                                  ? 'خلال ${_toArabicDigits(_countdown)}'
+                                  : 'in $_countdown',
                               style: const TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.bold,
@@ -401,8 +522,12 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
                 Expanded(
                   child: Text(
                     _locationName != null && _locationName!.isNotEmpty
-                        ? '📍 $_locationName • Iqamah scheduled'
-                        : 'Iqamah scheduled • Clean for Salah',
+                        ? (isAr
+                              ? '📍 $_locationName • مجدول مع الإقامة'
+                              : '📍 $_locationName • Iqamah scheduled')
+                        : (isAr
+                              ? 'مجدول مع الإقامة • طهارة للصلاة'
+                              : 'Iqamah scheduled • Clean for Salah'),
                     maxLines: 1,
                     textAlign: _cachedPrayerTimes != null
                         ? TextAlign.end
