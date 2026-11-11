@@ -14,6 +14,7 @@ import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
+import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -165,7 +166,7 @@ class HomeScreen extends StatelessWidget {
               builder: (context, snapshot) {
                 final streak = snapshot.data ?? 0;
                 return AppPressable(
-                  onTap: () => context.go('/profile'),
+                  onTap: () => IstiqamahStreakSheet.show(context),
                   pressedScale: 0.92,
                   borderRadius: BorderRadius.circular(14),
                   child: Container(

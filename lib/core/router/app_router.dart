@@ -62,7 +62,10 @@ class AppRouter {
       router.go('/barakah');
     } else if (host == 'tasks' || path == '/tasks') {
       router.go('/tasks');
-    } else if (host == 'habits' || path == '/habits') {
+    } else if (host == 'habits' ||
+        path == '/habits' ||
+        host == 'streak' ||
+        path == '/streak') {
       router.go('/habits');
     } else if (host == 'journal' || path == '/journal') {
       router.go('/journal');
@@ -179,6 +182,7 @@ class AppRouter {
             path: '/fasting',
             builder: (context, state) => const FastingScreen(),
           ),
+          GoRoute(path: '/streak', redirect: (context, state) => '/habits'),
           GoRoute(
             path: '/adhkar',
             builder: (context, state) {

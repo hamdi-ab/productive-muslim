@@ -15,5 +15,7 @@ abstract class HabitRepository {
   Future<int> getStreak(int habitId);
   Future<int> getOverallStreak();
   Stream<int> watchOverallStreak();
+  Future<int> getLongestStreak();
   Future<Map<String, int>> getCompletionsCountByDate({int days = 84});
+  Stream<Map<String, int>> watchCompletionsCountByDate({int days = 84});
 }

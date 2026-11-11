@@ -27,6 +27,7 @@ class FocusTimerDial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final progress = totalSeconds > 0
         ? (secondsRemaining / totalSeconds).clamp(0.0, 1.0)
         : 0.0;
@@ -159,7 +160,9 @@ class FocusTimerDial extends StatelessWidget {
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 300),
                         child: Text(
-                          isRunning ? 'In Flow...' : 'Ready',
+                          isRunning
+                              ? (isAr ? 'في تدفق...' : 'In Flow...')
+                              : (isAr ? 'جاهز' : 'Ready'),
                           key: ValueKey('focus_status_$isRunning'),
                           style: TextStyle(
                             fontSize: 13,
@@ -173,8 +176,12 @@ class FocusTimerDial extends StatelessWidget {
                       const SizedBox(height: 1),
                       Text(
                         isRunning
-                            ? 'Khushu\' State • Level 1 Active'
-                            : 'Ready • Level 1 Calm',
+                            ? (isAr
+                                  ? 'حالة خشوع • تركيز نشط'
+                                  : "Khushu' State • Active Focus")
+                            : (isAr
+                                  ? 'جاهز • هدوء وسكينة'
+                                  : 'Ready • Calm Presence'),
                         style: TextStyle(
                           fontSize: 10,
                           color: isDark

@@ -51,10 +51,14 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
         .clamp(0, 100);
   }
 
-  String get _compositeTier {
-    if (_compositeScore >= 80) return 'Al-Qawiyy Tier';
-    if (_compositeScore >= 60) return 'Barakah Flow Tier';
-    return 'Recharge Needed';
+  String _getCompositeTier(bool isAr) {
+    if (_compositeScore >= 80) {
+      return isAr ? 'رتبة القوي' : 'Al-Qawiyy Tier';
+    }
+    if (_compositeScore >= 60) {
+      return isAr ? 'تدفق البركة' : 'Barakah Flow Tier';
+    }
+    return isAr ? 'بحاجة للشحن' : 'Recharge Needed';
   }
 
   Future<void> _saveEnergy() async {
@@ -81,6 +85,7 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -112,9 +117,9 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'SELF-AUDIT',
-                      style: TextStyle(
+                    Text(
+                      isAr ? 'التقييم الذاتي' : 'SELF-AUDIT',
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF4EDEA3),
@@ -123,7 +128,7 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                     ),
                     const SizedBox(height: 1),
                     Text(
-                      'Today\'s Energy Levels',
+                      isAr ? 'مستويات طاقة اليوم' : 'Today\'s Energy Levels',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -164,7 +169,7 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _compositeTier,
+                          _getCompositeTier(isAr),
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,

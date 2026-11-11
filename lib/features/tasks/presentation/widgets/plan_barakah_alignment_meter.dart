@@ -21,6 +21,8 @@ class PlanBarakahAlignmentMeter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     return StreamBuilder<List<Task>>(
       stream: context.read<TaskRepository>().watchTasksForDate(formattedDate),
       builder: (context, snapshot) {
@@ -68,7 +70,9 @@ class PlanBarakahAlignmentMeter extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Daily Intention Alignment',
+                          isAr
+                              ? 'مواءمة النية اليومية'
+                              : 'Daily Intention Alignment',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -80,8 +84,12 @@ class PlanBarakahAlignmentMeter extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           totalTasks == 0
-                              ? 'Daily Intention Alignment'
-                              : '$completedTasks of $totalTasks Tasks Completed',
+                              ? (isAr
+                                    ? 'لا توجد مهام اليوم'
+                                    : 'Daily Intention Alignment')
+                              : (isAr
+                                    ? 'تم إنجاز $completedTasks من أصل $totalTasks مهام'
+                                    : '$completedTasks of $totalTasks Tasks Completed'),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

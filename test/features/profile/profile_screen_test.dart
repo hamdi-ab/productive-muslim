@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
+import 'package:productive_muslim/domain/repositories/habit_repository.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_radar_chart_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
@@ -16,8 +18,11 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class MockBarakahRepository extends Mock implements BarakahRepository {}
 
+class MockHabitRepository extends Mock implements HabitRepository {}
+
 void main() {
   late MockBarakahRepository mockRepository;
+  late MockHabitRepository mockHabitRepository;
 
   const testEntry = BarakahEntry(
     id: 1,
@@ -34,6 +39,26 @@ void main() {
     mockRepository = MockBarakahRepository();
     when(() => mockRepository.getEntriesForDate(any()))
         .thenAnswer((_) async => [testEntry]);
+
+    mockHabitRepository = MockHabitRepository();
+    when(() => mockHabitRepository.watchOverallStreak())
+        .thenAnswer((_) => Stream.value(21));
+    when(
+      () => mockHabitRepository.getCompletionsCountByDate(
+        days: any(named: 'days'),
+      ),
+    ).thenAnswer((_) async => {});
+
+    if (getIt.isRegistered<HabitRepository>()) {
+      getIt.unregister<HabitRepository>();
+    }
+    getIt.registerSingleton<HabitRepository>(mockHabitRepository);
+  });
+
+  tearDown(() {
+    if (getIt.isRegistered<HabitRepository>()) {
+      getIt.unregister<HabitRepository>();
+    }
   });
 
   Widget buildScreen({Locale locale = const Locale('en')}) {

@@ -331,6 +331,7 @@ class BarakahHeatmapCard extends StatelessWidget {
     };
 
     final List<(String, String, IconData?, bool, bool)> days = [];
+    int peakFlowDaysCount = 0;
     for (int offset = 6; offset >= 0; offset--) {
       final date = DateTime(now.year, now.month, now.day - offset);
       final isToday = offset == 0;
@@ -352,6 +353,10 @@ class BarakahHeatmapCard extends StatelessWidget {
         icon = isJumuah
             ? Icons.hotel_class_rounded
             : (isThursday ? Icons.star_rounded : Icons.check_rounded);
+      }
+
+      if (scoreVal >= 70) {
+        peakFlowDaysCount++;
       }
 
       final label = isToday
@@ -596,7 +601,9 @@ class BarakahHeatmapCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  isAr ? '٥/٧ أيام التدفق الإيماني' : '5/7 Peak Flow Days',
+                  isAr
+                      ? '${_locDigits(context, '$peakFlowDaysCount')}/٧ أيام التدفق الإيماني'
+                      : '$peakFlowDaysCount/7 Peak Flow Days',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -606,16 +613,22 @@ class BarakahHeatmapCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                const Icon(
-                  Icons.bolt_rounded,
+                Icon(
+                  now.weekday == DateTime.friday
+                      ? Icons.bolt_rounded
+                      : Icons.trending_up_rounded,
                   size: 14,
                   color: AppColors.secondary,
                 ),
                 const SizedBox(width: 3),
                 Text(
-                  isAr
-                      ? 'دفعة الجمعة نشطة (+١٨٪)'
-                      : "Jumu'ah Boost Active (+18%)",
+                  now.weekday == DateTime.friday
+                      ? (isAr
+                            ? 'دفعة الجمعة نشطة (+١٨٪)'
+                            : "Jumu'ah Boost Active (+18%)")
+                      : (isAr
+                            ? 'الاستقامة تثمر البركة'
+                            : 'Istiqamah Builds Barakah'),
                   style: const TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.bold,
