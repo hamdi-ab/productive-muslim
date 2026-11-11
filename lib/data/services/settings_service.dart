@@ -250,6 +250,51 @@ class SettingsService {
     await _prefs?.setInt('energy_m_$date', mental);
   }
 
+  Set<String> getPhysicalAnchors(String date) {
+    final list = _prefs?.getStringList('physical_anchors_$date');
+    if (list == null) return {};
+    return list.toSet();
+  }
+
+  Future<void> togglePhysicalAnchor(String date, String anchorId) async {
+    final set = getPhysicalAnchors(date).toSet();
+    if (set.contains(anchorId)) {
+      set.remove(anchorId);
+    } else {
+      set.add(anchorId);
+    }
+    await _prefs?.setStringList('physical_anchors_$date', set.toList());
+  }
+
+  int getMuhasabahRating(String date) {
+    return _prefs?.getInt('muhasabah_rating_$date') ?? 4;
+  }
+
+  Future<void> setMuhasabahRating(String date, int rating) async {
+    await _prefs?.setInt('muhasabah_rating_$date', rating);
+  }
+
+  Set<String> getMuhasabahCheckpoints(String date) {
+    final list = _prefs?.getStringList('muhasabah_checkpoints_$date');
+    if (list == null) {
+      return {'fajr', 'morning_adhkar', 'mindful_eating', 'tongue_guarded'};
+    }
+    return list.toSet();
+  }
+
+  Future<void> toggleMuhasabahCheckpoint(
+    String date,
+    String checkpointId,
+  ) async {
+    final set = getMuhasabahCheckpoints(date).toSet();
+    if (set.contains(checkpointId)) {
+      set.remove(checkpointId);
+    } else {
+      set.add(checkpointId);
+    }
+    await _prefs?.setStringList('muhasabah_checkpoints_$date', set.toList());
+  }
+
   List<String> getCompletedDhikrIds(String date) {
     return _prefs?.getStringList('adhkar_done_$date') ?? [];
   }

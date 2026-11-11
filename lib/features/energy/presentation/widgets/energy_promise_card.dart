@@ -8,6 +8,7 @@ class EnergyPromiseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -35,7 +36,9 @@ class EnergyPromiseCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Energize Body for the Creator',
+            isAr
+                ? 'استثمار طاقة الجسد في طاعة الخالق'
+                : 'Energize Body for the Creator',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
@@ -44,7 +47,9 @@ class EnergyPromiseCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Your energy is an investment in worship and service. Recharging with Sunnah intention transforms rest into continuous reward.',
+            isAr
+                ? 'طاقتك أمانة واستثمار في العبادة والنفع. تجديد النشاط بنية السنة يحول الراحة إلى عبادة مأجورة مستمرة.'
+                : 'Your energy is an investment in worship and service. Recharging with Sunnah intention transforms rest into continuous reward.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 10,

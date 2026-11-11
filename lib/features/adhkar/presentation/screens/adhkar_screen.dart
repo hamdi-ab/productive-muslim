@@ -16,6 +16,15 @@ import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_ty
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 class AdhkarScreen extends StatefulWidget {
   final DhikrCategory initialCategory;
 
@@ -170,6 +179,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final items = _currentItems;
 
     return Scaffold(
@@ -208,7 +218,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  '${_currentPageIndex + 1} / ${items.length}',
+                  isAr
+                      ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
+                      : '${_currentPageIndex + 1} / ${items.length}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,

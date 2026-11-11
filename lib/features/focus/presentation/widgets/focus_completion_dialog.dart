@@ -6,6 +6,15 @@ import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 /// Displays the Muhasabah completion dialog when a focus session successfully concludes.
 Future<void> showFocusCompletionDialog({
   required BuildContext context,
@@ -16,6 +25,7 @@ Future<void> showFocusCompletionDialog({
   if (!context.mounted) return;
   final l10n = AppLocalizations.of(context)!;
   final isDark = Theme.of(context).brightness == Brightness.dark;
+  final isAr = Localizations.localeOf(context).languageCode == 'ar';
   bool taskMarkedDone = false;
 
   return showDialog<void>(
@@ -99,7 +109,9 @@ Future<void> showFocusCompletionDialog({
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '+$selectedDurationMinutes min focus added',
+                        isAr
+                            ? '+${_toArabicDigits('$selectedDurationMinutes')} دقيقة تركيز مضافة'
+                            : '+$selectedDurationMinutes min focus added',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,

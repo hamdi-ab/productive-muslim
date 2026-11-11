@@ -202,7 +202,9 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'SPIRITUAL PROFILE & 9 QUALITIES',
+                isAr
+                    ? 'الملف الإيماني والخصال التسع'
+                    : 'SPIRITUAL PROFILE & 9 QUALITIES',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,

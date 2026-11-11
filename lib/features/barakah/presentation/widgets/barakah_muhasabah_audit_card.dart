@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
+
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
 
 class BarakahMuhasabahAuditCard extends StatefulWidget {
   const BarakahMuhasabahAuditCard({super.key});
@@ -12,43 +24,81 @@ class BarakahMuhasabahAuditCard extends StatefulWidget {
 }
 
 class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
+  late final String _today;
   int _rating = 4;
-  final Set<String> _passedCheckpoints = {
-    "Fajr in Jama'ah",
-    "Morning Adhkar",
-    "Mindful Eating",
-    "Tongue Guarded",
+  Set<String> _passedCheckpoints = {
+    'fajr',
+    'morning_adhkar',
+    'mindful_eating',
+    'tongue_guarded',
   };
 
-  static const List<String> allCheckpoints = [
-    "Fajr in Jama'ah",
-    "Morning Adhkar",
-    "Mindful Eating",
-    "Tongue Guarded",
-    "Evening Adhkar",
-    "Quran Tadabbur",
+  static const List<(String, String, String)> allCheckpoints = [
+    ('fajr', "Fajr in Jama'ah", "صلاة الفجر في جماعة"),
+    ('morning_adhkar', "Morning Adhkar", "أذكار الصباح"),
+    ('mindful_eating', "Mindful Eating", "الأكل بوعي وتسمية"),
+    ('tongue_guarded', "Tongue Guarded", "حفظ اللسان"),
+    ('evening_adhkar', "Evening Adhkar", "أذكار المساء"),
+    ('quran_tadabbur', "Quran Tadabbur", "ورد تدبر القرآن"),
   ];
 
-  void _toggleCheckpoint(String item) {
-    AppHaptics.selectionClick();
-    setState(() {
-      if (_passedCheckpoints.contains(item)) {
-        _passedCheckpoints.remove(item);
-      } else {
-        _passedCheckpoints.add(item);
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    _today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    _loadAudit();
   }
 
-  void _setRating(int value) {
+  void _loadAudit() {
+    try {
+      if (getIt.isRegistered<SettingsService>()) {
+        final settings = getIt<SettingsService>();
+        setState(() {
+          _rating = settings.getMuhasabahRating(_today);
+          _passedCheckpoints = settings.getMuhasabahCheckpoints(_today);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _toggleCheckpoint(String checkpointId) async {
+    AppHaptics.selectionClick();
+    try {
+      if (getIt.isRegistered<SettingsService>()) {
+        final settings = getIt<SettingsService>();
+        await settings.toggleMuhasabahCheckpoint(_today, checkpointId);
+        setState(() {
+          _passedCheckpoints = settings.getMuhasabahCheckpoints(_today);
+        });
+      } else {
+        setState(() {
+          if (_passedCheckpoints.contains(checkpointId)) {
+            _passedCheckpoints.remove(checkpointId);
+          } else {
+            _passedCheckpoints.add(checkpointId);
+          }
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _setRating(int value) async {
     AppHaptics.mediumImpact();
     setState(() => _rating = value);
+    try {
+      if (getIt.isRegistered<SettingsService>()) {
+        await getIt<SettingsService>().setMuhasabahRating(_today, value);
+      }
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    final ratingStr = isAr ? _toArabicDigits('$_rating') : '$_rating';
+    final maxRatingStr = isAr ? '٥' : '5';
 
     return Container(
       decoration: BoxDecoration(
@@ -114,22 +164,30 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColors.primaryLight.withValues(alpha: 0.3),
-                    width: 0.8,
-                  ),
-                ),
-                child: Text(
-                  isAr ? 'محاسبة النفس' : 'Muhasabah',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryLight,
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.primaryLight.withValues(alpha: 0.3),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Text(
+                      isAr ? 'محاسبة النفس' : 'Muhasabah',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryLight,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -169,46 +227,50 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ...List.generate(5, (index) {
-                        final starNum = index + 1;
-                        final isFilled = starNum <= _rating;
-                        return InkWell(
-                          onTap: () => _setRating(starNum),
-                          borderRadius: BorderRadius.circular(6),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: Icon(
-                              isFilled
-                                  ? Icons.star_rounded
-                                  : Icons.star_border_rounded,
-                              size: 21,
-                              color: isFilled
-                                  ? AppColors.secondary
-                                  : (isDark
-                                        ? AppColors.darkTextSecondary
-                                              .withValues(alpha: 0.4)
-                                        : AppColors.textSecondary.withValues(
-                                            alpha: 0.4,
-                                          )),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ...List.generate(5, (index) {
+                          final starNum = index + 1;
+                          final isFilled = starNum <= _rating;
+                          return InkWell(
+                            onTap: () => _setRating(starNum),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                              ),
+                              child: Icon(
+                                isFilled
+                                    ? Icons.star_rounded
+                                    : Icons.star_border_rounded,
+                                size: 21,
+                                color: isFilled
+                                    ? AppColors.secondary
+                                    : (isDark
+                                          ? AppColors.darkTextSecondary
+                                                .withValues(alpha: 0.4)
+                                          : AppColors.textSecondary.withValues(
+                                              alpha: 0.4,
+                                            )),
+                              ),
                             ),
+                          );
+                        }),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$ratingStr/$maxRatingStr',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.secondary,
                           ),
-                        );
-                      }),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$_rating/5',
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.secondary,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -231,10 +293,12 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: allCheckpoints.map((item) {
-              final isPassed = _passedCheckpoints.contains(item);
+            children: allCheckpoints.map((cp) {
+              final id = cp.$1;
+              final label = isAr ? cp.$3 : cp.$2;
+              final isPassed = _passedCheckpoints.contains(id);
               return InkWell(
-                onTap: () => _toggleCheckpoint(item),
+                onTap: () => _toggleCheckpoint(id),
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -263,7 +327,7 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        item,
+                        label,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: isPassed
@@ -324,8 +388,9 @@ class _BarakahMuhasabahAuditCardState extends State<BarakahMuhasabahAuditCard> {
                         ? '«اللهم اغفر لي تقصيري اليوم، وبارك لي في فجري غداً»'
                         : '"O Allah, forgive my lapses today and multiply the barakah in my dawn tomorrow."',
                     style: TextStyle(
+                      fontFamily: isAr ? 'amiri' : null,
                       fontSize: 11.5,
-                      fontStyle: FontStyle.italic,
+                      fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
                       color: isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.textSecondary,
