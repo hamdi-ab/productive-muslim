@@ -4,9 +4,19 @@ import 'package:intl/intl.dart';
 
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
 
 class DailyEnergyKhushuMeter extends StatelessWidget {
   const DailyEnergyKhushuMeter({super.key});
@@ -31,8 +41,18 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
     final optimalPct = ((physicalPct + khushuPct) / 2).round().clamp(10, 100);
     final widthFactor = (optimalPct / 100.0).clamp(0.05, 1.0);
 
+    final title = isAr
+        ? "مستوى الطاقة والخشوع اليومي"
+        : "Daily Energy & Khushu' Level";
+    final optimalBadge = isAr
+        ? "${_toArabicDigits('$optimalPct')}٪ مثالي"
+        : "$optimalPct% Optimal";
+
     return AppPressable(
-      onTap: () => context.push('/energy'),
+      onTap: () {
+        AppHaptics.lightImpact();
+        context.push('/energy');
+      },
       pressedScale: 0.98,
       haptic: AppHapticFeedback.light,
       borderRadius: BorderRadius.circular(20),
@@ -58,7 +78,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          "Daily Energy & Khushu' Level",
+                          title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -90,7 +110,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        '$optimalPct% Optimal',
+                        optimalBadge,
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -113,7 +133,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
+                alignment: isAr ? Alignment.centerRight : Alignment.centerLeft,
                 widthFactor: widthFactor,
                 child: Container(
                   decoration: BoxDecoration(
@@ -157,7 +177,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                         const SizedBox(width: 5),
                         Text(
                           isAr
-                              ? 'الطاقة البدنية $physicalPct٪'
+                              ? 'الطاقة البدنية ${_toArabicDigits('$physicalPct')}٪'
                               : 'Physical Energy $physicalPct%',
                           style: TextStyle(
                             fontSize: 11.5,
@@ -196,7 +216,7 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                         const SizedBox(width: 5),
                         Text(
                           isAr
-                              ? 'التركيز الروحي $khushuPct٪'
+                              ? 'التركيز الروحي ${_toArabicDigits('$khushuPct')}٪'
                               : 'Spiritual Focus $khushuPct%',
                           style: TextStyle(
                             fontSize: 11.5,
@@ -210,10 +230,13 @@ class DailyEnergyKhushuMeter extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 11,
-                  color: AppColors.primary,
+                Transform.flip(
+                  flipX: isAr,
+                  child: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 11,
+                    color: AppColors.primary,
+                  ),
                 ),
               ],
             ),

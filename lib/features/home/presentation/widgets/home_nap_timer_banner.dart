@@ -7,6 +7,15 @@ import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 
+String _toArabicDigits(String input) {
+  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  for (int i = 0; i < english.length; i++) {
+    input = input.replaceAll(english[i], arabic[i]);
+  }
+  return input;
+}
+
 class HomeNapTimerBanner extends StatefulWidget {
   const HomeNapTimerBanner({super.key});
 
@@ -72,32 +81,37 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
     });
   }
 
-  String _formatTime(int sec) {
+  String _formatTime(int sec, bool isAr) {
     final m = (sec ~/ 60).toString().padLeft(2, '0');
     final s = (sec % 60).toString().padLeft(2, '0');
-    return '$m:$s';
+    final formatted = '$m:$s';
+    return isAr ? _toArabicDigits(formatted) : formatted;
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
     if (_dismissed && !_isRunning) {
       return Align(
-        alignment: Alignment.centerRight,
+        alignment: isAr ? Alignment.centerLeft : Alignment.centerRight,
         child: TextButton.icon(
           onPressed: () => setState(() => _dismissed = false),
           icon: const Icon(Icons.refresh_rounded, size: 14),
-          label: const Text(
-            'Show Sunnah Nap Routine',
-            style: TextStyle(fontSize: 11),
+          label: Text(
+            isAr ? 'إظهار روتين القيلولة السنية' : 'Show Sunnah Nap Routine',
+            style: const TextStyle(fontSize: 11),
           ),
         ),
       );
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hour = DateTime.now().hour;
     final isMidday = hour >= 11 && hour < 16;
-    final title = isMidday ? 'Midday Barakah Boost' : 'Sunnah Qaylulah Nap';
+    final title = isMidday
+        ? (isAr ? 'دفعة بركة الظهيرة' : 'Midday Barakah Boost')
+        : (isAr ? 'قيلولة الظهيرة النبوية' : 'Sunnah Qaylulah Nap');
 
     return GlassContainer(
       padding: const EdgeInsets.all(16),
@@ -136,6 +150,8 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                         Flexible(
                           child: Text(
                             title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -160,9 +176,9 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                                   .withValues(alpha: 0.3),
                             ),
                           ),
-                          child: const Text(
-                            'Sunnah Routine',
-                            style: TextStyle(
+                          child: Text(
+                            isAr ? 'روتين نبوي' : 'Sunnah Routine',
+                            style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFFD4AF37),
@@ -174,8 +190,12 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                     const SizedBox(height: 4),
                     Text(
                       _isRunning
-                          ? 'Taking Sunnah Qaylulah nap before Salah to revitalize Khushu\'.'
-                          : 'Renew your Wudhu and take a 15-min Qaylulah (Sunnah nap) before Asr prayer to revitalize your Khushu\'.',
+                          ? (isAr
+                                ? 'أخذ قيلولة نبوية لتجديد الخشوع والنشاط قبل الصلاة.'
+                                : 'Taking Sunnah Qaylulah nap before Salah to revitalize Khushu\'.')
+                          : (isAr
+                                ? 'جدد وضوءك وخذ قيلولة لمدة ١٥ دقيقة قبل صلاة العصر لتجديد نشاطك وخشوعك.'
+                                : 'Renew your Wudhu and take a 15-min Qaylulah (Sunnah nap) before Asr prayer to revitalize your Khushu\'.'),
                       style: TextStyle(
                         fontSize: 12,
                         height: 1.35,
@@ -223,7 +243,7 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _formatTime(_remainingSeconds),
+                      _formatTime(_remainingSeconds, isAr),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -233,7 +253,9 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _isPaused ? '(Paused)' : 'remaining',
+                      _isPaused
+                          ? (isAr ? '(مؤقت)' : '(Paused)')
+                          : (isAr ? 'متبقي' : 'remaining'),
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark
@@ -254,19 +276,21 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                         size: 20,
                       ),
                       onPressed: _togglePause,
-                      tooltip: _isPaused ? 'Resume' : 'Pause',
+                      tooltip: _isPaused
+                          ? (isAr ? 'استئناف' : 'Resume')
+                          : (isAr ? 'إيقاف مؤقت' : 'Pause'),
                     ),
                     IconButton(
                       icon: const Icon(Icons.stop_rounded, size: 20),
                       onPressed: _stopNap,
-                      tooltip: 'End Nap',
+                      tooltip: isAr ? 'إنهاء القيلولة' : 'End Nap',
                     ),
                     TextButton.icon(
                       onPressed: () => context.push('/energy'),
                       icon: const Icon(Icons.graphic_eq_rounded, size: 14),
-                      label: const Text(
-                        'Soundscape',
-                        style: TextStyle(fontSize: 11),
+                      label: Text(
+                        isAr ? 'أصوات مهدئة' : 'Soundscape',
+                        style: const TextStyle(fontSize: 11),
                       ),
                     ),
                   ],
@@ -299,9 +323,9 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                       ),
                     ),
                     icon: const Icon(Icons.bedtime_rounded, size: 16),
-                    label: const Text(
-                      'Start 15m Nap',
-                      style: TextStyle(
+                    label: Text(
+                      isAr ? 'بدء قيلولة ١٥ د' : 'Start 15m Nap',
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -326,9 +350,9 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                             : Colors.black.withValues(alpha: 0.1),
                       ),
                     ),
-                    child: const Text(
-                      '20m',
-                      style: TextStyle(
+                    child: Text(
+                      isAr ? '٢٠ د' : '20m',
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -340,7 +364,7 @@ class _HomeNapTimerBannerState extends State<HomeNapTimerBanner> {
                   child: TextButton(
                     onPressed: () => setState(() => _dismissed = true),
                     child: Text(
-                      'Dismiss',
+                      isAr ? 'إخفاء' : 'Dismiss',
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark

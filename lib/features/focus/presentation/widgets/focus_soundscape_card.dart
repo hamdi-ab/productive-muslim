@@ -124,6 +124,7 @@ class FocusSoundscapeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return GlassContainer(
       borderRadius: 18,
@@ -137,21 +138,23 @@ class FocusSoundscapeCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.graphic_eq_rounded,
                       size: 18,
                       color: AppColors.secondary,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'AMBIENT BARAKAH SOUNDSCAPE',
+                        isAr
+                            ? 'أصوات البركة والسكينة'
+                            : 'AMBIENT BARAKAH SOUNDSCAPE',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.6,
@@ -174,24 +177,30 @@ class FocusSoundscapeCard extends StatelessWidget {
               _buildSoundscapePill(
                 index: 0,
                 icon: Icons.water_drop_rounded,
-                title: 'Rain & Makkah',
-                subtitle: selectedSoundscapeIndex == 0 ? 'Active' : 'Offline',
+                title: isAr ? 'مطر الحرم' : 'Rain & Makkah',
+                subtitle: selectedSoundscapeIndex == 0
+                    ? (isAr ? 'مفعّل' : 'Active')
+                    : (isAr ? 'غير مفعّل' : 'Offline'),
                 isDark: isDark,
               ),
               const SizedBox(width: 8),
               _buildSoundscapePill(
                 index: 1,
                 icon: Icons.waves_rounded,
-                title: 'Gentle Stream',
-                subtitle: selectedSoundscapeIndex == 1 ? 'Active' : 'Offline',
+                title: isAr ? 'هدير النهر' : 'Gentle Stream',
+                subtitle: selectedSoundscapeIndex == 1
+                    ? (isAr ? 'مفعّل' : 'Active')
+                    : (isAr ? 'غير مفعّل' : 'Offline'),
                 isDark: isDark,
               ),
               const SizedBox(width: 8),
               _buildSoundscapePill(
                 index: 2,
                 icon: Icons.volume_off_rounded,
-                title: 'Pure Silence',
-                subtitle: selectedSoundscapeIndex == 2 ? 'Active' : 'Muted',
+                title: isAr ? 'سكون تام' : 'Pure Silence',
+                subtitle: selectedSoundscapeIndex == 2
+                    ? (isAr ? 'مفعّل' : 'Active')
+                    : (isAr ? 'صامت' : 'Muted'),
                 isDark: isDark,
               ),
             ],

@@ -20,6 +20,7 @@ class HomeTodayTasksCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return StreamBuilder<List<Task>>(
       stream: context.read<TaskRepository>().watchTasksForDate(today),
@@ -51,7 +52,7 @@ class HomeTodayTasksCard extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => context.push('/plan'),
                       child: Text(
-                        'View All',
+                        isAr ? 'عرض الكل' : 'View All',
                         style: TextStyle(
                           color: isDark
                               ? AppColors.primaryLight

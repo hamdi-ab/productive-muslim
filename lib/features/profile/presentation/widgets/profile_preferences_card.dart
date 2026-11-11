@@ -150,10 +150,13 @@ class ProfilePreferencesCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 13,
-                  color: isDark ? Colors.white54 : Colors.black45,
+                Transform.flip(
+                  flipX: isAr,
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 13,
+                    color: isDark ? Colors.white54 : Colors.black45,
+                  ),
                 ),
               ],
             ),
