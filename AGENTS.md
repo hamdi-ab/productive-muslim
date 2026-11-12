@@ -43,6 +43,9 @@ Core shared code lives under `lib/core/`:
 - **Commits**: conventional commits — `feat:`, `fix:`, `refactor:`, `test:`, `chore:`
 - **RTL & Text-Scale Resilience**: Every dynamic or localized `Text` in a `Row` must be wrapped in `Expanded` or `Flexible` with `overflow: TextOverflow.ellipsis` to prevent RenderFlex overflows under large font scaling and RTL Arabic. Verify with `test/helpers/overflow_test_helper.dart`.
 - **FittedBox in Flex**: A `FittedBox` inside a `Row` or `Column` must be wrapped in `Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: ...))` or `Expanded` to prevent unconstrained width calculation and enforce downward scaling when constrained.
+- **Navigation (Tab Switching vs Subpage Pushing)**: Use `context.go(AppRoutes.<tab>)` when navigating to primary shell tabs (`AppRoutes.home`, `plan`, `tasks`, `habits`, `prayerTimes`, `journal`, `profile`, `barakah`). Never use `context.push()` for tab destinations to prevent duplicate shell scaffolds. Use `context.push(AppRoutes.<detail>)` only for root detail screens (`settings`, `focus`, `energy`, `fasting`, `adhkar`, `barakahReview`).
+- **Route Constants**: Always use typed `AppRoutes` constants from `package:productive_muslim/core/router/app_routes.dart` instead of hardcoded string literals.
+- **Testing Mocks & Fakes**: Use canonical mocks from `test/helpers/mocks.dart` rather than redeclaring repository mocks per test file. Singletons with mutable state must provide a `@visibleForTesting resetForTesting()` hook.
 
 ## Agent skills
 

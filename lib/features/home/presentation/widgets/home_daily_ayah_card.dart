@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
+import 'package:productive_muslim/core/router/app_routes.dart';
+
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
@@ -293,7 +295,7 @@ class _HomeDailyAyahCardState extends State<HomeDailyAyahCard> {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: TextButton.icon(
-                            onPressed: () => context.go('/journal'),
+                            onPressed: () => context.go(AppRoutes.journal),
                             icon: const Icon(Icons.edit_note_rounded, size: 18),
                             label: Text(
                               isAr ? 'تدوين وتأمل' : 'Reflect & Journal',

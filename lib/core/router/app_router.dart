@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
+
+export 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/features/settings/presentation/barakah_reminder_lifecycle.dart';
@@ -41,17 +44,23 @@ class AppRouter {
     return loc;
   }
 
+  @visibleForTesting
+  static void resetForTesting() {
+    _previousLocationBeforeNotification = null;
+    _pendingBarakahReminder = false;
+  }
+
   static void openBarakahReminder() {
     try {
       final currentUri = router.routeInformationProvider.value.uri.toString();
       if (currentUri.isNotEmpty &&
-          currentUri != '/barakah' &&
-          !currentUri.contains('onboarding')) {
+          currentUri != AppRoutes.barakah &&
+          !currentUri.contains(AppRoutes.onboarding)) {
         _previousLocationBeforeNotification = currentUri;
       }
     } catch (_) {}
     _pendingBarakahReminder = true;
-    router.go('/barakah');
+    router.go(AppRoutes.barakah);
   }
 
   static void handleNotificationPayload(String payload) {
@@ -61,20 +70,20 @@ class AppRouter {
       final currentUri = router.routeInformationProvider.value.uri.toString();
       if (currentUri.isNotEmpty &&
           currentUri != payload &&
-          !currentUri.contains('onboarding')) {
+          !currentUri.contains(AppRoutes.onboarding)) {
         _previousLocationBeforeNotification = currentUri;
       }
     } catch (_) {}
 
-    if (payload == '/barakah') {
+    if (payload == AppRoutes.barakah) {
       openBarakahReminder();
       return;
     }
 
     final uri = Uri.tryParse(payload);
     final path = uri?.path.toLowerCase() ?? payload;
-    if (path == '/intentions') {
-      router.go('/journal');
+    if (path == AppRoutes.intentions) {
+      router.go(AppRoutes.journal);
     } else {
       router.go(payload);
     }
@@ -86,41 +95,41 @@ class AppRouter {
 
     if (host == 'prayer_times' ||
         host == 'prayer-times' ||
-        path == '/prayer-times' ||
-        path == '/prayer_times') {
-      router.go('/prayer-times');
-    } else if (host == 'adhkar' || path == '/adhkar') {
+        path == AppRoutes.prayerTimes ||
+        path == AppRoutes.prayerTimesUnderscore) {
+      router.go(AppRoutes.prayerTimes);
+    } else if (host == 'adhkar' || path == AppRoutes.adhkar) {
       final query = uri.hasQuery ? '?${uri.query}' : '';
-      handleNotificationPayload('/adhkar$query');
-    } else if (host == 'focus' || path == '/focus') {
-      handleNotificationPayload('/focus');
-    } else if (host == 'energy' || path == '/energy') {
-      handleNotificationPayload('/energy');
-    } else if (host == 'fasting' || path == '/fasting') {
-      handleNotificationPayload('/fasting');
-    } else if (host == 'profile' || path == '/profile') {
-      router.go('/profile');
-    } else if (host == 'barakah' || path == '/barakah') {
-      handleNotificationPayload('/barakah');
-    } else if (host == 'tasks' || path == '/tasks') {
-      router.go('/tasks');
+      handleNotificationPayload('${AppRoutes.adhkar}$query');
+    } else if (host == 'focus' || path == AppRoutes.focus) {
+      handleNotificationPayload(AppRoutes.focus);
+    } else if (host == 'energy' || path == AppRoutes.energy) {
+      handleNotificationPayload(AppRoutes.energy);
+    } else if (host == 'fasting' || path == AppRoutes.fasting) {
+      handleNotificationPayload(AppRoutes.fasting);
+    } else if (host == 'profile' || path == AppRoutes.profile) {
+      router.go(AppRoutes.profile);
+    } else if (host == 'barakah' || path == AppRoutes.barakah) {
+      handleNotificationPayload(AppRoutes.barakah);
+    } else if (host == 'tasks' || path == AppRoutes.tasks) {
+      router.go(AppRoutes.tasks);
     } else if (host == 'habits' ||
-        path == '/habits' ||
+        path == AppRoutes.habits ||
         host == 'streak' ||
-        path == '/streak') {
-      router.go('/habits');
+        path == AppRoutes.streak) {
+      router.go(AppRoutes.habits);
     } else if (host == 'journal' ||
-        path == '/journal' ||
+        path == AppRoutes.journal ||
         host == 'intentions' ||
-        path == '/intentions') {
-      router.go('/journal');
-    } else if (host == 'settings' || path == '/settings') {
-      handleNotificationPayload('/settings');
+        path == AppRoutes.intentions) {
+      router.go(AppRoutes.journal);
+    } else if (host == 'settings' || path == AppRoutes.settings) {
+      handleNotificationPayload(AppRoutes.settings);
     } else if (host == 'home' ||
         host.isEmpty ||
-        path == '/' ||
+        path == AppRoutes.home ||
         path == '/home') {
-      router.go('/');
+      router.go(AppRoutes.home);
     } else if (path.isNotEmpty) {
       handleNotificationPayload(path);
     }
@@ -136,17 +145,19 @@ class AppRouter {
 
   static final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: AppRoutes.home,
     redirect: (context, state) {
       final onboardingDone = _isOnboardingDone();
-      final goingToOnboarding = state.matchedLocation == '/onboarding';
+      final goingToOnboarding = state.matchedLocation == AppRoutes.onboarding;
 
-      if (!onboardingDone && !goingToOnboarding) return '/onboarding';
+      if (!onboardingDone && !goingToOnboarding) return AppRoutes.onboarding;
       if (onboardingDone && _pendingBarakahReminder) {
         _pendingBarakahReminder = false;
-        return state.matchedLocation == '/barakah' ? null : '/barakah';
+        return state.matchedLocation == AppRoutes.barakah
+            ? null
+            : AppRoutes.barakah;
       }
-      if (onboardingDone && goingToOnboarding) return '/';
+      if (onboardingDone && goingToOnboarding) return AppRoutes.home;
       return null;
     },
     routes: [
@@ -161,50 +172,59 @@ class AppRouter {
               )
             : HomeScreen(child: child),
         routes: [
-          GoRoute(path: '/', builder: (context, state) => const HomeContent()),
           GoRoute(
-            path: '/plan',
+            path: AppRoutes.home,
+            builder: (context, state) => const HomeContent(),
+          ),
+          GoRoute(
+            path: AppRoutes.plan,
             builder: (context, state) => const PlanScreen(),
           ),
           GoRoute(
-            path: '/tasks',
+            path: AppRoutes.tasks,
             builder: (context, state) =>
                 const PlanScreen(initialTab: PlanTab.tasks),
           ),
           GoRoute(
-            path: '/habits',
+            path: AppRoutes.habits,
             builder: (context, state) =>
                 const PlanScreen(initialTab: PlanTab.habits),
           ),
           GoRoute(
-            path: '/prayer-times',
+            path: AppRoutes.prayerTimes,
             builder: (context, state) => const PrayerTimesScreen(),
           ),
           GoRoute(
-            path: '/journal',
+            path: AppRoutes.journal,
             builder: (context, state) => const IntentionScreen(),
           ),
           GoRoute(
-            path: '/profile',
+            path: AppRoutes.profile,
             builder: (context, state) => const ProfileScreen(),
           ),
           GoRoute(
-            path: '/barakah',
+            path: AppRoutes.barakah,
             builder: (context, state) => const BarakahScreen(),
           ),
         ],
       ),
       // Redirect aliases
-      GoRoute(path: '/intentions', redirect: (context, state) => '/journal'),
       GoRoute(
-        path: '/prayer_times',
-        redirect: (context, state) => '/prayer-times',
+        path: AppRoutes.intentions,
+        redirect: (context, state) => AppRoutes.journal,
       ),
-      GoRoute(path: '/streak', redirect: (context, state) => '/habits'),
+      GoRoute(
+        path: AppRoutes.prayerTimesUnderscore,
+        redirect: (context, state) => AppRoutes.prayerTimes,
+      ),
+      GoRoute(
+        path: AppRoutes.streak,
+        redirect: (context, state) => AppRoutes.habits,
+      ),
 
       // 2. Subpages / Detail Screens (Full-Screen, NO Bottom Navigation)
       GoRoute(
-        path: '/onboarding',
+        path: AppRoutes.onboarding,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           try {
@@ -215,29 +235,29 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/settings',
+        path: AppRoutes.settings,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
-        path: '/focus',
+        path: AppRoutes.focus,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => FocusScreen(
           initialTask: state.extra is Task ? state.extra as Task : null,
         ),
       ),
       GoRoute(
-        path: '/energy',
+        path: AppRoutes.energy,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const EnergyScreen(),
       ),
       GoRoute(
-        path: '/fasting',
+        path: AppRoutes.fasting,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const FastingScreen(),
       ),
       GoRoute(
-        path: '/adhkar',
+        path: AppRoutes.adhkar,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           DhikrCategory category = DhikrCategory.morning;
@@ -256,7 +276,7 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: '/barakah/review',
+        path: AppRoutes.barakahReview,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const BarakahReviewScreen(),
       ),

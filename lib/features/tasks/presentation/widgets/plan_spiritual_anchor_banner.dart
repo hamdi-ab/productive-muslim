@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -92,7 +93,7 @@ class PlanSpiritualAnchorBanner extends StatelessWidget {
                 onTap: () {
                   AppHaptics.mediumImpact();
                   Navigator.pop(ctx);
-                  context.go('/journal');
+                  context.go(AppRoutes.journal);
                 },
                 pressedScale: 0.96,
                 child: Container(

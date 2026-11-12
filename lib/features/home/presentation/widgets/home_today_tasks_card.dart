@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/router/app_routes.dart';
+
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
@@ -50,7 +52,7 @@ class HomeTodayTasksCard extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: TextButton(
-                      onPressed: () => context.go('/plan'),
+                      onPressed: () => context.go(AppRoutes.plan),
                       child: Text(
                         isAr ? 'عرض الكل' : 'View All',
                         style: TextStyle(
