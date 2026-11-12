@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 
@@ -37,8 +38,8 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final canPop =
-        showBackButton ?? (Navigator.of(context).canPop() || context.canPop());
+    final canPopRoute = Navigator.of(context).canPop() || context.canPop();
+    final canPop = showBackButton ?? canPopRoute;
 
     Widget? leadingWidget = leading;
     if (leadingWidget == null && canPop) {
@@ -50,7 +51,20 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Tooltip(
             message: backTooltip,
             child: AppPressable(
-              onTap: onBackPressed ?? () => Navigator.maybePop(context),
+              onTap:
+                  onBackPressed ??
+                  () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      final fallback =
+                          AppRouter.consumeNotificationFallbackLocation() ??
+                          '/';
+                      context.go(fallback);
+                    }
+                  },
               pressedScale: 0.88,
               haptic: AppHapticFeedback.selection,
               borderRadius: BorderRadius.circular(20),
@@ -153,7 +167,7 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
 
-    return ClipRect(
+    final appBar = ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
@@ -187,6 +201,26 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
+
+    if (showBackButton == true && !canPopRoute) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) {
+            if (onBackPressed != null) {
+              onBackPressed!();
+            } else {
+              final fallback =
+                  AppRouter.consumeNotificationFallbackLocation() ?? '/';
+              context.go(fallback);
+            }
+          }
+        },
+        child: appBar,
+      );
+    }
+
+    return appBar;
   }
 }
 

@@ -50,7 +50,7 @@ class HomeTodayTasksCard extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: TextButton(
-                      onPressed: () => context.push('/plan'),
+                      onPressed: () => context.go('/plan'),
                       child: Text(
                         isAr ? 'عرض الكل' : 'View All',
                         style: TextStyle(

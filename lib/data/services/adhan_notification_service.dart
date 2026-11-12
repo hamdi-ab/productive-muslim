@@ -10,6 +10,7 @@ class AdhanNotificationService {
     MethodChannel timezoneChannel = const MethodChannel(
       'productive_muslim/timezone',
     ),
+    this.onNotificationTapped,
   }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
        _timezoneChannel = timezoneChannel;
 
@@ -19,6 +20,7 @@ class AdhanNotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin;
   final MethodChannel _timezoneChannel;
+  final void Function(String payload)? onNotificationTapped;
   bool _initialized = false;
 
   bool get supported =>
@@ -38,7 +40,21 @@ class AdhanNotificationService {
           requestSoundPermission: false,
         ),
       ),
+      onDidReceiveNotificationResponse: (response) {
+        final payload = response.payload;
+        if (payload != null && onNotificationTapped != null) {
+          onNotificationTapped!(payload);
+        }
+      },
     );
+
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details?.didNotificationLaunchApp == true) {
+      final payload = details?.notificationResponse?.payload;
+      if (payload != null && onNotificationTapped != null) {
+        onNotificationTapped!(payload);
+      }
+    }
 
     tz_data.initializeTimeZones();
     final zone = await _timezoneChannel.invokeMethod<String>(
@@ -99,6 +115,7 @@ class AdhanNotificationService {
         title: 'Adhan - $name',
         body: 'It\'s time for $name prayer',
         scheduledDate: tzDate,
+        payload: '/prayer-times',
         notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             _channelId,

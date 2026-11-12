@@ -252,7 +252,7 @@ class _HomePrayerCardState extends State<HomePrayerCard> {
     final prayerName = getLocalizedPrayerName(_nextPrayer, l10n);
 
     return AppPressable(
-      onTap: () => context.push('/prayer-times'),
+      onTap: () => context.go('/prayer-times'),
       pressedScale: 0.98,
       haptic: AppHapticFeedback.light,
       borderRadius: BorderRadius.circular(24),

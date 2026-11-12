@@ -293,7 +293,7 @@ class _HomeDailyAyahCardState extends State<HomeDailyAyahCard> {
                         child: FittedBox(
                           fit: BoxFit.scaleDown,
                           child: TextButton.icon(
-                            onPressed: () => context.push('/journal'),
+                            onPressed: () => context.go('/journal'),
                             icon: const Icon(Icons.edit_note_rounded, size: 18),
                             label: Text(
                               isAr ? 'تدوين وتأمل' : 'Reflect & Journal',
