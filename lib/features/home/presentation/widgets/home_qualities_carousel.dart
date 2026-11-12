@@ -43,7 +43,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الإخلاص لله',
       descEn: 'Purify intentions before every action and word.',
       descAr: 'إخلاص النية لله تعالى قبل كل قول وفعل.',
-      route: '/intentions',
+      route: '/journal',
       icon: Icons.favorite_rounded,
       color: Color(0xFF10B981),
     ),
@@ -164,7 +164,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: TextButton(
-                  onPressed: () => context.push('/profile'),
+                  onPressed: () => context.go('/profile'),
                   child: Text(
                     isAr ? 'عرض الكل' : 'Explore All',
                     style: TextStyle(
@@ -191,7 +191,16 @@ class HomeQualitiesCarousel extends StatelessWidget {
               return AppPressable(
                 onTap: () {
                   AppHaptics.lightImpact();
-                  context.push(q.route);
+                  final route = q.route;
+                  if (route == '/profile' ||
+                      route == '/journal' ||
+                      route == '/tasks' ||
+                      route == '/habits' ||
+                      route == '/barakah') {
+                    context.go(route);
+                  } else {
+                    context.push(route);
+                  }
                 },
                 pressedScale: 0.96,
                 borderRadius: BorderRadius.circular(18),

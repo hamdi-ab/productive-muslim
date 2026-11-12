@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
@@ -148,93 +149,113 @@ class HomeScreen extends StatelessWidget {
           )
         : null;
 
-    return Scaffold(
-      extendBody: true,
-      appBar: ProductiveAppBar(
-        title: headerInfo.title,
-        subtitle: subtitle,
-        leading: homeLeading,
-        leadingIcon: isHome ? null : headerInfo.icon,
-        showBackButton: false,
-        actions: [
-          if (isHome) ...[
-            StreamBuilder<int>(
-              stream: getIt.isRegistered<HabitRepository>()
-                  ? getIt<HabitRepository>().watchOverallStreak()
-                  : null,
-              initialData: 0,
-              builder: (context, snapshot) {
-                final streak = snapshot.data ?? 0;
-                return AppPressable(
-                  onTap: () => IstiqamahStreakSheet.show(context),
-                  pressedScale: 0.92,
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    key: const Key('home_streak_badge'),
-                    margin: const EdgeInsetsDirectional.only(end: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
-                          : const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+    final isBarakah = location == '/barakah';
+
+    return PopScope(
+      canPop: isHome,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && !isHome) {
+          final fallback =
+              AppRouter.consumeNotificationFallbackLocation() ?? '/';
+          context.go(fallback);
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        appBar: ProductiveAppBar(
+          title: headerInfo.title,
+          subtitle: subtitle,
+          leading: homeLeading,
+          leadingIcon: isHome ? null : headerInfo.icon,
+          showBackButton: isBarakah,
+          onBackPressed: isBarakah
+              ? () {
+                  final fallback =
+                      AppRouter.consumeNotificationFallbackLocation() ?? '/';
+                  context.go(fallback);
+                }
+              : null,
+          actions: [
+            if (isHome) ...[
+              StreamBuilder<int>(
+                stream: getIt.isRegistered<HabitRepository>()
+                    ? getIt<HabitRepository>().watchOverallStreak()
+                    : null,
+                initialData: 0,
+                builder: (context, snapshot) {
+                  final streak = snapshot.data ?? 0;
+                  return AppPressable(
+                    onTap: () => IstiqamahStreakSheet.show(context),
+                    pressedScale: 0.92,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      key: const Key('home_streak_badge'),
+                      margin: const EdgeInsetsDirectional.only(end: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                            : const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: const Color(0xFFF59E0B)
+                              .withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.local_fire_department_rounded,
+                            color: Color(0xFFD97706),
+                            size: 14,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${streak}d',
+                            style: TextStyle(
+                              color: isDark
+                                  ? const Color(0xFFFBBF24)
+                                  : const Color(0xFF92400E),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.local_fire_department_rounded,
-                          color: Color(0xFFD97706),
-                          size: 14,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${streak}d',
-                          style: TextStyle(
-                            color: isDark
-                                ? const Color(0xFFFBBF24)
-                                : const Color(0xFF92400E),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-            ProductiveAppBarAction(
-              icon: Icons.settings_outlined,
-              tooltip: l10n.settings,
-              onTap: () => context.push('/settings'),
-            ),
-          ] else if (location == '/barakah') ...[
-            ProductiveAppBarAction(
-              key: const Key('open-review'),
-              tooltip: l10n.barakahWeeklyTitle,
-              icon: Icons.calendar_month_outlined,
-              onTap: () => context.push('/barakah/review'),
-            ),
+                  );
+                },
+              ),
+              ProductiveAppBarAction(
+                icon: Icons.settings_outlined,
+                tooltip: l10n.settings,
+                onTap: () => context.push('/settings'),
+              ),
+            ] else if (location == '/barakah') ...[
+              ProductiveAppBarAction(
+                key: const Key('open-review'),
+                tooltip: l10n.barakahWeeklyTitle,
+                icon: Icons.calendar_month_outlined,
+                onTap: () => context.push('/barakah/review'),
+              ),
+            ],
           ],
-        ],
-      ),
-      body: Stack(
-        children: [
-          _HomeWidgetSyncWatcher(service: prayerService),
-          Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
-        ],
-      ),
-      bottomNavigationBar: FloatingGlassNavBar(
-        currentIndex: currentIndex,
-        onTap: (index) => _navigateToIndex(context, index),
-        items: navItems,
+        ),
+        body: Stack(
+          children: [
+            _HomeWidgetSyncWatcher(service: prayerService),
+            Padding(padding: const EdgeInsets.only(bottom: 80), child: child),
+          ],
+        ),
+        bottomNavigationBar: FloatingGlassNavBar(
+          currentIndex: currentIndex,
+          onTap: (index) => _navigateToIndex(context, index),
+          items: navItems,
+        ),
       ),
     );
   }

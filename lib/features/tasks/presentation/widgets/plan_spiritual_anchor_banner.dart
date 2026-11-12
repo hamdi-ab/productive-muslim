@@ -92,7 +92,7 @@ class PlanSpiritualAnchorBanner extends StatelessWidget {
                 onTap: () {
                   AppHaptics.mediumImpact();
                   Navigator.pop(ctx);
-                  context.push('/journal');
+                  context.go('/journal');
                 },
                 pressedScale: 0.96,
                 child: Container(

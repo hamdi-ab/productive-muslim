@@ -26,17 +26,56 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 class AppRouter {
   AppRouter._();
 
+  static final GlobalKey<NavigatorState> rootNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'root');
+  static final GlobalKey<NavigatorState> shellNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'shell');
+
   static bool _pendingBarakahReminder = false;
 
+  static String? _previousLocationBeforeNotification;
+
+  static String? consumeNotificationFallbackLocation() {
+    final loc = _previousLocationBeforeNotification;
+    _previousLocationBeforeNotification = null;
+    return loc;
+  }
+
   static void openBarakahReminder() {
+    try {
+      final currentUri = router.routeInformationProvider.value.uri.toString();
+      if (currentUri.isNotEmpty &&
+          currentUri != '/barakah' &&
+          !currentUri.contains('onboarding')) {
+        _previousLocationBeforeNotification = currentUri;
+      }
+    } catch (_) {}
     _pendingBarakahReminder = true;
     router.go('/barakah');
   }
 
   static void handleNotificationPayload(String payload) {
+    if (payload.isEmpty) return;
+
+    try {
+      final currentUri = router.routeInformationProvider.value.uri.toString();
+      if (currentUri.isNotEmpty &&
+          currentUri != payload &&
+          !currentUri.contains('onboarding')) {
+        _previousLocationBeforeNotification = currentUri;
+      }
+    } catch (_) {}
+
     if (payload == '/barakah') {
       openBarakahReminder();
-    } else if (payload.isNotEmpty) {
+      return;
+    }
+
+    final uri = Uri.tryParse(payload);
+    final path = uri?.path.toLowerCase() ?? payload;
+    if (path == '/intentions') {
+      router.go('/journal');
+    } else {
       router.go(payload);
     }
   }
@@ -51,15 +90,18 @@ class AppRouter {
         path == '/prayer_times') {
       router.go('/prayer-times');
     } else if (host == 'adhkar' || path == '/adhkar') {
-      router.go('/adhkar');
+      final query = uri.hasQuery ? '?${uri.query}' : '';
+      handleNotificationPayload('/adhkar$query');
     } else if (host == 'focus' || path == '/focus') {
-      router.go('/focus');
+      handleNotificationPayload('/focus');
+    } else if (host == 'energy' || path == '/energy') {
+      handleNotificationPayload('/energy');
     } else if (host == 'fasting' || path == '/fasting') {
-      router.go('/fasting');
+      handleNotificationPayload('/fasting');
     } else if (host == 'profile' || path == '/profile') {
       router.go('/profile');
     } else if (host == 'barakah' || path == '/barakah') {
-      router.go('/barakah');
+      handleNotificationPayload('/barakah');
     } else if (host == 'tasks' || path == '/tasks') {
       router.go('/tasks');
     } else if (host == 'habits' ||
@@ -67,17 +109,20 @@ class AppRouter {
         host == 'streak' ||
         path == '/streak') {
       router.go('/habits');
-    } else if (host == 'journal' || path == '/journal') {
+    } else if (host == 'journal' ||
+        path == '/journal' ||
+        host == 'intentions' ||
+        path == '/intentions') {
       router.go('/journal');
     } else if (host == 'settings' || path == '/settings') {
-      router.go('/settings');
+      handleNotificationPayload('/settings');
     } else if (host == 'home' ||
         host.isEmpty ||
         path == '/' ||
         path == '/home') {
       router.go('/');
     } else if (path.isNotEmpty) {
-      router.go(path);
+      handleNotificationPayload(path);
     }
   }
 
@@ -90,6 +135,7 @@ class AppRouter {
   }
 
   static final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     redirect: (context, state) {
       final onboardingDone = _isOnboardingDone();
@@ -104,108 +150,115 @@ class AppRouter {
       return null;
     },
     routes: [
+      // 1. Primary Bottom Navigation Shell (Top-level Tabs)
       ShellRoute(
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) =>
             getIt.isRegistered<BarakahReminderService>()
             ? BarakahReminderLifecycle(
                 service: getIt<BarakahReminderService>(),
-                child: child,
+                child: HomeScreen(child: child),
               )
-            : child,
+            : HomeScreen(child: child),
         routes: [
+          GoRoute(path: '/', builder: (context, state) => const HomeContent()),
           GoRoute(
-            path: '/onboarding',
-            builder: (context, state) {
-              try {
-                return OnboardingScreen(settings: getIt<SettingsService>());
-              } catch (_) {
-                return const OnboardingScreen();
-              }
-            },
-          ),
-          // 1. Primary Bottom Navigation Shell (Top-level Tabs)
-          ShellRoute(
-            builder: (context, state, child) => HomeScreen(child: child),
-            routes: [
-              GoRoute(
-                path: '/',
-                builder: (context, state) => const HomeContent(),
-              ),
-              GoRoute(
-                path: '/plan',
-                builder: (context, state) => const PlanScreen(),
-              ),
-              GoRoute(
-                path: '/tasks',
-                builder: (context, state) =>
-                    const PlanScreen(initialTab: PlanTab.tasks),
-              ),
-              GoRoute(
-                path: '/habits',
-                builder: (context, state) =>
-                    const PlanScreen(initialTab: PlanTab.habits),
-              ),
-              GoRoute(
-                path: '/prayer-times',
-                builder: (context, state) => const PrayerTimesScreen(),
-              ),
-              GoRoute(
-                path: '/journal',
-                builder: (context, state) => const IntentionScreen(),
-              ),
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-              GoRoute(
-                path: '/barakah',
-                builder: (context, state) => const BarakahScreen(),
-              ),
-            ],
-          ),
-          // 2. Subpages / Detail Screens (Full-Screen, NO Bottom Navigation)
-          GoRoute(
-            path: '/settings',
-            builder: (context, state) => const SettingsScreen(),
+            path: '/plan',
+            builder: (context, state) => const PlanScreen(),
           ),
           GoRoute(
-            path: '/focus',
-            builder: (context, state) => FocusScreen(
-              initialTask: state.extra is Task ? state.extra as Task : null,
-            ),
+            path: '/tasks',
+            builder: (context, state) =>
+                const PlanScreen(initialTab: PlanTab.tasks),
           ),
           GoRoute(
-            path: '/energy',
-            builder: (context, state) => const EnergyScreen(),
+            path: '/habits',
+            builder: (context, state) =>
+                const PlanScreen(initialTab: PlanTab.habits),
           ),
           GoRoute(
-            path: '/fasting',
-            builder: (context, state) => const FastingScreen(),
-          ),
-          GoRoute(path: '/streak', redirect: (context, state) => '/habits'),
-          GoRoute(
-            path: '/adhkar',
-            builder: (context, state) {
-              DhikrCategory category = DhikrCategory.morning;
-              if (state.extra is DhikrCategory) {
-                category = state.extra as DhikrCategory;
-              } else {
-                final queryCat = state.uri.queryParameters['category'];
-                if (queryCat != null) {
-                  category = DhikrCategory.values.firstWhere(
-                    (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
-                    orElse: () => DhikrCategory.morning,
-                  );
-                }
-              }
-              return AdhkarScreen(initialCategory: category);
-            },
+            path: '/prayer-times',
+            builder: (context, state) => const PrayerTimesScreen(),
           ),
           GoRoute(
-            path: '/barakah/review',
-            builder: (context, state) => const BarakahReviewScreen(),
+            path: '/journal',
+            builder: (context, state) => const IntentionScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/barakah',
+            builder: (context, state) => const BarakahScreen(),
           ),
         ],
+      ),
+      // Redirect aliases
+      GoRoute(path: '/intentions', redirect: (context, state) => '/journal'),
+      GoRoute(
+        path: '/prayer_times',
+        redirect: (context, state) => '/prayer-times',
+      ),
+      GoRoute(path: '/streak', redirect: (context, state) => '/habits'),
+
+      // 2. Subpages / Detail Screens (Full-Screen, NO Bottom Navigation)
+      GoRoute(
+        path: '/onboarding',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          try {
+            return OnboardingScreen(settings: getIt<SettingsService>());
+          } catch (_) {
+            return const OnboardingScreen();
+          }
+        },
+      ),
+      GoRoute(
+        path: '/settings',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/focus',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => FocusScreen(
+          initialTask: state.extra is Task ? state.extra as Task : null,
+        ),
+      ),
+      GoRoute(
+        path: '/energy',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const EnergyScreen(),
+      ),
+      GoRoute(
+        path: '/fasting',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const FastingScreen(),
+      ),
+      GoRoute(
+        path: '/adhkar',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          DhikrCategory category = DhikrCategory.morning;
+          if (state.extra is DhikrCategory) {
+            category = state.extra as DhikrCategory;
+          } else {
+            final queryCat = state.uri.queryParameters['category'];
+            if (queryCat != null) {
+              category = DhikrCategory.values.firstWhere(
+                (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
+                orElse: () => DhikrCategory.morning,
+              );
+            }
+          }
+          return AdhkarScreen(initialCategory: category);
+        },
+      ),
+      GoRoute(
+        path: '/barakah/review',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const BarakahReviewScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

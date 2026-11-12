@@ -94,7 +94,9 @@ Future<void> setupDi() async {
   );
   getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
   getIt.registerLazySingleton<AdhanNotificationService>(
-    () => AdhanNotificationService(),
+    () => AdhanNotificationService(
+      onNotificationTapped: AppRouter.handleNotificationPayload,
+    ),
   );
   getIt.registerLazySingleton<AdhkarService>(
     () => AdhkarService(

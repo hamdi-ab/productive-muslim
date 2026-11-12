@@ -418,22 +418,22 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
         context.push('/energy');
         break;
       case 'ummah':
-        context.push('/tasks');
+        context.go('/tasks');
         break;
       case 'aql':
       case 'khushu':
         context.push('/focus');
         break;
       case 'istiqamah':
-        context.push('/habits');
+        context.go('/habits');
         break;
       case 'niyyah':
       case 'shukr':
-        context.push('/journal');
+        context.go('/journal');
         break;
       case 'ihsan':
       default:
-        context.push('/barakah');
+        context.go('/barakah');
         break;
     }
   }
