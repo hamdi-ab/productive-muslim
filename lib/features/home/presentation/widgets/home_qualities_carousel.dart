@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/router/app_routes.dart';
+
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -43,7 +45,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الإخلاص لله',
       descEn: 'Purify intentions before every action and word.',
       descAr: 'إخلاص النية لله تعالى قبل كل قول وفعل.',
-      route: '/journal',
+      route: AppRoutes.journal,
       icon: Icons.favorite_rounded,
       color: Color(0xFF10B981),
     ),
@@ -54,7 +56,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'المراقبة والذكر',
       descEn: 'Mindful presence through continuous remembrance and reflection.',
       descAr: 'الاستشعار الدائم لمعية الله بالذكر والتأمل الصادق.',
-      route: '/adhkar',
+      route: AppRoutes.adhkar,
       icon: Icons.fingerprint_rounded,
       color: Color(0xFF0D9488),
     ),
@@ -65,7 +67,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الطهارة والنشاط',
       descEn: 'Renewed wudhu, restorative sleep, and vibrant clean energy.',
       descAr: 'تجديد الوضوء، والنوم الكافي، والطاقة الحيوية النظيفة.',
-      route: '/energy',
+      route: AppRoutes.energy,
       icon: Icons.water_drop_rounded,
       color: Color(0xFF0284C7),
     ),
@@ -76,7 +78,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الإحسان والإتقان',
       descEn: 'Execute work and daily tasks as beautiful worship.',
       descAr: 'إتقان كل مهمة وعمل كأنك تؤديه عبادة خالصة لله.',
-      route: '/tasks',
+      route: AppRoutes.tasks,
       icon: Icons.star_rounded,
       color: Color(0xFFD4AF37),
     ),
@@ -87,7 +89,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الشكر والثناء',
       descEn: 'Daily recognition of blessings preserves and multiplies them.',
       descAr: 'تدوين النعم اليومية وحفظها بالحمد والشكر المستمر.',
-      route: '/journal',
+      route: AppRoutes.journal,
       icon: Icons.auto_awesome_rounded,
       color: Color(0xFFF59E0B),
     ),
@@ -98,7 +100,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'التوكل على الله',
       descEn: 'Exert full effort while trusting Allah for every outcome.',
       descAr: 'بذل أقصى الأسباب مع اليقين ببركة الله وتوفيقه.',
-      route: '/barakah',
+      route: AppRoutes.barakah,
       icon: Icons.shield_rounded,
       color: Color(0xFF6366F1),
     ),
@@ -109,7 +111,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الاستقامة والمداومة',
       descEn: 'The most beloved deeds are those done regularly, even if small.',
       descAr: 'أحب الأعمال إلى الله تعالى أدومها وإن قلّت.',
-      route: '/habits',
+      route: AppRoutes.habits,
       icon: Icons.local_fire_department_rounded,
       color: Color(0xFFEA580C),
     ),
@@ -120,7 +122,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'الاقتصاد والتوازن',
       descEn: 'Giving body and spirit their due rights without burnout.',
       descAr: 'إعطاء الجسد والروح حقهما بتناغم دون إرهاق أو تفريط.',
-      route: '/energy',
+      route: AppRoutes.energy,
       icon: Icons.balance_rounded,
       color: Color(0xFF14B8A6),
     ),
@@ -131,7 +133,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
       qualityAr: 'القصد والخشوع',
       descEn: 'Deep focused work blocks free from distractions and noise.',
       descAr: 'التركيز العميق في مساحات خالية من المشتتات والضوضاء.',
-      route: '/focus',
+      route: AppRoutes.focus,
       icon: Icons.center_focus_strong_rounded,
       color: Color(0xFF8B5CF6),
     ),
@@ -164,7 +166,7 @@ class HomeQualitiesCarousel extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: TextButton(
-                  onPressed: () => context.go('/profile'),
+                  onPressed: () => context.go(AppRoutes.profile),
                   child: Text(
                     isAr ? 'عرض الكل' : 'Explore All',
                     style: TextStyle(
@@ -192,11 +194,11 @@ class HomeQualitiesCarousel extends StatelessWidget {
                 onTap: () {
                   AppHaptics.lightImpact();
                   final route = q.route;
-                  if (route == '/profile' ||
-                      route == '/journal' ||
-                      route == '/tasks' ||
-                      route == '/habits' ||
-                      route == '/barakah') {
+                  if (route == AppRoutes.profile ||
+                      route == AppRoutes.journal ||
+                      route == AppRoutes.tasks ||
+                      route == AppRoutes.habits ||
+                      route == AppRoutes.barakah) {
                     context.go(route);
                   } else {
                     context.push(route);

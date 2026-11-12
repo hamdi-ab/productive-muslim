@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/data/services/barakah_score_service.dart'
@@ -412,28 +413,28 @@ class _BarakahRadarChartCardState extends State<BarakahRadarChartCard>
     AppHaptics.mediumImpact();
     switch (key) {
       case 'ruh':
-        context.push('/adhkar');
+        context.push(AppRoutes.adhkar);
         break;
       case 'jism':
-        context.push('/energy');
+        context.push(AppRoutes.energy);
         break;
       case 'ummah':
-        context.go('/tasks');
+        context.go(AppRoutes.tasks);
         break;
       case 'aql':
       case 'khushu':
-        context.push('/focus');
+        context.push(AppRoutes.focus);
         break;
       case 'istiqamah':
-        context.go('/habits');
+        context.go(AppRoutes.habits);
         break;
       case 'niyyah':
       case 'shukr':
-        context.go('/journal');
+        context.go(AppRoutes.journal);
         break;
       case 'ihsan':
       default:
-        context.go('/barakah');
+        context.go(AppRoutes.barakah);
         break;
     }
   }

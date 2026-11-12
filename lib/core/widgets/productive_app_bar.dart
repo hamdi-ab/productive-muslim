@@ -38,7 +38,16 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final canPopRoute = Navigator.of(context).canPop() || context.canPop();
+    bool canPopRoute = false;
+    try {
+      canPopRoute = Navigator.of(context).canPop() || context.canPop();
+    } catch (_) {
+      try {
+        canPopRoute = Navigator.of(context).canPop();
+      } catch (_) {
+        canPopRoute = false;
+      }
+    }
     final canPop = showBackButton ?? canPopRoute;
 
     Widget? leadingWidget = leading;
@@ -54,15 +63,25 @@ class ProductiveAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap:
                   onBackPressed ??
                   () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop();
-                    } else {
-                      final fallback =
-                          AppRouter.consumeNotificationFallbackLocation() ??
-                          '/';
-                      context.go(fallback);
+                    bool popped = false;
+                    try {
+                      if (context.canPop()) {
+                        context.pop();
+                        popped = true;
+                      }
+                    } catch (_) {}
+
+                    if (!popped) {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        final fallback =
+                            AppRouter.consumeNotificationFallbackLocation() ??
+                            AppRoutes.home;
+                        try {
+                          context.go(fallback);
+                        } catch (_) {}
+                      }
                     }
                   },
               pressedScale: 0.88,

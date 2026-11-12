@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
 
     final currentIndex = _getIndexForLocation(location);
     final headerInfo = _getHeaderInfo(location, l10n);
-    final isHome = location == '/';
+    final isHome = location == AppRoutes.home;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
               child: Tooltip(
                 message: l10n.profile,
                 child: AppPressable(
-                  onTap: () => context.go('/profile'),
+                  onTap: () => context.go(AppRoutes.profile),
                   pressedScale: 0.92,
                   borderRadius: BorderRadius.circular(20),
                   child: Stack(
@@ -149,14 +149,14 @@ class HomeScreen extends StatelessWidget {
           )
         : null;
 
-    final isBarakah = location == '/barakah';
+    final isBarakah = location == AppRoutes.barakah;
 
     return PopScope(
       canPop: isHome,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && !isHome) {
           final fallback =
-              AppRouter.consumeNotificationFallbackLocation() ?? '/';
+              AppRouter.consumeNotificationFallbackLocation() ?? AppRoutes.home;
           context.go(fallback);
         }
       },
@@ -171,7 +171,8 @@ class HomeScreen extends StatelessWidget {
           onBackPressed: isBarakah
               ? () {
                   final fallback =
-                      AppRouter.consumeNotificationFallbackLocation() ?? '/';
+                      AppRouter.consumeNotificationFallbackLocation() ??
+                      AppRoutes.home;
                   context.go(fallback);
                 }
               : null,
@@ -233,14 +234,14 @@ class HomeScreen extends StatelessWidget {
               ProductiveAppBarAction(
                 icon: Icons.settings_outlined,
                 tooltip: l10n.settings,
-                onTap: () => context.push('/settings'),
+                onTap: () => context.push(AppRoutes.settings),
               ),
-            ] else if (location == '/barakah') ...[
+            ] else if (location == AppRoutes.barakah) ...[
               ProductiveAppBarAction(
                 key: const Key('open-review'),
                 tooltip: l10n.barakahWeeklyTitle,
                 icon: Icons.calendar_month_outlined,
-                onTap: () => context.push('/barakah/review'),
+                onTap: () => context.push(AppRoutes.barakahReview),
               ),
             ],
           ],
@@ -267,16 +268,18 @@ class HomeScreen extends StatelessWidget {
     bool isAr,
   ) {
     return switch (location) {
-      '/plan' || '/tasks' || '/habits' =>
+      AppRoutes.plan || AppRoutes.tasks || AppRoutes.habits =>
         isAr ? '${l10n.tasks} والعادات' : '${l10n.tasks} & ${l10n.habits}',
-      '/prayer-times' =>
+      AppRoutes.prayerTimes =>
         prayerService?.cachedLocationName != null &&
                 prayerService!.cachedLocationName!.isNotEmpty
             ? '📍 ${prayerService.cachedLocationName}'
             : null,
-      '/journal' => isAr ? 'النيات والخواطر' : 'Intentions & Reflections',
-      '/profile' => l10n.profileSubtitle,
-      '/barakah' => isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
+      AppRoutes.journal =>
+        isAr ? 'النيات والخواطر' : 'Intentions & Reflections',
+      AppRoutes.profile => l10n.profileSubtitle,
+      AppRoutes.barakah =>
+        isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
       _ => null,
     };
   }
@@ -286,25 +289,31 @@ class HomeScreen extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     return switch (location) {
-      '/' => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
-      '/plan' ||
-      '/tasks' ||
-      '/habits' => (title: l10n.plan, icon: Icons.checklist_rtl_rounded),
-      '/prayer-times' => (title: l10n.prayerTimes, icon: Icons.mosque_rounded),
-      '/journal' => (title: l10n.journal, icon: Icons.menu_book_rounded),
-      '/profile' => (title: l10n.profile, icon: Icons.person_rounded),
-      '/barakah' => (title: l10n.barakah, icon: Icons.auto_awesome_rounded),
+      AppRoutes.home => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
+      AppRoutes.plan ||
+      AppRoutes.tasks ||
+      AppRoutes.habits => (title: l10n.plan, icon: Icons.checklist_rtl_rounded),
+      AppRoutes.prayerTimes => (
+        title: l10n.prayerTimes,
+        icon: Icons.mosque_rounded,
+      ),
+      AppRoutes.journal => (title: l10n.journal, icon: Icons.menu_book_rounded),
+      AppRoutes.profile => (title: l10n.profile, icon: Icons.person_rounded),
+      AppRoutes.barakah => (
+        title: l10n.barakah,
+        icon: Icons.auto_awesome_rounded,
+      ),
       _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
     };
   }
 
   static int _getIndexForLocation(String location) {
     return switch (location) {
-      '/' => 0,
-      '/plan' || '/tasks' || '/habits' => 1,
-      '/prayer-times' => 2,
-      '/journal' => 3,
-      '/profile' || '/barakah' => 4,
+      AppRoutes.home => 0,
+      AppRoutes.plan || AppRoutes.tasks || AppRoutes.habits => 1,
+      AppRoutes.prayerTimes => 2,
+      AppRoutes.journal => 3,
+      AppRoutes.profile || AppRoutes.barakah => 4,
       _ => 0,
     };
   }
@@ -312,19 +321,19 @@ class HomeScreen extends StatelessWidget {
   static void _navigateToIndex(BuildContext context, int index) {
     switch (index) {
       case 0:
-        context.go('/');
+        context.go(AppRoutes.home);
         break;
       case 1:
-        context.go('/plan');
+        context.go(AppRoutes.plan);
         break;
       case 2:
-        context.go('/prayer-times');
+        context.go(AppRoutes.prayerTimes);
         break;
       case 3:
-        context.go('/journal');
+        context.go(AppRoutes.journal);
         break;
       case 4:
-        context.go('/profile');
+        context.go(AppRoutes.profile);
         break;
     }
   }

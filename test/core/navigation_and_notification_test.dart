@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/router/app_router.dart';
@@ -10,9 +9,6 @@ import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
-import 'package:productive_muslim/domain/models/barakah_entry.dart';
-import 'package:productive_muslim/domain/models/habit.dart';
-import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
@@ -26,26 +22,14 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/fake_reminder_scheduler.dart';
-
-class MockBarakahRepo extends Mock implements BarakahRepository {}
-
-class MockHabitRepo extends Mock implements HabitRepository {}
-
-class MockTaskRepo extends Mock implements TaskRepository {}
-
-class MockIntentionRepo extends Mock implements IntentionRepository {}
-
-class MockPrayerTimeService extends PrayerTimeService {
-  @override
-  Future<Position?> getCurrentPosition() async => null;
-}
+import '../helpers/mocks.dart';
 
 void main() {
   late SettingsService settings;
-  late MockBarakahRepo barakahRepo;
-  late MockHabitRepo habitRepo;
-  late MockTaskRepo taskRepo;
-  late MockIntentionRepo intentionRepo;
+  late MockBarakahRepository barakahRepo;
+  late MockHabitRepository habitRepo;
+  late MockTaskRepository taskRepo;
+  late MockIntentionRepository intentionRepo;
   late BarakahReminderService reminderService;
 
   setUp(() async {
@@ -59,29 +43,19 @@ void main() {
       scheduler: FakeReminderScheduler(),
     );
 
-    barakahRepo = MockBarakahRepo();
-    habitRepo = MockHabitRepo();
-    taskRepo = MockTaskRepo();
-    intentionRepo = MockIntentionRepo();
+    barakahRepo = MockBarakahRepository();
+    habitRepo = MockHabitRepository();
+    taskRepo = MockTaskRepository();
+    intentionRepo = MockIntentionRepository();
 
-    when(() => barakahRepo.watchEntriesForDate(any()))
-        .thenAnswer((_) => Stream.value(<BarakahEntry>[]));
-    when(() => barakahRepo.getEntriesForDate(any()))
-        .thenAnswer((_) async => []);
-    when(() => barakahRepo.watchDailyResponse(any()))
-        .thenAnswer((_) => Stream.value(null));
+    stubDefaultRepositoryMocks(
+      barakahRepo: barakahRepo,
+      habitRepo: habitRepo,
+      taskRepo: taskRepo,
+      intentionRepo: intentionRepo,
+    );
     when(() => habitRepo.watchOverallStreak())
         .thenAnswer((_) => Stream.value(5));
-    when(() => habitRepo.watchActiveHabits())
-        .thenAnswer((_) => Stream.value(<Habit>[]));
-    when(() => habitRepo.watchCompletionsForDate(any()))
-        .thenAnswer((_) => Stream.value(<int, bool>{}));
-    when(() => habitRepo.getCompletionsCountByDate(days: any(named: 'days')))
-        .thenAnswer((_) async => <String, int>{});
-    when(() => taskRepo.watchTasksForDate(any()))
-        .thenAnswer((_) => Stream.value(<Task>[]));
-    when(() => intentionRepo.watchEntriesForDate(any()))
-        .thenAnswer((_) => Stream.value([]));
 
     getIt.registerSingleton<SettingsService>(settings);
     getIt.registerSingleton<BarakahReminderService>(reminderService);
@@ -96,11 +70,12 @@ void main() {
       () => AdhkarService(settingsService: settings),
     );
 
-    AppRouter.consumeNotificationFallbackLocation();
-    AppRouter.router.go('/');
+    AppRouter.resetForTesting();
+    AppRouter.router.go(AppRoutes.home);
   });
 
   tearDown(() async {
+    AppRouter.resetForTesting();
     await reminderService.dispose();
     await getIt.reset();
   });
