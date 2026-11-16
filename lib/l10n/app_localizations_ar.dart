@@ -1359,4 +1359,127 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileSubtitle => 'النمو الإيماني والصفات التسع';
+
+  @override
+  String get editProfile => 'تعديل الملف الشخصي';
+
+  @override
+  String get displayName => 'الاسم المستعار';
+
+  @override
+  String get enterNameHint => 'أدخل اسمك أو صفتك الإيمانية';
+
+  @override
+  String get spiritualMotto => 'شعار النية والهمة';
+
+  @override
+  String get enterMottoHint => 'مثال: ابتغاء مرضاة الله وإتقان العمل';
+
+  @override
+  String get chooseAvatar => 'اختر رمز الهوية الإيمانية';
+
+  @override
+  String get saveChanges => 'حفظ التغييرات';
+
+  @override
+  String get spiritualRank => 'المرتبة الإيمانية';
+
+  @override
+  String get nextRankProgress => 'التقدم إلى المرتبة التالية';
+
+  @override
+  String get lifetimeMomentum => 'سجل الإنجاز والهمة';
+
+  @override
+  String get currentStreak => 'سلسلة الاستقامة';
+
+  @override
+  String bestStreak(int days) {
+    return 'الأفضل: $days يوم';
+  }
+
+  @override
+  String get habitsCompleted => 'العادات المنجزة';
+
+  @override
+  String get tasksAccomplished => 'المهام المحققة';
+
+  @override
+  String get focusHours => 'ساعات التركيز';
+
+  @override
+  String get spiritualMilestones => 'الأوسمة والبركات';
+
+  @override
+  String get milestoneUnlocked => 'مكتمل';
+
+  @override
+  String get milestoneLocked => 'قيد الإنجاز';
+
+  @override
+  String get qualitiesCoaching => 'توجيه وتطوير الصفات';
+
+  @override
+  String get topStrength => 'أبرز نقاط القوة';
+
+  @override
+  String get growthFocus => 'فرصة الارتقاء والنمو';
+
+  @override
+  String get dataSovereignty => 'البيانات والخصوصية';
+
+  @override
+  String get exportBackup => 'تصدير نسخة احتياطية (JSON)';
+
+  @override
+  String get restoreBackup => 'استعادة من النسخة الاحتياطية';
+
+  @override
+  String get shareUmmah => 'شارك التطبيق مع أصدقائك';
+
+  @override
+  String get offlinePrivacyNotice =>
+      'تطبيق محلي بنسبة 100٪ — أعمالك بينك وبين الله وحده.';
+
+  @override
+  String get badgeFajrVanguard => 'طليعة الفجر';
+
+  @override
+  String get badgeFajrVanguardDesc =>
+      'المحافظة على صلاة الفجر وأذكار الصباح لمدة 7 أيام متتالية.';
+
+  @override
+  String get badgeIstiqamahMaster => 'سيد الاستقامة';
+
+  @override
+  String get badgeIstiqamahMasterDesc =>
+      'بلوغ سلسلة استقامة لمدة 21 يوماً متواصلاً.';
+
+  @override
+  String get badgeWhiteDaysGuardian => 'حارس الأيام البيض';
+
+  @override
+  String get badgeWhiteDaysGuardianDesc =>
+      'صيام الأيام البيض المباركة (13، 14، 15 من الشهر الهجري).';
+
+  @override
+  String get badgeDhikrAbundance => 'فيض الذكر';
+
+  @override
+  String get badgeDhikrAbundanceDesc =>
+      'إتمام أكثر من 1,000 تسبيحة وذكر لله تعالى.';
+
+  @override
+  String get badgeNiyyahPurity => 'إخلاص النية';
+
+  @override
+  String get badgeNiyyahPurityDesc =>
+      'تسجيل النوايا الصالحة لمدة 14 يوماً متتالياً.';
+
+  @override
+  String get badgeMuhasabahDevotee => 'أهل المحاسبة';
+
+  @override
+  String get badgeMuhasabahDevoteeDesc =>
+      'إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية.';
 }

@@ -56,12 +56,17 @@ void stubDefaultRepositoryMocks({
     when(() => habitRepo.getCompletionsCountByDate(days: any(named: 'days')))
         .thenAnswer((_) async => <String, int>{});
     when(() => habitRepo.getActiveHabits()).thenAnswer((_) async => []);
+    when(() => habitRepo.getLongestStreak()).thenAnswer((_) async => 0);
+    when(() => habitRepo.getLifetimeCompletionsCount())
+        .thenAnswer((_) async => 0);
   }
 
   if (taskRepo != null) {
     when(() => taskRepo.watchTasksForDate(any()))
         .thenAnswer((_) => Stream.value(<Task>[]));
     when(() => taskRepo.getTasksForDate(any())).thenAnswer((_) async => []);
+    when(() => taskRepo.getLifetimeCompletedTasksCount())
+        .thenAnswer((_) async => 0);
   }
 
   if (intentionRepo != null) {

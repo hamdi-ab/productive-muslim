@@ -63,6 +63,10 @@ class FakeTaskRepository implements TaskRepository {
     _tasks.removeWhere((t) => t.id == id);
     return 1;
   }
+
+  @override
+  Future<int> getLifetimeCompletedTasksCount() async =>
+      _tasks.where((t) => t.completed).length;
 }
 
 void main() {

@@ -121,4 +121,9 @@ class HabitRepositoryImpl implements HabitRepository {
   Stream<Map<String, int>> watchCompletionsCountByDate({int days = 84}) {
     return _completionsDao.watchCompletionsCountByDate(days: days);
   }
+
+  @override
+  Future<int> getLifetimeCompletionsCount() {
+    return _completionsDao.getLifetimeCompletionsCount();
+  }
 }

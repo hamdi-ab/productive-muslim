@@ -85,6 +85,10 @@ class MockTaskRepository implements TaskRepository {
 
   @override
   Future<int> deactivateTask(int id) async => 1;
+
+  @override
+  Future<int> getLifetimeCompletedTasksCount() async =>
+      tasks.where((t) => t.completed).length;
 }
 
 void main() {

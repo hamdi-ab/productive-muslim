@@ -203,4 +203,11 @@ class HabitCompletionsDao extends DatabaseAccessor<AppDatabase>
         .watch()
         .asyncMap((_) => getCompletionsCountByDate(days: days, now: now));
   }
+
+  Future<int> getLifetimeCompletionsCount() async {
+    final rows = await (select(
+      habitCompletions,
+    )..where((c) => c.completed.equals(1))).get();
+    return rows.length;
+  }
 }

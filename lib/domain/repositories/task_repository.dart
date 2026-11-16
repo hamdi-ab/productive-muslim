@@ -9,4 +9,5 @@ abstract class TaskRepository {
   Future<bool> updateTask(Task task);
   Future<int> toggleTask(int id);
   Future<int> deactivateTask(int id);
+  Future<int> getLifetimeCompletedTasksCount();
 }

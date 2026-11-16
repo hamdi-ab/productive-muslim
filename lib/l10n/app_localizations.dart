@@ -2497,6 +2497,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spiritual Growth & 9 Qualities'**
   String get profileSubtitle;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @displayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// No description provided for @enterNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name or seeker title'**
+  String get enterNameHint;
+
+  /// No description provided for @spiritualMotto.
+  ///
+  /// In en, this message translates to:
+  /// **'Sacred Intention / Daily Motto'**
+  String get spiritualMotto;
+
+  /// No description provided for @enterMottoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Seeking Allah\'s pleasure through Ihsan'**
+  String get enterMottoHint;
+
+  /// No description provided for @chooseAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Avatar Symbol'**
+  String get chooseAvatar;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @spiritualRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Rank'**
+  String get spiritualRank;
+
+  /// No description provided for @nextRankProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress to next rank'**
+  String get nextRankProgress;
+
+  /// No description provided for @lifetimeMomentum.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime Momentum'**
+  String get lifetimeMomentum;
+
+  /// No description provided for @currentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get currentStreak;
+
+  /// No description provided for @bestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Best: {days}d'**
+  String bestStreak(int days);
+
+  /// No description provided for @habitsCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits Built'**
+  String get habitsCompleted;
+
+  /// No description provided for @tasksAccomplished.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks Done'**
+  String get tasksAccomplished;
+
+  /// No description provided for @focusHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Hours'**
+  String get focusHours;
+
+  /// No description provided for @spiritualMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Milestones'**
+  String get spiritualMilestones;
+
+  /// No description provided for @milestoneUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get milestoneUnlocked;
+
+  /// No description provided for @milestoneLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get milestoneLocked;
+
+  /// No description provided for @qualitiesCoaching.
+  ///
+  /// In en, this message translates to:
+  /// **'9 Qualities Coaching'**
+  String get qualitiesCoaching;
+
+  /// No description provided for @topStrength.
+  ///
+  /// In en, this message translates to:
+  /// **'Core Strength'**
+  String get topStrength;
+
+  /// No description provided for @growthFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth Focus'**
+  String get growthFocus;
+
+  /// No description provided for @dataSovereignty.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & Sovereignty'**
+  String get dataSovereignty;
+
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Export JSON Backup'**
+  String get exportBackup;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Backup'**
+  String get restoreBackup;
+
+  /// No description provided for @shareUmmah.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Productive Muslim'**
+  String get shareUmmah;
+
+  /// No description provided for @offlinePrivacyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'100% Offline & Private — Your deeds remain between you and Allah.'**
+  String get offlinePrivacyNotice;
+
+  /// No description provided for @badgeFajrVanguard.
+  ///
+  /// In en, this message translates to:
+  /// **'Fajr Vanguard'**
+  String get badgeFajrVanguard;
+
+  /// No description provided for @badgeFajrVanguardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintained a 7-day Fajr prayer & morning adhkar streak.'**
+  String get badgeFajrVanguardDesc;
+
+  /// No description provided for @badgeIstiqamahMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Istiqamah Master'**
+  String get badgeIstiqamahMaster;
+
+  /// No description provided for @badgeIstiqamahMasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Achieved a 21-day continuous habit momentum.'**
+  String get badgeIstiqamahMasterDesc;
+
+  /// No description provided for @badgeWhiteDaysGuardian.
+  ///
+  /// In en, this message translates to:
+  /// **'White Days Guardian'**
+  String get badgeWhiteDaysGuardian;
+
+  /// No description provided for @badgeWhiteDaysGuardianDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasted the sacred White Days (Ayyam al-Beed).'**
+  String get badgeWhiteDaysGuardianDesc;
+
+  /// No description provided for @badgeDhikrAbundance.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikr Abundance'**
+  String get badgeDhikrAbundance;
+
+  /// No description provided for @badgeDhikrAbundanceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reached 1,000+ total tasbeeh repetitions.'**
+  String get badgeDhikrAbundanceDesc;
+
+  /// No description provided for @badgeNiyyahPurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Niyyah Purity'**
+  String get badgeNiyyahPurity;
+
+  /// No description provided for @badgeNiyyahPurityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded pure intentions for 14 consecutive days.'**
+  String get badgeNiyyahPurityDesc;
+
+  /// No description provided for @badgeMuhasabahDevotee.
+  ///
+  /// In en, this message translates to:
+  /// **'Muhasabah Devotee'**
+  String get badgeMuhasabahDevotee;
+
+  /// No description provided for @badgeMuhasabahDevoteeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed 4 consecutive weekly spiritual self-audits.'**
+  String get badgeMuhasabahDevoteeDesc;
 }
 
 class _AppLocalizationsDelegate

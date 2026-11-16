@@ -6,22 +6,36 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
+import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_atmosphere_background.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_radar_chart_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_weekly_review_card.dart';
+import 'package:productive_muslim/features/profile/presentation/widgets/profile_action_hub.dart';
+import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_preferences_card.dart';
+import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
+import 'package:productive_muslim/features/profile/presentation/widgets/profile_qualities_coaching_card.dart';
+import 'package:productive_muslim/features/profile/presentation/widgets/profile_tier_progress_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// Screen representing the user's spiritual profile, anchoring the 9-essential qualities
-/// radar chart, Barakah capacity level, consistency momentum, and personal settings.
+typedef _ProfileData = ({
+  BarakahScores? scores,
+  Map<String, int> habitCounts,
+  int streak,
+  int longestStreak,
+  int lifetimeHabits,
+  int lifetimeTasks,
+  int focusMinutes,
+});
+
+/// Screen representing the user's personal sovereignty & spiritual profile,
+/// combining identity, spiritual progression, lifetime achievements, milestone badges,
+/// 9-qualities coaching, and sovereign settings.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -41,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
           entriesByDate[e.date] = (entriesByDate[e.date] ?? 0) + 1;
         }
 
-        return FutureBuilder<(BarakahScores?, Map<String, int>)>(
+        return FutureBuilder<_ProfileData>(
           future: () async {
             BarakahScores? scores;
             if (getIt.isRegistered<BarakahScoreService>()) {
@@ -49,16 +63,50 @@ class ProfileScreen extends StatelessWidget {
                 date: today,
               );
             }
+
             Map<String, int> habitCounts = const {};
+            int streak = 0;
+            int longestStreak = 0;
+            int lifetimeHabits = 0;
             if (getIt.isRegistered<HabitRepository>()) {
-              habitCounts = await getIt<HabitRepository>()
-                  .getCompletionsCountByDate(days: 84);
+              final habitRepo = getIt<HabitRepository>();
+              habitCounts = await habitRepo.getCompletionsCountByDate(days: 84);
+              streak = await habitRepo.getOverallStreak();
+              longestStreak = await habitRepo.getLongestStreak();
+              lifetimeHabits = await habitRepo.getLifetimeCompletionsCount();
             }
-            return (scores, habitCounts);
+
+            int lifetimeTasks = 0;
+            if (getIt.isRegistered<TaskRepository>()) {
+              lifetimeTasks = await getIt<TaskRepository>()
+                  .getLifetimeCompletedTasksCount();
+            }
+
+            int focusMinutes = 0;
+            if (getIt.isRegistered<SettingsService>()) {
+              focusMinutes = getIt<SettingsService>().totalFocusMinutes;
+            }
+
+            return (
+              scores: scores,
+              habitCounts: habitCounts,
+              streak: streak,
+              longestStreak: longestStreak,
+              lifetimeHabits: lifetimeHabits,
+              lifetimeTasks: lifetimeTasks,
+              focusMinutes: focusMinutes,
+            );
           }(),
           builder: (context, snapshot) {
-            final scores = snapshot.data?.$1;
-            final habitCounts = snapshot.data?.$2 ?? const {};
+            final data = snapshot.data;
+            final scores = data?.scores;
+            final habitCounts = data?.habitCounts ?? const {};
+            final streak = data?.streak ?? 0;
+            final longestStreak = data?.longestStreak ?? 0;
+            final lifetimeHabits = data?.lifetimeHabits ?? 0;
+            final lifetimeTasks = data?.lifetimeTasks ?? 0;
+            final focusMinutes = data?.focusMinutes ?? 0;
+
             final Map<String, int> totalActivity = Map<String, int>.from(
               habitCounts,
             );
@@ -73,33 +121,55 @@ class ProfileScreen extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               children: [
-                // 1. User Spiritual Identity Header Card
+                // 1. User Spiritual Identity Header Card (tap-to-edit name, motto & avatar)
                 ProfileHeaderCard(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.md),
 
-                // 2. Barakah Capacity & Score Header Card
-                BarakahScoreHeaderCard(
+                // 2. Spiritual Progression Tier Card
+                ProfileTierProgressCard(
+                  streak: streak,
                   isDark: isDark,
                   isAr: isAr,
-                  scorePercent: scores?.scorePercent ?? 0.85,
-                  scorePoints: scores?.scorePoints ?? 85,
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // 3. 9-Qualities Radar / Spider Chart Card
-                BarakahRadarChartCard(dimensions: scores?.dimensions),
+                // 3. 2x2 Lifetime Achievement Momentum Grid
+                ProfileLifetimeStatsGrid(
+                  currentStreak: streak,
+                  longestStreak: longestStreak,
+                  lifetimeHabitCompletions: lifetimeHabits,
+                  lifetimeTasksCompleted: lifetimeTasks,
+                  totalFocusMinutes: focusMinutes,
+                  isDark: isDark,
+                  isAr: isAr,
+                ),
                 const SizedBox(height: AppSpacing.md),
 
-                // 4. 12-Week Consistency & Growth Momentum Heatmap
+                // 4. Spiritual Milestones & Badges Cabinet
+                ProfileBadgesCard(
+                  streak: streak,
+                  lifetimeHabitCompletions: lifetimeHabits,
+                  lifetimeTasksCompleted: lifetimeTasks,
+                  totalFocusMinutes: focusMinutes,
+                  isDark: isDark,
+                  isAr: isAr,
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                // 5. 9-Qualities Radar Chart with Personal Spiritual Coaching
+                ProfileQualitiesCoachingCard(
+                  scores: scores,
+                  isDark: isDark,
+                  isAr: isAr,
+                ),
+                const SizedBox(height: AppSpacing.md),
+
+                // 6. 12-Week Consistency & Growth Momentum Heatmap
                 BarakahHeatmapCard(activityByDate: totalActivity),
                 const SizedBox(height: AppSpacing.md),
 
-                // 5. Weekly Muhasabah Milestone Launcher
-                const BarakahWeeklyReviewCard(),
-                const SizedBox(height: AppSpacing.md),
-
-                // 6. Quick Preferences & Touch Settings
-                ProfilePreferencesCard(isDark: isDark, isAr: isAr),
+                // 7. Action Hub (Preferences, JSON Backup & Restore, Privacy & Sharing)
+                ProfileActionHub(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.xl),
               ],
             );
