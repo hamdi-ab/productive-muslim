@@ -1370,4 +1370,127 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSubtitle => 'Spiritual Growth & 9 Qualities';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get enterNameHint => 'Enter your name or seeker title';
+
+  @override
+  String get spiritualMotto => 'Sacred Intention / Daily Motto';
+
+  @override
+  String get enterMottoHint => 'e.g. Seeking Allah\'s pleasure through Ihsan';
+
+  @override
+  String get chooseAvatar => 'Choose Avatar Symbol';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get spiritualRank => 'Spiritual Rank';
+
+  @override
+  String get nextRankProgress => 'Progress to next rank';
+
+  @override
+  String get lifetimeMomentum => 'Lifetime Momentum';
+
+  @override
+  String get currentStreak => 'Current Streak';
+
+  @override
+  String bestStreak(int days) {
+    return 'Best: ${days}d';
+  }
+
+  @override
+  String get habitsCompleted => 'Habits Built';
+
+  @override
+  String get tasksAccomplished => 'Tasks Done';
+
+  @override
+  String get focusHours => 'Focus Hours';
+
+  @override
+  String get spiritualMilestones => 'Spiritual Milestones';
+
+  @override
+  String get milestoneUnlocked => 'Unlocked';
+
+  @override
+  String get milestoneLocked => 'Locked';
+
+  @override
+  String get qualitiesCoaching => '9 Qualities Coaching';
+
+  @override
+  String get topStrength => 'Core Strength';
+
+  @override
+  String get growthFocus => 'Growth Focus';
+
+  @override
+  String get dataSovereignty => 'Data & Sovereignty';
+
+  @override
+  String get exportBackup => 'Export JSON Backup';
+
+  @override
+  String get restoreBackup => 'Restore from Backup';
+
+  @override
+  String get shareUmmah => 'Share Productive Muslim';
+
+  @override
+  String get offlinePrivacyNotice =>
+      '100% Offline & Private — Your deeds remain between you and Allah.';
+
+  @override
+  String get badgeFajrVanguard => 'Fajr Vanguard';
+
+  @override
+  String get badgeFajrVanguardDesc =>
+      'Maintained a 7-day Fajr prayer & morning adhkar streak.';
+
+  @override
+  String get badgeIstiqamahMaster => 'Istiqamah Master';
+
+  @override
+  String get badgeIstiqamahMasterDesc =>
+      'Achieved a 21-day continuous habit momentum.';
+
+  @override
+  String get badgeWhiteDaysGuardian => 'White Days Guardian';
+
+  @override
+  String get badgeWhiteDaysGuardianDesc =>
+      'Fasted the sacred White Days (Ayyam al-Beed).';
+
+  @override
+  String get badgeDhikrAbundance => 'Dhikr Abundance';
+
+  @override
+  String get badgeDhikrAbundanceDesc =>
+      'Reached 1,000+ total tasbeeh repetitions.';
+
+  @override
+  String get badgeNiyyahPurity => 'Niyyah Purity';
+
+  @override
+  String get badgeNiyyahPurityDesc =>
+      'Recorded pure intentions for 14 consecutive days.';
+
+  @override
+  String get badgeMuhasabahDevotee => 'Muhasabah Devotee';
+
+  @override
+  String get badgeMuhasabahDevoteeDesc =>
+      'Completed 4 consecutive weekly spiritual self-audits.';
 }

@@ -463,5 +463,50 @@
   "energy": "الطاقة والروتين",
   "adhkar": "الأذكار والتلاوة",
   "profile": "الملف الشخصي",
-  "profileSubtitle": "النمو الإيماني والصفات التسع"
+  "profileSubtitle": "النمو الإيماني والصفات التسع",
+  "editProfile": "تعديل الملف الشخصي",
+  "displayName": "الاسم المستعار",
+  "enterNameHint": "أدخل اسمك أو صفتك الإيمانية",
+  "spiritualMotto": "شعار النية والهمة",
+  "enterMottoHint": "مثال: ابتغاء مرضاة الله وإتقان العمل",
+  "chooseAvatar": "اختر رمز الهوية الإيمانية",
+  "saveChanges": "حفظ التغييرات",
+  "spiritualRank": "المرتبة الإيمانية",
+  "nextRankProgress": "التقدم إلى المرتبة التالية",
+  "lifetimeMomentum": "سجل الإنجاز والهمة",
+  "currentStreak": "سلسلة الاستقامة",
+  "bestStreak": "الأفضل: {days} يوم",
+  "@bestStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "habitsCompleted": "العادات المنجزة",
+  "tasksAccomplished": "المهام المحققة",
+  "focusHours": "ساعات التركيز",
+  "spiritualMilestones": "الأوسمة والبركات",
+  "milestoneUnlocked": "مكتمل",
+  "milestoneLocked": "قيد الإنجاز",
+  "qualitiesCoaching": "توجيه وتطوير الصفات",
+  "topStrength": "أبرز نقاط القوة",
+  "growthFocus": "فرصة الارتقاء والنمو",
+  "dataSovereignty": "البيانات والخصوصية",
+  "exportBackup": "تصدير نسخة احتياطية (JSON)",
+  "restoreBackup": "استعادة من النسخة الاحتياطية",
+  "shareUmmah": "شارك التطبيق مع أصدقائك",
+  "offlinePrivacyNotice": "تطبيق محلي بنسبة 100٪ — أعمالك بينك وبين الله وحده.",
+  "badgeFajrVanguard": "طليعة الفجر",
+  "badgeFajrVanguardDesc": "المحافظة على صلاة الفجر وأذكار الصباح لمدة 7 أيام متتالية.",
+  "badgeIstiqamahMaster": "سيد الاستقامة",
+  "badgeIstiqamahMasterDesc": "بلوغ سلسلة استقامة لمدة 21 يوماً متواصلاً.",
+  "badgeWhiteDaysGuardian": "حارس الأيام البيض",
+  "badgeWhiteDaysGuardianDesc": "صيام الأيام البيض المباركة (13، 14، 15 من الشهر الهجري).",
+  "badgeDhikrAbundance": "فيض الذكر",
+  "badgeDhikrAbundanceDesc": "إتمام أكثر من 1,000 تسبيحة وذكر لله تعالى.",
+  "badgeNiyyahPurity": "إخلاص النية",
+  "badgeNiyyahPurityDesc": "تسجيل النوايا الصالحة لمدة 14 يوماً متتالياً.",
+  "badgeMuhasabahDevotee": "أهل المحاسبة",
+  "badgeMuhasabahDevoteeDesc": "إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية."
 }

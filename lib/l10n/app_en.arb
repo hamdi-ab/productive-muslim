@@ -533,5 +533,50 @@
   "energy": "Energy & Routines",
   "adhkar": "Adhkar Studio",
   "profile": "Profile",
-  "profileSubtitle": "Spiritual Growth & 9 Qualities"
+  "profileSubtitle": "Spiritual Growth & 9 Qualities",
+  "editProfile": "Edit Profile",
+  "displayName": "Display Name",
+  "enterNameHint": "Enter your name or seeker title",
+  "spiritualMotto": "Sacred Intention / Daily Motto",
+  "enterMottoHint": "e.g. Seeking Allah's pleasure through Ihsan",
+  "chooseAvatar": "Choose Avatar Symbol",
+  "saveChanges": "Save Changes",
+  "spiritualRank": "Spiritual Rank",
+  "nextRankProgress": "Progress to next rank",
+  "lifetimeMomentum": "Lifetime Momentum",
+  "currentStreak": "Current Streak",
+  "bestStreak": "Best: {days}d",
+  "@bestStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "habitsCompleted": "Habits Built",
+  "tasksAccomplished": "Tasks Done",
+  "focusHours": "Focus Hours",
+  "spiritualMilestones": "Spiritual Milestones",
+  "milestoneUnlocked": "Unlocked",
+  "milestoneLocked": "Locked",
+  "qualitiesCoaching": "9 Qualities Coaching",
+  "topStrength": "Core Strength",
+  "growthFocus": "Growth Focus",
+  "dataSovereignty": "Data & Sovereignty",
+  "exportBackup": "Export JSON Backup",
+  "restoreBackup": "Restore from Backup",
+  "shareUmmah": "Share Productive Muslim",
+  "offlinePrivacyNotice": "100% Offline & Private — Your deeds remain between you and Allah.",
+  "badgeFajrVanguard": "Fajr Vanguard",
+  "badgeFajrVanguardDesc": "Maintained a 7-day Fajr prayer & morning adhkar streak.",
+  "badgeIstiqamahMaster": "Istiqamah Master",
+  "badgeIstiqamahMasterDesc": "Achieved a 21-day continuous habit momentum.",
+  "badgeWhiteDaysGuardian": "White Days Guardian",
+  "badgeWhiteDaysGuardianDesc": "Fasted the sacred White Days (Ayyam al-Beed).",
+  "badgeDhikrAbundance": "Dhikr Abundance",
+  "badgeDhikrAbundanceDesc": "Reached 1,000+ total tasbeeh repetitions.",
+  "badgeNiyyahPurity": "Niyyah Purity",
+  "badgeNiyyahPurityDesc": "Recorded pure intentions for 14 consecutive days.",
+  "badgeMuhasabahDevotee": "Muhasabah Devotee",
+  "badgeMuhasabahDevoteeDesc": "Completed 4 consecutive weekly spiritual self-audits."
 }

@@ -21,6 +21,7 @@ class SettingsService {
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
+  static const _userAvatarKey = 'user_avatar';
   static const _selectedQualitiesKey = 'selected_qualities';
   static const _barakahReminderKey = 'barakah_reminder';
   static const _locationPermissionKey = 'location_permission';
@@ -189,6 +190,11 @@ class SettingsService {
 
   Future<void> setUserIntention(String intention) async =>
       _prefs?.setString(_userIntentionKey, intention);
+
+  String get userAvatar => _prefs?.getString(_userAvatarKey) ?? 'spa';
+
+  Future<void> setUserAvatar(String avatar) async =>
+      _prefs?.setString(_userAvatarKey, avatar);
 
   List<String> get selectedQualities =>
       _prefs?.getStringList(_selectedQualitiesKey) ?? [];

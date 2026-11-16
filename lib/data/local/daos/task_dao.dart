@@ -55,4 +55,11 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
       const TasksCompanion(active: Value(0)),
     );
   }
+
+  Future<int> getLifetimeCompletedTasksCount() async {
+    final rows = await (select(
+      tasks,
+    )..where((t) => t.completed.equals(1))).get();
+    return rows.length;
+  }
 }

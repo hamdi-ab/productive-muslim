@@ -75,4 +75,9 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<int> deactivateTask(int id) {
     return _taskDao.deactivateTask(id);
   }
+
+  @override
+  Future<int> getLifetimeCompletedTasksCount() {
+    return _taskDao.getLifetimeCompletedTasksCount();
+  }
 }
