@@ -6,7 +6,6 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/core/theme/arabic_typography.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
@@ -82,9 +81,6 @@ class _BarakahScreenState extends State<BarakahScreen> {
                               vertical: AppSpacing.sm,
                             ),
                             children: [
-                              // Bismillah & Muhasabah Header Pill
-                              _buildBismillahPill(isDark, isAr),
-
                               // 1. Live Barakah Capacity & Score Badge
                               FutureBuilder<BarakahScores>(
                                 future:
@@ -242,65 +238,6 @@ class _BarakahScreenState extends State<BarakahScreen> {
                   : AppColors.textSecondary,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBismillahPill(bool isDark, bool isAr) {
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkSurfaceSubtle
-                : AppColors.surfaceSubtle,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.secondary.withValues(alpha: 0.35)
-                  : AppColors.borderLight,
-              width: 0.8,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                textDirection: TextDirection.rtl,
-                style: ArabicFontFamily.amiri.getTextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.secondary : AppColors.secondaryDark,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 3,
-                height: 3,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                isAr ? 'محاسبة النفس' : 'MUHASABAH & BARAKAH',
-                style: TextStyle(
-                  fontSize: 9.5,
-                  letterSpacing: 0.8,
-                  fontWeight: FontWeight.bold,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

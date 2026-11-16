@@ -4,7 +4,6 @@ import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
-import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/barakah_score_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
@@ -74,16 +73,6 @@ class ProfileScreen extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               children: [
-                // Bismillah Sacred Purpose Pill
-                _buildBismillahPill(isDark, isAr),
-                const SizedBox(height: AppSpacing.sm),
-
-                // In-Page Header when hosted inside bottom navigation shell
-                if (hasParentScaffold) ...[
-                  _buildInPageHeader(context, l10n, isDark),
-                  const SizedBox(height: AppSpacing.sm),
-                ],
-
                 // 1. User Spiritual Identity Header Card
                 ProfileHeaderCard(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.md),
@@ -155,106 +144,6 @@ class ProfileScreen extends StatelessWidget {
         children: [
           BarakahAtmosphereBackground(isDark: isDark),
           bodyWithBloc,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBismillahPill(bool isDark, bool isAr) {
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkSurfaceSubtle
-                : AppColors.surfaceSubtle,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.secondary.withValues(alpha: 0.35)
-                  : AppColors.borderLight,
-              width: 0.8,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  fontFamily: 'amiri',
-                  fontSize: 13,
-                  color: AppColors.secondaryDark,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                isAr
-                    ? 'الملف الإيماني والخصال التسع'
-                    : 'SPIRITUAL PROFILE & 9 QUALITIES',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                  color: isDark ? Colors.white70 : AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInPageHeader(
-    BuildContext context,
-    AppLocalizations l10n,
-    bool isDark,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.profile,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.profileSubtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.white60 : Colors.black54,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

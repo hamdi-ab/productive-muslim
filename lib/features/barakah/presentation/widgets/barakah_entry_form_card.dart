@@ -622,12 +622,13 @@ class _BarakahEntryFormCardState extends State<BarakahEntryFormCard> {
   }
 
   Widget _buildHistory(BuildContext context, bool isDark) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     if (widget.entries.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           child: Text(
-            'No barakah entries yet',
+            isAr ? 'لا توجد مدخلات بركة حتى الآن' : 'No barakah entries yet',
             style: TextStyle(
               fontSize: 13,
               color: isDark
@@ -650,9 +651,16 @@ class _BarakahEntryFormCardState extends State<BarakahEntryFormCard> {
               color: AppColors.secondary,
             ),
             const SizedBox(width: 6),
-            const Text(
-              "Today's Entries",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                isAr ? 'مدخلات اليوم' : "Today's Entries",
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
