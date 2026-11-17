@@ -533,7 +533,7 @@
   "energy": "Energy & Routines",
   "adhkar": "Adhkar Studio",
   "profile": "Profile",
-  "profileSubtitle": "Spiritual Growth & 9 Qualities",
+  "profileSubtitle": "Personal Sovereignty & Account",
   "editProfile": "Edit Profile",
   "displayName": "Display Name",
   "enterNameHint": "Enter your name or seeker title",
@@ -556,7 +556,7 @@
   "habitsCompleted": "Habits Built",
   "tasksAccomplished": "Tasks Done",
   "focusHours": "Focus Hours",
-  "spiritualMilestones": "Spiritual Milestones",
+  "spiritualMilestones": "Consistency Milestones",
   "milestoneUnlocked": "Unlocked",
   "milestoneLocked": "Locked",
   "qualitiesCoaching": "9 Qualities Coaching",
@@ -578,5 +578,35 @@
   "badgeNiyyahPurity": "Niyyah Purity",
   "badgeNiyyahPurityDesc": "Recorded pure intentions for 14 consecutive days.",
   "badgeMuhasabahDevotee": "Muhasabah Devotee",
-  "badgeMuhasabahDevoteeDesc": "Completed 4 consecutive weekly spiritual self-audits."
+  "badgeMuhasabahDevoteeDesc": "Completed 4 consecutive weekly spiritual self-audits.",
+  "barakahReflectiveHeaderTitle": "Barakah & Reflection",
+  "barakahReflectiveSubtitle": "Mindful intention, sincere action, and gratitude.",
+  "barakahActivityRecordDisclaimer": "Activity counts describe self-reported app usage, not a measure of divine blessing, faith, or sincerity.",
+  "todayRecordedActivity": "Today's Recorded Activity",
+  "habitsLoggedCount": "{count} habits kept",
+  "@habitsLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "focusMinutesLoggedCount": "{count} focus mins",
+  "@focusMinutesLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reflectionsLoggedCount": "{count} reflections",
+  "@reflectionsLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reflectionCompleted": "Reflection saved",
+  "reflectionPending": "Reflection pending"
 }

@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
-
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/l10n/app_localizations.dart';
 
-String _toArabicDigits(String input) {
-  const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-  const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-  for (int i = 0; i < english.length; i++) {
-    input = input.replaceAll(english[i], arabic[i]);
-  }
-  return input;
-}
-
+/// Peaceful, reflective header card displaying the user's daily intention,
+/// observable app activity summary, and an explicit humility disclaimer.
+///
+/// NOTE: This card intentionally displays zero numerical spiritual scores,
+/// percentage ratings, ranks, or tiers to respect Islamic contemplation.
 class BarakahScoreHeaderCard extends StatelessWidget {
   final bool isDark;
   final bool isAr;
-  final double scorePercent;
-  final int scorePoints;
+  final BarakahActivitySummary? summary;
 
   const BarakahScoreHeaderCard({
     super.key,
     required this.isDark,
     required this.isAr,
-    this.scorePercent = 0.92,
-    this.scorePoints = 84,
+    this.summary,
   });
 
   @override
   Widget build(BuildContext context) {
-    final scoreStr = (scorePercent * 100).toInt();
+    final l10n = AppLocalizations.of(context)!;
+    final activity = summary ?? const BarakahActivitySummary();
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -56,15 +53,32 @@ class BarakahScoreHeaderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // 1. Header Title & Subtitle with Peaceful Sparkle Icon
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withValues(alpha: 0.18),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.secondary.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.secondary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm + 4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isAr ? 'البركة والتأمل اليومي' : 'Barakah & Reflection',
+                      l10n.barakahReflectiveHeaderTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -76,9 +90,7 @@ class BarakahScoreHeaderCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isAr
-                          ? 'إطار الأبعاد التسعة للإنتاجية'
-                          : '9 Qualities Framework',
+                      l10n.barakahReflectiveSubtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -90,132 +102,151 @@ class BarakahScoreHeaderCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF222C29).withValues(alpha: 0.9)
-                        : AppColors.secondary.withValues(alpha: 0.22),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.secondary.withValues(alpha: 0.5),
-                      width: 1,
-                    ),
-                  ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const BarakahPulseBeaconDot(),
-                        const SizedBox(width: 6),
-                        const Icon(
-                          Icons.stars_rounded,
-                          size: 15,
-                          color: AppColors.secondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          isAr
-                              ? '${_toArabicDigits('$scoreStr')}٪ مقياس البركة'
-                              : '$scoreStr% Barakah Score',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: 12),
-          // Progress Bar with dynamic Spiritual Tier
-          () {
-            final tierName = scorePoints >= 90
-                ? (isAr ? 'رتبة المقربين' : 'Al-Muqarraboon Tier')
-                : scorePoints >= 80
-                ? (isAr ? 'رتبة الإحسان' : 'Al-Ihsan Tier')
-                : scorePoints >= 70
-                ? (isAr ? 'رتبة المقتصد' : 'Al-Muqtased Tier')
-                : (isAr ? 'رتبة الساعين' : 'Sabiqun Tier');
-            final scorePointsStr = isAr
-                ? _toArabicDigits('$scorePoints')
-                : '$scorePoints';
-            final totalPointsStr = isAr ? '١٠٠' : '100';
-            final pointsWord = isAr ? 'نقطة' : 'points';
+          const SizedBox(height: AppSpacing.md),
 
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // 2. Sacred Contemplation / Dua Callout
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.12),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                    '$tierName ($scorePointsStr/$totalPointsStr $pointsWord)',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                const Icon(
+                  Icons.spa_rounded,
+                  size: 15,
+                  color: AppColors.secondary,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  isAr ? '$scorePointsStr٪' : '$scorePoints%',
-                  style: const TextStyle(
-                    fontSize: 10.5,
-                    color: AppColors.secondary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    isAr
+                        ? '«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»'
+                        : '“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”',
+                    style: TextStyle(
+                      fontFamily: isAr ? 'amiri' : null,
+                      fontSize: isAr ? 13 : 11,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
-            );
-          }(),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 3. Factual Observable App Activity Section
+          Text(
+            l10n.todayRecordedActivity,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.white70,
+              letterSpacing: 0.3,
+            ),
+          ),
           const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: SizedBox(
-              height: 6,
-              child: LinearProgressIndicator(
-                value: scorePoints / 100.0,
-                backgroundColor: Colors.black.withValues(alpha: 0.3),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppColors.secondary,
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _buildActivityChip(
+                icon: Icons.check_circle_outline_rounded,
+                label: l10n.habitsLoggedCount(activity.completedHabitsToday),
+              ),
+              _buildActivityChip(
+                icon: Icons.timer_outlined,
+                label: l10n.focusMinutesLoggedCount(activity.focusMinutes),
+              ),
+              _buildActivityChip(
+                icon: Icons.edit_note_rounded,
+                label: activity.hasDailyResponse
+                    ? l10n.reflectionCompleted
+                    : l10n.reflectionPending,
+                highlight: activity.hasDailyResponse,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm + 4),
+
+          // 4. Theological Humility Disclaimer
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: 13,
+                color: Colors.white.withValues(alpha: 0.6),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.barakahActivityRecordDisclaimer,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.white.withValues(alpha: 0.65),
+                    height: 1.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class BarakahPulseBeaconDot extends StatelessWidget {
-  const BarakahPulseBeaconDot({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildActivityChip({
+    required IconData icon,
+    required String label,
+    bool highlight = false,
+  }) {
     return Container(
-      width: 7,
-      height: 7,
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.secondary,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.secondary.withValues(alpha: 0.6),
-            blurRadius: 6,
-            spreadRadius: 1.5,
+        color: highlight
+            ? AppColors.secondary.withValues(alpha: 0.22)
+            : Colors.black.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: highlight
+              ? AppColors.secondary.withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.15),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 13,
+            color: highlight ? AppColors.secondary : Colors.white70,
+          ),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: highlight ? FontWeight.bold : FontWeight.w500,
+                color: highlight ? AppColors.secondary : Colors.white,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

@@ -385,88 +385,51 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                       initialData: 0,
                       builder: (context, snapshot) {
                         final streak = snapshot.data ?? 0;
-                        final (levelTitle, levelRank) = _computeSpiritualLevel(
-                          streak,
-                          widget.isAr,
-                        );
 
-                        return Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2.5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.secondary.withValues(
-                                  alpha: 0.16,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: AppColors.secondary.withValues(
-                                    alpha: 0.35,
-                                  ),
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Text(
-                                '$levelTitle • $levelRank',
-                                style: const TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.secondaryDark,
-                                ),
+                        return AppPressable(
+                          onTap: () => IstiqamahStreakSheet.show(context),
+                          pressedScale: 0.92,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            key: const Key('profile_streak_badge'),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF59E0B)
+                                  .withValues(alpha: 0.16),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.35),
+                                width: 0.8,
                               ),
                             ),
-                            AppPressable(
-                              onTap: () => IstiqamahStreakSheet.show(context),
-                              pressedScale: 0.92,
-                              borderRadius: BorderRadius.circular(10),
-                              child: Container(
-                                key: const Key('profile_streak_badge'),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2.5,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.local_fire_department_rounded,
+                                  size: 12,
+                                  color: Color(0xFFD97706),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF59E0B)
-                                      .withValues(alpha: 0.16),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: const Color(0xFFF59E0B)
-                                        .withValues(alpha: 0.35),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.local_fire_department_rounded,
-                                      size: 12,
+                                const SizedBox(width: 3),
+                                Flexible(
+                                  child: Text(
+                                    l10n.streak(streak),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.bold,
                                       color: Color(0xFFD97706),
                                     ),
-                                    const SizedBox(width: 3),
-                                    Flexible(
-                                      child: Text(
-                                        l10n.streak(streak),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFD97706),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
                         );
                       },
                     ),
@@ -557,34 +520,5 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
         ],
       ),
     );
-  }
-
-  static (String, String) _computeSpiritualLevel(int streak, bool isAr) {
-    if (streak >= 40) {
-      return (
-        isAr ? 'الـمُقـرّب' : 'Al-Muqarrab',
-        isAr ? 'المستوى ٥' : 'Level 5',
-      );
-    } else if (streak >= 21) {
-      return (
-        isAr ? 'الـمُبـارك' : 'Al-Mubarak',
-        isAr ? 'المستوى ٤' : 'Level 4',
-      );
-    } else if (streak >= 7) {
-      return (
-        isAr ? 'الـثّـابـت' : 'Al-Thabit',
-        isAr ? 'المستوى ٣' : 'Level 3',
-      );
-    } else if (streak >= 3) {
-      return (
-        isAr ? 'الـمُجـاهـد' : 'Al-Mujahid',
-        isAr ? 'المستوى ٢' : 'Level 2',
-      );
-    } else {
-      return (
-        isAr ? 'الـسَّـاعِـي' : 'Al-Sa\'i',
-        isAr ? 'المستوى ١' : 'Level 1',
-      );
-    }
   }
 }

@@ -463,7 +463,7 @@
   "energy": "الطاقة والروتين",
   "adhkar": "الأذكار والتلاوة",
   "profile": "الملف الشخصي",
-  "profileSubtitle": "النمو الإيماني والصفات التسع",
+  "profileSubtitle": "الخصوصية وإعدادات الحساب",
   "editProfile": "تعديل الملف الشخصي",
   "displayName": "الاسم المستعار",
   "enterNameHint": "أدخل اسمك أو صفتك الإيمانية",
@@ -486,7 +486,7 @@
   "habitsCompleted": "العادات المنجزة",
   "tasksAccomplished": "المهام المحققة",
   "focusHours": "ساعات التركيز",
-  "spiritualMilestones": "الأوسمة والبركات",
+  "spiritualMilestones": "معالم الاستمرارية",
   "milestoneUnlocked": "مكتمل",
   "milestoneLocked": "قيد الإنجاز",
   "qualitiesCoaching": "توجيه وتطوير الصفات",
@@ -508,5 +508,35 @@
   "badgeNiyyahPurity": "إخلاص النية",
   "badgeNiyyahPurityDesc": "تسجيل النوايا الصالحة لمدة 14 يوماً متتالياً.",
   "badgeMuhasabahDevotee": "أهل المحاسبة",
-  "badgeMuhasabahDevoteeDesc": "إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية."
+  "badgeMuhasabahDevoteeDesc": "إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية.",
+  "barakahReflectiveHeaderTitle": "البركة والتأمل اليومي",
+  "barakahReflectiveSubtitle": "حضور النية، إتقان العمل، وشكر النعم.",
+  "barakahActivityRecordDisclaimer": "يعكس هذا السجل نشاطك الذاتي في التطبيق، وليس مقياساً لمكانتك الإيمانية أو إخلاصك أمام الله.",
+  "todayRecordedActivity": "النشاط المسجل لهذا اليوم",
+  "habitsLoggedCount": "{count} عادات منجزة",
+  "@habitsLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "focusMinutesLoggedCount": "{count} دقيقة تركيز",
+  "@focusMinutesLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reflectionsLoggedCount": "{count} تأملات وشكر",
+  "@reflectionsLoggedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reflectionCompleted": "تم تسجيل التأمل",
+  "reflectionPending": "بانتظار التأمل"
 }

@@ -1369,7 +1369,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profile => 'Profile';
 
   @override
-  String get profileSubtitle => 'Spiritual Growth & 9 Qualities';
+  String get profileSubtitle => 'Personal Sovereignty & Account';
 
   @override
   String get editProfile => 'Edit Profile';
@@ -1419,7 +1419,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get focusHours => 'Focus Hours';
 
   @override
-  String get spiritualMilestones => 'Spiritual Milestones';
+  String get spiritualMilestones => 'Consistency Milestones';
 
   @override
   String get milestoneUnlocked => 'Unlocked';
@@ -1493,4 +1493,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get badgeMuhasabahDevoteeDesc =>
       'Completed 4 consecutive weekly spiritual self-audits.';
+
+  @override
+  String get barakahReflectiveHeaderTitle => 'Barakah & Reflection';
+
+  @override
+  String get barakahReflectiveSubtitle =>
+      'Mindful intention, sincere action, and gratitude.';
+
+  @override
+  String get barakahActivityRecordDisclaimer =>
+      'Activity counts describe self-reported app usage, not a measure of divine blessing, faith, or sincerity.';
+
+  @override
+  String get todayRecordedActivity => 'Today\'s Recorded Activity';
+
+  @override
+  String habitsLoggedCount(int count) {
+    return '$count habits kept';
+  }
+
+  @override
+  String focusMinutesLoggedCount(int count) {
+    return '$count focus mins';
+  }
+
+  @override
+  String reflectionsLoggedCount(int count) {
+    return '$count reflections';
+  }
+
+  @override
+  String get reflectionCompleted => 'Reflection saved';
+
+  @override
+  String get reflectionPending => 'Reflection pending';
 }

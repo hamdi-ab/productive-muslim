@@ -2495,7 +2495,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Spiritual Growth & 9 Qualities'**
+  /// **'Personal Sovereignty & Account'**
   String get profileSubtitle;
 
   /// No description provided for @editProfile.
@@ -2591,7 +2591,7 @@ abstract class AppLocalizations {
   /// No description provided for @spiritualMilestones.
   ///
   /// In en, this message translates to:
-  /// **'Spiritual Milestones'**
+  /// **'Consistency Milestones'**
   String get spiritualMilestones;
 
   /// No description provided for @milestoneUnlocked.
@@ -2725,6 +2725,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed 4 consecutive weekly spiritual self-audits.'**
   String get badgeMuhasabahDevoteeDesc;
+
+  /// No description provided for @barakahReflectiveHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Barakah & Reflection'**
+  String get barakahReflectiveHeaderTitle;
+
+  /// No description provided for @barakahReflectiveSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mindful intention, sincere action, and gratitude.'**
+  String get barakahReflectiveSubtitle;
+
+  /// No description provided for @barakahActivityRecordDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity counts describe self-reported app usage, not a measure of divine blessing, faith, or sincerity.'**
+  String get barakahActivityRecordDisclaimer;
+
+  /// No description provided for @todayRecordedActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Recorded Activity'**
+  String get todayRecordedActivity;
+
+  /// No description provided for @habitsLoggedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} habits kept'**
+  String habitsLoggedCount(int count);
+
+  /// No description provided for @focusMinutesLoggedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} focus mins'**
+  String focusMinutesLoggedCount(int count);
+
+  /// No description provided for @reflectionsLoggedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reflections'**
+  String reflectionsLoggedCount(int count);
+
+  /// No description provided for @reflectionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection saved'**
+  String get reflectionCompleted;
+
+  /// No description provided for @reflectionPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection pending'**
+  String get reflectionPending;
 }
 
 class _AppLocalizationsDelegate

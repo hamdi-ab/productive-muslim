@@ -5,7 +5,6 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
-import 'package:productive_muslim/data/services/barakah_score_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -19,12 +18,9 @@ import 'package:productive_muslim/features/profile/presentation/widgets/profile_
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_qualities_coaching_card.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_tier_progress_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 typedef _ProfileData = ({
-  BarakahScores? scores,
   Map<String, int> habitCounts,
   int streak,
   int longestStreak,
@@ -33,9 +29,9 @@ typedef _ProfileData = ({
   int focusMinutes,
 });
 
-/// Screen representing the user's personal sovereignty & spiritual profile,
-/// combining identity, spiritual progression, lifetime achievements, milestone badges,
-/// 9-qualities coaching, and sovereign settings.
+/// Screen representing the user's personal sovereignty & account hub,
+/// combining identity, lifetime activity metrics, consistency badges,
+/// consistency heatmap, and sovereign data settings.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -57,13 +53,6 @@ class ProfileScreen extends StatelessWidget {
 
         return FutureBuilder<_ProfileData>(
           future: () async {
-            BarakahScores? scores;
-            if (getIt.isRegistered<BarakahScoreService>()) {
-              scores = await getIt<BarakahScoreService>().calculateLiveScores(
-                date: today,
-              );
-            }
-
             Map<String, int> habitCounts = const {};
             int streak = 0;
             int longestStreak = 0;
@@ -88,7 +77,6 @@ class ProfileScreen extends StatelessWidget {
             }
 
             return (
-              scores: scores,
               habitCounts: habitCounts,
               streak: streak,
               longestStreak: longestStreak,
@@ -99,7 +87,6 @@ class ProfileScreen extends StatelessWidget {
           }(),
           builder: (context, snapshot) {
             final data = snapshot.data;
-            final scores = data?.scores;
             final habitCounts = data?.habitCounts ?? const {};
             final streak = data?.streak ?? 0;
             final longestStreak = data?.longestStreak ?? 0;
@@ -121,19 +108,11 @@ class ProfileScreen extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               children: [
-                // 1. User Spiritual Identity Header Card (tap-to-edit name, motto & avatar)
+                // 1. User Identity Header Card (tap-to-edit name, motto & avatar)
                 ProfileHeaderCard(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.md),
 
-                // 2. Spiritual Progression Tier Card
-                ProfileTierProgressCard(
-                  streak: streak,
-                  isDark: isDark,
-                  isAr: isAr,
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // 3. 2x2 Lifetime Achievement Momentum Grid
+                // 2. 2x2 Lifetime Achievement Momentum Grid
                 ProfileLifetimeStatsGrid(
                   currentStreak: streak,
                   longestStreak: longestStreak,
@@ -145,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // 4. Spiritual Milestones & Badges Cabinet
+                // 3. Consistency Milestones & Badges Cabinet
                 ProfileBadgesCard(
                   streak: streak,
                   lifetimeHabitCompletions: lifetimeHabits,
@@ -156,19 +135,11 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // 5. 9-Qualities Radar Chart with Personal Spiritual Coaching
-                ProfileQualitiesCoachingCard(
-                  scores: scores,
-                  isDark: isDark,
-                  isAr: isAr,
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // 6. 12-Week Consistency & Growth Momentum Heatmap
+                // 4. 12-Week Consistency & Growth Momentum Heatmap
                 BarakahHeatmapCard(activityByDate: totalActivity),
                 const SizedBox(height: AppSpacing.md),
 
-                // 7. Action Hub (Preferences, JSON Backup & Restore, Privacy & Sharing)
+                // 5. Action Hub (Preferences, JSON Backup & Restore, Privacy & Sharing)
                 ProfileActionHub(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.xl),
               ],
