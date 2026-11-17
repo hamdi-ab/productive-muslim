@@ -10,14 +10,11 @@ import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_radar_chart_card.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_action_hub.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_qualities_coaching_card.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_tier_progress_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class MockBarakahRepository extends Mock implements BarakahRepository {}
@@ -108,7 +105,7 @@ void main() {
   }
 
   testWidgets(
-    'renders Profile screen with hero identity card and spiritual rank',
+    'renders Profile screen with hero identity card and consistency streak badge without spiritual ranks',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -118,28 +115,28 @@ void main() {
 
       expect(find.byType(ProfileHeaderCard), findsOneWidget);
       expect(find.text('Productive Seeker'), findsOneWidget);
-      expect(find.textContaining('Al-Mubarak'), findsWidgets);
+      expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+      expect(find.textContaining('Al-Mubarak'), findsNothing);
+      expect(find.textContaining('Level'), findsNothing);
     },
   );
 
-  testWidgets('renders all industry-standard profile components', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 3200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'renders all profile components without spiritual tiers or scorecards',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 3200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await tester.pumpWidget(buildScreen());
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
 
-    expect(find.byType(ProfileHeaderCard), findsOneWidget);
-    expect(find.byType(ProfileTierProgressCard), findsOneWidget);
-    expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
-    expect(find.byType(ProfileBadgesCard), findsOneWidget);
-    expect(find.byType(ProfileQualitiesCoachingCard), findsOneWidget);
-    expect(find.byType(BarakahRadarChartCard), findsOneWidget);
-    expect(find.byType(BarakahHeatmapCard), findsOneWidget);
-    expect(find.byType(ProfileActionHub), findsOneWidget);
-  });
+      expect(find.byType(ProfileHeaderCard), findsOneWidget);
+      expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
+      expect(find.byType(ProfileBadgesCard), findsOneWidget);
+      expect(find.byType(BarakahHeatmapCard), findsOneWidget);
+      expect(find.byType(ProfileActionHub), findsOneWidget);
+    },
+  );
 
   testWidgets('tapping edit profile opens modal dialog with form inputs', (
     tester,
@@ -199,8 +196,8 @@ void main() {
 
     expect(find.byType(ProfileHeaderCard), findsOneWidget);
     expect(find.text('طالب البركة'), findsOneWidget);
-    expect(find.textContaining('الـمُبـارك'), findsWidgets);
-    expect(find.byType(ProfileTierProgressCard), findsOneWidget);
+    expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+    expect(find.textContaining('الـمُبـارك'), findsNothing);
     expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
     expect(find.byType(ProfileBadgesCard), findsOneWidget);
     expect(find.byType(ProfileActionHub), findsOneWidget);

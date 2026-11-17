@@ -1358,7 +1358,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profile => 'الملف الشخصي';
 
   @override
-  String get profileSubtitle => 'النمو الإيماني والصفات التسع';
+  String get profileSubtitle => 'الخصوصية وإعدادات الحساب';
 
   @override
   String get editProfile => 'تعديل الملف الشخصي';
@@ -1408,7 +1408,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get focusHours => 'ساعات التركيز';
 
   @override
-  String get spiritualMilestones => 'الأوسمة والبركات';
+  String get spiritualMilestones => 'معالم الاستمرارية';
 
   @override
   String get milestoneUnlocked => 'مكتمل';
@@ -1482,4 +1482,39 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get badgeMuhasabahDevoteeDesc =>
       'إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية.';
+
+  @override
+  String get barakahReflectiveHeaderTitle => 'البركة والتأمل اليومي';
+
+  @override
+  String get barakahReflectiveSubtitle =>
+      'حضور النية، إتقان العمل، وشكر النعم.';
+
+  @override
+  String get barakahActivityRecordDisclaimer =>
+      'يعكس هذا السجل نشاطك الذاتي في التطبيق، وليس مقياساً لمكانتك الإيمانية أو إخلاصك أمام الله.';
+
+  @override
+  String get todayRecordedActivity => 'النشاط المسجل لهذا اليوم';
+
+  @override
+  String habitsLoggedCount(int count) {
+    return '$count عادات منجزة';
+  }
+
+  @override
+  String focusMinutesLoggedCount(int count) {
+    return '$count دقيقة تركيز';
+  }
+
+  @override
+  String reflectionsLoggedCount(int count) {
+    return '$count تأملات وشكر';
+  }
+
+  @override
+  String get reflectionCompleted => 'تم تسجيل التأمل';
+
+  @override
+  String get reflectionPending => 'بانتظار التأمل';
 }

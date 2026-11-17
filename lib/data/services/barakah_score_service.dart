@@ -1,6 +1,3 @@
-import 'dart:math' as math;
-
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
@@ -10,38 +7,47 @@ import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
-class BarakahQualityDimension {
-  final String key;
-  final String nameEn;
-  final String nameAr;
-  final double score; // 0.0 to 100.0
-  final Color color;
+/// Factual summary of user-reported app activity for the day.
+///
+/// NOTE: These counts represent observable app interactions (habits logged,
+/// tasks completed, focus minutes recorded, reflections written) and are NOT
+/// a measure of faith, sincerity, spiritual rank, or divine blessing.
+class BarakahActivitySummary {
+  final int completedHabitsToday;
+  final int totalHabitsToday;
+  final int completedTasksToday;
+  final int totalTasksToday;
+  final int barakahEntriesToday;
+  final bool hasDailyResponse;
+  final int focusMinutes;
+  final int overallStreak;
+  final int completedDhikrCount;
+  final bool isSunnahFasting;
 
-  const BarakahQualityDimension({
-    required this.key,
-    required this.nameEn,
-    required this.nameAr,
-    required this.score,
-    required this.color,
+  const BarakahActivitySummary({
+    this.completedHabitsToday = 0,
+    this.totalHabitsToday = 0,
+    this.completedTasksToday = 0,
+    this.totalTasksToday = 0,
+    this.barakahEntriesToday = 0,
+    this.hasDailyResponse = false,
+    this.focusMinutes = 0,
+    this.overallStreak = 0,
+    this.completedDhikrCount = 0,
+    this.isSunnahFasting = false,
   });
+
+  bool get hasActivityToday =>
+      completedHabitsToday > 0 ||
+      completedTasksToday > 0 ||
+      barakahEntriesToday > 0 ||
+      hasDailyResponse ||
+      focusMinutes > 0 ||
+      completedDhikrCount > 0;
 }
 
-class BarakahScores {
-  final List<BarakahQualityDimension> dimensions;
-  final double scorePercent;
-  final int scorePoints;
-  final BarakahQualityDimension topStrength;
-  final BarakahQualityDimension growthFocus;
-
-  const BarakahScores({
-    required this.dimensions,
-    required this.scorePercent,
-    required this.scorePoints,
-    required this.topStrength,
-    required this.growthFocus,
-  });
-}
-
+/// Service that aggregates observable activity metrics without assigning
+/// numerical scores, percentages, ranks, or tiers to a user's spirituality.
 class BarakahScoreService {
   final HabitRepository? _habitRepo;
   final TaskRepository? _taskRepo;
@@ -64,10 +70,9 @@ class BarakahScoreService {
        _adhkarService = adhkarService,
        _hijriService = hijriService;
 
-  /// Pure calculation from extracted metric primitives
-  BarakahScores calculateScores({
+  /// Pure assembly from metric primitives
+  BarakahActivitySummary calculateActivitySummary({
     required int overallStreak,
-    required ({int physical, int spiritual, int mental}) energy,
     required int focusMinutes,
     required int completedDhikrCount,
     required bool isSunnahFasting,
@@ -78,155 +83,22 @@ class BarakahScoreService {
     required int completedTasksToday,
     required int totalTasksToday,
   }) {
-    // 1. Ruh (Spiritual)
-    final double ruhScore = (energy.spiritual > 0)
-        ? ((energy.spiritual / 5.0) * 60 +
-                  math.min(completedDhikrCount, 4) * 10)
-              .clamp(35.0, 100.0)
-        : 75.0;
-
-    // 2. Jism (Physical)
-    final double jismScore = (energy.physical > 0)
-        ? ((energy.physical / 5.0) * 70 +
-                  (isSunnahFasting ? 15.0 : 0.0) +
-                  (completedHabitsToday > 0 ? 15.0 : 0.0))
-              .clamp(35.0, 100.0)
-        : 70.0;
-
-    // 3. Ummah (Social)
-    final int totalSocialLife = totalTasksToday + totalHabitsToday;
-    final int completedSocialLife = completedTasksToday + completedHabitsToday;
-    final double ummahScore = totalSocialLife > 0
-        ? ((completedSocialLife / totalSocialLife) * 35 + 65.0).clamp(
-            40.0,
-            100.0,
-          )
-        : 78.0;
-
-    // 4. Aql (Mindset)
-    final double aqlScore = (energy.mental > 0)
-        ? ((energy.mental / 5.0) * 70 +
-                  (completedTasksToday > 0 ? 15.0 : 0.0) +
-                  15.0)
-              .clamp(40.0, 100.0)
-        : 80.0;
-
-    // 5. Istiqamah (Consistency)
-    final double istiqamahScore = totalHabitsToday > 0
-        ? ((completedHabitsToday / totalHabitsToday) * 60 +
-                  math.min(overallStreak, 10) * 4.0)
-              .clamp(30.0, 100.0)
-        : (50.0 + math.min(overallStreak, 10) * 5.0).clamp(30.0, 100.0);
-
-    // 6. Khushu' (Focus)
-    final double khushuScore =
-        (50.0 +
-                (math.min(focusMinutes, 60) / 60.0 * 35.0) +
-                (hasDailyResponse ? 15.0 : 0.0))
-            .clamp(35.0, 100.0);
-
-    // 7. Niyyah (Intention)
-    final double niyyahScore = hasDailyResponse ? 92.0 : 70.0;
-
-    // 8. Shukr (Gratitude)
-    final double shukrScore = (65.0 + math.min(barakahEntriesToday, 3) * 11.0)
-        .clamp(40.0, 100.0);
-
-    // 9. Ihsan (Excellence) - Master Harmony Average
-    final double ihsanScore =
-        (ruhScore +
-            jismScore +
-            ummahScore +
-            aqlScore +
-            istiqamahScore +
-            khushuScore +
-            niyyahScore +
-            shukrScore) /
-        8.0;
-
-    final dimensions = [
-      BarakahQualityDimension(
-        key: 'ruh',
-        nameEn: 'Ruh (Spiritual)',
-        nameAr: 'الروح',
-        score: (ruhScore * 10).round() / 10.0,
-        color: const Color(0xFFE9C349),
-      ),
-      BarakahQualityDimension(
-        key: 'jism',
-        nameEn: 'Jism (Physical)',
-        nameAr: 'الجسد',
-        score: (jismScore * 10).round() / 10.0,
-        color: const Color(0xFF6FFBBE),
-      ),
-      BarakahQualityDimension(
-        key: 'ummah',
-        nameEn: 'Ummah (Social)',
-        nameAr: 'الأمة',
-        score: (ummahScore * 10).round() / 10.0,
-        color: const Color(0xFF4EDEA3),
-      ),
-      BarakahQualityDimension(
-        key: 'aql',
-        nameEn: 'Aql (Mindset)',
-        nameAr: 'العقل',
-        score: (aqlScore * 10).round() / 10.0,
-        color: const Color(0xFFE9C349),
-      ),
-      BarakahQualityDimension(
-        key: 'istiqamah',
-        nameEn: 'Istiqaamah',
-        nameAr: 'الاستقامة',
-        score: (istiqamahScore * 10).round() / 10.0,
-        color: const Color(0xFFFFE088),
-      ),
-      BarakahQualityDimension(
-        key: 'khushu',
-        nameEn: "Khushu' (Focus)",
-        nameAr: 'الخشوع',
-        score: (khushuScore * 10).round() / 10.0,
-        color: const Color(0xFFFFB4AB),
-      ),
-      BarakahQualityDimension(
-        key: 'niyyah',
-        nameEn: 'Niyyah (Intention)',
-        nameAr: 'النية',
-        score: (niyyahScore * 10).round() / 10.0,
-        color: const Color(0xFF4EDEA3),
-      ),
-      BarakahQualityDimension(
-        key: 'shukr',
-        nameEn: 'Shukr (Gratitude)',
-        nameAr: 'الشكر',
-        score: (shukrScore * 10).round() / 10.0,
-        color: const Color(0xFFE9C349),
-      ),
-      BarakahQualityDimension(
-        key: 'ihsan',
-        nameEn: 'Ihsan (Excellence)',
-        nameAr: 'الإحسان',
-        score: (ihsanScore * 10).round() / 10.0,
-        color: const Color(0xFF6FFBBE),
-      ),
-    ];
-
-    final sorted = List<BarakahQualityDimension>.from(dimensions)
-      ..sort((a, b) => b.score.compareTo(a.score));
-
-    final overallPercent = (ihsanScore / 100.0).clamp(0.0, 1.0);
-    final overallPoints = ihsanScore.round().clamp(0, 100);
-
-    return BarakahScores(
-      dimensions: dimensions,
-      scorePercent: overallPercent,
-      scorePoints: overallPoints,
-      topStrength: sorted.first,
-      growthFocus: sorted.last,
+    return BarakahActivitySummary(
+      overallStreak: overallStreak,
+      focusMinutes: focusMinutes,
+      completedDhikrCount: completedDhikrCount,
+      isSunnahFasting: isSunnahFasting,
+      completedHabitsToday: completedHabitsToday,
+      totalHabitsToday: totalHabitsToday,
+      barakahEntriesToday: barakahEntriesToday,
+      hasDailyResponse: hasDailyResponse,
+      completedTasksToday: completedTasksToday,
+      totalTasksToday: totalTasksToday,
     );
   }
 
-  /// Async helper to pull live records from the environment
-  Future<BarakahScores> calculateLiveScores({String? date}) async {
+  /// Async helper to pull live observable records from repositories
+  Future<BarakahActivitySummary> calculateLiveSummary({String? date}) async {
     final targetDate = date ?? DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     int overallStreak = 0;
@@ -281,11 +153,6 @@ class BarakahScoreService {
       } catch (_) {}
     }
 
-    ({int physical, int spiritual, int mental}) energy = (
-      physical: 3,
-      spiritual: 3,
-      mental: 3,
-    );
     int focusMinutes = 0;
     bool isFasting = false;
     int completedDhikrCount = 0;
@@ -297,7 +164,6 @@ class BarakahScoreService {
             : null);
     if (settings != null) {
       try {
-        energy = settings.getDailyEnergy(targetDate);
         focusMinutes = settings.totalFocusMinutes;
         isFasting = settings.isSunnahFastingTarget(targetDate);
         completedDhikrCount = settings.getCompletedDhikrIds(targetDate).length;
@@ -324,9 +190,8 @@ class BarakahScoreService {
       } catch (_) {}
     }
 
-    return calculateScores(
+    return calculateActivitySummary(
       overallStreak: overallStreak,
-      energy: energy,
       focusMinutes: focusMinutes,
       completedDhikrCount: completedDhikrCount,
       isSunnahFasting: isFasting,
