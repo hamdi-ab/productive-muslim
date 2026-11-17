@@ -199,22 +199,30 @@ void main() {
       },
     );
 
-    testWidgets('Aliases /intentions and /prayer_times cleanly redirect', (
-      tester,
-    ) async {
-      AppRouter.handleNotificationPayload('/intentions');
-      await pumpRouter(tester);
-      expect(
-        AppRouter.router.routeInformationProvider.value.uri.path,
-        '/journal',
-      );
+    testWidgets(
+      'Aliases /intentions, /journal, /plan and /prayer_times cleanly redirect',
+      (tester) async {
+        AppRouter.handleNotificationPayload('/intentions');
+        await pumpRouter(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/reflect',
+        );
 
-      AppRouter.handleNotificationPayload('/prayer_times');
-      await pumpFrames(tester);
-      expect(
-        AppRouter.router.routeInformationProvider.value.uri.path,
-        '/prayer-times',
-      );
-    });
+        AppRouter.handleNotificationPayload('/prayer_times');
+        await pumpFrames(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/prayer-times',
+        );
+
+        AppRouter.handleNotificationPayload('/plan');
+        await pumpFrames(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/my-day',
+        );
+      },
+    );
   });
 }

@@ -60,6 +60,16 @@ class PlanTabSwitcher extends StatelessWidget {
                 isSelected: selectedTab == PlanTab.habits,
               ),
             ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: _buildTabPill(
+                context: context,
+                tab: PlanTab.focus,
+                label: l10n.widgetBtnFocus,
+                icon: Icons.timer_outlined,
+                isSelected: selectedTab == PlanTab.focus,
+              ),
+            ),
           ],
         ),
       ),

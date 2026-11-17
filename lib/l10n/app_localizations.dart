@@ -470,6 +470,30 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @myDay.
+  ///
+  /// In en, this message translates to:
+  /// **'My Day'**
+  String get myDay;
+
+  /// No description provided for @adhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Adhkar Studio'**
+  String get adhkar;
+
+  /// No description provided for @reflect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflect'**
+  String get reflect;
+
+  /// No description provided for @muhasabah.
+  ///
+  /// In en, this message translates to:
+  /// **'Muhasabah'**
+  String get muhasabah;
+
   /// No description provided for @newTask.
   ///
   /// In en, this message translates to:
@@ -2479,12 +2503,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Energy & Routines'**
   String get energy;
-
-  /// No description provided for @adhkar.
-  ///
-  /// In en, this message translates to:
-  /// **'Adhkar Studio'**
-  String get adhkar;
 
   /// No description provided for @profile.
   ///

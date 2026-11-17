@@ -181,57 +181,65 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final items = _currentItems;
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-      appBar: ProductiveAppBar(
-        title: l10n.adhkarTitle,
-        subtitle: l10n.adhkarSubtitle,
-        showBackButton: true,
-        actions: [
-          if (items.isNotEmpty) ...[
-            ProductiveAppBarAction(
-              tooltip: l10n.typographyTooltip,
-              icon: Icons.format_size_rounded,
-              onTap: _showTypographySheet,
-            ),
-            ProductiveAppBarAction(
-              tooltip: l10n.adhkarResetCategory,
-              icon: Icons.restart_alt_rounded,
-              onTap: () => _resetCategory(_selectedCategory),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.primaryLight.withValues(alpha: 0.16)
-                    : AppColors.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.primaryLight.withValues(alpha: 0.3)
-                      : AppColors.primary.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-              ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  isAr
-                      ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
-                      : '${_currentPageIndex + 1} / ${items.length}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: isDark ? AppColors.primaryLight : AppColors.primary,
+      appBar: hasParentScaffold
+          ? null
+          : ProductiveAppBar(
+              title: l10n.adhkarTitle,
+              subtitle: l10n.adhkarSubtitle,
+              showBackButton: true,
+              actions: [
+                if (items.isNotEmpty) ...[
+                  ProductiveAppBarAction(
+                    tooltip: l10n.typographyTooltip,
+                    icon: Icons.format_size_rounded,
+                    onTap: _showTypographySheet,
                   ),
-                ),
-              ),
+                  ProductiveAppBarAction(
+                    tooltip: l10n.adhkarResetCategory,
+                    icon: Icons.restart_alt_rounded,
+                    onTap: () => _resetCategory(_selectedCategory),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.primaryLight.withValues(alpha: 0.16)
+                          : AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? AppColors.primaryLight.withValues(alpha: 0.3)
+                            : AppColors.primary.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        isAr
+                            ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
+                            : '${_currentPageIndex + 1} / ${items.length}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
-        ],
-      ),
       body: Stack(
         children: [
           AdhkarBackgroundAtmosphere(isDark: isDark),
@@ -244,6 +252,72 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   l10n: l10n,
                   isDark: isDark,
                 ),
+                if (hasParentScaffold && items.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: 2,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.primaryLight.withValues(alpha: 0.16)
+                                : AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.primaryLight.withValues(
+                                      alpha: 0.3,
+                                    )
+                                  : AppColors.primary.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            isAr
+                                ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
+                                : '${_currentPageIndex + 1} / ${items.length}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppColors.primaryLight
+                                  : AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: l10n.typographyTooltip,
+                              icon: const Icon(
+                                Icons.format_size_rounded,
+                                size: 20,
+                              ),
+                              onPressed: _showTypographySheet,
+                            ),
+                            IconButton(
+                              tooltip: l10n.adhkarResetCategory,
+                              icon: const Icon(
+                                Icons.restart_alt_rounded,
+                                size: 20,
+                              ),
+                              onPressed: () =>
+                                  _resetCategory(_selectedCategory),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 const SizedBox(height: AppSpacing.xs),
                 Expanded(
                   child: items.isEmpty
