@@ -96,11 +96,16 @@ class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
     required String date,
     required int completedAt,
   }) {
-    return into(adhkarCompletions).insertOnConflictUpdate(
-      AdhkarCompletionsCompanion.insert(
-        collectionId: collectionId,
-        date: date,
-        completedAt: completedAt,
+    final companion = AdhkarCompletionsCompanion.insert(
+      collectionId: collectionId,
+      date: date,
+      completedAt: completedAt,
+    );
+    return into(adhkarCompletions).insert(
+      companion,
+      onConflict: DoUpdate(
+        (_) => AdhkarCompletionsCompanion(completedAt: Value(completedAt)),
+        target: [adhkarCompletions.collectionId, adhkarCompletions.date],
       ),
     );
   }

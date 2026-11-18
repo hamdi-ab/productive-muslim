@@ -83,7 +83,8 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   @override
   Future<AdhkarSessionRecord?> getSession(String collectionId) async {
-    final row = await _adhkarDao.getSession(collectionId);
+    final effectiveCollectionId = _canonicalCollectionId(collectionId);
+    final row = await _adhkarDao.getSession(effectiveCollectionId);
     if (row != null) {
       return _mapSessionRow(row);
     }
@@ -91,7 +92,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     // Fallback & seamless migration from SettingsService legacy counts
     if (_settingsService != null) {
       final nowStr = DateTime.now().toIso8601String().substring(0, 10);
-      final category = _parseCategory(collectionId);
+      final category = _parseCategory(effectiveCollectionId);
       if (category != null) {
         final items = AdhkarCatalog.getByCategory(category);
         final completedIds = _settingsService.getCompletedDhikrIds(nowStr);
@@ -116,20 +117,23 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
               items.isNotEmpty &&
               items.every((i) => (counts[i.id] ?? 0) >= i.targetCount);
           final record = AdhkarSessionRecord(
-            collectionId: collectionId,
+            collectionId: effectiveCollectionId,
             lastPageIndex: 0,
             counts: counts,
             lastAccessedAt: DateTime.now(),
             isCompleted: isCompleted,
           );
           await saveSession(
-            collectionId: collectionId,
+            collectionId: effectiveCollectionId,
             lastPageIndex: 0,
             counts: counts,
             isCompleted: isCompleted,
           );
           if (isCompleted) {
-            await recordCollectionCompletion(collectionId, date: nowStr);
+            await recordCollectionCompletion(
+              effectiveCollectionId,
+              date: nowStr,
+            );
           }
           return record;
         }
@@ -141,7 +145,9 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   @override
   Stream<AdhkarSessionRecord?> watchSession(String collectionId) {
-    return _adhkarDao.watchSession(collectionId).map((row) {
+    return _adhkarDao.watchSession(_canonicalCollectionId(collectionId)).map((
+      row,
+    ) {
       return row != null ? _mapSessionRow(row) : null;
     });
   }
@@ -154,7 +160,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     bool isCompleted = false,
   }) {
     return _adhkarDao.saveSession(
-      collectionId: collectionId,
+      collectionId: _canonicalCollectionId(collectionId),
       lastPageIndex: lastPageIndex,
       countsJson: jsonEncode(counts),
       lastAccessedAt: DateTime.now().millisecondsSinceEpoch,
@@ -164,14 +170,15 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   @override
   Future<void> clearSession(String collectionId) {
-    return _adhkarDao.clearSession(collectionId);
+    return _adhkarDao.clearSession(_canonicalCollectionId(collectionId));
   }
 
   // --- Progress & Counts ---
 
   @override
   Future<int> getCategoryCompletedCount(DhikrCategory category) async {
-    final session = await getSession(category.name);
+    final collectionId = _categoryToCollectionId(category);
+    final session = await getSession(collectionId);
     if (session == null) return 0;
     final items = AdhkarCatalog.getByCategory(category);
     return items
@@ -181,8 +188,9 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   @override
   Stream<int> watchCategoryCompletedCount(DhikrCategory category) {
+    final collectionId = _categoryToCollectionId(category);
     final items = AdhkarCatalog.getByCategory(category);
-    return watchSession(category.name).map((session) {
+    return watchSession(collectionId).map((session) {
       if (session == null) return 0;
       return items
           .where((i) => (session.counts[i.id] ?? 0) >= i.targetCount)
@@ -197,7 +205,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     return _adhkarDao.logCollectionCompletion(
-      collectionId: collectionId,
+      collectionId: _canonicalCollectionId(collectionId),
       date: targetDate,
       completedAt: DateTime.now().millisecondsSinceEpoch,
     );
@@ -207,7 +215,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   Future<bool> isCollectionCompletedToday(String collectionId, {String? date}) {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
-    return _adhkarDao.isCollectionCompletedOnDate(collectionId, targetDate);
+    return _adhkarDao.isCollectionCompletedOnDate(
+      _canonicalCollectionId(collectionId),
+      targetDate,
+    );
   }
 
   @override
@@ -218,7 +229,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     return _adhkarDao.watchIsCollectionCompletedOnDate(
-      collectionId,
+      _canonicalCollectionId(collectionId),
       targetDate,
     );
   }
@@ -233,7 +244,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   Future<void> removeCollectionCompletion(String collectionId, {String? date}) {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
-    return _adhkarDao.removeCompletion(collectionId, targetDate);
+    return _adhkarDao.removeCompletion(
+      _canonicalCollectionId(collectionId),
+      targetDate,
+    );
   }
 
   // --- Migration ---
@@ -248,6 +262,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     final keys = prefs.getKeys();
     final todayStr = DateTime.now().toIso8601String().substring(0, 10);
     final sessionsToSave = <String, Map<String, int>>{};
+    final dateCompletionsToLog = <String, Set<String>>{};
 
     for (final key in keys) {
       if (key.startsWith('adhkar_done_')) {
@@ -256,24 +271,28 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
         for (final id in completedIds) {
           final item = AdhkarCatalog.getById(id);
           if (item != null) {
-            final cat = item.category.name;
-            sessionsToSave.putIfAbsent(cat, () => {})[id] = item.targetCount;
-            // Check if collection completed
-            final catItems = AdhkarCatalog.getByCategory(item.category);
-            final allDone =
-                catItems.isNotEmpty &&
-                catItems.every(
-                  (ci) =>
-                      completedIds.contains(ci.id) ||
-                      (sessionsToSave[cat]?[ci.id] ?? 0) >= ci.targetCount,
-                );
-            if (allDone) {
-              await _adhkarDao.logCollectionCompletion(
-                collectionId: cat,
-                date: date,
-                completedAt: DateTime.now().millisecondsSinceEpoch,
-              );
+            final colId = _categoryToCollectionId(item.category);
+            if (date == todayStr) {
+              sessionsToSave.putIfAbsent(colId, () => {})[id] =
+                  item.targetCount;
             }
+          }
+        }
+
+        // Check if any canonical collection was fully completed on this date
+        for (final cat in [
+          DhikrCategory.morning,
+          DhikrCategory.evening,
+          DhikrCategory.postPrayer,
+          DhikrCategory.general,
+          DhikrCategory.sleeping,
+          DhikrCategory.dailySunnah,
+        ]) {
+          final colId = _categoryToCollectionId(cat);
+          final catItems = AdhkarCatalog.getByCategory(cat);
+          if (catItems.isNotEmpty &&
+              catItems.every((ci) => completedIds.contains(ci.id))) {
+            dateCompletionsToLog.putIfAbsent(date, () => {}).add(colId);
           }
         }
       } else if (key.startsWith('adhkar_count_')) {
@@ -285,16 +304,30 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
           if (date == todayStr && count > 0) {
             final item = AdhkarCatalog.getById(dhikrId);
             if (item != null) {
-              final cat = item.category.name;
-              sessionsToSave.putIfAbsent(cat, () => {})[dhikrId] = count;
+              final colId = _categoryToCollectionId(item.category);
+              sessionsToSave.putIfAbsent(colId, () => {})[dhikrId] = count;
             }
           }
         }
       }
     }
 
+    // Save completions to database
+    for (final entry in dateCompletionsToLog.entries) {
+      final date = entry.key;
+      for (final colId in entry.value) {
+        await _adhkarDao.logCollectionCompletion(
+          collectionId: colId,
+          date: date,
+          completedAt: DateTime.now().millisecondsSinceEpoch,
+        );
+      }
+    }
+
+    // Save sessions to database
     for (final entry in sessionsToSave.entries) {
-      final cat = _parseCategory(entry.key);
+      final colId = entry.key;
+      final cat = _parseCategory(colId);
       final items = cat != null
           ? AdhkarCatalog.getByCategory(cat)
           : <DhikrItem>[];
@@ -302,15 +335,21 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
           items.isNotEmpty &&
           items.every((i) => (entry.value[i.id] ?? 0) >= i.targetCount);
       await saveSession(
-        collectionId: entry.key,
+        collectionId: colId,
         lastPageIndex: 0,
         counts: entry.value,
         isCompleted: isCompleted,
       );
+      if (isCompleted) {
+        await recordCollectionCompletion(colId, date: todayStr);
+      }
     }
 
-    // Clean up legacy keys if any migrated
-    if (sessionsToSave.isNotEmpty) {
+    // Clean up legacy keys if any adhkar data was present
+    final hasLegacyData = keys.any(
+      (k) => k.startsWith('adhkar_done_') || k.startsWith('adhkar_count_'),
+    );
+    if (hasLegacyData) {
       for (final key in keys) {
         if (key.startsWith('adhkar_done_') || key.startsWith('adhkar_count_')) {
           await prefs.remove(key);
@@ -321,6 +360,20 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   }
 
   // --- Helpers ---
+
+  static String _canonicalCollectionId(String collectionId) {
+    if (collectionId == DhikrCategory.wakingUp.name) {
+      return DhikrCategory.morning.name;
+    }
+    return collectionId;
+  }
+
+  static String _categoryToCollectionId(DhikrCategory category) {
+    if (category == DhikrCategory.wakingUp) {
+      return DhikrCategory.morning.name;
+    }
+    return category.name;
+  }
 
   AdhkarSessionRecord _mapSessionRow(AdhkarSession row) {
     Map<String, int> counts = {};
@@ -343,6 +396,9 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   }
 
   DhikrCategory? _parseCategory(String name) {
+    if (name == DhikrCategory.wakingUp.name) {
+      return DhikrCategory.morning;
+    }
     for (final cat in DhikrCategory.values) {
       if (cat.name == name) return cat;
     }

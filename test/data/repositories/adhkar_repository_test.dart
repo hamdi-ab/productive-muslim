@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/repositories/adhkar_repository_impl.dart';
@@ -73,7 +74,8 @@ void main() {
       );
       expect(istighfar.reference, contains('Bukhari 6307'));
       expect(istighfar.targetCount, equals(70));
-      expect(istighfar.isCountPrescribed, isTrue);
+      // 70 is an app target, not a user-facing prescription
+      expect(istighfar.isCountPrescribed, isFalse);
 
       final laHawla = generalItems.firstWhere(
         (i) => i.id == 'general_la_hawla',
@@ -84,24 +86,18 @@ void main() {
       expect(salawat.isCountPrescribed, isFalse);
     });
 
-    test('established collections have approved status', () {
-      final morningItems = repository.getByCategory(DhikrCategory.morning);
-      expect(
-        morningItems.every(
-          (i) => i.reviewStatus == ContentReviewStatus.approved,
-        ),
-        isTrue,
-      );
-      expect(morningItems.every((i) => i.isApproved), isTrue);
-
-      final eveningItems = repository.getByCategory(DhikrCategory.evening);
-      expect(eveningItems.every((i) => i.isApproved), isTrue);
-
-      final postPrayerItems = repository.getByCategory(
-        DhikrCategory.postPrayer,
-      );
-      expect(postPrayerItems.every((i) => i.isApproved), isTrue);
-    });
+    test(
+      'all catalog items remain pending review until editorial sign-off',
+      () {
+        final all = repository.getAll();
+        expect(
+          all.every((i) => i.reviewStatus == ContentReviewStatus.pendingReview),
+          isTrue,
+        );
+        expect(all.every((i) => i.isPendingReview), isTrue);
+        expect(all.every((i) => !i.isApproved), isTrue);
+      },
+    );
 
     test('getById returns matching item or null', () {
       expect(repository.getById('ayat_al_kursi'), isNotNull);
@@ -166,6 +162,71 @@ void main() {
         expect(dbRow!.countsJson, contains('sayyid_al_istighfar'));
       },
     );
+
+    test('canonicalizes waking-up category into morning collection during SharedPreferences migration', () async {
+      final prefs = settingsService.prefs!;
+      final today = DateTime.now().toIso8601String().substring(0, 10);
+
+      // Simulate legacy SharedPreferences storage where waking-up items were tracked
+      await prefs.setInt('adhkar_count_${today}_wake_up_1', 1);
+      await prefs.setInt('adhkar_count_${today}_wake_up_2', 1);
+
+      // Run migration
+      await repository.migrateFromSharedPreferencesIfNeeded(prefs);
+
+      // Waking-up counts must be preserved in the canonical 'morning' session
+      final morningSession = await repository.getSession('morning');
+      expect(morningSession, isNotNull);
+      expect(morningSession!.counts['wake_up_1'], equals(1));
+      expect(morningSession.counts['wake_up_2'], equals(1));
+
+      // getSession('wakingUp') should also route to canonical morning session
+      final wakingSession = await repository.getSession('wakingUp');
+      expect(wakingSession, isNotNull);
+      expect(wakingSession!.counts['wake_up_1'], equals(1));
+
+      // Morning completed count should include the 2 waking-up items
+      final completedMorningCount = await repository.getCategoryCompletedCount(
+        DhikrCategory.morning,
+      );
+      expect(completedMorningCount, equals(2));
+
+      // Legacy keys should be cleared and migration flag set
+      expect(prefs.getBool('adhkar_migrated_to_drift_v1'), isTrue);
+      expect(prefs.getInt('adhkar_count_${today}_wake_up_1'), isNull);
+    });
+
+    test('migrates legacy full morning completion (including waking-up) to canonical morning completion', () async {
+      final prefs = settingsService.prefs!;
+      final today = DateTime.now().toIso8601String().substring(0, 10);
+
+      // Reset migration flag to simulate another upgrade scenario
+      await prefs.remove('adhkar_migrated_to_drift_v1');
+
+      // Legacy full morning completion includes wakingUp and morning items
+      final allMorningIds = AdhkarCatalog.getByCategory(DhikrCategory.morning)
+          .map((i) => i.id)
+          .toList();
+      await prefs.setStringList('adhkar_done_$today', allMorningIds);
+
+      await repository.migrateFromSharedPreferencesIfNeeded(prefs);
+
+      // Morning session is completed
+      final session = await repository.getSession('morning');
+      expect(session, isNotNull);
+      expect(session!.isCompleted, isTrue);
+      expect(session.counts['wake_up_1'], equals(1));
+      expect(session.counts['wake_up_2'], equals(1));
+
+      // Morning daily completion recorded in AdhkarCompletions table
+      expect(await repository.isCollectionCompletedToday('morning'), isTrue);
+      expect(await repository.isCollectionCompletedToday('wakingUp'), isTrue);
+
+      final completedIds = await repository.getCompletedCollectionIdsForDate(
+        today,
+      );
+      expect(completedIds, contains('morning'));
+    });
 
     test('getCategoryCompletedCount and watchCategoryCompletedCount compute live progress', () async {
       expect(

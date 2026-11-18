@@ -41,7 +41,7 @@ class DhikrItem {
     this.targetCount = 1,
     this.order = 0,
     this.contentVersion = 1,
-    this.reviewStatus = ContentReviewStatus.approved,
+    this.reviewStatus = ContentReviewStatus.pendingReview,
     this.isCountPrescribed = false,
   });
 

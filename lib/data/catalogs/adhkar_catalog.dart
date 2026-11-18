@@ -22,7 +22,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'wake_up_2',
@@ -38,7 +38,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 2. MORNING ADHKAR
@@ -56,7 +56,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'sayyid_al_istighfar',
@@ -72,7 +72,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'bismillah_alladhi_morning',
@@ -89,7 +89,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 3,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'raditu_billahi_morning',
@@ -106,7 +106,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 4,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'subhanallahi_wa_bihamdihi_100',
@@ -122,7 +122,7 @@ class AdhkarCatalog {
       targetCount: 100,
       order: 5,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 3. EVENING ADHKAR
@@ -140,7 +140,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'bismillah_alladhi_evening',
@@ -157,7 +157,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'audhu_bikalimatillah',
@@ -173,7 +173,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 3,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 4. SLEEPING & BEDTIME
@@ -191,7 +191,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'sleep_33_tasbih',
@@ -210,7 +210,7 @@ class AdhkarCatalog {
       targetCount: 100,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'sleep_ayat_kursi',
@@ -226,7 +226,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 3,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 5. POST-SALAH ADHKAR
@@ -244,7 +244,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'post_salah_tasbih',
@@ -260,7 +260,7 @@ class AdhkarCatalog {
       targetCount: 100,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 6. DAILY SUNNAH REMEMBRANCES
@@ -278,7 +278,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 1,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'entering_home',
@@ -294,7 +294,7 @@ class AdhkarCatalog {
       targetCount: 1,
       order: 2,
       isCountPrescribed: true,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'dua_knowledge_focus',
@@ -311,7 +311,7 @@ class AdhkarCatalog {
       targetCount: 3,
       order: 3,
       isCountPrescribed: false,
-      reviewStatus: ContentReviewStatus.approved,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 7. GENERAL DHIKR (Phase 1 Essential Remembrance - Under Editorial Review)
@@ -362,7 +362,7 @@ class AdhkarCatalog {
       virtue: 'The Prophet (peace be upon him) sought forgiveness and repented more than 70 times a day.',
       targetCount: 70,
       order: 3,
-      isCountPrescribed: true,
+      isCountPrescribed: false,
       reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(

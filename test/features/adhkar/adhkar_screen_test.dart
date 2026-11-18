@@ -12,6 +12,7 @@ import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 void main() {
@@ -54,7 +55,7 @@ void main() {
   }
 
   testWidgets(
-    'renders Adhkar screen with Phase 1 category tabs and Authentic badge on approved item',
+    'renders Adhkar screen with Phase 1 category tabs and Pending Review badge on catalog item',
     (tester) async {
       await tester.pumpWidget(
         buildSubject(initialCategory: DhikrCategory.morning),
@@ -75,10 +76,51 @@ void main() {
       expect(find.text('Bedtime'), findsNothing);
       expect(find.text('Daily Sunnah'), findsNothing);
 
-      // Approved item has Authentic badge and Prescribed badge
-      expect(find.text('Authentic'), findsOneWidget);
+      // Unreviewed catalog item has Pending Review badge, never Authentic badge
+      expect(find.text('Pending Review'), findsOneWidget);
+      expect(find.text('Authentic'), findsNothing);
       expect(find.text('Prescribed'), findsOneWidget);
       expect(find.text('Tap anywhere to count'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DhikrCard displays Authentic badge when item reviewStatus is approved',
+    (tester) async {
+      const approvedItem = DhikrItem(
+        id: 'test_approved',
+        category: DhikrCategory.morning,
+        titleEn: 'Approved Dhikr',
+        titleAr: 'ذكر معتمد',
+        arabic: 'سبحان الله',
+        transliteration: 'SubhanAllah',
+        translationEn: 'Glory be to Allah',
+        translationAr: 'سبحان الله',
+        reference: 'Sahih Muslim',
+        virtue: 'Virtue',
+        targetCount: 3,
+        reviewStatus: ContentReviewStatus.approved,
+        isCountPrescribed: true,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: DhikrCard(
+              item: approvedItem,
+              count: 0,
+              onTap: () {},
+              onReset: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Authentic'), findsOneWidget);
+      expect(find.text('Pending Review'), findsNothing);
     },
   );
 
@@ -127,6 +169,27 @@ void main() {
 
       // Muslim 2692 specifies 100 times, so it is Prescribed
       expect(find.text('Prescribed'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'general istighfar displays Target badge rather than Prescribed count',
+    (tester) async {
+      await tester.pumpWidget(
+        buildSubject(initialCategory: DhikrCategory.general),
+      );
+      await tester.pumpAndSettle();
+
+      // Navigate to general_istighfar (page index 2: 0=subhanallah, 1=four_beloved, 2=istighfar)
+      final nextBtn = find.text('Next Dhikr');
+      await tester.tap(nextBtn);
+      await tester.pumpAndSettle();
+      await tester.tap(nextBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Seeking Forgiveness & Repentance'), findsOneWidget);
+      expect(find.text('Target'), findsOneWidget);
+      expect(find.text('Prescribed'), findsNothing);
     },
   );
 

@@ -263,14 +263,18 @@ class DhikrCard extends StatelessWidget {
                                             : AppColors.primary,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
-                                        'Authentic',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? AppColors.primaryLight
-                                              : AppColors.primary,
+                                      Flexible(
+                                        child: Text(
+                                          'Authentic',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? AppColors.primaryLight
+                                                : AppColors.primary,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -305,14 +309,18 @@ class DhikrCard extends StatelessWidget {
                                             : const Color(0xFFD97706),
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
-                                        l10n.adhkarPendingReview,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? const Color(0xFFFCD34D)
-                                              : const Color(0xFFD97706),
+                                      Flexible(
+                                        child: Text(
+                                          l10n.adhkarPendingReview,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: isDark
+                                                ? const Color(0xFFFCD34D)
+                                                : const Color(0xFFD97706),
+                                          ),
                                         ),
                                       ),
                                     ],
