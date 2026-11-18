@@ -77,7 +77,7 @@ class AppDatabase extends _$AppDatabase {
           await into(muhasabahEntries).insert(
             MuhasabahEntriesCompanion.insert(
               date: date,
-              content: reflection.trim(),
+              content: reflection,
               createdAt: Value(createdAt),
               updatedAt: Value(createdAt),
             ),

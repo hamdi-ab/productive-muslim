@@ -90,7 +90,7 @@ void main() {
           ),
         );
 
-    // Record with another valid reflection
+    // Record with another valid reflection preserving user-authored leading/trailing whitespace exactly
     await v3Db
         .into(v3Db.intentionEntries)
         .insert(
@@ -101,7 +101,7 @@ void main() {
             category: const Value('work'),
             completed: const Value(1),
             reflection: const Value(
-              'Grateful for clarity and energy after Dhuhr.',
+              '  \nGrateful for clarity and energy after Dhuhr.\n  ',
             ),
             createdAt: const Value(1700000030000),
           ),
@@ -136,7 +136,7 @@ void main() {
       final second = reflections.firstWhere((r) => r.date == '2026-11-18');
       expect(
         second.content,
-        equals('Grateful for clarity and energy after Dhuhr.'),
+        equals('  \nGrateful for clarity and energy after Dhuhr.\n  '),
       );
       expect(second.createdAt, equals(1700000030000));
 

@@ -17,8 +17,10 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 /// Serene evening Muhasabah view for personal reflection, gratitude, and lessons learned.
 ///
 /// Features:
-/// - Thoughtful prompt chips (Blessings, Patience, Forgiveness, Ihsan, Intention, Free)
-/// - Flexible reflection editor with spiritual tags
+/// - Support for single prompt, multiple prompts, or pure free writing in one reflection session
+/// - Preserves each prompt and its corresponding answer without losing the free-writing path
+/// - Preserves original createdAt timestamp on edits
+/// - Sourced and verified Umar ibn al-Khattab (RA) quotation banner
 /// - Immediate saving without any requirement of completed intentions
 /// - Chronological list of today's saved reflections with edit/delete actions
 /// - Zero gamification, zero percentage gauges, zero streaks, zero guilt empty states
@@ -30,10 +32,12 @@ class MuhasabahView extends StatefulWidget {
 }
 
 class _MuhasabahViewState extends State<MuhasabahView> {
-  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _freeController = TextEditingController();
+  final Map<String, TextEditingController> _promptControllers = {};
+  final Set<String> _selectedPromptKeys = {};
   final Set<String> _selectedTags = {};
-  String? _selectedPromptKey;
   int? _editingEntryId;
+  int? _editingCreatedAt;
   bool _isSaving = false;
 
   static const List<String> _availableTags = [
@@ -48,17 +52,29 @@ class _MuhasabahViewState extends State<MuhasabahView> {
   @override
   void initState() {
     super.initState();
-    _contentController.addListener(_onContentChanged);
+    _freeController.addListener(_onContentChanged);
   }
 
   void _onContentChanged() {
     setState(() {});
   }
 
+  TextEditingController _getPromptController(String key) {
+    return _promptControllers.putIfAbsent(key, () {
+      final c = TextEditingController();
+      c.addListener(_onContentChanged);
+      return c;
+    });
+  }
+
   @override
   void dispose() {
-    _contentController.removeListener(_onContentChanged);
-    _contentController.dispose();
+    _freeController.removeListener(_onContentChanged);
+    _freeController.dispose();
+    for (final c in _promptControllers.values) {
+      c.removeListener(_onContentChanged);
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -93,11 +109,21 @@ class _MuhasabahViewState extends State<MuhasabahView> {
   void _onPromptSelected(String key) {
     AppHaptics.selectionClick();
     setState(() {
-      if (_selectedPromptKey == key) {
-        _selectedPromptKey = null;
+      if (key == 'free') {
+        if (_selectedPromptKeys.contains('free')) {
+          _selectedPromptKeys.remove('free');
+        } else {
+          _selectedPromptKeys.add('free');
+        }
+        return;
+      }
+
+      if (_selectedPromptKeys.contains(key)) {
+        _selectedPromptKeys.remove(key);
       } else {
-        _selectedPromptKey = key;
-        // Optionally suggest a matching tag
+        _selectedPromptKeys.add(key);
+        _getPromptController(key);
+        // Suggest matching tag
         switch (key) {
           case 'gratitude':
             _selectedTags.add('#Shukr');
@@ -130,23 +156,76 @@ class _MuhasabahViewState extends State<MuhasabahView> {
     });
   }
 
+  bool get _hasAnyContent {
+    if (_freeController.text.trim().isNotEmpty) return true;
+    for (final key in _selectedPromptKeys) {
+      if (key != 'free') {
+        final c = _promptControllers[key];
+        if (c != null && c.text.trim().isNotEmpty) return true;
+      }
+    }
+    return false;
+  }
+
+  void _clearEditor() {
+    _freeController.clear();
+    for (final c in _promptControllers.values) {
+      c.clear();
+    }
+    _selectedPromptKeys.clear();
+    _selectedTags.clear();
+    _editingEntryId = null;
+    _editingCreatedAt = null;
+  }
+
   Future<void> _saveReflection(
     MuhasabahRepository repo,
     String today,
     AppLocalizations l10n,
   ) async {
-    final text = _contentController.text.trim();
-    if (text.isEmpty || _isSaving) return;
+    if (!_hasAnyContent || _isSaving) return;
 
     AppHaptics.mediumImpact();
     setState(() => _isSaving = true);
 
     final tagsString = _selectedTags.isEmpty ? null : _selectedTags.join(' ');
     final now = DateTime.now().millisecondsSinceEpoch;
-    final promptId = _selectedPromptKey == null || _selectedPromptKey == 'free'
+
+    // Collect answered prompt responses
+    final promptResponses = <MuhasabahPromptResponse>[];
+    final activePromptKeys = _selectedPromptKeys
+        .where((k) => k != 'free')
+        .toList();
+
+    for (final key in activePromptKeys) {
+      final c = _promptControllers[key];
+      final answer = c?.text.trim() ?? '';
+      if (answer.isNotEmpty) {
+        promptResponses.add(
+          MuhasabahPromptResponse(
+            promptId: key,
+            promptText: _getPromptText(l10n, key),
+            response: answer,
+          ),
+        );
+      }
+    }
+
+    final freeText = _freeController.text.trim();
+    final contentToSave = MuhasabahEntry.encodeContent(
+      prompts: promptResponses,
+      freeWriting: freeText.isNotEmpty ? freeText : null,
+    );
+
+    final promptIdString = promptResponses.isEmpty
         ? null
-        : _selectedPromptKey;
-    final promptText = promptId == null ? null : _getPromptText(l10n, promptId);
+        : promptResponses.map((p) => p.promptId).whereType<String>().join(',');
+    final promptTextString = promptResponses.isEmpty
+        ? null
+        : promptResponses
+              .map((p) => p.promptText)
+              .whereType<String>()
+              .join(' | ');
 
     try {
       if (_editingEntryId != null) {
@@ -154,11 +233,11 @@ class _MuhasabahViewState extends State<MuhasabahView> {
           MuhasabahEntry(
             id: _editingEntryId!,
             date: today,
-            promptId: promptId,
-            promptText: promptText,
-            content: text,
+            promptId: promptIdString,
+            promptText: promptTextString,
+            content: contentToSave,
             tags: tagsString,
-            createdAt: now,
+            createdAt: _editingCreatedAt ?? now,
             updatedAt: now,
           ),
         );
@@ -167,9 +246,9 @@ class _MuhasabahViewState extends State<MuhasabahView> {
           MuhasabahEntry(
             id: 0,
             date: today,
-            promptId: promptId,
-            promptText: promptText,
-            content: text,
+            promptId: promptIdString,
+            promptText: promptTextString,
+            content: contentToSave,
             tags: tagsString,
             createdAt: now,
             updatedAt: now,
@@ -177,10 +256,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
         );
       }
 
-      _contentController.clear();
-      _selectedTags.clear();
-      _selectedPromptKey = null;
-      _editingEntryId = null;
+      _clearEditor();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -201,15 +277,30 @@ class _MuhasabahViewState extends State<MuhasabahView> {
   void _editEntry(MuhasabahEntry entry) {
     AppHaptics.selectionClick();
     setState(() {
+      _clearEditor();
       _editingEntryId = entry.id;
-      _contentController.text = entry.content;
-      _selectedTags.clear();
+      _editingCreatedAt = entry.createdAt;
+
+      final decoded = entry.decodedContent;
+      for (final p in decoded.prompts) {
+        if (p.promptId != null) {
+          _selectedPromptKeys.add(p.promptId!);
+          _getPromptController(p.promptId!).text = p.response;
+        }
+      }
+
+      if (decoded.freeWriting != null && decoded.freeWriting!.isNotEmpty) {
+        _freeController.text = decoded.freeWriting!;
+        if (decoded.prompts.isNotEmpty) {
+          _selectedPromptKeys.add('free');
+        }
+      }
+
       if (entry.tags != null) {
         _selectedTags.addAll(
           entry.tags!.split(' ').where((t) => t.trim().isNotEmpty),
         );
       }
-      _selectedPromptKey = null;
     });
   }
 
@@ -243,9 +334,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
       await repo.deleteEntry(entry.id);
       if (_editingEntryId == entry.id) {
         setState(() {
-          _editingEntryId = null;
-          _contentController.clear();
-          _selectedTags.clear();
+          _clearEditor();
         });
       }
     }
@@ -261,34 +350,23 @@ class _MuhasabahViewState extends State<MuhasabahView> {
 
     return Stack(
       children: [
-        // Serene atmospheric lattice background
         IntentionAtmosphereBackground(isDark: isDark),
-
         ListView(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
             vertical: AppSpacing.sm,
           ),
           children: [
-            // 1. Contemplative Hadith / Umar (RA) Banner
             _buildContemplationBanner(isDark, isAr, l10n),
             const SizedBox(height: AppSpacing.md),
-
-            // 2. Thoughtful Prompts Carousel / Chips
             _buildPromptSelector(isDark, isAr, l10n),
             const SizedBox(height: AppSpacing.md),
-
-            // 3. Reflection Input Form Card
             if (repo != null)
               _buildReflectionInputCard(isDark, isAr, l10n, repo, today),
             const SizedBox(height: AppSpacing.md),
-
-            // 4. Saved Reflections for Today
             if (repo != null)
               _buildSavedReflectionsSection(isDark, isAr, l10n, repo, today),
             const SizedBox(height: AppSpacing.md),
-
-            // 5. Bookend Adhkar & Quranic Ayah
             IntentionAdhkarBookendCard(isDark: isDark),
             const SizedBox(height: AppSpacing.md),
             IntentionAyahCard(isDark: isDark),
@@ -390,13 +468,16 @@ class _MuhasabahViewState extends State<MuhasabahView> {
               fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
-            isAr ? 'عمر بن الخطاب رضي الله عنه' : '— Umar ibn al-Khattab (RA)',
+            isAr
+                ? '— عمر بن الخطاب رضي الله عنه · سنن الترمذي (2459)، كتاب الزهد للإمام أحمد (177)'
+                : '— Umar ibn al-Khattab (RA) · Sunan al-Tirmidhi (2459), Kitab al-Zuhd by Ahmad (177)',
             style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
               color: AppColors.secondaryLight,
+              letterSpacing: 0.1,
             ),
           ),
         ],
@@ -468,7 +549,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: prompts.map((p) {
-              final isSelected = _selectedPromptKey == p.key;
+              final isSelected = _selectedPromptKeys.contains(p.key);
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: AppPressable(
@@ -537,40 +618,6 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             }).toList(),
           ),
         ),
-        if (_selectedPromptKey != null && _selectedPromptKey != 'free') ...[
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF132A22) : const Color(0xFFE8F5EE),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.25),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.help_outline_rounded,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _getPromptText(l10n, _selectedPromptKey),
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : AppColors.primaryDark,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -582,8 +629,10 @@ class _MuhasabahViewState extends State<MuhasabahView> {
     MuhasabahRepository repo,
     String today,
   ) {
-    final hasContent = _contentController.text.trim().isNotEmpty;
     final isEditing = _editingEntryId != null;
+    final activePromptKeys = _selectedPromptKeys
+        .where((k) => k != 'free')
+        .toList();
 
     return Card(
       elevation: 0,
@@ -638,9 +687,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
                   TextButton(
                     onPressed: () {
                       setState(() {
-                        _editingEntryId = null;
-                        _contentController.clear();
-                        _selectedTags.clear();
+                        _clearEditor();
                       });
                     },
                     style: TextButton.styleFrom(
@@ -660,9 +707,26 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             ),
             const SizedBox(height: AppSpacing.sm),
 
-            // Text Input Field
+            // Render focused input for each active prompt
+            for (final pKey in activePromptKeys) ...[
+              _buildPromptInputSection(pKey, isDark, isAr, l10n),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+
+            // Free writing section
+            if (activePromptKeys.isNotEmpty) ...[
+              Text(
+                isAr ? 'تأملات حرة إضافية' : 'Additional Free Reflections',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white70 : AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 4),
+            ],
             TextField(
-              controller: _contentController,
+              controller: _freeController,
               decoration: InputDecoration(
                 hintText: l10n.muhasabahInputHint,
                 filled: true,
@@ -750,7 +814,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             ),
             const SizedBox(height: AppSpacing.md),
 
-            // Save Reflection Button (Enabled as long as content is not empty)
+            // Save Reflection Button
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
@@ -771,7 +835,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
                         ),
                       )
                     : const Icon(Icons.check_rounded, size: 18),
-                onPressed: hasContent && !_isSaving
+                onPressed: _hasAnyContent && !_isSaving
                     ? () => _saveReflection(repo, today, l10n)
                     : null,
                 label: Text(
@@ -784,6 +848,83 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPromptInputSection(
+    String pKey,
+    bool isDark,
+    bool isAr,
+    AppLocalizations l10n,
+  ) {
+    final controller = _getPromptController(pKey);
+    final question = _getPromptText(l10n, pKey);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm + 2),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF132A22) : const Color(0xFFE8F5EE),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.25),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.help_outline_rounded,
+                size: 14,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  question,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : AppColors.primaryDark,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              hintText: isAr ? 'إجابتك...' : 'Your response...',
+              filled: true,
+              fillColor: isDark ? AppColors.darkSurfaceSubtle : Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.white10 : Colors.black12,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.white10 : Colors.black12,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 1.2,
+                ),
+              ),
+            ),
+            minLines: 2,
+            maxLines: 4,
+          ),
+        ],
       ),
     );
   }
@@ -849,7 +990,6 @@ class _MuhasabahViewState extends State<MuhasabahView> {
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
-
             if (entries.isEmpty)
               _buildGentleEmptyState(isDark, l10n)
             else
@@ -917,6 +1057,7 @@ class _MuhasabahViewState extends State<MuhasabahView> {
     final timeFormatted = DateFormat.jm().format(entryTime);
     final tags =
         entry.tags?.split(' ').where((t) => t.isNotEmpty).toList() ?? [];
+    final decoded = entry.decodedContent;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -990,27 +1131,58 @@ class _MuhasabahViewState extends State<MuhasabahView> {
               ),
             ],
           ),
-          if (entry.promptText != null && entry.promptText!.isNotEmpty) ...[
+
+          // Render structured prompts
+          if (decoded.prompts.isNotEmpty) ...[
+            for (final p in decoded.prompts) ...[
+              const SizedBox(height: 6),
+              if (p.promptText != null && p.promptText!.isNotEmpty)
+                Text(
+                  'Q: ${p.promptText}',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? AppColors.secondaryLight
+                        : AppColors.primary,
+                  ),
+                ),
+              const SizedBox(height: 2),
+              Text(
+                p.response,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  height: 1.45,
+                  color: isDark ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ],
+
+          // Render free writing notes
+          if (decoded.freeWriting != null &&
+              decoded.freeWriting!.isNotEmpty) ...[
             const SizedBox(height: 6),
+            if (decoded.prompts.isNotEmpty)
+              Text(
+                isAr ? 'خواطر حرة:' : 'Free Reflection:',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : AppColors.textSecondary,
+                ),
+              ),
             Text(
-              'Q: ${entry.promptText}',
+              decoded.freeWriting!,
               style: TextStyle(
-                fontSize: 11.5,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.secondaryLight : AppColors.primary,
+                fontSize: 13.5,
+                height: 1.45,
+                color: isDark ? Colors.white : AppColors.textPrimary,
               ),
             ),
           ],
-          const SizedBox(height: 8),
-          Text(
-            entry.content,
-            style: TextStyle(
-              fontSize: 13.5,
-              height: 1.45,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
-          ),
+
           if (tags.isNotEmpty) ...[
             const SizedBox(height: 8),
             Wrap(

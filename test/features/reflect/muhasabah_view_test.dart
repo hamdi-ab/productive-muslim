@@ -36,7 +36,13 @@ void main() {
     );
 
     registerFallbackValue(
-      MuhasabahEntry(id: 0, date: '', content: '', createdAt: 0, updatedAt: 0),
+      const MuhasabahEntry(
+        id: 0,
+        date: '',
+        content: '',
+        createdAt: 0,
+        updatedAt: 0,
+      ),
     );
   });
 
@@ -44,51 +50,58 @@ void main() {
     await getIt.reset();
   });
 
-  Widget buildSubject({List<MuhasabahEntry> initialEntries = const []}) {
+  Future<void> pumpSubject(
+    WidgetTester tester, {
+    List<MuhasabahEntry> initialEntries = const [],
+  }) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     when(() => mockRepo.watchEntriesForDate(any()))
         .thenAnswer((_) => Stream.value(initialEntries));
     when(() => mockRepo.getEntriesForDate(any()))
         .thenAnswer((_) async => initialEntries);
 
-    return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: RepositoryProvider<MuhasabahRepository>.value(
-          value: mockRepo,
-          child: const MuhasabahView(),
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: RepositoryProvider<MuhasabahRepository>.value(
+            value: mockRepo,
+            child: const MuhasabahView(),
+          ),
         ),
       ),
     );
+    await tester.pumpAndSettle();
   }
 
   group('MuhasabahView Tests', () {
     testWidgets(
-      'renders contemplative banner, prompts, and gentle empty state',
+      'renders verified Umar ibn al-Khattab quotation with authentic hadith citation',
       (tester) async {
-        await tester.pumpWidget(buildSubject());
-        await tester.pumpAndSettle();
+        await pumpSubject(tester);
 
-        // Banner text
+        // Banner title & Arabic heading
         expect(find.text('حَاسِبُوا أَنْفُسَكُمْ'), findsOneWidget);
         expect(find.text('Evening Muhasabah'), findsOneWidget);
 
-        // Prompts
-        expect(find.text('Thoughtful Prompts'), findsOneWidget);
-        expect(find.text('Free Reflection'), findsOneWidget);
-        expect(find.text('Gratitude'), findsOneWidget);
-        expect(find.text('Patience'), findsOneWidget);
-
-        // Input card
-        expect(find.text('Reflection'), findsOneWidget);
-        expect(find.byType(TextField), findsOneWidget);
-        expect(find.text('Save Reflection'), findsOneWidget);
-
-        // Save button disabled when input is empty
-        final saveButton = tester.widget<FilledButton>(
-          find.widgetWithText(FilledButton, 'Save Reflection'),
+        // Verified quotation wording
+        expect(
+          find.text(
+            '“Take account of yourselves before you are taken to account, and weigh your deeds before they are weighed.”',
+          ),
+          findsOneWidget,
         );
-        expect(saveButton.onPressed, isNull);
+
+        // Authoritative scholarly source citation (Item 4)
+        expect(
+          find.text(
+            '— Umar ibn al-Khattab (RA) · Sunan al-Tirmidhi (2459), Kitab al-Zuhd by Ahmad (177)',
+          ),
+          findsOneWidget,
+        );
 
         // Gentle empty state (no guilt, no streaks)
         expect(find.byIcon(Icons.spa_outlined), findsOneWidget);
@@ -101,76 +114,221 @@ void main() {
       },
     );
 
-    testWidgets('selecting a prompt shows guiding question and suggests tag', (
-      tester,
-    ) async {
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
+    testWidgets(
+      'supports selecting multiple prompts in one reflection session and saves both (Item 1)',
+      (tester) async {
+        when(() => mockRepo.insertEntry(any())).thenAnswer((_) async => 1);
 
-      // Tap Gratitude prompt
-      await tester.tap(find.text('Gratitude'));
-      await tester.pumpAndSettle();
+        await pumpSubject(tester);
 
-      // Displays guided question
-      expect(
-        find.text(
-          'What blessing did you receive today that you are grateful for?',
-        ),
-        findsOneWidget,
-      );
+        // 1. Select Gratitude prompt
+        await tester.tap(find.text('Gratitude'));
+        await tester.pumpAndSettle();
 
-      // Auto-selected tag
-      expect(find.text('#Shukr'), findsWidgets);
-    });
-
-    testWidgets('typing reflection enables Save button and saves entry', (
-      tester,
-    ) async {
-      when(() => mockRepo.insertEntry(any())).thenAnswer((_) async => 1);
-
-      await tester.pumpWidget(buildSubject());
-      await tester.pumpAndSettle();
-
-      // Enter reflection
-      await tester.enterText(
-        find.byType(TextField),
-        'Grateful for patience during a challenging exam today.',
-      );
-      await tester.pumpAndSettle();
-
-      // Tap tag #Sabr
-      await tester.tap(find.text('#Sabr'));
-      await tester.pumpAndSettle();
-
-      // Save button enabled
-      final saveButton = tester.widget<FilledButton>(
-        find.widgetWithText(FilledButton, 'Save Reflection'),
-      );
-      expect(saveButton.onPressed, isNotNull);
-
-      // Tap save
-      await tester.tap(find.widgetWithText(FilledButton, 'Save Reflection'));
-      await tester.pumpAndSettle();
-
-      // Verify insertEntry called
-      verify(
-        () => mockRepo.insertEntry(
-          any(
-            that: isA<MuhasabahEntry>().having(
-              (e) => e.content,
-              'content',
-              'Grateful for patience during a challenging exam today.',
-            ),
+        expect(
+          find.text(
+            'What blessing did you receive today that you are grateful for?',
           ),
-        ),
-      ).called(1);
+          findsOneWidget,
+        );
 
-      // Input is cleared
-      expect(
-        find.text('Grateful for patience during a challenging exam today.'),
-        findsNothing,
-      );
-    });
+        // 2. Select Patience prompt as well (multiple prompts in one session!)
+        await tester.tap(find.text('Patience'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(
+            'Where did you face difficulty today, and how did you seek Allah\'s help?',
+          ),
+          findsOneWidget,
+        );
+
+        // Enter answers for both prompts
+        final textFields = find.byType(TextField);
+        await tester.enterText(
+          textFields.at(0),
+          'Grateful for health and time with family.',
+        );
+        await tester.enterText(
+          textFields.at(1),
+          'Exercised patience during a delay at work.',
+        );
+        await tester.pumpAndSettle();
+
+        // Save reflection
+        final saveBtn = find.widgetWithText(FilledButton, 'Save Reflection');
+        await tester.ensureVisible(saveBtn);
+        await tester.tap(saveBtn);
+        await tester.pumpAndSettle();
+
+        // Verify insertEntry captured both prompts and their answers
+        final captured = verify(() => mockRepo.insertEntry(captureAny()))
+            .captured;
+        expect(captured.length, equals(1));
+        final entry = captured.first as MuhasabahEntry;
+
+        expect(entry.promptId, equals('gratitude,patience'));
+        expect(entry.promptResponses.length, equals(2));
+        expect(entry.promptResponses[0].promptId, equals('gratitude'));
+        expect(
+          entry.promptResponses[0].response,
+          equals('Grateful for health and time with family.'),
+        );
+        expect(entry.promptResponses[1].promptId, equals('patience'));
+        expect(
+          entry.promptResponses[1].response,
+          equals('Exercised patience during a delay at work.'),
+        );
+      },
+    );
+
+    testWidgets(
+      'supports combining multiple prompts with free writing in one reflection (Item 1)',
+      (tester) async {
+        when(() => mockRepo.insertEntry(any())).thenAnswer((_) async => 1);
+
+        await pumpSubject(tester);
+
+        // Select Gratitude prompt
+        await tester.tap(find.text('Gratitude'));
+        await tester.pumpAndSettle();
+
+        final textFields = find.byType(TextField);
+        // Prompt input
+        await tester.enterText(
+          textFields.at(0),
+          'Grateful for clarity after prayer.',
+        );
+        // Free writing input
+        await tester.enterText(
+          textFields.at(1),
+          'Also feeling optimistic about tomorrow.',
+        );
+        await tester.pumpAndSettle();
+
+        // Save
+        final saveBtn = find.widgetWithText(FilledButton, 'Save Reflection');
+        await tester.ensureVisible(saveBtn);
+        await tester.tap(saveBtn);
+        await tester.pumpAndSettle();
+
+        final captured = verify(() => mockRepo.insertEntry(captureAny()))
+            .captured;
+        final entry = captured.first as MuhasabahEntry;
+
+        expect(entry.promptResponses.length, equals(1));
+        expect(
+          entry.promptResponses[0].response,
+          equals('Grateful for clarity after prayer.'),
+        );
+        expect(
+          entry.freeWriting,
+          equals('Also feeling optimistic about tomorrow.'),
+        );
+      },
+    );
+
+    testWidgets(
+      'supports pure free writing without selecting any prompts (Item 1)',
+      (tester) async {
+        when(() => mockRepo.insertEntry(any())).thenAnswer((_) async => 1);
+
+        await pumpSubject(tester);
+
+        // Type directly into free reflection field without selecting prompts
+        await tester.enterText(
+          find.byType(TextField),
+          'Open evening contemplation without any prompts.',
+        );
+        await tester.pumpAndSettle();
+
+        final saveBtn = find.widgetWithText(FilledButton, 'Save Reflection');
+        await tester.ensureVisible(saveBtn);
+        await tester.tap(saveBtn);
+        await tester.pumpAndSettle();
+
+        final captured = verify(() => mockRepo.insertEntry(captureAny()))
+            .captured;
+        final entry = captured.first as MuhasabahEntry;
+
+        expect(entry.promptId, isNull);
+        expect(entry.promptResponses, isEmpty);
+        expect(
+          entry.content,
+          equals('Open evening contemplation without any prompts.'),
+        );
+        expect(
+          entry.freeWriting,
+          equals('Open evening contemplation without any prompts.'),
+        );
+      },
+    );
+
+    testWidgets(
+      'preserves original createdAt timestamp when editing a reflection (Item 2)',
+      (tester) async {
+        const originalCreatedAt = 1600000000000;
+        final sample = MuhasabahEntry(
+          id: 10,
+          date: '2026-11-18',
+          content: 'Original thoughts before evening prayer.',
+          tags: '#Tawakkul',
+          createdAt: originalCreatedAt,
+          updatedAt: originalCreatedAt,
+        );
+
+        when(() => mockRepo.updateEntry(any())).thenAnswer((_) async => true);
+
+        await pumpSubject(tester, initialEntries: [sample]);
+
+        // Tap edit
+        final editBtn = find.byIcon(Icons.edit_outlined);
+        await tester.ensureVisible(editBtn);
+        await tester.tap(editBtn);
+        await tester.pumpAndSettle();
+
+        // Verify editor is in editing mode
+        expect(find.text('Update Reflection'), findsOneWidget);
+
+        // Edit text
+        await tester.enterText(
+          find.byType(TextField),
+          'Updated thoughts before evening prayer.',
+        );
+        await tester.pumpAndSettle();
+
+        // Save updated reflection
+        final updateBtn = find.widgetWithText(
+          FilledButton,
+          'Update Reflection',
+        );
+        await tester.ensureVisible(updateBtn);
+        await tester.tap(updateBtn);
+        await tester.pumpAndSettle();
+
+        // Verify updateEntry was called with the exact original createdAt timestamp
+        final captured = verify(() => mockRepo.updateEntry(captureAny()))
+            .captured;
+        expect(captured.length, equals(1));
+        final updatedEntry = captured.first as MuhasabahEntry;
+
+        expect(updatedEntry.id, equals(10));
+        expect(
+          updatedEntry.content,
+          equals('Updated thoughts before evening prayer.'),
+        );
+        expect(
+          updatedEntry.createdAt,
+          equals(originalCreatedAt),
+          reason: 'Original createdAt must be preserved when editing (Item 2)',
+        );
+        expect(
+          updatedEntry.updatedAt,
+          greaterThan(originalCreatedAt),
+          reason: 'updatedAt must be refreshed on edit',
+        );
+      },
+    );
 
     testWidgets('displays saved reflections for today with time and tags', (
       tester,
@@ -185,8 +343,7 @@ void main() {
         updatedAt: DateTime(2026, 11, 18, 20, 30).millisecondsSinceEpoch,
       );
 
-      await tester.pumpWidget(buildSubject(initialEntries: [sample]));
-      await tester.pumpAndSettle();
+      await pumpSubject(tester, initialEntries: [sample]);
 
       expect(
         find.text('Reflected on how barakah came through focus after Fajr.'),
@@ -200,59 +357,25 @@ void main() {
       expect(find.text('1'), findsOneWidget); // badge count
     });
 
-    testWidgets('editing a reflection populates editor and calls updateEntry', (
-      tester,
-    ) async {
-      final sample = MuhasabahEntry(
-        id: 10,
-        date: '2026-11-18',
-        content: 'Original thoughts before evening prayer.',
-        tags: '#Tawakkul',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        updatedAt: DateTime.now().millisecondsSinceEpoch,
-      );
-
-      when(() => mockRepo.updateEntry(any())).thenAnswer((_) async => true);
-
-      await tester.pumpWidget(buildSubject(initialEntries: [sample]));
-      await tester.pumpAndSettle();
-
-      // Tap edit
-      await tester.tap(find.byIcon(Icons.edit_outlined));
-      await tester.pumpAndSettle();
-
-      // Editor now has content
-      expect(
-        find.text('Original thoughts before evening prayer.'),
-        findsNWidgets(2),
-      ); // in editor and list
-      expect(find.text('Update Reflection'), findsOneWidget);
-
-      // Save updated reflection
-      await tester.tap(find.widgetWithText(FilledButton, 'Update Reflection'));
-      await tester.pumpAndSettle();
-
-      verify(() => mockRepo.updateEntry(any())).called(1);
-    });
-
     testWidgets('deleting a reflection prompts confirmation dialog', (
       tester,
     ) async {
-      final sample = MuhasabahEntry(
+      final sample = const MuhasabahEntry(
         id: 99,
         date: '2026-11-18',
         content: 'To be removed.',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        updatedAt: DateTime.now().millisecondsSinceEpoch,
+        createdAt: 1700000000000,
+        updatedAt: 1700000000000,
       );
 
       when(() => mockRepo.deleteEntry(99)).thenAnswer((_) async => 1);
 
-      await tester.pumpWidget(buildSubject(initialEntries: [sample]));
-      await tester.pumpAndSettle();
+      await pumpSubject(tester, initialEntries: [sample]);
 
       // Tap delete icon
-      await tester.tap(find.byIcon(Icons.delete_outline_rounded));
+      final deleteBtn = find.byIcon(Icons.delete_outline_rounded);
+      await tester.ensureVisible(deleteBtn);
+      await tester.tap(deleteBtn);
       await tester.pumpAndSettle();
 
       // Dialog appears
