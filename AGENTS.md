@@ -46,6 +46,7 @@ Core shared code lives under `lib/core/`:
 - **Navigation (Tab Switching vs Subpage Pushing)**: Use `context.go(AppRoutes.<tab>)` when navigating to primary shell tabs (`AppRoutes.home`, `plan`, `tasks`, `habits`, `prayerTimes`, `journal`, `profile`, `barakah`). Never use `context.push()` for tab destinations to prevent duplicate shell scaffolds. Use `context.push(AppRoutes.<detail>)` only for root detail screens (`settings`, `focus`, `energy`, `fasting`, `adhkar`, `barakahReview`).
 - **Route Constants**: Always use typed `AppRoutes` constants from `package:productive_muslim/core/router/app_routes.dart` instead of hardcoded string literals.
 - **Testing Mocks & Fakes**: Use canonical mocks from `test/helpers/mocks.dart` rather than redeclaring repository mocks per test file. Singletons with mutable state must provide a `@visibleForTesting resetForTesting()` hook.
+- **Spiritual Anti-Gamification & Factual Progress**: Intention, spirituality, and Barakah must NEVER be scored, gamified, or displayed as percentage/radial gauges (no "Daily Intention Alignment %", no spiritual XP, no level bars). Task progress must remain strictly factual (e.g. `3 of 5 tasks completed`) without implying task completion measures spiritual worth. Core surfaces (Home, app bars) must omit streak pressure signals (no fire icons or streak numbers).
 
 ## Agent skills
 
@@ -72,7 +73,7 @@ This repository maintains a pre-indexed knowledge graph at `graphify-out/` to el
 - **Targeted Lookups**: Before reading or scanning large directories or multiple files, use `graphify explain "<Symbol>"` to inspect a class/function's exact inbound/outbound calls, references, and inheritance in a compact format.
 - **Path Discovery**: Use `graphify path "<Source>" "<Target>"` to trace call chains across clean architecture layers.
 - **Architectural Queries**: Use `graphify query "<Question>"` for scoped subgraphs on architectural workflows.
-- **Keep Graph Fresh**: Always run `graphify update .` after creating or modifying Dart files in a session (fast AST-only index, zero API cost).
+- **Keep Graph Fresh**: Run `npx.cmd -y graphify update .` (or `graphify update .`) after creating or modifying Dart files in a session (fast AST-only index, zero API cost).
 
 ### Ponytail (Minimal & Anti-Overengineering)
 
@@ -85,11 +86,11 @@ Follow the Ponytail Ladder on every task:
 ## Testing
 
 ```bash
-# Tier 1: Fast targeted tests during implementation (fast local feedback)
-flutter test test/features/<feature>/
+# Tier 1: Fast targeted tests during implementation (use --no-pub on Windows to bypass runner plugin symlinks)
+flutter test --no-pub test/features/<feature>/
 
 # Tier 2: Full regression suite before commit / push
-flutter test
+flutter test --no-pub
 
 # Code generation (run after schema changes)
 dart run build_runner build --delete-conflicting-outputs
