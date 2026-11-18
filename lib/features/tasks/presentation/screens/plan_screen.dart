@@ -17,7 +17,6 @@ import 'package:productive_muslim/features/tasks/presentation/screens/task_scree
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/my_day_overview_view.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_atmosphere_background.dart';
-import 'package:productive_muslim/features/tasks/presentation/widgets/plan_barakah_alignment_meter.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_date_navigator.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_spiritual_anchor_banner.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_tab_switcher.dart';
@@ -225,13 +224,7 @@ class _PlanScreenState extends State<PlanScreen> {
               // 2. Spiritual Anchor Banner (Bismillah & Niyyah Renewal)
               PlanSpiritualAnchorBanner(isDark: isDark),
 
-              // 3. Barakah Alignment Progress Meter
-              PlanBarakahAlignmentMeter(
-                formattedDate: _formattedDate,
-                isDark: isDark,
-              ),
-
-              // 4. Segmented Capsule Switcher [Tasks | Habits | Focus]
+              // 3. Segmented Capsule Switcher [Overview | Tasks | Habits | Focus]
               PlanTabSwitcher(
                 selectedTab: _selectedTab,
                 onTabChanged: _onTabChanged,

@@ -255,47 +255,17 @@ class MyDayOverviewView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          l10n.tasks,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (tasks.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: (isDark ? Colors.white : AppColors.primary)
-                                .withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${tasks.where((t) => t.completed).length}/${tasks.length}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: isDark
-                                  ? const Color(0xFF4EDEA3)
-                                  : AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
+                  child: Text(
+                    l10n.tasks,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -315,6 +285,20 @@ class MyDayOverviewView extends StatelessWidget {
                 ),
               ],
             ),
+            if (tasks.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                isAr
+                    ? 'تم إنجاز ${tasks.where((t) => t.completed).length} من أصل ${tasks.length} مهام'
+                    : '${tasks.where((t) => t.completed).length} of ${tasks.length} tasks completed',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.white60 : AppColors.textSecondary,
+                ),
+              ),
+            ],
             const SizedBox(height: 6),
             if (tasks.isEmpty) ...[
               GlassContainer(
@@ -462,45 +446,17 @@ class MyDayOverviewView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              l10n.habits,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          if (habits.isNotEmpty) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF59E0B)
-                                    .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                '${completions.values.where((v) => v).length}/${habits.length}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFF59E0B),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
+                      child: Text(
+                        l10n.habits,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Flexible(
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
@@ -520,6 +476,20 @@ class MyDayOverviewView extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (habits.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    isAr
+                        ? 'تم إنجاز ${completions.values.where((v) => v).length} من أصل ${habits.length} عادات'
+                        : '${completions.values.where((v) => v).length} of ${habits.length} habits completed',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white60 : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 6),
                 if (habits.isEmpty) ...[
                   GlassContainer(
