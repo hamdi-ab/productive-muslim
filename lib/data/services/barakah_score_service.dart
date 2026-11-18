@@ -5,6 +5,7 @@ import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
+import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
 /// Factual summary of user-reported app activity for the day.
@@ -52,6 +53,7 @@ class BarakahScoreService {
   final HabitRepository? _habitRepo;
   final TaskRepository? _taskRepo;
   final BarakahRepository? _barakahRepo;
+  final MuhasabahRepository? _muhasabahRepo;
   final SettingsService? _settingsService;
   final AdhkarService? _adhkarService;
   final HijriService? _hijriService;
@@ -60,12 +62,14 @@ class BarakahScoreService {
     HabitRepository? habitRepo,
     TaskRepository? taskRepo,
     BarakahRepository? barakahRepo,
+    MuhasabahRepository? muhasabahRepo,
     SettingsService? settingsService,
     AdhkarService? adhkarService,
     HijriService? hijriService,
   }) : _habitRepo = habitRepo,
        _taskRepo = taskRepo,
        _barakahRepo = barakahRepo,
+       _muhasabahRepo = muhasabahRepo,
        _settingsService = settingsService,
        _adhkarService = adhkarService,
        _hijriService = hijriService;
@@ -150,6 +154,20 @@ class BarakahScoreService {
         barakahEntriesToday = entries.length;
         final daily = await barakahRepo.watchDailyResponse(targetDate).first;
         hasDailyResponse = daily?.answer != null;
+      } catch (_) {}
+    }
+
+    final muhasabahRepo =
+        _muhasabahRepo ??
+        (getIt.isRegistered<MuhasabahRepository>()
+            ? getIt<MuhasabahRepository>()
+            : null);
+    if (muhasabahRepo != null) {
+      try {
+        final mEntries = await muhasabahRepo.getEntriesForDate(targetDate);
+        if (mEntries.isNotEmpty) {
+          hasDailyResponse = true;
+        }
       } catch (_) {}
     }
 

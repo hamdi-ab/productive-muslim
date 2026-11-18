@@ -2803,6 +2803,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reflection pending'**
   String get reflectionPending;
+
+  /// No description provided for @muhasabahHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening Muhasabah'**
+  String get muhasabahHeaderTitle;
+
+  /// No description provided for @muhasabahHeaderQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Take account of yourselves before you are taken to account, and weigh your deeds before they are weighed.'**
+  String get muhasabahHeaderQuote;
+
+  /// No description provided for @muhasabahPromptsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thoughtful Prompts'**
+  String get muhasabahPromptsTitle;
+
+  /// No description provided for @muhasabahPromptFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Reflection'**
+  String get muhasabahPromptFree;
+
+  /// No description provided for @muhasabahPromptGratitude.
+  ///
+  /// In en, this message translates to:
+  /// **'What blessing did you receive today that you are grateful for?'**
+  String get muhasabahPromptGratitude;
+
+  /// No description provided for @muhasabahPromptPatience.
+  ///
+  /// In en, this message translates to:
+  /// **'Where did you face difficulty today, and how did you seek Allah\'s help?'**
+  String get muhasabahPromptPatience;
+
+  /// No description provided for @muhasabahPromptForgiveness.
+  ///
+  /// In en, this message translates to:
+  /// **'What shortcoming can you ask forgiveness (Istighfar) for tonight?'**
+  String get muhasabahPromptForgiveness;
+
+  /// No description provided for @muhasabahPromptIhsan.
+  ///
+  /// In en, this message translates to:
+  /// **'How did you strive for excellence (Ihsan) in your work or dealings?'**
+  String get muhasabahPromptIhsan;
+
+  /// No description provided for @muhasabahPromptIntention.
+  ///
+  /// In en, this message translates to:
+  /// **'What intention do you renew for tomorrow?'**
+  String get muhasabahPromptIntention;
+
+  /// No description provided for @muhasabahSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Reflection'**
+  String get muhasabahSaveAction;
+
+  /// No description provided for @muhasabahInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Jot down your reflections, gratitude, or lessons learned...'**
+  String get muhasabahInputHint;
+
+  /// No description provided for @muhasabahSavedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Reflections'**
+  String get muhasabahSavedToday;
+
+  /// No description provided for @muhasabahEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a quiet moment to reflect whenever you are ready. No scores, no streaks.'**
+  String get muhasabahEmptyMessage;
+
+  /// No description provided for @muhasabahDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reflection?'**
+  String get muhasabahDeleteConfirmTitle;
+
+  /// No description provided for @muhasabahDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove this reflection entry?'**
+  String get muhasabahDeleteConfirmMessage;
+
+  /// No description provided for @muhasabahReflectionSavedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection saved quietly.'**
+  String get muhasabahReflectionSavedToast;
 }
 
 class _AppLocalizationsDelegate

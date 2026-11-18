@@ -613,5 +613,21 @@
     }
   },
   "reflectionCompleted": "Reflection saved",
-  "reflectionPending": "Reflection pending"
+  "reflectionPending": "Reflection pending",
+  "muhasabahHeaderTitle": "Evening Muhasabah",
+  "muhasabahHeaderQuote": "Take account of yourselves before you are taken to account, and weigh your deeds before they are weighed.",
+  "muhasabahPromptsTitle": "Thoughtful Prompts",
+  "muhasabahPromptFree": "Free Reflection",
+  "muhasabahPromptGratitude": "What blessing did you receive today that you are grateful for?",
+  "muhasabahPromptPatience": "Where did you face difficulty today, and how did you seek Allah's help?",
+  "muhasabahPromptForgiveness": "What shortcoming can you ask forgiveness (Istighfar) for tonight?",
+  "muhasabahPromptIhsan": "How did you strive for excellence (Ihsan) in your work or dealings?",
+  "muhasabahPromptIntention": "What intention do you renew for tomorrow?",
+  "muhasabahSaveAction": "Save Reflection",
+  "muhasabahInputHint": "Jot down your reflections, gratitude, or lessons learned...",
+  "muhasabahSavedToday": "Today's Reflections",
+  "muhasabahEmptyMessage": "Take a quiet moment to reflect whenever you are ready. No scores, no streaks.",
+  "muhasabahDeleteConfirmTitle": "Delete Reflection?",
+  "muhasabahDeleteConfirmMessage": "Are you sure you want to remove this reflection entry?",
+  "muhasabahReflectionSavedToast": "Reflection saved quietly."
 }

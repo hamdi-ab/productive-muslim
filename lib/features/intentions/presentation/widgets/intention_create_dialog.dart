@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/domain/models/intention_entry.dart';
+import 'package:productive_muslim/domain/repositories/intention_repository.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_bloc.dart';
 import 'package:productive_muslim/features/intentions/logic/intention_event.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -560,22 +562,43 @@ class _AddIntentionDialogState extends State<AddIntentionDialog> {
                   ),
                 ),
                 icon: const Icon(Icons.check_rounded, size: 18),
-                onPressed: () {
+                onPressed: () async {
                   if (_titleController.text.trim().isNotEmpty) {
                     AppHaptics.mediumImpact();
                     final statement = _statementController.text.trim();
-                    context.read<IntentionBloc>().add(
-                      IntentionCreated(
-                        IntentionEntry(
-                          id: 0,
-                          date: widget.today,
-                          title: _titleController.text.trim(),
-                          statement: statement.isNotEmpty ? statement : null,
-                          createdAt: DateTime.now().millisecondsSinceEpoch,
-                        ),
-                      ),
+                    final entry = IntentionEntry(
+                      id: 0,
+                      date: widget.today,
+                      title: _titleController.text.trim(),
+                      statement: statement.isNotEmpty ? statement : null,
+                      createdAt: DateTime.now().millisecondsSinceEpoch,
                     );
-                    Navigator.of(context).pop();
+
+                    IntentionBloc? bloc;
+                    try {
+                      bloc = context.read<IntentionBloc>();
+                    } catch (_) {}
+
+                    IntentionRepository? repo;
+                    if (bloc == null) {
+                      try {
+                        repo = context.read<IntentionRepository>();
+                      } catch (_) {
+                        if (getIt.isRegistered<IntentionRepository>()) {
+                          repo = getIt<IntentionRepository>();
+                        }
+                      }
+                    }
+
+                    if (bloc != null) {
+                      bloc.add(IntentionCreated(entry));
+                    } else if (repo != null) {
+                      await repo.insertEntry(entry);
+                    }
+
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
                   }
                 },
                 label: Text(

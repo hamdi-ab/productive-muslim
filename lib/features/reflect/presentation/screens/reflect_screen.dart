@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
-import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
+import 'package:productive_muslim/features/reflect/presentation/widgets/muhasabah_view.dart';
 import 'package:productive_muslim/features/reflect/presentation/widgets/reflect_tab_switcher.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -72,7 +72,7 @@ class _ReflectScreenState extends State<ReflectScreen> {
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 220),
                   child: _selectedTab == ReflectTab.muhasabah
-                      ? const IntentionScreen(
+                      ? const MuhasabahView(
                           key: ValueKey('reflect_muhasabah_view'),
                         )
                       : const BarakahScreen(

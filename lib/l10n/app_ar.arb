@@ -543,5 +543,21 @@
     }
   },
   "reflectionCompleted": "تم تسجيل التأمل",
-  "reflectionPending": "بانتظار التأمل"
+  "reflectionPending": "بانتظار التأمل",
+  "muhasabahHeaderTitle": "المحاسبة المسائية",
+  "muhasabahHeaderQuote": "حَاسِبُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا، وَزِنُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُوزَنُوا",
+  "muhasabahPromptsTitle": "أسئلة ملهمة للتأمل",
+  "muhasabahPromptFree": "كتابة حرة",
+  "muhasabahPromptGratitude": "ما هي النعمة التي أنعم الله بها عليك اليوم وتشعر بالامتنان لها؟",
+  "muhasabahPromptPatience": "أين واجهت صعوبة اليوم، وكيف استعنت بالله وتدربت على الصبر؟",
+  "muhasabahPromptForgiveness": "ما التقصير أو الخطأ الذي تسأل الله المغفرة والاستغفار عنه الليلة؟",
+  "muhasabahPromptIhsan": "كيف سعيت للإحسان وإتقان العمل والتعامل الطيب اليوم؟",
+  "muhasabahPromptIntention": "ما النية الصالحة التي تجددها لغدك؟",
+  "muhasabahSaveAction": "حفظ التأمل",
+  "muhasabahInputHint": "دوّن تأملاتك، نعم الله عليك، أو دروس يومك...",
+  "muhasabahSavedToday": "تأملات اليوم",
+  "muhasabahEmptyMessage": "خذ لحظة هادئة للتأمل ومحاسبة النفس متى شئت. بلا درجات ولا قيود.",
+  "muhasabahDeleteConfirmTitle": "حذف التأمل؟",
+  "muhasabahDeleteConfirmMessage": "هل أنت متأكد من حذف هذا التأمل؟",
+  "muhasabahReflectionSavedToast": "تم حفظ التأمل بنجاح."
 }

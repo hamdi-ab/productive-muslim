@@ -13,6 +13,7 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
+import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
@@ -24,10 +25,10 @@ import 'package:productive_muslim/features/home/presentation/widgets/home_intent
 import 'package:productive_muslim/features/home/presentation/widgets/home_prayer_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_reflection_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_today_tasks_card.dart';
-import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
+import 'package:productive_muslim/features/reflect/presentation/widgets/muhasabah_view.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/my_day_overview_view.dart';
@@ -44,6 +45,7 @@ void main() {
   late MockHabitRepository habitRepo;
   late MockTaskRepository taskRepo;
   late MockIntentionRepository intentionRepo;
+  late MockMuhasabahRepository muhasabahRepo;
   late BarakahReminderService reminderService;
 
   setUp(() async {
@@ -61,12 +63,14 @@ void main() {
     habitRepo = MockHabitRepository();
     taskRepo = MockTaskRepository();
     intentionRepo = MockIntentionRepository();
+    muhasabahRepo = MockMuhasabahRepository();
 
     stubDefaultRepositoryMocks(
       barakahRepo: barakahRepo,
       habitRepo: habitRepo,
       taskRepo: taskRepo,
       intentionRepo: intentionRepo,
+      muhasabahRepo: muhasabahRepo,
     );
     when(() => habitRepo.watchOverallStreak())
         .thenAnswer((_) => Stream.value(3));
@@ -77,6 +81,7 @@ void main() {
     getIt.registerSingleton<HabitRepository>(habitRepo);
     getIt.registerSingleton<TaskRepository>(taskRepo);
     getIt.registerSingleton<IntentionRepository>(intentionRepo);
+    getIt.registerSingleton<MuhasabahRepository>(muhasabahRepo);
     getIt.registerLazySingleton<PrayerTimeService>(
       () => MockPrayerTimeService(),
     );
@@ -104,6 +109,7 @@ void main() {
           RepositoryProvider<HabitRepository>.value(value: habitRepo),
           RepositoryProvider<TaskRepository>.value(value: taskRepo),
           RepositoryProvider<IntentionRepository>.value(value: intentionRepo),
+          RepositoryProvider<MuhasabahRepository>.value(value: muhasabahRepo),
         ],
         child: MaterialApp.router(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -232,7 +238,7 @@ void main() {
         // 1. /reflect/muhasabah
         AppRouter.router.go(AppRoutes.reflectMuhasabah);
         await pumpRouter(tester);
-        expect(find.byType(IntentionScreen), findsOneWidget);
+        expect(find.byType(MuhasabahView), findsOneWidget);
 
         // 2. /reflect/barakah
         AppRouter.router.go(AppRoutes.reflectBarakah);
@@ -278,8 +284,8 @@ void main() {
       AppRouter.router.go(AppRoutes.reflect);
       await pumpRouter(tester);
 
-      // Initial tab is Muhasabah (IntentionScreen)
-      expect(find.byType(IntentionScreen), findsOneWidget);
+      // Initial tab is Muhasabah (MuhasabahView)
+      expect(find.byType(MuhasabahView), findsOneWidget);
 
       // Switch to Barakah tab
       await tester.tap(find.text('Barakah'));

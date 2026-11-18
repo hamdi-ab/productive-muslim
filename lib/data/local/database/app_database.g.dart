@@ -3469,6 +3469,504 @@ class BarakahDailyResponsesCompanion
   }
 }
 
+class $MuhasabahEntriesTable extends MuhasabahEntries
+    with TableInfo<$MuhasabahEntriesTable, MuhasabahEntryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MuhasabahEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _promptIdMeta = const VerificationMeta(
+    'promptId',
+  );
+  @override
+  late final GeneratedColumn<String> promptId = GeneratedColumn<String>(
+    'prompt_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _promptTextMeta = const VerificationMeta(
+    'promptText',
+  );
+  @override
+  late final GeneratedColumn<String> promptText = GeneratedColumn<String>(
+    'prompt_text',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+    'tags',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    promptId,
+    promptText,
+    content,
+    tags,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'muhasabah_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MuhasabahEntryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('prompt_id')) {
+      context.handle(
+        _promptIdMeta,
+        promptId.isAcceptableOrUnknown(data['prompt_id']!, _promptIdMeta),
+      );
+    }
+    if (data.containsKey('prompt_text')) {
+      context.handle(
+        _promptTextMeta,
+        promptText.isAcceptableOrUnknown(data['prompt_text']!, _promptTextMeta),
+      );
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+        _tagsMeta,
+        tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MuhasabahEntryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MuhasabahEntryRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      promptId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prompt_id'],
+      ),
+      promptText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prompt_text'],
+      ),
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      tags: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tags'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MuhasabahEntriesTable createAlias(String alias) {
+    return $MuhasabahEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class MuhasabahEntryRow extends DataClass
+    implements Insertable<MuhasabahEntryRow> {
+  final int id;
+  final String date;
+  final String? promptId;
+  final String? promptText;
+  final String content;
+  final String? tags;
+  final int createdAt;
+  final int updatedAt;
+  const MuhasabahEntryRow({
+    required this.id,
+    required this.date,
+    this.promptId,
+    this.promptText,
+    required this.content,
+    this.tags,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<String>(date);
+    if (!nullToAbsent || promptId != null) {
+      map['prompt_id'] = Variable<String>(promptId);
+    }
+    if (!nullToAbsent || promptText != null) {
+      map['prompt_text'] = Variable<String>(promptText);
+    }
+    map['content'] = Variable<String>(content);
+    if (!nullToAbsent || tags != null) {
+      map['tags'] = Variable<String>(tags);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  MuhasabahEntriesCompanion toCompanion(bool nullToAbsent) {
+    return MuhasabahEntriesCompanion(
+      id: Value(id),
+      date: Value(date),
+      promptId: promptId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(promptId),
+      promptText: promptText == null && nullToAbsent
+          ? const Value.absent()
+          : Value(promptText),
+      content: Value(content),
+      tags: tags == null && nullToAbsent ? const Value.absent() : Value(tags),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MuhasabahEntryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MuhasabahEntryRow(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<String>(json['date']),
+      promptId: serializer.fromJson<String?>(json['promptId']),
+      promptText: serializer.fromJson<String?>(json['promptText']),
+      content: serializer.fromJson<String>(json['content']),
+      tags: serializer.fromJson<String?>(json['tags']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<String>(date),
+      'promptId': serializer.toJson<String?>(promptId),
+      'promptText': serializer.toJson<String?>(promptText),
+      'content': serializer.toJson<String>(content),
+      'tags': serializer.toJson<String?>(tags),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  MuhasabahEntryRow copyWith({
+    int? id,
+    String? date,
+    Value<String?> promptId = const Value.absent(),
+    Value<String?> promptText = const Value.absent(),
+    String? content,
+    Value<String?> tags = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => MuhasabahEntryRow(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    promptId: promptId.present ? promptId.value : this.promptId,
+    promptText: promptText.present ? promptText.value : this.promptText,
+    content: content ?? this.content,
+    tags: tags.present ? tags.value : this.tags,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  MuhasabahEntryRow copyWithCompanion(MuhasabahEntriesCompanion data) {
+    return MuhasabahEntryRow(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      promptId: data.promptId.present ? data.promptId.value : this.promptId,
+      promptText: data.promptText.present
+          ? data.promptText.value
+          : this.promptText,
+      content: data.content.present ? data.content.value : this.content,
+      tags: data.tags.present ? data.tags.value : this.tags,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MuhasabahEntryRow(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('promptId: $promptId, ')
+          ..write('promptText: $promptText, ')
+          ..write('content: $content, ')
+          ..write('tags: $tags, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    date,
+    promptId,
+    promptText,
+    content,
+    tags,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MuhasabahEntryRow &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.promptId == this.promptId &&
+          other.promptText == this.promptText &&
+          other.content == this.content &&
+          other.tags == this.tags &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MuhasabahEntriesCompanion extends UpdateCompanion<MuhasabahEntryRow> {
+  final Value<int> id;
+  final Value<String> date;
+  final Value<String?> promptId;
+  final Value<String?> promptText;
+  final Value<String> content;
+  final Value<String?> tags;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  const MuhasabahEntriesCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.promptId = const Value.absent(),
+    this.promptText = const Value.absent(),
+    this.content = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  MuhasabahEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required String date,
+    this.promptId = const Value.absent(),
+    this.promptText = const Value.absent(),
+    required String content,
+    this.tags = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : date = Value(date),
+       content = Value(content);
+  static Insertable<MuhasabahEntryRow> custom({
+    Expression<int>? id,
+    Expression<String>? date,
+    Expression<String>? promptId,
+    Expression<String>? promptText,
+    Expression<String>? content,
+    Expression<String>? tags,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (promptId != null) 'prompt_id': promptId,
+      if (promptText != null) 'prompt_text': promptText,
+      if (content != null) 'content': content,
+      if (tags != null) 'tags': tags,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  MuhasabahEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? date,
+    Value<String?>? promptId,
+    Value<String?>? promptText,
+    Value<String>? content,
+    Value<String?>? tags,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+  }) {
+    return MuhasabahEntriesCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      promptId: promptId ?? this.promptId,
+      promptText: promptText ?? this.promptText,
+      content: content ?? this.content,
+      tags: tags ?? this.tags,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (promptId.present) {
+      map['prompt_id'] = Variable<String>(promptId.value);
+    }
+    if (promptText.present) {
+      map['prompt_text'] = Variable<String>(promptText.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MuhasabahEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('promptId: $promptId, ')
+          ..write('promptText: $promptText, ')
+          ..write('content: $content, ')
+          ..write('tags: $tags, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3484,6 +3982,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $BarakahDailyResponsesTable barakahDailyResponses =
       $BarakahDailyResponsesTable(this);
+  late final $MuhasabahEntriesTable muhasabahEntries = $MuhasabahEntriesTable(
+    this,
+  );
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitCompletionsDao habitCompletionsDao = HabitCompletionsDao(
@@ -3491,6 +3992,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
   late final IntentionDao intentionDao = IntentionDao(this as AppDatabase);
+  late final MuhasabahDao muhasabahDao = MuhasabahDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3503,6 +4005,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     tasks,
     intentionEntries,
     barakahDailyResponses,
+    muhasabahEntries,
   ];
 }
 
@@ -5356,6 +5859,278 @@ typedef $$BarakahDailyResponsesTableProcessedTableManager =
       BarakahDailyResponseRow,
       PrefetchHooks Function()
     >;
+typedef $$MuhasabahEntriesTableCreateCompanionBuilder =
+    MuhasabahEntriesCompanion Function({
+      Value<int> id,
+      required String date,
+      Value<String?> promptId,
+      Value<String?> promptText,
+      required String content,
+      Value<String?> tags,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+    });
+typedef $$MuhasabahEntriesTableUpdateCompanionBuilder =
+    MuhasabahEntriesCompanion Function({
+      Value<int> id,
+      Value<String> date,
+      Value<String?> promptId,
+      Value<String?> promptText,
+      Value<String> content,
+      Value<String?> tags,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+    });
+
+class $$MuhasabahEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $MuhasabahEntriesTable> {
+  $$MuhasabahEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get promptId => $composableBuilder(
+    column: $table.promptId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get promptText => $composableBuilder(
+    column: $table.promptText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tags => $composableBuilder(
+    column: $table.tags,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MuhasabahEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MuhasabahEntriesTable> {
+  $$MuhasabahEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get promptId => $composableBuilder(
+    column: $table.promptId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get promptText => $composableBuilder(
+    column: $table.promptText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tags => $composableBuilder(
+    column: $table.tags,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MuhasabahEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MuhasabahEntriesTable> {
+  $$MuhasabahEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get promptId =>
+      $composableBuilder(column: $table.promptId, builder: (column) => column);
+
+  GeneratedColumn<String> get promptText => $composableBuilder(
+    column: $table.promptText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<String> get tags =>
+      $composableBuilder(column: $table.tags, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MuhasabahEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MuhasabahEntriesTable,
+          MuhasabahEntryRow,
+          $$MuhasabahEntriesTableFilterComposer,
+          $$MuhasabahEntriesTableOrderingComposer,
+          $$MuhasabahEntriesTableAnnotationComposer,
+          $$MuhasabahEntriesTableCreateCompanionBuilder,
+          $$MuhasabahEntriesTableUpdateCompanionBuilder,
+          (
+            MuhasabahEntryRow,
+            BaseReferences<
+              _$AppDatabase,
+              $MuhasabahEntriesTable,
+              MuhasabahEntryRow
+            >,
+          ),
+          MuhasabahEntryRow,
+          PrefetchHooks Function()
+        > {
+  $$MuhasabahEntriesTableTableManager(
+    _$AppDatabase db,
+    $MuhasabahEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MuhasabahEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MuhasabahEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MuhasabahEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<String?> promptId = const Value.absent(),
+                Value<String?> promptText = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<String?> tags = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+              }) => MuhasabahEntriesCompanion(
+                id: id,
+                date: date,
+                promptId: promptId,
+                promptText: promptText,
+                content: content,
+                tags: tags,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String date,
+                Value<String?> promptId = const Value.absent(),
+                Value<String?> promptText = const Value.absent(),
+                required String content,
+                Value<String?> tags = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+              }) => MuhasabahEntriesCompanion.insert(
+                id: id,
+                date: date,
+                promptId: promptId,
+                promptText: promptText,
+                content: content,
+                tags: tags,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MuhasabahEntriesTable, MuhasabahEntryRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $MuhasabahEntriesTable,
+                    MuhasabahEntryRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MuhasabahEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MuhasabahEntriesTable,
+      MuhasabahEntryRow,
+      $$MuhasabahEntriesTableFilterComposer,
+      $$MuhasabahEntriesTableOrderingComposer,
+      $$MuhasabahEntriesTableAnnotationComposer,
+      $$MuhasabahEntriesTableCreateCompanionBuilder,
+      $$MuhasabahEntriesTableUpdateCompanionBuilder,
+      (
+        MuhasabahEntryRow,
+        BaseReferences<
+          _$AppDatabase,
+          $MuhasabahEntriesTable,
+          MuhasabahEntryRow
+        >,
+      ),
+      MuhasabahEntryRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5374,4 +6149,6 @@ class $AppDatabaseManager {
       $$IntentionEntriesTableTableManager(_db, _db.intentionEntries);
   $$BarakahDailyResponsesTableTableManager get barakahDailyResponses =>
       $$BarakahDailyResponsesTableTableManager(_db, _db.barakahDailyResponses);
+  $$MuhasabahEntriesTableTableManager get muhasabahEntries =>
+      $$MuhasabahEntriesTableTableManager(_db, _db.muhasabahEntries);
 }
