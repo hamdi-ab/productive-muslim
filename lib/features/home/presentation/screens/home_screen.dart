@@ -12,10 +12,10 @@ import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
+import 'package:intl/intl.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
-import 'package:productive_muslim/domain/repositories/habit_repository.dart';
-import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -68,8 +68,13 @@ class HomeScreen extends StatelessWidget {
 
     String? subtitle;
     if (isHome) {
+      final now = DateTime.now();
+      final gregorianStr = DateFormat(
+        'EEEE, d MMM',
+        isAr ? 'ar' : 'en',
+      ).format(now);
       if (getIt.isRegistered<HijriService>()) {
-        final hijri = getIt<HijriService>().getHijriDate(DateTime.now());
+        final hijri = getIt<HijriService>().getHijriDate(now);
         final hijriStr = isAr
             ? '${hijri.hDay} ${hijri.monthNameAr}'
             : '${hijri.hDay} ${hijri.monthNameEn}';
@@ -81,10 +86,12 @@ class HomeScreen extends StatelessWidget {
                     : (hijri.isAshura
                           ? (isAr ? 'عاشوراء' : 'Ashura')
                           : l10n.sunnahBadge));
-          subtitle = '$hijriStr • 🌙 $badge';
+          subtitle = '$gregorianStr • $hijriStr • 🌙 $badge';
         } else {
-          subtitle = hijriStr;
+          subtitle = '$gregorianStr • $hijriStr';
         }
+      } else {
+        subtitle = gregorianStr;
       }
     } else {
       subtitle = _getSubtitleForLocation(location, l10n, prayerService, isAr);
@@ -180,59 +187,6 @@ class HomeScreen extends StatelessWidget {
               : null,
           actions: [
             if (isHome) ...[
-              StreamBuilder<int>(
-                stream: getIt.isRegistered<HabitRepository>()
-                    ? getIt<HabitRepository>().watchOverallStreak()
-                    : null,
-                initialData: 0,
-                builder: (context, snapshot) {
-                  final streak = snapshot.data ?? 0;
-                  return AppPressable(
-                    onTap: () => IstiqamahStreakSheet.show(context),
-                    pressedScale: 0.92,
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      key: const Key('home_streak_badge'),
-                      margin: const EdgeInsetsDirectional.only(end: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
-                            : const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: const Color(0xFFF59E0B)
-                              .withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.local_fire_department_rounded,
-                            color: Color(0xFFD97706),
-                            size: 14,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${streak}d',
-                            style: TextStyle(
-                              color: isDark
-                                  ? const Color(0xFFFBBF24)
-                                  : const Color(0xFF92400E),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
               ProductiveAppBarAction(
                 icon: Icons.settings_outlined,
                 tooltip: l10n.settings,
@@ -300,12 +254,35 @@ class HomeScreen extends StatelessWidget {
     return null;
   }
 
+  static String _getHomeGreeting(AppLocalizations l10n) {
+    final hour = DateTime.now().hour;
+    String greeting;
+    if (hour < 12) {
+      greeting = l10n.goodMorning;
+    } else if (hour < 17) {
+      greeting = l10n.goodAfternoon;
+    } else {
+      greeting = l10n.goodEvening;
+    }
+
+    try {
+      if (getIt.isRegistered<SettingsService>()) {
+        final name = getIt<SettingsService>().userName;
+        if (name != null && name.trim().isNotEmpty) {
+          greeting = l10n.homeGreeting(name.trim());
+        }
+      }
+    } catch (_) {}
+
+    return greeting;
+  }
+
   static ({String title, IconData icon}) _getHeaderInfo(
     String location,
     AppLocalizations l10n,
   ) {
     if (location == AppRoutes.home) {
-      return (title: l10n.appTitle, icon: Icons.nights_stay_rounded);
+      return (title: _getHomeGreeting(l10n), icon: Icons.nights_stay_rounded);
     }
     if (location.startsWith(AppRoutes.adhkar)) {
       return (title: l10n.adhkarTitle, icon: Icons.flare_rounded);
