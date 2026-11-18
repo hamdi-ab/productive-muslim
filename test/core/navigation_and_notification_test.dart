@@ -199,22 +199,82 @@ void main() {
       },
     );
 
-    testWidgets('Aliases /intentions and /prayer_times cleanly redirect', (
-      tester,
-    ) async {
-      AppRouter.handleNotificationPayload('/intentions');
-      await pumpRouter(tester);
-      expect(
-        AppRouter.router.routeInformationProvider.value.uri.path,
-        '/journal',
-      );
+    testWidgets(
+      'Cold launch to /adhkar?category=evening falls back to Home when tapping back',
+      (tester) async {
+        AppRouter.handleNotificationPayload('/adhkar?category=evening');
+        await pumpRouter(tester);
 
-      AppRouter.handleNotificationPayload('/prayer_times');
-      await pumpFrames(tester);
-      expect(
-        AppRouter.router.routeInformationProvider.value.uri.path,
-        '/prayer-times',
-      );
-    });
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        expect(backButton, findsWidgets);
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(find.byType(HomeContent), findsOneWidget);
+        expect(AppRouter.router.routeInformationProvider.value.uri.path, '/');
+      },
+    );
+
+    testWidgets(
+      'Navigating from notification to /focus from My Day returns to My Day',
+      (tester) async {
+        AppRouter.router.go(AppRoutes.myDay);
+        await pumpRouter(tester);
+
+        AppRouter.handleNotificationPayload(AppRoutes.focus);
+        await pumpFrames(tester);
+
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        expect(backButton, findsWidgets);
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          AppRoutes.myDay,
+        );
+      },
+    );
+
+    testWidgets(
+      'Aliases /intentions, /journal, /plan, /streak and /prayer_times cleanly redirect',
+      (tester) async {
+        AppRouter.handleNotificationPayload('/intentions');
+        await pumpRouter(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/reflect',
+        );
+
+        AppRouter.handleNotificationPayload('/prayer_times');
+        await pumpFrames(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/prayer-times',
+        );
+
+        AppRouter.handleNotificationPayload('/plan');
+        await pumpFrames(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/my-day',
+        );
+
+        AppRouter.handleNotificationPayload('/streak');
+        await pumpFrames(tester);
+        expect(
+          AppRouter.router.routeInformationProvider.value.uri.path,
+          '/habits',
+        );
+      },
+    );
   });
 }

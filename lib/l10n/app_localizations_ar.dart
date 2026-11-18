@@ -213,6 +213,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get home => 'الصفحة الرئيسية';
 
   @override
+  String get myDay => 'يومي';
+
+  @override
+  String get overview => 'نظرة عامة';
+
+  @override
+  String get adhkar => 'الأذكار والتلاوة';
+
+  @override
+  String get reflect => 'تأمّل';
+
+  @override
+  String get muhasabah => 'المحاسبة';
+
+  @override
   String get newTask => 'مهمة جديدة';
 
   @override
@@ -1350,9 +1365,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get energy => 'الطاقة والروتين';
-
-  @override
-  String get adhkar => 'الأذكار والتلاوة';
 
   @override
   String get profile => 'الملف الشخصي';

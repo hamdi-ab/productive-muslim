@@ -62,9 +62,14 @@ void main() {
 
     when(() => mockHabitRepo.watchActiveHabits())
         .thenAnswer((_) => Stream.value(<Habit>[]));
+    when(() => mockHabitRepo.watchCompletionsForDate(any()))
+        .thenAnswer((_) => Stream.value(<int, bool>{}));
     when(() => mockHabitRepo.getCompletionsForDateMap(any()))
         .thenAnswer((_) async => <int, bool>{});
     when(() => mockHabitRepo.getStreak(any())).thenAnswer((_) async => 0);
+    when(() => mockHabitRepo.getOverallStreak()).thenAnswer((_) async => 0);
+    when(() => mockHabitRepo.watchOverallStreak())
+        .thenAnswer((_) => Stream.value(0));
   });
 
   Widget buildSubject({PlanTab initialTab = PlanTab.tasks}) {

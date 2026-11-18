@@ -195,74 +195,84 @@ class _FocusScreenState extends State<FocusScreen> {
         _selectedDurationMinutes * 60 >
             _timeUntilNextPrayer!.inSeconds - (5 * 60);
 
+    final hasParentScaffold = Scaffold.maybeOf(context) != null;
+
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-      appBar: ProductiveAppBar(
-        title: l10n.focusTitle,
-        subtitle: _selectedTask != null
-            ? _selectedTask!.title
-            : l10n.focusSubtitle,
-        showBackButton: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.primaryLight.withValues(alpha: 0.16)
-                  : AppColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.primaryLight.withValues(alpha: 0.3)
-                    : AppColors.primary.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+      appBar: hasParentScaffold
+          ? null
+          : ProductiveAppBar(
+              title: l10n.focusTitle,
+              subtitle: _selectedTask != null
+                  ? _selectedTask!.title
+                  : l10n.focusSubtitle,
+              showBackButton: true,
+              actions: [
                 Container(
-                  width: 6,
-                  height: 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.8),
-                        blurRadius: 4,
-                        spreadRadius: 1,
+                    color: isDark
+                        ? AppColors.primaryLight.withValues(alpha: 0.16)
+                        : AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.primaryLight.withValues(alpha: 0.3)
+                          : AppColors.primary.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.8),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.insights_rounded,
+                        size: 14,
+                        color: isDark
+                            ? AppColors.primaryLight
+                            : AppColors.primary,
+                      ),
+                      const SizedBox(width: 5),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 140),
+                        child: Text(
+                          l10n.focusTotalMinutes(totalFocusMins),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? AppColors.primaryLight
+                                : AppColors.primary,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.insights_rounded,
-                  size: 14,
-                  color: isDark ? AppColors.primaryLight : AppColors.primary,
-                ),
-                const SizedBox(width: 5),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 140),
-                  child: Text(
-                    l10n.focusTotalMinutes(totalFocusMins),
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? AppColors.primaryLight
-                          : AppColors.primary,
-                    ),
-                  ),
-                ),
               ],
             ),
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           // Background Islamic Rosette Lattice Watermark (matching Stitch obsidian/emerald design)

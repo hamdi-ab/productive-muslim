@@ -12,10 +12,10 @@ import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
+import 'package:intl/intl.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
-import 'package:productive_muslim/domain/repositories/habit_repository.dart';
-import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -39,9 +39,14 @@ class HomeScreen extends StatelessWidget {
         label: l10n.home,
       ),
       FloatingNavItem(
+        icon: Icons.flare_outlined,
+        activeIcon: Icons.flare_rounded,
+        label: l10n.adhkar,
+      ),
+      FloatingNavItem(
         icon: Icons.checklist_rtl_outlined,
         activeIcon: Icons.checklist_rtl_rounded,
-        label: l10n.plan,
+        label: l10n.myDay,
       ),
       FloatingNavItem(
         icon: Icons.mosque_outlined,
@@ -51,12 +56,7 @@ class HomeScreen extends StatelessWidget {
       FloatingNavItem(
         icon: Icons.menu_book_outlined,
         activeIcon: Icons.menu_book_rounded,
-        label: l10n.journal,
-      ),
-      FloatingNavItem(
-        icon: Icons.person_outline_rounded,
-        activeIcon: Icons.person_rounded,
-        label: l10n.profile,
+        label: l10n.reflect,
       ),
     ];
 
@@ -68,8 +68,13 @@ class HomeScreen extends StatelessWidget {
 
     String? subtitle;
     if (isHome) {
+      final now = DateTime.now();
+      final gregorianStr = DateFormat(
+        'EEEE, d MMM',
+        isAr ? 'ar' : 'en',
+      ).format(now);
       if (getIt.isRegistered<HijriService>()) {
-        final hijri = getIt<HijriService>().getHijriDate(DateTime.now());
+        final hijri = getIt<HijriService>().getHijriDate(now);
         final hijriStr = isAr
             ? '${hijri.hDay} ${hijri.monthNameAr}'
             : '${hijri.hDay} ${hijri.monthNameEn}';
@@ -81,10 +86,12 @@ class HomeScreen extends StatelessWidget {
                     : (hijri.isAshura
                           ? (isAr ? 'عاشوراء' : 'Ashura')
                           : l10n.sunnahBadge));
-          subtitle = '$hijriStr • 🌙 $badge';
+          subtitle = '$gregorianStr • $hijriStr • 🌙 $badge';
         } else {
-          subtitle = hijriStr;
+          subtitle = '$gregorianStr • $hijriStr';
         }
+      } else {
+        subtitle = gregorianStr;
       }
     } else {
       subtitle = _getSubtitleForLocation(location, l10n, prayerService, isAr);
@@ -150,6 +157,8 @@ class HomeScreen extends StatelessWidget {
         : null;
 
     final isBarakah = location == AppRoutes.barakah;
+    final hasNotificationFallback = AppRouter.hasNotificationFallback;
+    final shouldShowBack = (!isHome && hasNotificationFallback) || isBarakah;
 
     return PopScope(
       canPop: isHome,
@@ -167,8 +176,8 @@ class HomeScreen extends StatelessWidget {
           subtitle: subtitle,
           leading: homeLeading,
           leadingIcon: isHome ? null : headerInfo.icon,
-          showBackButton: isBarakah,
-          onBackPressed: isBarakah
+          showBackButton: shouldShowBack,
+          onBackPressed: shouldShowBack
               ? () {
                   final fallback =
                       AppRouter.consumeNotificationFallbackLocation() ??
@@ -178,65 +187,14 @@ class HomeScreen extends StatelessWidget {
               : null,
           actions: [
             if (isHome) ...[
-              StreamBuilder<int>(
-                stream: getIt.isRegistered<HabitRepository>()
-                    ? getIt<HabitRepository>().watchOverallStreak()
-                    : null,
-                initialData: 0,
-                builder: (context, snapshot) {
-                  final streak = snapshot.data ?? 0;
-                  return AppPressable(
-                    onTap: () => IstiqamahStreakSheet.show(context),
-                    pressedScale: 0.92,
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      key: const Key('home_streak_badge'),
-                      margin: const EdgeInsetsDirectional.only(end: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
-                            : const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: const Color(0xFFF59E0B)
-                              .withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.local_fire_department_rounded,
-                            color: Color(0xFFD97706),
-                            size: 14,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${streak}d',
-                            style: TextStyle(
-                              color: isDark
-                                  ? const Color(0xFFFBBF24)
-                                  : const Color(0xFF92400E),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
               ProductiveAppBarAction(
                 icon: Icons.settings_outlined,
                 tooltip: l10n.settings,
                 onTap: () => context.push(AppRoutes.settings),
               ),
-            ] else if (location == AppRoutes.barakah) ...[
+            ] else if (location.startsWith(AppRoutes.reflect) ||
+                location == AppRoutes.barakah ||
+                location == AppRoutes.journal) ...[
               ProductiveAppBarAction(
                 key: const Key('open-review'),
                 tooltip: l10n.barakahWeeklyTitle,
@@ -267,55 +225,106 @@ class HomeScreen extends StatelessWidget {
     PrayerTimeService? prayerService,
     bool isAr,
   ) {
-    return switch (location) {
-      AppRoutes.plan || AppRoutes.tasks || AppRoutes.habits =>
-        isAr ? '${l10n.tasks} والعادات' : '${l10n.tasks} & ${l10n.habits}',
-      AppRoutes.prayerTimes =>
-        prayerService?.cachedLocationName != null &&
-                prayerService!.cachedLocationName!.isNotEmpty
-            ? '📍 ${prayerService.cachedLocationName}'
-            : null,
-      AppRoutes.journal =>
-        isAr ? 'النيات والخواطر' : 'Intentions & Reflections',
-      AppRoutes.profile => l10n.profileSubtitle,
-      AppRoutes.barakah =>
-        isAr ? 'محاسبة النفس والبركة' : 'Mindset & Reflections',
-      _ => null,
-    };
+    if (location.startsWith(AppRoutes.adhkar)) {
+      return l10n.adhkarSubtitle;
+    }
+    if (location.startsWith(AppRoutes.myDay) ||
+        location == AppRoutes.plan ||
+        location == AppRoutes.tasks ||
+        location == AppRoutes.habits) {
+      return isAr ? 'المهام والعادات والتركيز' : 'Tasks, Habits & Focus';
+    }
+    if (location.startsWith(AppRoutes.prayerTimes)) {
+      return prayerService?.cachedLocationName != null &&
+              prayerService!.cachedLocationName!.isNotEmpty
+          ? '📍 ${prayerService.cachedLocationName}'
+          : null;
+    }
+    if (location.startsWith(AppRoutes.reflect) ||
+        location == AppRoutes.journal ||
+        location == AppRoutes.intentions) {
+      return isAr ? 'محاسبة النفس والتأمل' : 'Muhasabah & Reflection';
+    }
+    if (location.startsWith(AppRoutes.barakah)) {
+      return isAr ? 'البركة والنمو' : 'Barakah & Growth';
+    }
+    if (location.startsWith(AppRoutes.profile)) {
+      return l10n.profileSubtitle;
+    }
+    return null;
+  }
+
+  static String _getHomeGreeting(AppLocalizations l10n) {
+    final hour = DateTime.now().hour;
+    String greeting;
+    if (hour < 12) {
+      greeting = l10n.goodMorning;
+    } else if (hour < 17) {
+      greeting = l10n.goodAfternoon;
+    } else {
+      greeting = l10n.goodEvening;
+    }
+
+    try {
+      if (getIt.isRegistered<SettingsService>()) {
+        final name = getIt<SettingsService>().userName;
+        if (name != null && name.trim().isNotEmpty) {
+          greeting = l10n.homeGreeting(name.trim());
+        }
+      }
+    } catch (_) {}
+
+    return greeting;
   }
 
   static ({String title, IconData icon}) _getHeaderInfo(
     String location,
     AppLocalizations l10n,
   ) {
-    return switch (location) {
-      AppRoutes.home => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
-      AppRoutes.plan ||
-      AppRoutes.tasks ||
-      AppRoutes.habits => (title: l10n.plan, icon: Icons.checklist_rtl_rounded),
-      AppRoutes.prayerTimes => (
-        title: l10n.prayerTimes,
-        icon: Icons.mosque_rounded,
-      ),
-      AppRoutes.journal => (title: l10n.journal, icon: Icons.menu_book_rounded),
-      AppRoutes.profile => (title: l10n.profile, icon: Icons.person_rounded),
-      AppRoutes.barakah => (
-        title: l10n.barakah,
-        icon: Icons.auto_awesome_rounded,
-      ),
-      _ => (title: l10n.appTitle, icon: Icons.nights_stay_rounded),
-    };
+    if (location == AppRoutes.home) {
+      return (title: _getHomeGreeting(l10n), icon: Icons.nights_stay_rounded);
+    }
+    if (location.startsWith(AppRoutes.adhkar)) {
+      return (title: l10n.adhkarTitle, icon: Icons.flare_rounded);
+    }
+    if (location.startsWith(AppRoutes.myDay) ||
+        location == AppRoutes.plan ||
+        location == AppRoutes.tasks ||
+        location == AppRoutes.habits) {
+      return (title: l10n.myDay, icon: Icons.checklist_rtl_rounded);
+    }
+    if (location.startsWith(AppRoutes.prayerTimes)) {
+      return (title: l10n.prayerTimes, icon: Icons.mosque_rounded);
+    }
+    if (location.startsWith(AppRoutes.reflect) ||
+        location == AppRoutes.journal ||
+        location == AppRoutes.intentions ||
+        location.startsWith(AppRoutes.barakah)) {
+      return (title: l10n.reflect, icon: Icons.menu_book_rounded);
+    }
+    if (location.startsWith(AppRoutes.profile)) {
+      return (title: l10n.profile, icon: Icons.person_rounded);
+    }
+    return (title: l10n.appTitle, icon: Icons.nights_stay_rounded);
   }
 
   static int _getIndexForLocation(String location) {
-    return switch (location) {
-      AppRoutes.home => 0,
-      AppRoutes.plan || AppRoutes.tasks || AppRoutes.habits => 1,
-      AppRoutes.prayerTimes => 2,
-      AppRoutes.journal => 3,
-      AppRoutes.profile || AppRoutes.barakah => 4,
-      _ => 0,
-    };
+    if (location == AppRoutes.home) return 0;
+    if (location.startsWith(AppRoutes.adhkar)) return 1;
+    if (location.startsWith(AppRoutes.myDay) ||
+        location == AppRoutes.plan ||
+        location == AppRoutes.tasks ||
+        location == AppRoutes.habits) {
+      return 2;
+    }
+    if (location.startsWith(AppRoutes.prayerTimes)) return 3;
+    if (location.startsWith(AppRoutes.reflect) ||
+        location == AppRoutes.journal ||
+        location == AppRoutes.intentions ||
+        location.startsWith(AppRoutes.barakah)) {
+      return 4;
+    }
+    return 0;
   }
 
   static void _navigateToIndex(BuildContext context, int index) {
@@ -324,16 +333,16 @@ class HomeScreen extends StatelessWidget {
         context.go(AppRoutes.home);
         break;
       case 1:
-        context.go(AppRoutes.plan);
+        context.go(AppRoutes.adhkar);
         break;
       case 2:
-        context.go(AppRoutes.prayerTimes);
+        context.go(AppRoutes.myDay);
         break;
       case 3:
-        context.go(AppRoutes.journal);
+        context.go(AppRoutes.prayerTimes);
         break;
       case 4:
-        context.go(AppRoutes.profile);
+        context.go(AppRoutes.reflect);
         break;
     }
   }

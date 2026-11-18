@@ -12,10 +12,8 @@ import 'package:productive_muslim/features/settings/presentation/screens/setting
 import 'package:productive_muslim/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
-import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
-import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
@@ -23,8 +21,8 @@ import 'package:productive_muslim/features/focus/presentation/screens/focus_scre
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
-
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
+import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -37,6 +35,9 @@ class AppRouter {
   static bool _pendingBarakahReminder = false;
 
   static String? _previousLocationBeforeNotification;
+
+  static bool get hasNotificationFallback =>
+      _previousLocationBeforeNotification != null;
 
   static String? consumeNotificationFallbackLocation() {
     final loc = _previousLocationBeforeNotification;
@@ -55,6 +56,7 @@ class AppRouter {
       final currentUri = router.routeInformationProvider.value.uri.toString();
       if (currentUri.isNotEmpty &&
           currentUri != AppRoutes.barakah &&
+          currentUri != AppRoutes.reflectBarakah &&
           !currentUri.contains(AppRoutes.onboarding)) {
         _previousLocationBeforeNotification = currentUri;
       }
@@ -82,8 +84,10 @@ class AppRouter {
 
     final uri = Uri.tryParse(payload);
     final path = uri?.path.toLowerCase() ?? payload;
-    if (path == AppRoutes.intentions) {
-      router.go(AppRoutes.journal);
+    if (path == AppRoutes.intentions || path == AppRoutes.journal) {
+      router.go(AppRoutes.reflect);
+    } else if (path == AppRoutes.plan) {
+      router.go(AppRoutes.myDay);
     } else {
       router.go(payload);
     }
@@ -118,11 +122,19 @@ class AppRouter {
         host == 'streak' ||
         path == AppRoutes.streak) {
       router.go(AppRoutes.habits);
-    } else if (host == 'journal' ||
+    } else if (host == 'my-day' ||
+        host == 'my_day' ||
+        host == 'plan' ||
+        path == AppRoutes.myDay ||
+        path == AppRoutes.plan) {
+      router.go(AppRoutes.myDay);
+    } else if (host == 'reflect' ||
+        host == 'journal' ||
+        path == AppRoutes.reflect ||
         path == AppRoutes.journal ||
         host == 'intentions' ||
         path == AppRoutes.intentions) {
-      router.go(AppRoutes.journal);
+      router.go(AppRoutes.reflect);
     } else if (host == 'settings' || path == AppRoutes.settings) {
       handleNotificationPayload(AppRoutes.settings);
     } else if (host == 'home' ||
@@ -153,7 +165,8 @@ class AppRouter {
       if (!onboardingDone && !goingToOnboarding) return AppRoutes.onboarding;
       if (onboardingDone && _pendingBarakahReminder) {
         _pendingBarakahReminder = false;
-        return state.matchedLocation == AppRoutes.barakah
+        return state.matchedLocation == AppRoutes.barakah ||
+                state.matchedLocation == AppRoutes.reflectBarakah
             ? null
             : AppRoutes.barakah;
       }
@@ -177,6 +190,43 @@ class AppRouter {
             builder: (context, state) => const HomeContent(),
           ),
           GoRoute(
+            path: AppRoutes.adhkar,
+            builder: (context, state) {
+              DhikrCategory category = DhikrCategory.morning;
+              if (state.extra is DhikrCategory) {
+                category = state.extra as DhikrCategory;
+              } else {
+                final queryCat = state.uri.queryParameters['category'];
+                if (queryCat != null) {
+                  category = DhikrCategory.values.firstWhere(
+                    (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
+                    orElse: () => DhikrCategory.morning,
+                  );
+                }
+              }
+              return AdhkarScreen(initialCategory: category);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.myDay,
+            builder: (context, state) => const PlanScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.myDayTasks,
+            builder: (context, state) =>
+                const PlanScreen(initialTab: PlanTab.tasks),
+          ),
+          GoRoute(
+            path: AppRoutes.myDayHabits,
+            builder: (context, state) =>
+                const PlanScreen(initialTab: PlanTab.habits),
+          ),
+          GoRoute(
+            path: AppRoutes.myDayFocus,
+            builder: (context, state) =>
+                const PlanScreen(initialTab: PlanTab.focus),
+          ),
+          GoRoute(
             path: AppRoutes.plan,
             builder: (context, state) => const PlanScreen(),
           ),
@@ -195,23 +245,35 @@ class AppRouter {
             builder: (context, state) => const PrayerTimesScreen(),
           ),
           GoRoute(
-            path: AppRoutes.journal,
-            builder: (context, state) => const IntentionScreen(),
+            path: AppRoutes.reflect,
+            builder: (context, state) => const ReflectScreen(),
           ),
           GoRoute(
-            path: AppRoutes.profile,
-            builder: (context, state) => const ProfileScreen(),
+            path: AppRoutes.reflectMuhasabah,
+            builder: (context, state) =>
+                const ReflectScreen(initialTab: ReflectTab.muhasabah),
+          ),
+          GoRoute(
+            path: AppRoutes.reflectBarakah,
+            builder: (context, state) =>
+                const ReflectScreen(initialTab: ReflectTab.barakah),
+          ),
+          GoRoute(
+            path: AppRoutes.journal,
+            builder: (context, state) =>
+                const ReflectScreen(initialTab: ReflectTab.muhasabah),
           ),
           GoRoute(
             path: AppRoutes.barakah,
-            builder: (context, state) => const BarakahScreen(),
+            builder: (context, state) =>
+                const ReflectScreen(initialTab: ReflectTab.barakah),
           ),
         ],
       ),
       // Redirect aliases
       GoRoute(
         path: AppRoutes.intentions,
-        redirect: (context, state) => AppRoutes.journal,
+        redirect: (context, state) => AppRoutes.reflect,
       ),
       GoRoute(
         path: AppRoutes.prayerTimesUnderscore,
@@ -240,6 +302,11 @@ class AppRouter {
         builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
+        path: AppRoutes.profile,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.focus,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => FocusScreen(
@@ -255,25 +322,6 @@ class AppRouter {
         path: AppRoutes.fasting,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const FastingScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.adhkar,
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) {
-          DhikrCategory category = DhikrCategory.morning;
-          if (state.extra is DhikrCategory) {
-            category = state.extra as DhikrCategory;
-          } else {
-            final queryCat = state.uri.queryParameters['category'];
-            if (queryCat != null) {
-              category = DhikrCategory.values.firstWhere(
-                (c) => c.name.toLowerCase() == queryCat.toLowerCase(),
-                orElse: () => DhikrCategory.morning,
-              );
-            }
-          }
-          return AdhkarScreen(initialCategory: category);
-        },
       ),
       GoRoute(
         path: AppRoutes.barakahReview,

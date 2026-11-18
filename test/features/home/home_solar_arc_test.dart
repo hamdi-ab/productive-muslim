@@ -185,19 +185,15 @@ void main() {
         expect(progressDusk, greaterThan(tMaghribNight));
         expect(progressDusk, lessThan(tIshaNight));
 
-        // 2. Midnight (between Isha and Tahajjud)
+        // 2. Mid-night (between Isha and Tahajjud)
         final tahajjudTime = tomorrowFajr.subtract(
           Duration(seconds: (nightDuration / 3).round()),
         );
-        final midnight = DateTime(
-          baseDate.year,
-          baseDate.month,
-          baseDate.day,
-          23,
-          59,
-        );
         final nightMidSpan = tahajjudTime.difference(isha).inSeconds;
-        final nightMidElapsed = midnight.difference(isha).inSeconds;
+        final midNightTime = isha.add(
+          Duration(seconds: (nightMidSpan / 2).round()),
+        );
+        final nightMidElapsed = midNightTime.difference(isha).inSeconds;
         final nightMidRatio = (nightMidElapsed / nightMidSpan).clamp(0.0, 1.0);
         final progressMidnight =
             tIshaNight + nightMidRatio * (tTahajjudNight - tIshaNight);

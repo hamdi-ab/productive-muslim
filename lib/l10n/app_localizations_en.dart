@@ -216,6 +216,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get myDay => 'My Day';
+
+  @override
+  String get overview => 'Overview';
+
+  @override
+  String get adhkar => 'Adhkar Studio';
+
+  @override
+  String get reflect => 'Reflect';
+
+  @override
+  String get muhasabah => 'Muhasabah';
+
+  @override
   String get newTask => 'New Task';
 
   @override
@@ -1361,9 +1376,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get energy => 'Energy & Routines';
-
-  @override
-  String get adhkar => 'Adhkar Studio';
 
   @override
   String get profile => 'Profile';

@@ -194,10 +194,13 @@ class HomeQualitiesCarousel extends StatelessWidget {
                 onTap: () {
                   AppHaptics.lightImpact();
                   final route = q.route;
-                  if (route == AppRoutes.profile ||
+                  if (route == AppRoutes.reflect ||
                       route == AppRoutes.journal ||
+                      route == AppRoutes.myDay ||
                       route == AppRoutes.tasks ||
                       route == AppRoutes.habits ||
+                      route == AppRoutes.adhkar ||
+                      route == AppRoutes.prayerTimes ||
                       route == AppRoutes.barakah) {
                     context.go(route);
                   } else {

@@ -4,16 +4,14 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_adhkar_pill.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_celestial_arc.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_daily_ayah_card.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_daily_progress_section.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_energy_khushu_meter.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_nap_timer_banner.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_intention_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_prayer_card.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_productivity_toolkit.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_qualities_carousel.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_reflection_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_today_tasks_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+/// Simplified, calm daily home dashboard focusing on what matters now:
+/// next Salah, Adhkar, today's intention, top tasks, and gentle reflection.
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
 
@@ -96,40 +94,24 @@ class HomeContent extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Hero Celestial Solar Arc Prayer Card
+                  // 1. Next Salah & Celestial Solar Arc
                   const HomePrayerCard(),
                   const SizedBox(height: AppSpacing.md),
 
-                  // 2. Sub-Hero Proactive Barakah Nap Timer Banner
-                  const HomeNapTimerBanner(),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // 3. Daily Energy & Khushu' Level Meter
-                  const DailyEnergyKhushuMeter(),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 4. Spiritual Performance Toolkit (2x2 Bento)
-                  const HomeProductivityToolkit(),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 5. Daily Ayah of Barakah
-                  HomeDailyAyahCard(isDark: isDark),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 6. Quick Adhkar Routine Pill
+                  // 2. Morning / Evening Adhkar Status with Continue Action
                   const HomeAdhkarPill(),
                   const SizedBox(height: AppSpacing.md),
 
-                  // 7. Daily Progress Rings
-                  HomeDailyProgressSection(today: today, l10n: l10n),
-                  const SizedBox(height: AppSpacing.lg),
+                  // 3. Today's Intention
+                  HomeIntentionCard(today: today, isDark: isDark),
+                  const SizedBox(height: AppSpacing.md),
 
-                  // 8. Today's Tasks Overview
+                  // 4. Small Task Preview
                   HomeTodayTasksCard(today: today, l10n: l10n),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.md),
 
-                  // 9. The 9 Essential Qualities Carousel
-                  HomeQualitiesCarousel(l10n: l10n),
+                  // 5. Gentle Reflection Entry Point
+                  HomeReflectionCard(isDark: isDark),
                 ],
               ),
             ),

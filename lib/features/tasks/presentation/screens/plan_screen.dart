@@ -14,21 +14,24 @@ import 'package:productive_muslim/features/tasks/logic/task_bloc.dart';
 import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/create_task_sheet.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
+import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
+import 'package:productive_muslim/features/tasks/presentation/widgets/my_day_overview_view.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_atmosphere_background.dart';
-import 'package:productive_muslim/features/tasks/presentation/widgets/plan_barakah_alignment_meter.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_date_navigator.dart';
-import 'package:productive_muslim/features/tasks/presentation/widgets/plan_spiritual_anchor_banner.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_tab_switcher.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-enum PlanTab { tasks, habits }
+enum PlanTab { overview, tasks, habits, focus }
+
+/// Type alias for My Day overview
+typedef MyDayScreen = PlanScreen;
 
 /// Screen orchestrating the daily planning experience with spiritual alignment, date navigation,
 /// and quick switching between actionable Tasks and ongoing Habits.
 class PlanScreen extends StatefulWidget {
   final PlanTab initialTab;
 
-  const PlanScreen({super.key, this.initialTab = PlanTab.tasks});
+  const PlanScreen({super.key, this.initialTab = PlanTab.overview});
 
   @override
   State<PlanScreen> createState() => _PlanScreenState();
@@ -42,6 +45,14 @@ class _PlanScreenState extends State<PlanScreen> {
   void initState() {
     super.initState();
     _selectedTab = widget.initialTab;
+  }
+
+  @override
+  void didUpdateWidget(covariant PlanScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      _selectedTab = widget.initialTab;
+    }
   }
 
   String get _formattedDate => DateFormat('yyyy-MM-dd').format(_selectedDate);
@@ -142,10 +153,10 @@ class _PlanScreenState extends State<PlanScreen> {
   }
 
   void _showCreateAction(BuildContext context) {
-    if (_selectedTab == PlanTab.tasks) {
-      _showCreateTaskSheet(context);
-    } else {
+    if (_selectedTab == PlanTab.habits) {
       _showCreateHabitSheet(context);
+    } else {
+      _showCreateTaskSheet(context);
     }
   }
 
@@ -156,40 +167,42 @@ class _PlanScreenState extends State<PlanScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B1512) : null,
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFE9C349), Color(0xFFFFD54F)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFE9C349).withValues(alpha: 0.35),
-              blurRadius: 18,
-              offset: const Offset(0, 5),
+      floatingActionButton: _selectedTab == PlanTab.focus
+          ? null
+          : Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFE9C349), Color(0xFFFFD54F)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFE9C349).withValues(alpha: 0.35),
+                    blurRadius: 18,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: FloatingActionButton.extended(
+                onPressed: () {
+                  AppHaptics.lightImpact();
+                  _showCreateAction(context);
+                },
+                elevation: 0,
+                highlightElevation: 0,
+                backgroundColor: Colors.transparent,
+                icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
+                label: Text(
+                  _selectedTab == PlanTab.habits ? l10n.newHabit : l10n.newTask,
+                  style: const TextStyle(
+                    color: Color(0xFF241A00),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            AppHaptics.lightImpact();
-            _showCreateAction(context);
-          },
-          elevation: 0,
-          highlightElevation: 0,
-          backgroundColor: Colors.transparent,
-          icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
-          label: Text(
-            _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
-            style: const TextStyle(
-              color: Color(0xFF241A00),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
       body: Stack(
         children: [
           // Background atmospheric sacred geometry & ambient glows
@@ -207,16 +220,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 onPickDate: () => _pickDate(context),
               ),
 
-              // 2. Spiritual Anchor Banner (Bismillah & Niyyah Renewal)
-              PlanSpiritualAnchorBanner(isDark: isDark),
-
-              // 3. Barakah Alignment Progress Meter
-              PlanBarakahAlignmentMeter(
-                formattedDate: _formattedDate,
-                isDark: isDark,
-              ),
-
-              // 4. Segmented Capsule Switcher [Tasks | Habits]
+              // 2. Segmented Capsule Switcher [Overview | Tasks | Habits | Focus]
               PlanTabSwitcher(
                 selectedTab: _selectedTab,
                 onTabChanged: _onTabChanged,
@@ -227,12 +231,26 @@ class _PlanScreenState extends State<PlanScreen> {
               Expanded(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 220),
-                  child: _selectedTab == PlanTab.tasks
-                      ? TaskScreen(
-                          key: ValueKey('plan_task_view_$_formattedDate'),
-                          date: _formattedDate,
-                        )
-                      : const HabitScreen(key: ValueKey('plan_habit_view')),
+                  child: switch (_selectedTab) {
+                    PlanTab.overview => MyDayOverviewView(
+                      key: ValueKey('plan_overview_view_$_formattedDate'),
+                      formattedDate: _formattedDate,
+                      onSwitchTab: _onTabChanged,
+                      onShowCreateTask: () => _showCreateTaskSheet(context),
+                      onShowCreateHabit: () => _showCreateHabitSheet(context),
+                      isDark: isDark,
+                    ),
+                    PlanTab.tasks => TaskScreen(
+                      key: ValueKey('plan_task_view_$_formattedDate'),
+                      date: _formattedDate,
+                    ),
+                    PlanTab.habits => const HabitScreen(
+                      key: ValueKey('plan_habit_view'),
+                    ),
+                    PlanTab.focus => const FocusScreen(
+                      key: ValueKey('plan_focus_view'),
+                    ),
+                  },
                 ),
               ),
             ],

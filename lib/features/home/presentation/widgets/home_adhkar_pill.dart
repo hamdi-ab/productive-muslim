@@ -2,6 +2,7 @@ import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
@@ -73,7 +74,7 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
   }
 
   Future<void> _handleTap(DhikrCategory activeCategory) async {
-    await context.push('/adhkar', extra: activeCategory);
+    context.go(AppRoutes.adhkar, extra: activeCategory);
     if (mounted) {
       setState(() {});
     }
@@ -82,6 +83,7 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final now = DateTime.now();
 
     DhikrCategory activeCategory = DhikrCategory.morning;
@@ -187,7 +189,9 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
                   Text(
                     isAllDone
                         ? l10n.adhkarActionReview
-                        : l10n.adhkarActionRecite,
+                        : (completedCount > 0
+                              ? (isAr ? 'متابعة' : 'Continue')
+                              : l10n.adhkarActionRecite),
                     style: TextStyle(
                       color: accentColor,
                       fontSize: 12,
