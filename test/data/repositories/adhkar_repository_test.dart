@@ -35,13 +35,39 @@ void main() {
   group('AdhkarRepository - Catalog', () {
     test('returns catalog version and verified items', () {
       expect(repository.catalogVersion, equals(1));
-      final all = repository.getAll();
+      final all = repository.getAll(includePendingReview: true);
       expect(all, isNotEmpty);
       expect(all.every((item) => item.contentVersion >= 1), isTrue);
     });
 
+    test('excludes pending review items by default and reveals them in review mode', () async {
+      // Normal reader path: unreviewed items are not exposed
+      expect(repository.isReviewModeEnabled, isFalse);
+      expect(repository.getByCategory(DhikrCategory.morning), isEmpty);
+      expect(repository.getByCategory(DhikrCategory.general), isEmpty);
+      expect(repository.getAll(), isEmpty);
+
+      // Explicit parameter overrides review mode
+      expect(
+        repository.getByCategory(
+          DhikrCategory.general,
+          includePendingReview: true,
+        ),
+        isNotEmpty,
+      );
+
+      // Enabling editorial review mode
+      await repository.setReviewModeEnabled(true);
+      expect(repository.isReviewModeEnabled, isTrue);
+      expect(repository.getByCategory(DhikrCategory.morning), isNotEmpty);
+      expect(repository.getByCategory(DhikrCategory.general).length, equals(5));
+    });
+
     test('marks general dhikr items as pending review and distinguishes prescribed counts', () {
-      final generalItems = repository.getByCategory(DhikrCategory.general);
+      final generalItems = repository.getByCategory(
+        DhikrCategory.general,
+        includePendingReview: true,
+      );
       expect(generalItems.length, equals(5));
 
       // All 5 General Dhikr items must be pending editorial review
@@ -89,7 +115,7 @@ void main() {
     test(
       'all catalog items remain pending review until editorial sign-off',
       () {
-        final all = repository.getAll();
+        final all = repository.getAll(includePendingReview: true);
         expect(
           all.every((i) => i.reviewStatus == ContentReviewStatus.pendingReview),
           isTrue,
@@ -185,7 +211,8 @@ void main() {
       expect(wakingSession, isNotNull);
       expect(wakingSession!.counts['wake_up_1'], equals(1));
 
-      // Morning completed count should include the 2 waking-up items
+      // Morning completed count should include the 2 waking-up items in review mode
+      await repository.setReviewModeEnabled(true);
       final completedMorningCount = await repository.getCategoryCompletedCount(
         DhikrCategory.morning,
       );
@@ -204,9 +231,10 @@ void main() {
       await prefs.remove('adhkar_migrated_to_drift_v1');
 
       // Legacy full morning completion includes wakingUp and morning items
-      final allMorningIds = AdhkarCatalog.getByCategory(DhikrCategory.morning)
-          .map((i) => i.id)
-          .toList();
+      final allMorningIds = AdhkarCatalog.getByCategory(
+        DhikrCategory.morning,
+        includePendingReview: true,
+      ).map((i) => i.id).toList();
       await prefs.setStringList('adhkar_done_$today', allMorningIds);
 
       await repository.migrateFromSharedPreferencesIfNeeded(prefs);
@@ -228,7 +256,8 @@ void main() {
       expect(completedIds, contains('morning'));
     });
 
-    test('getCategoryCompletedCount and watchCategoryCompletedCount compute live progress', () async {
+    test('getCategoryCompletedCount and watchCategoryCompletedCount compute live progress in review mode', () async {
+      await repository.setReviewModeEnabled(true);
       expect(
         await repository.getCategoryCompletedCount(DhikrCategory.postPrayer),
         equals(0),
@@ -237,7 +266,7 @@ void main() {
       await repository.saveSession(
         collectionId: DhikrCategory.postPrayer.name,
         lastPageIndex: 0,
-        counts: {'post_salah_astaghfirullah': 3},
+        counts: {'post_salah_astaghfirullah': 4},
         isCompleted: false,
       );
 

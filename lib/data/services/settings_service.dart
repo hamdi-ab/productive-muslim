@@ -359,6 +359,17 @@ class SettingsService {
   Future<void> setAdhkarTransliterationEnabled(bool enabled) async =>
       _prefs?.setBool('adhkar_transliteration_enabled', enabled);
 
+  static const _adhkarReviewModeKey = 'adhkar_review_mode_enabled';
+  bool _adhkarReviewModeFallback = false;
+
+  bool get adhkarReviewModeEnabled =>
+      _prefs?.getBool(_adhkarReviewModeKey) ?? _adhkarReviewModeFallback;
+
+  Future<void> setAdhkarReviewModeEnabled(bool enabled) async {
+    _adhkarReviewModeFallback = enabled;
+    await _prefs?.setBool(_adhkarReviewModeKey, enabled);
+  }
+
   // Smart Reminders & Notifications
   bool get morningAdhkarNotificationEnabled =>
       _prefs?.getBool('notif_morning_adhkar') ?? true;

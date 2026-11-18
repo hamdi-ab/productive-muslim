@@ -78,5 +78,25 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'AdhkarScreen in review mode with multi-part sub-steps has zero overflow at 1.5x in Arabic',
+      (tester) async {
+        await pumpAndCheckOverflow(
+          tester,
+          child: const SizedBox(
+            height: 900,
+            child: AdhkarScreen(
+              initialCategory: DhikrCategory.postPrayer,
+              isReviewModeEnabled: true,
+            ),
+          ),
+          locale: const Locale('ar'),
+          textScale: 1.5,
+          isDark: true,
+          screenSize: const Size(360, 780),
+        );
+      },
+    );
   });
 }

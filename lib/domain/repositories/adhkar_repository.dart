@@ -4,10 +4,17 @@ import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 
 abstract class AdhkarRepository {
-  List<DhikrItem> getAll();
-  List<DhikrItem> getByCategory(DhikrCategory category);
+  List<DhikrItem> getAll({bool? includePendingReview});
+  List<DhikrItem> getByCategory(
+    DhikrCategory category, {
+    bool? includePendingReview,
+  });
   DhikrItem? getById(String id);
   int get catalogVersion;
+
+  // Review Mode
+  bool get isReviewModeEnabled;
+  Future<void> setReviewModeEnabled(bool enabled);
 
   // Bookmarks
   Future<void> toggleBookmark(String dhikrId);

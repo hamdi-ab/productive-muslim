@@ -150,12 +150,25 @@ class DhikrCard extends StatelessWidget {
     final font = ArabicFontFamily.fromKey(settings?.arabicFontFamily);
     final fontSize = settings?.arabicFontSize ?? 22.0;
 
+    final activeStep = item.currentStep(count);
+    final activeStepIndex = item.currentStepIndex(count);
+    final activeStepProgress = item.currentStepProgress(count);
+
     final displayTitle = isArabic && item.titleAr.isNotEmpty
         ? item.titleAr
         : item.titleEn;
-    final displayTranslation = isArabic && item.translationAr.isNotEmpty
-        ? item.translationAr
-        : item.translationEn;
+    final displayArabic = activeStep != null ? activeStep.arabic : item.arabic;
+    final displayTransliteration =
+        activeStep != null && activeStep.transliteration.isNotEmpty
+        ? activeStep.transliteration
+        : item.transliteration;
+    final displayTranslation = activeStep != null
+        ? (isArabic && activeStep.translationAr.isNotEmpty
+              ? activeStep.translationAr
+              : activeStep.translationEn)
+        : (isArabic && item.translationAr.isNotEmpty
+              ? item.translationAr
+              : item.translationEn);
 
     return Container(
       decoration: BoxDecoration(
@@ -445,6 +458,35 @@ class DhikrCard extends StatelessWidget {
                       ),
                     ),
 
+                    if (item.hasSteps) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            for (int i = 0; i < item.steps.length; i++) ...[
+                              if (i > 0) const SizedBox(width: 6),
+                              _buildStepChip(
+                                context: context,
+                                stepIndex: i,
+                                step: item.steps[i],
+                                isActive: i == activeStepIndex && !isCompleted,
+                                isCompleted: i < activeStepIndex || isCompleted,
+                                activeProgress: i == activeStepIndex
+                                    ? activeStepProgress
+                                    : (i < activeStepIndex || isCompleted
+                                          ? item.steps[i].targetCount
+                                          : 0),
+                                isDark: isDark,
+                                isArabic: isArabic,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+
                     const SizedBox(height: AppSpacing.sm),
 
                     // Arabic Text Box (Sacred Geometry & Tap-to-count surface)
@@ -470,7 +512,7 @@ class DhikrCard extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          item.arabic,
+                          displayArabic,
                           textAlign: TextAlign.center,
                           textDirection: TextDirection.rtl,
                           style: font.getTextStyle(
@@ -488,11 +530,11 @@ class DhikrCard extends StatelessWidget {
                     // Transliteration (optional)
                     if (showTransliteration &&
                         !isArabic &&
-                        item.transliteration.isNotEmpty) ...[
+                        displayTransliteration.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
-                          '"${item.transliteration}"',
+                          '"$displayTransliteration"',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13.5,
@@ -508,7 +550,7 @@ class DhikrCard extends StatelessWidget {
                     ],
 
                     // English / Localized Translation
-                    if (!isArabic || item.translationAr != item.arabic)
+                    if (!isArabic || displayTranslation != displayArabic)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(
@@ -666,60 +708,105 @@ class DhikrCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Row(
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 150),
-                                    transitionBuilder: (child, anim) =>
-                                        ScaleTransition(
-                                          scale: anim,
-                                          child: child,
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Row(
+                                  children: [
+                                    AnimatedSwitcher(
+                                      duration: const Duration(
+                                        milliseconds: 150,
+                                      ),
+                                      transitionBuilder: (child, anim) =>
+                                          ScaleTransition(
+                                            scale: anim,
+                                            child: child,
+                                          ),
+                                      child: Text(
+                                        '$count / ${item.targetCount}',
+                                        key: ValueKey('dhikr_count_$count'),
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          fontFeatures: const [
+                                            FontFeature.tabularFigures(),
+                                          ],
+                                          color: isCompleted
+                                              ? const Color(0xFF10B981)
+                                              : (isDark
+                                                    ? Colors.white
+                                                    : AppColors.primary),
                                         ),
-                                    child: Text(
-                                      '$count / ${item.targetCount}',
-                                      key: ValueKey('dhikr_count_$count'),
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        fontFeatures: const [
-                                          FontFeature.tabularFigures(),
-                                        ],
-                                        color: isCompleted
-                                            ? const Color(0xFF10B981)
-                                            : (isDark
-                                                  ? Colors.white
-                                                  : AppColors.primary),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isCompleted
+                                            ? const Color(0xFF10B981)
+                                                  .withValues(alpha: 0.2)
+                                            : (isDark
+                                                  ? Colors.white.withValues(
+                                                      alpha: 0.08,
+                                                    )
+                                                  : Colors.black.withValues(
+                                                      alpha: 0.05,
+                                                    )),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Text(
+                                        remaining > 0
+                                            ? '$remaining remaining'
+                                            : 'Done',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: isCompleted
+                                              ? const Color(0xFF10B981)
+                                              : (isDark
+                                                    ? AppColors
+                                                          .darkTextSecondary
+                                                    : AppColors.textSecondary),
+                                        ),
+                                      ),
                                     ),
-                                    decoration: BoxDecoration(
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isCompleted
+                                          ? Icons.check_circle_outline_rounded
+                                          : Icons.touch_app_rounded,
+                                      size: 13,
                                       color: isCompleted
                                           ? const Color(0xFF10B981)
-                                                .withValues(alpha: 0.2)
                                           : (isDark
-                                                ? Colors.white.withValues(
-                                                    alpha: 0.08,
-                                                  )
-                                                : Colors.black.withValues(
-                                                    alpha: 0.05,
-                                                  )),
-                                      borderRadius: BorderRadius.circular(10),
+                                                ? AppColors.secondary
+                                                : AppColors.primary),
                                     ),
-                                    child: Text(
-                                      remaining > 0
-                                          ? '$remaining remaining'
-                                          : 'Done',
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isCompleted
+                                          ? l10n.adhkarCompleted
+                                          : (item.hasSteps && activeStep != null
+                                                ? '${isArabic && activeStep.titleAr.isNotEmpty ? activeStep.titleAr : activeStep.titleEn} ($activeStepProgress / ${activeStep.targetCount}) • ${l10n.adhkarTapToCount}'
+                                                : l10n.adhkarTapToCount),
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: isCompleted
                                             ? const Color(0xFF10B981)
@@ -728,44 +815,8 @@ class DhikrCard extends StatelessWidget {
                                                   : AppColors.textSecondary),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: AlignmentDirectional.centerStart,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCompleted
-                                        ? Icons.check_circle_outline_rounded
-                                        : Icons.touch_app_rounded,
-                                    size: 13,
-                                    color: isCompleted
-                                        ? const Color(0xFF10B981)
-                                        : (isDark
-                                              ? AppColors.secondary
-                                              : AppColors.primary),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    isCompleted
-                                        ? l10n.adhkarCompleted
-                                        : l10n.adhkarTapToCount,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: isCompleted
-                                          ? const Color(0xFF10B981)
-                                          : (isDark
-                                                ? AppColors.darkTextSecondary
-                                                : AppColors.textSecondary),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -778,6 +829,98 @@ class DhikrCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStepChip({
+    required BuildContext context,
+    required int stepIndex,
+    required DhikrStep step,
+    required bool isActive,
+    required bool isCompleted,
+    required int activeProgress,
+    required bool isDark,
+    required bool isArabic,
+  }) {
+    final title = isArabic && step.titleAr.isNotEmpty
+        ? step.titleAr
+        : step.titleEn;
+
+    Color bgColor;
+    Color borderColor;
+    Color textColor;
+
+    if (isCompleted) {
+      bgColor = const Color(0xFF10B981).withValues(alpha: isDark ? 0.2 : 0.12);
+      borderColor = const Color(0xFF10B981).withValues(alpha: 0.5);
+      textColor = const Color(0xFF10B981);
+    } else if (isActive) {
+      bgColor = isDark
+          ? AppColors.secondary.withValues(alpha: 0.22)
+          : AppColors.secondary.withValues(alpha: 0.12);
+      borderColor = AppColors.secondary;
+      textColor = isDark ? Colors.white : AppColors.secondaryDark;
+    } else {
+      bgColor = isDark
+          ? Colors.white.withValues(alpha: 0.04)
+          : Colors.black.withValues(alpha: 0.03);
+      borderColor = isDark
+          ? Colors.white.withValues(alpha: 0.1)
+          : Colors.black.withValues(alpha: 0.08);
+      textColor = isDark
+          ? AppColors.darkTextSecondary
+          : AppColors.textSecondary;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor, width: isActive ? 1.4 : 0.8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isCompleted) ...[
+            const Icon(
+              Icons.check_circle_rounded,
+              size: 12,
+              color: Color(0xFF10B981),
+            ),
+            const SizedBox(width: 4),
+          ] else if (isActive) ...[
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.secondary,
+              ),
+            ),
+            const SizedBox(width: 5),
+          ],
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isActive
+                ? '($activeProgress/${step.targetCount})'
+                : '(${step.targetCount}x)',
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              color: textColor.withValues(alpha: 0.85),
+            ),
+          ),
+        ],
       ),
     );
   }

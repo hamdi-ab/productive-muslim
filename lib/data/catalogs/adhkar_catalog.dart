@@ -211,6 +211,38 @@ class AdhkarCatalog {
       order: 2,
       isCountPrescribed: true,
       reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'sleep_subhanallah',
+          titleEn: 'SubhanAllah',
+          titleAr: 'سبحان الله',
+          arabic: 'سُبْحَانَ اللَّهِ',
+          transliteration: 'SubhanAllah',
+          translationEn: 'Glory be to Allah.',
+          translationAr: 'سبحان الله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'sleep_alhamdulillah',
+          titleEn: 'Alhamdulillah',
+          titleAr: 'الحمد لله',
+          arabic: 'الْحَمْدُ لِلَّهِ',
+          transliteration: 'Alhamdulillah',
+          translationEn: 'All praise is for Allah.',
+          translationAr: 'الحمد لله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'sleep_allahu_akbar',
+          titleEn: 'Allahu Akbar',
+          titleAr: 'الله أكبر',
+          arabic: 'اللَّهُ أَكْبَرُ',
+          transliteration: 'Allahu Akbar',
+          translationEn: 'Allah is the Greatest.',
+          translationAr: 'الله أكبر',
+          targetCount: 34,
+        ),
+      ],
     ),
     DhikrItem(
       id: 'sleep_ayat_kursi',
@@ -241,10 +273,33 @@ class AdhkarCatalog {
       translationAr: 'أستغفر الله (٣ مرات)، اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام',
       reference: 'Sahih Muslim 591',
       virtue: 'Direct Sunnah practice immediately after completing the final salam.',
-      targetCount: 3,
+      targetCount: 4,
       order: 1,
       isCountPrescribed: true,
       reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'post_salah_istighfar_phrase',
+          titleEn: 'Astaghfirullah',
+          titleAr: 'أستغفر الله',
+          arabic: 'أَسْتَغْفِرُ اللَّهَ',
+          transliteration: 'Astaghfirullah',
+          translationEn: 'I seek forgiveness from Allah.',
+          translationAr: 'أستغفر الله',
+          targetCount: 3,
+        ),
+        DhikrStep(
+          id: 'post_salah_antas_salam',
+          titleEn: 'Allahumma Antas-Salam',
+          titleAr: 'اللهم أنت السلام',
+          arabic: 'اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ',
+          transliteration: "Allahumma Antas-Salam wa minkas-Salam, tabarakta ya Dhal-Jalali wal-Ikram",
+          translationEn: 'O Allah, You are Peace and from You comes peace. Blessed are You, O Owner of majesty and honor.',
+          translationAr:
+              'اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام',
+          targetCount: 1,
+        ),
+      ],
     ),
     DhikrItem(
       id: 'post_salah_tasbih',
@@ -261,6 +316,48 @@ class AdhkarCatalog {
       order: 2,
       isCountPrescribed: true,
       reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'tasbih_subhanallah',
+          titleEn: 'SubhanAllah',
+          titleAr: 'سبحان الله',
+          arabic: 'سُبْحَانَ اللَّهِ',
+          transliteration: 'SubhanAllah',
+          translationEn: 'Glory be to Allah.',
+          translationAr: 'سبحان الله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_alhamdulillah',
+          titleEn: 'Alhamdulillah',
+          titleAr: 'الحمد لله',
+          arabic: 'الْحَمْدُ لِلَّهِ',
+          transliteration: 'Alhamdulillah',
+          translationEn: 'All praise is for Allah.',
+          translationAr: 'الحمد لله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_allahu_akbar',
+          titleEn: 'Allahu Akbar',
+          titleAr: 'الله أكبر',
+          arabic: 'اللَّهُ أَكْبَرُ',
+          transliteration: 'Allahu Akbar',
+          translationEn: 'Allah is the Greatest.',
+          translationAr: 'الله أكبر',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_kalimah_tawheed',
+          titleEn: 'Kalimah of Tawheed (Completion of 100)',
+          titleAr: 'تمام المائة: لا إله إلا الله وحده لا شريك له',
+          arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+          transliteration: "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu wa Huwa 'ala kulli shay'in Qadir",
+          translationEn: 'None has the right to be worshipped but Allah alone, without partner. His is the dominion and His is the praise, and He is Able to do all things.',
+          translationAr: 'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير',
+          targetCount: 1,
+        ),
+      ],
     ),
 
     // 6. DAILY SUNNAH REMEMBRANCES
@@ -402,7 +499,7 @@ class AdhkarCatalog {
 
   static List<DhikrItem> getByCategory(
     DhikrCategory category, {
-    bool includePendingReview = true,
+    bool includePendingReview = false,
   }) {
     List<DhikrItem> items;
     if (category == DhikrCategory.morning) {

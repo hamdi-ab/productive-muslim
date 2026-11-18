@@ -984,6 +984,31 @@ class AppLocalizationsAr extends AppLocalizations {
       'أتممت وردك من هذا القسم بحمد الله، وقد حُفظ إنجازك لهذا اليوم.';
 
   @override
+  String get adhkarEditorialReviewMode => 'وضع المراجعة التحريرية';
+
+  @override
+  String get adhkarReviewModeBanner =>
+      'وضع المراجعة التحريرية: عرض الأذكار قيد التدقيق الشرعي.';
+
+  @override
+  String get adhkarContentUnderReview => 'المحتوى قيد المراجعة والتدقيق';
+
+  @override
+  String get adhkarContentUnderReviewDesc =>
+      'أذكار هذا القسم تخضع حالياً للمراجعة والتدقيق الشرعي وستتاح فور اعتمادها.';
+
+  @override
+  String get adhkarEnableReviewMode => 'معاينة مسودة الأذكار';
+
+  @override
+  String get adhkarDisableReviewMode => 'الخروج من وضع المراجعة';
+
+  @override
+  String adhkarStepIndicator(int current, int total) {
+    return 'الخطوة $current من $total';
+  }
+
+  @override
   String get smartNotificationsTitle => 'تذكيرات الأذكار والسنن الذكية';
 
   @override

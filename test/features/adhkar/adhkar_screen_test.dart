@@ -46,19 +46,28 @@ void main() {
     await getIt.reset();
   });
 
-  Widget buildSubject({DhikrCategory initialCategory = DhikrCategory.morning}) {
+  Widget buildSubject({
+    DhikrCategory initialCategory = DhikrCategory.morning,
+    bool isReviewModeEnabled = true,
+  }) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: AdhkarScreen(initialCategory: initialCategory),
+      home: AdhkarScreen(
+        initialCategory: initialCategory,
+        isReviewModeEnabled: isReviewModeEnabled,
+      ),
     );
   }
 
   testWidgets(
-    'renders Adhkar screen with Phase 1 category tabs and Pending Review badge on catalog item',
+    'renders Adhkar screen with Content Under Editorial Review by default and reveals review mode on toggle',
     (tester) async {
       await tester.pumpWidget(
-        buildSubject(initialCategory: DhikrCategory.morning),
+        buildSubject(
+          initialCategory: DhikrCategory.morning,
+          isReviewModeEnabled: false,
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -71,16 +80,24 @@ void main() {
       expect(find.text('General'), findsOneWidget);
       expect(find.text('Bookmarks'), findsOneWidget);
 
-      // Legacy/Phase 2 categories are NOT exposed as top-level tabs
-      expect(find.text('Waking Up'), findsNothing);
-      expect(find.text('Bedtime'), findsNothing);
-      expect(find.text('Daily Sunnah'), findsNothing);
+      // Default state: Content Under Editorial Review (unreviewed texts withheld)
+      expect(find.text('Content Under Editorial Review'), findsOneWidget);
+      expect(find.text('Preview Draft Content'), findsOneWidget);
+      expect(find.byKey(const Key('adhkar_review_mode_banner')), findsNothing);
 
-      // Unreviewed catalog item has Pending Review badge, never Authentic badge
+      // Tap Preview Draft Content button to enter review mode
+      await tester.tap(find.text('Preview Draft Content'));
+      await tester.pumpAndSettle();
+
+      // In Review Mode: Review banner appears and draft items are shown with Pending Review badge
+      expect(
+        find.byKey(const Key('adhkar_review_mode_banner')),
+        findsOneWidget,
+      );
       expect(find.text('Pending Review'), findsOneWidget);
       expect(find.text('Authentic'), findsNothing);
       expect(find.text('Prescribed'), findsOneWidget);
-      expect(find.text('Tap anywhere to count'), findsOneWidget);
+      expect(find.textContaining('Tap anywhere to count'), findsOneWidget);
     },
   );
 
@@ -196,12 +213,12 @@ void main() {
   testWidgets(
     'shows calm collection-completion state with Done and Read Again actions',
     (tester) async {
-      // Complete all items in After Salah collection (2 items: 3x astaghfirullah, 100x tasbih)
+      // Complete all items in After Salah collection (2 items: 4x astaghfirullah, 100x tasbih)
       final repo = getIt<AdhkarRepository>();
       await repo.saveSession(
         collectionId: DhikrCategory.postPrayer.name,
         lastPageIndex: 1,
-        counts: {'post_salah_astaghfirullah': 3, 'post_salah_tasbih': 100},
+        counts: {'post_salah_astaghfirullah': 4, 'post_salah_tasbih': 100},
         isCompleted: true,
       );
       await repo.recordCollectionCompletion(DhikrCategory.postPrayer.name);
@@ -245,7 +262,7 @@ void main() {
 
       expect(find.byType(AdhkarCollectionCompletionCard), findsNothing);
       expect(find.text('Seeking Forgiveness after Prayer'), findsOneWidget);
-      expect(find.text('0 / 3'), findsOneWidget);
+      expect(find.text('0 / 4'), findsOneWidget);
 
       // Daily completion history is preserved!
       final completedToday = await repo.isCollectionCompletedToday(
@@ -392,4 +409,62 @@ void main() {
     // The bookmarked waking up dhikr is shown in the bookmarks view
     expect(find.text('Waking Up Remembrance'), findsOneWidget);
   });
+
+  testWidgets(
+    'progresses through structured sub-steps with dynamic Arabic text and indicators',
+    (tester) async {
+      await tester.pumpWidget(
+        buildSubject(
+          initialCategory: DhikrCategory.postPrayer,
+          isReviewModeEnabled: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Item 1: post_salah_astaghfirullah (Step 1: Astaghfirullah 3x, Step 2: Allahumma Antas-Salam 1x)
+      expect(find.text('Seeking Forgiveness after Prayer'), findsOneWidget);
+      expect(find.text('Astaghfirullah'), findsWidgets);
+      expect(find.text('(0/3)'), findsOneWidget);
+      expect(find.text('(1x)'), findsOneWidget);
+      expect(find.text('أَسْتَغْفِرُ اللَّهَ'), findsOneWidget);
+      expect(find.text('0 / 4'), findsOneWidget);
+
+      final dial = find.byIcon(Icons.touch_app_rounded).first;
+      expect(dial, findsOneWidget);
+
+      // Tap 1: count 1/4 (Step 1 progress 1/3)
+      await tester.tap(dial);
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 4'), findsOneWidget);
+      expect(find.text('(1/3)'), findsOneWidget);
+
+      // Tap 2: count 2/4 (Step 1 progress 2/3)
+      await tester.tap(dial);
+      await tester.pumpAndSettle();
+      expect(find.text('2 / 4'), findsOneWidget);
+      expect(find.text('(2/3)'), findsOneWidget);
+
+      // Tap 3: count 3/4 (Step 1 complete, now Step 2 active!)
+      await tester.tap(dial);
+      await tester.pumpAndSettle();
+      expect(find.text('3 / 4'), findsOneWidget);
+
+      // Arabic text dynamically switched to Allahumma Antas-Salam
+      expect(find.text('أَسْتَغْفِرُ اللَّهَ'), findsNothing);
+      expect(
+        find.text(
+          'اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('(0/1)'), findsOneWidget);
+
+      // Tap 4: count 4/4 (Step 2 complete, overall dhikr completed!)
+      await tester.tap(dial);
+      await tester.pumpAndSettle();
+
+      expect(find.text('4 / 4'), findsOneWidget);
+      expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+    },
+  );
 }

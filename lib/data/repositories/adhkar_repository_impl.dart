@@ -28,12 +28,34 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     }
   }
 
-  @override
-  List<DhikrItem> getAll() => AdhkarCatalog.all;
+  bool _adhkarReviewModeFallback = false;
 
   @override
-  List<DhikrItem> getByCategory(DhikrCategory category) =>
-      AdhkarCatalog.getByCategory(category);
+  bool get isReviewModeEnabled =>
+      _settingsService?.adhkarReviewModeEnabled ?? _adhkarReviewModeFallback;
+
+  @override
+  Future<void> setReviewModeEnabled(bool enabled) async {
+    _adhkarReviewModeFallback = enabled;
+    await _settingsService?.setAdhkarReviewModeEnabled(enabled);
+  }
+
+  @override
+  List<DhikrItem> getAll({bool? includePendingReview}) {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    return include
+        ? AdhkarCatalog.all
+        : AdhkarCatalog.all.where((d) => d.isApproved).toList();
+  }
+
+  @override
+  List<DhikrItem> getByCategory(
+    DhikrCategory category, {
+    bool? includePendingReview,
+  }) {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    return AdhkarCatalog.getByCategory(category, includePendingReview: include);
+  }
 
   @override
   DhikrItem? getById(String id) => AdhkarCatalog.getById(id);
@@ -94,7 +116,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       final nowStr = DateTime.now().toIso8601String().substring(0, 10);
       final category = _parseCategory(effectiveCollectionId);
       if (category != null) {
-        final items = AdhkarCatalog.getByCategory(category);
+        final items = AdhkarCatalog.getByCategory(
+          category,
+          includePendingReview: true,
+        );
         final completedIds = _settingsService.getCompletedDhikrIds(nowStr);
         final counts = <String, int>{};
         bool hasAnyProgress = false;
@@ -180,7 +205,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     final collectionId = _categoryToCollectionId(category);
     final session = await getSession(collectionId);
     if (session == null) return 0;
-    final items = AdhkarCatalog.getByCategory(category);
+    final items = getByCategory(category);
     return items
         .where((i) => (session.counts[i.id] ?? 0) >= i.targetCount)
         .length;
@@ -189,9 +214,9 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   @override
   Stream<int> watchCategoryCompletedCount(DhikrCategory category) {
     final collectionId = _categoryToCollectionId(category);
-    final items = AdhkarCatalog.getByCategory(category);
     return watchSession(collectionId).map((session) {
       if (session == null) return 0;
+      final items = getByCategory(category);
       return items
           .where((i) => (session.counts[i.id] ?? 0) >= i.targetCount)
           .length;
@@ -289,7 +314,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
           DhikrCategory.dailySunnah,
         ]) {
           final colId = _categoryToCollectionId(cat);
-          final catItems = AdhkarCatalog.getByCategory(cat);
+          final catItems = AdhkarCatalog.getByCategory(
+            cat,
+            includePendingReview: true,
+          );
           if (catItems.isNotEmpty &&
               catItems.every((ci) => completedIds.contains(ci.id))) {
             dateCompletionsToLog.putIfAbsent(date, () => {}).add(colId);
@@ -329,7 +357,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       final colId = entry.key;
       final cat = _parseCategory(colId);
       final items = cat != null
-          ? AdhkarCatalog.getByCategory(cat)
+          ? AdhkarCatalog.getByCategory(cat, includePendingReview: true)
           : <DhikrItem>[];
       final isCompleted =
           items.isNotEmpty &&

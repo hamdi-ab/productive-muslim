@@ -1844,6 +1844,48 @@ abstract class AppLocalizations {
   /// **'You have completed this remembrance collection. Your progress is saved for today.'**
   String get adhkarCollectionCompletedDesc;
 
+  /// No description provided for @adhkarEditorialReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Editorial Review Mode'**
+  String get adhkarEditorialReviewMode;
+
+  /// No description provided for @adhkarReviewModeBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Editorial Review Mode: Viewing unreviewed entries for scholarly verification.'**
+  String get adhkarReviewModeBanner;
+
+  /// No description provided for @adhkarContentUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Under Editorial Review'**
+  String get adhkarContentUnderReview;
+
+  /// No description provided for @adhkarContentUnderReviewDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembrances in this collection are currently undergoing verification and will be available once approved.'**
+  String get adhkarContentUnderReviewDesc;
+
+  /// No description provided for @adhkarEnableReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Draft Content'**
+  String get adhkarEnableReviewMode;
+
+  /// No description provided for @adhkarDisableReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Review Mode'**
+  String get adhkarDisableReviewMode;
+
+  /// No description provided for @adhkarStepIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String adhkarStepIndicator(int current, int total);
+
   /// No description provided for @smartNotificationsTitle.
   ///
   /// In en, this message translates to:

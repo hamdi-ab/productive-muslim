@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/repositories/adhkar_repository_impl.dart';
@@ -100,6 +99,7 @@ void main() {
         adhkarDao: dao,
         settingsService: settingsService,
       );
+      await repo.setReviewModeEnabled(true);
 
       GetIt.instance.registerSingleton<AppDatabase>(db);
       GetIt.instance.registerSingleton<AdhkarDao>(dao);
@@ -134,7 +134,7 @@ void main() {
 
       // Simulate session progress saved to SQLite DB (e.g. 1 morning dhikr completed)
       final morningCategory = adhkarService.getCurrentContextCategory();
-      final items = AdhkarCatalog.getByCategory(morningCategory);
+      final items = repo.getByCategory(morningCategory);
 
       await repo.saveSession(
         collectionId: morningCategory.name,

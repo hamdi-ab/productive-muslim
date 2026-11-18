@@ -102,12 +102,13 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
       );
     }
 
-    final items = AdhkarCatalog.getByCategory(activeCategory);
-    final totalCount = items.length;
-
     final repo = getIt.isRegistered<AdhkarRepository>()
         ? getIt<AdhkarRepository>()
         : null;
+    final items = repo != null
+        ? repo.getByCategory(activeCategory)
+        : AdhkarCatalog.getByCategory(activeCategory);
+    final totalCount = items.length;
 
     if (repo != null) {
       return StreamBuilder<AdhkarSessionRecord?>(
