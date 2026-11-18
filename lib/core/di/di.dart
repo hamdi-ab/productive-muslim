@@ -101,7 +101,7 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<AdhkarRepository>(
     () => AdhkarRepositoryImpl(
       adhkarDao: getIt<AdhkarDao>(),
-      settingsService: getIt<SettingsService>(),
+      prefs: getIt<SharedPreferences>(),
     ),
   );
 

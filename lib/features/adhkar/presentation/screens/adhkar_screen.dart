@@ -15,6 +15,7 @@ import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_background_atmosphere.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_category_tabs.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_session_dock.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
@@ -44,7 +45,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   final Map<String, int> _counts = {};
-  int _categoryVersion = 0;
 
   final Set<String> _bookmarkedIds = {};
   bool _showTransliteration = false;
@@ -67,7 +67,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   }
 
   Future<void> _initData() async {
-    _loadLegacySavedCounts();
+    if (_adhkarRepo == null) {
+      _loadLegacySavedCounts();
+    }
     await _loadBookmarks();
     await _loadSessionForCollection(_selectedCategory.name);
   }
@@ -157,7 +159,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isBookmarksView = false;
       _selectedCategory = category;
       _currentPageIndex = 0;
-      _categoryVersion++;
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
@@ -171,7 +172,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     setState(() {
       _isBookmarksView = true;
       _currentPageIndex = 0;
-      _categoryVersion++;
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
@@ -216,15 +216,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _counts[item.id] = next;
     });
 
-    try {
-      if (getIt.isRegistered<AdhkarService>()) {
-        await getIt<AdhkarService>().recordDhikrCount(
-          dhikrId: item.id,
-          count: next,
-        );
-      }
-    } catch (_) {}
-
     final items = _currentItems;
     final isCollectionCompleted =
         items.isNotEmpty &&
@@ -247,32 +238,16 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     if (next == item.targetCount) {
       AppHaptics.heavyImpact();
-      try {
-        if (getIt.isRegistered<AdhkarService>()) {
-          final adhkarService = getIt<AdhkarService>();
-          await adhkarService.recordDhikrCompletion(dhikrId: item.id);
-          if (getIt.isRegistered<HomeWidgetSyncService>()) {
-            final count = adhkarService
-                .getCompletedDhikrIdsForDate(null)
-                .length;
-            getIt<HomeWidgetSyncService>().syncDhikrCount(count);
-          }
-        }
-      } catch (_) {}
-
-      final scheduledVersion = _categoryVersion;
-      if (_currentPageIndex < _currentItems.length - 1) {
-        Future.delayed(const Duration(milliseconds: 600), () {
-          if (mounted &&
-              _pageController.hasClients &&
-              _categoryVersion == scheduledVersion) {
-            _pageController.nextPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          }
-        });
+      if (getIt.isRegistered<HomeWidgetSyncService>()) {
+        try {
+          final completedCount = _counts.entries.where((entry) {
+            final d = AdhkarCatalog.getById(entry.key);
+            return d != null && entry.value >= d.targetCount;
+          }).length;
+          getIt<HomeWidgetSyncService>().syncDhikrCount(completedCount);
+        } catch (_) {}
       }
+      // Calm reading: do NOT force auto-advance to next item.
     } else if (next == 33 || next == 66) {
       AppHaptics.mediumImpact();
     } else {
@@ -286,9 +261,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _counts[item.id] = 0;
     });
     try {
-      if (getIt.isRegistered<AdhkarService>()) {
-        await getIt<AdhkarService>().resetDhikr(dhikrId: item.id);
-      }
       if (!_isBookmarksView && _adhkarRepo != null) {
         await _adhkarRepo!.saveSession(
           collectionId: _selectedCategory.name,
@@ -313,9 +285,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _pageController.jumpToPage(0);
     }
     try {
-      if (getIt.isRegistered<AdhkarService>()) {
-        await getIt<AdhkarService>().resetCategory(category);
-      }
       if (_adhkarRepo != null) {
         await _adhkarRepo!.saveSession(
           collectionId: category.name,
@@ -323,6 +292,31 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           counts: {},
           isCompleted: false,
         );
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _readAgain() async {
+    AppHaptics.mediumImpact();
+    final items = _currentItems;
+    setState(() {
+      for (final item in items) {
+        _counts[item.id] = 0;
+      }
+      _currentPageIndex = 0;
+    });
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    try {
+      if (!_isBookmarksView && _adhkarRepo != null) {
+        await _adhkarRepo!.saveSession(
+          collectionId: _selectedCategory.name,
+          lastPageIndex: 0,
+          counts: _counts,
+          isCompleted: false,
+        );
+        // Note: Retains daily completion record in AdhkarCompletions
       }
     } catch (_) {}
   }
@@ -339,6 +333,21 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final items = _currentItems;
     final hasParentScaffold = Scaffold.maybeOf(context) != null;
+
+    final isCollectionCompleted =
+        items.isNotEmpty &&
+        items.every((i) => (_counts[i.id] ?? 0) >= i.targetCount);
+    final hasCompletionCard = isCollectionCompleted && !_isBookmarksView;
+    final totalPageCount = hasCompletionCard ? items.length + 1 : items.length;
+
+    final String pageLabel;
+    if (_currentPageIndex >= items.length && hasCompletionCard) {
+      pageLabel = isAr ? 'اكتمل' : 'Completed';
+    } else {
+      pageLabel = isAr
+          ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
+          : '${_currentPageIndex + 1} / ${items.length}';
+    }
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
@@ -389,9 +398,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        isAr
-                            ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
-                            : '${_currentPageIndex + 1} / ${items.length}',
+                        pageLabel,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -461,9 +468,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    isAr
-                                        ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
-                                        : '${_currentPageIndex + 1} / ${items.length}',
+                                    pageLabel,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
@@ -474,39 +479,48 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                   ),
                                 ),
                               if (_isCompletedToday && !_isBookmarksView)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981)
-                                        .withValues(alpha: isDark ? 0.2 : 0.12),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: const Color(0xFF10B981)
-                                          .withValues(alpha: 0.4),
-                                      width: 0.8,
+                                GestureDetector(
+                                  onTap: () {
+                                    if (hasCompletionCard &&
+                                        _pageController.hasClients) {
+                                      _pageController.jumpToPage(items.length);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.check_circle_rounded,
-                                        size: 13,
-                                        color: Color(0xFF10B981),
+                                    decoration: BoxDecoration(
+                                      color: const Color(
+                                        0xFF10B981,
+                                      ).withValues(alpha: isDark ? 0.2 : 0.12),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xFF10B981)
+                                            .withValues(alpha: 0.4),
+                                        width: 0.8,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        l10n.adhkarCompletedToday,
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle_rounded,
+                                          size: 13,
                                           color: Color(0xFF10B981),
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          l10n.adhkarCompletedToday,
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF10B981),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                             ],
@@ -587,19 +601,42 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                       : PageView.builder(
                           controller: _pageController,
                           physics: const BouncingScrollPhysics(),
-                          itemCount: items.length,
+                          itemCount: totalPageCount,
                           onPageChanged: (idx) {
                             setState(() => _currentPageIndex = idx);
                             if (!_isBookmarksView && _adhkarRepo != null) {
                               _adhkarRepo!.saveSession(
                                 collectionId: _selectedCategory.name,
-                                lastPageIndex: idx,
+                                lastPageIndex: idx < items.length
+                                    ? idx
+                                    : items.length - 1,
                                 counts: _counts,
-                                isCompleted: _isCompletedToday,
+                                isCompleted: isCollectionCompleted,
                               );
                             }
                           },
                           itemBuilder: (context, index) {
+                            if (index == items.length && hasCompletionCard) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.xs,
+                                ),
+                                child: AdhkarCollectionCompletionCard(
+                                  category: _selectedCategory,
+                                  items: items,
+                                  onDone: () {
+                                    if (Navigator.canPop(context)) {
+                                      Navigator.maybePop(context);
+                                    } else {
+                                      _pageController.jumpToPage(0);
+                                    }
+                                  },
+                                  onReadAgain: _readAgain,
+                                ),
+                              );
+                            }
+
                             final item = items[index];
                             final count = _counts[item.id] ?? 0;
                             final isBookmarked = _bookmarkedIds.contains(
@@ -638,7 +675,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                             );
                           }
                         : null,
-                    onNext: _currentPageIndex < items.length - 1
+                    onNext: _currentPageIndex < totalPageCount - 1
                         ? () {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 300),

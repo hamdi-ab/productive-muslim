@@ -39,26 +39,68 @@ void main() {
       expect(all.every((item) => item.contentVersion >= 1), isTrue);
     });
 
-    test('returns general dhikr collection with authentic references', () {
+    test('marks general dhikr items as pending review and distinguishes prescribed counts', () {
       final generalItems = repository.getByCategory(DhikrCategory.general);
       expect(generalItems.length, equals(5));
+
+      // All 5 General Dhikr items must be pending editorial review
+      expect(
+        generalItems.every(
+          (i) => i.reviewStatus == ContentReviewStatus.pendingReview,
+        ),
+        isTrue,
+      );
+      expect(generalItems.every((i) => i.isPendingReview), isTrue);
+      expect(generalItems.every((i) => !i.isApproved), isTrue);
 
       final subhanallah = generalItems.firstWhere(
         (i) => i.id == 'general_subhanallah_bihamdihi',
       );
       expect(subhanallah.reference, contains('Muslim 2692'));
       expect(subhanallah.targetCount, equals(100));
+      // Source specifies 100
+      expect(subhanallah.isCountPrescribed, isTrue);
 
       final fourBeloved = generalItems.firstWhere(
         (i) => i.id == 'general_four_beloved_words',
       );
       expect(fourBeloved.reference, contains('Muslim 2137'));
+      // 33 is an app target, not Hadith-prescribed
+      expect(fourBeloved.isCountPrescribed, isFalse);
 
       final istighfar = generalItems.firstWhere(
         (i) => i.id == 'general_istighfar',
       );
       expect(istighfar.reference, contains('Bukhari 6307'));
       expect(istighfar.targetCount, equals(70));
+      expect(istighfar.isCountPrescribed, isTrue);
+
+      final laHawla = generalItems.firstWhere(
+        (i) => i.id == 'general_la_hawla',
+      );
+      expect(laHawla.isCountPrescribed, isFalse);
+
+      final salawat = generalItems.firstWhere((i) => i.id == 'general_salawat');
+      expect(salawat.isCountPrescribed, isFalse);
+    });
+
+    test('established collections have approved status', () {
+      final morningItems = repository.getByCategory(DhikrCategory.morning);
+      expect(
+        morningItems.every(
+          (i) => i.reviewStatus == ContentReviewStatus.approved,
+        ),
+        isTrue,
+      );
+      expect(morningItems.every((i) => i.isApproved), isTrue);
+
+      final eveningItems = repository.getByCategory(DhikrCategory.evening);
+      expect(eveningItems.every((i) => i.isApproved), isTrue);
+
+      final postPrayerItems = repository.getByCategory(
+        DhikrCategory.postPrayer,
+      );
+      expect(postPrayerItems.every((i) => i.isApproved), isTrue);
     });
 
     test('getById returns matching item or null', () {
@@ -124,6 +166,30 @@ void main() {
         expect(dbRow!.countsJson, contains('sayyid_al_istighfar'));
       },
     );
+
+    test('getCategoryCompletedCount and watchCategoryCompletedCount compute live progress', () async {
+      expect(
+        await repository.getCategoryCompletedCount(DhikrCategory.postPrayer),
+        equals(0),
+      );
+
+      await repository.saveSession(
+        collectionId: DhikrCategory.postPrayer.name,
+        lastPageIndex: 0,
+        counts: {'post_salah_astaghfirullah': 3},
+        isCompleted: false,
+      );
+
+      expect(
+        await repository.getCategoryCompletedCount(DhikrCategory.postPrayer),
+        equals(1),
+      );
+
+      final streamValue = await repository
+          .watchCategoryCompletedCount(DhikrCategory.postPrayer)
+          .first;
+      expect(streamValue, equals(1));
+    });
   });
 
   group('AdhkarRepository - Daily Completions & History', () {

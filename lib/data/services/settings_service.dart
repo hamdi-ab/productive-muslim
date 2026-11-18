@@ -14,6 +14,8 @@ class SettingsService {
 
   final SharedPreferences? _prefs;
 
+  SharedPreferences? get prefs => _prefs;
+
   static const _themeModeKey = 'app_theme_mode';
   static const _localeKey = 'app_locale';
   static const _arabicFontFamilyKey = 'arabic_font_family';

@@ -7,6 +7,14 @@ import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 class AdhkarCategoryTabs extends StatelessWidget {
+  static const List<DhikrCategory> phase1Categories = [
+    DhikrCategory.morning,
+    DhikrCategory.evening,
+    DhikrCategory.postPrayer,
+    DhikrCategory.general,
+  ];
+
+  final List<DhikrCategory>? categories;
   final DhikrCategory? selectedCategory;
   final ValueChanged<DhikrCategory> onCategorySelected;
   final bool isBookmarksSelected;
@@ -16,6 +24,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
 
   const AdhkarCategoryTabs({
     super.key,
+    this.categories,
     required this.selectedCategory,
     required this.onCategorySelected,
     this.isBookmarksSelected = false,
@@ -48,6 +57,8 @@ class AdhkarCategoryTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activeCategories = categories ?? phase1Categories;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
@@ -57,7 +68,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ...DhikrCategory.values.map((cat) {
+          ...activeCategories.map((cat) {
             final isSelected = !isBookmarksSelected && cat == selectedCategory;
             return Padding(
               padding: const EdgeInsets.only(right: 8),

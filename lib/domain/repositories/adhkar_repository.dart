@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 
@@ -25,6 +27,10 @@ abstract class AdhkarRepository {
   });
   Future<void> clearSession(String collectionId);
 
+  // Progress & Counts
+  Future<int> getCategoryCompletedCount(DhikrCategory category);
+  Stream<int> watchCategoryCompletedCount(DhikrCategory category);
+
   // Daily Completions
   Future<void> recordCollectionCompletion(String collectionId, {String? date});
   Future<bool> isCollectionCompletedToday(String collectionId, {String? date});
@@ -34,4 +40,7 @@ abstract class AdhkarRepository {
   });
   Future<List<String>> getCompletedCollectionIdsForDate(String date);
   Future<void> removeCollectionCompletion(String collectionId, {String? date});
+
+  // Migration
+  Future<void> migrateFromSharedPreferencesIfNeeded(SharedPreferences prefs);
 }

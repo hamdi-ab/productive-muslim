@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
@@ -11,12 +13,20 @@ import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 class AdhkarRepositoryImpl implements AdhkarRepository {
   final AdhkarDao _adhkarDao;
   final SettingsService? _settingsService;
+  final SharedPreferences? _prefs;
 
   AdhkarRepositoryImpl({
     required AdhkarDao adhkarDao,
+    SharedPreferences? prefs,
     SettingsService? settingsService,
   }) : _adhkarDao = adhkarDao,
-       _settingsService = settingsService;
+       _settingsService = settingsService,
+       _prefs = prefs ?? settingsService?.prefs {
+    final effectivePrefs = _prefs;
+    if (effectivePrefs != null) {
+      migrateFromSharedPreferencesIfNeeded(effectivePrefs);
+    }
+  }
 
   @override
   List<DhikrItem> getAll() => AdhkarCatalog.all;
@@ -157,6 +167,29 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     return _adhkarDao.clearSession(collectionId);
   }
 
+  // --- Progress & Counts ---
+
+  @override
+  Future<int> getCategoryCompletedCount(DhikrCategory category) async {
+    final session = await getSession(category.name);
+    if (session == null) return 0;
+    final items = AdhkarCatalog.getByCategory(category);
+    return items
+        .where((i) => (session.counts[i.id] ?? 0) >= i.targetCount)
+        .length;
+  }
+
+  @override
+  Stream<int> watchCategoryCompletedCount(DhikrCategory category) {
+    final items = AdhkarCatalog.getByCategory(category);
+    return watchSession(category.name).map((session) {
+      if (session == null) return 0;
+      return items
+          .where((i) => (session.counts[i.id] ?? 0) >= i.targetCount)
+          .length;
+    });
+  }
+
   // --- Daily Completions ---
 
   @override
@@ -201,6 +234,90 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     final targetDate =
         date ?? DateTime.now().toIso8601String().substring(0, 10);
     return _adhkarDao.removeCompletion(collectionId, targetDate);
+  }
+
+  // --- Migration ---
+
+  @override
+  Future<void> migrateFromSharedPreferencesIfNeeded(
+    SharedPreferences prefs,
+  ) async {
+    const migrationKey = 'adhkar_migrated_to_drift_v1';
+    if (prefs.getBool(migrationKey) == true) return;
+
+    final keys = prefs.getKeys();
+    final todayStr = DateTime.now().toIso8601String().substring(0, 10);
+    final sessionsToSave = <String, Map<String, int>>{};
+
+    for (final key in keys) {
+      if (key.startsWith('adhkar_done_')) {
+        final date = key.replaceFirst('adhkar_done_', '');
+        final completedIds = prefs.getStringList(key) ?? [];
+        for (final id in completedIds) {
+          final item = AdhkarCatalog.getById(id);
+          if (item != null) {
+            final cat = item.category.name;
+            sessionsToSave.putIfAbsent(cat, () => {})[id] = item.targetCount;
+            // Check if collection completed
+            final catItems = AdhkarCatalog.getByCategory(item.category);
+            final allDone =
+                catItems.isNotEmpty &&
+                catItems.every(
+                  (ci) =>
+                      completedIds.contains(ci.id) ||
+                      (sessionsToSave[cat]?[ci.id] ?? 0) >= ci.targetCount,
+                );
+            if (allDone) {
+              await _adhkarDao.logCollectionCompletion(
+                collectionId: cat,
+                date: date,
+                completedAt: DateTime.now().millisecondsSinceEpoch,
+              );
+            }
+          }
+        }
+      } else if (key.startsWith('adhkar_count_')) {
+        final parts = key.split('_');
+        if (parts.length >= 4) {
+          final date = parts[2];
+          final dhikrId = parts.sublist(3).join('_');
+          final count = prefs.getInt(key) ?? 0;
+          if (date == todayStr && count > 0) {
+            final item = AdhkarCatalog.getById(dhikrId);
+            if (item != null) {
+              final cat = item.category.name;
+              sessionsToSave.putIfAbsent(cat, () => {})[dhikrId] = count;
+            }
+          }
+        }
+      }
+    }
+
+    for (final entry in sessionsToSave.entries) {
+      final cat = _parseCategory(entry.key);
+      final items = cat != null
+          ? AdhkarCatalog.getByCategory(cat)
+          : <DhikrItem>[];
+      final isCompleted =
+          items.isNotEmpty &&
+          items.every((i) => (entry.value[i.id] ?? 0) >= i.targetCount);
+      await saveSession(
+        collectionId: entry.key,
+        lastPageIndex: 0,
+        counts: entry.value,
+        isCompleted: isCompleted,
+      );
+    }
+
+    // Clean up legacy keys if any migrated
+    if (sessionsToSave.isNotEmpty) {
+      for (final key in keys) {
+        if (key.startsWith('adhkar_done_') || key.startsWith('adhkar_count_')) {
+          await prefs.remove(key);
+        }
+      }
+      await prefs.setBool(migrationKey, true);
+    }
   }
 
   // --- Helpers ---

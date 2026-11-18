@@ -1814,6 +1814,36 @@ abstract class AppLocalizations {
   /// **'Remove bookmark'**
   String get adhkarBookmarkRemove;
 
+  /// No description provided for @adhkarPendingReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Review'**
+  String get adhkarPendingReview;
+
+  /// No description provided for @adhkarPrescribedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescribed'**
+  String get adhkarPrescribedCount;
+
+  /// No description provided for @adhkarRecommendedTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get adhkarRecommendedTarget;
+
+  /// No description provided for @adhkarReadAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Read again'**
+  String get adhkarReadAgain;
+
+  /// No description provided for @adhkarCollectionCompletedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have completed this remembrance collection. Your progress is saved for today.'**
+  String get adhkarCollectionCompletedDesc;
+
   /// No description provided for @smartNotificationsTitle.
   ///
   /// In en, this message translates to:

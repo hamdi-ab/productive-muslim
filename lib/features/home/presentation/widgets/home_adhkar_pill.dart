@@ -7,7 +7,9 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
+import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Ambient contextual pill on the Home Screen that highlights
@@ -93,25 +95,75 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
     final now = DateTime.now();
 
     DhikrCategory activeCategory = DhikrCategory.morning;
-    int completedCount = 0;
-    int totalCount = 0;
-
     if (getIt.isRegistered<AdhkarService>()) {
-      final adhkarService = getIt<AdhkarService>();
-      activeCategory = adhkarService.getCurrentContextCategory(
+      activeCategory = getIt<AdhkarService>().getCurrentContextCategory(
         now: now,
         prayerTimes: widget.prayerTimes,
       );
-      completedCount = adhkarService.getCompletedCountForCategory(
-        activeCategory,
-      );
-      totalCount = AdhkarCatalog.getByCategory(activeCategory).length;
-    } else {
-      totalCount = AdhkarCatalog.getByCategory(activeCategory).length;
     }
 
-    final accentColor = _getCategoryColor(activeCategory);
+    final items = AdhkarCatalog.getByCategory(activeCategory);
+    final totalCount = items.length;
+
+    final repo = getIt.isRegistered<AdhkarRepository>()
+        ? getIt<AdhkarRepository>()
+        : null;
+
+    if (repo != null) {
+      return StreamBuilder<AdhkarSessionRecord?>(
+        stream: repo.watchSession(activeCategory.name),
+        builder: (context, snapshot) {
+          final session = snapshot.data;
+          final counts = session?.counts ?? {};
+          final completedCount = items
+              .where((i) => (counts[i.id] ?? 0) >= i.targetCount)
+              .length;
+          final isAllDone =
+              totalCount > 0 &&
+              (completedCount >= totalCount || (session?.isCompleted ?? false));
+
+          return _buildPill(
+            context: context,
+            activeCategory: activeCategory,
+            completedCount: completedCount,
+            totalCount: totalCount,
+            isAllDone: isAllDone,
+            l10n: l10n,
+            isAr: isAr,
+          );
+        },
+      );
+    }
+
+    int completedCount = 0;
+    if (getIt.isRegistered<AdhkarService>()) {
+      completedCount = getIt<AdhkarService>().getCompletedCountForCategory(
+        activeCategory,
+      );
+    }
     final isAllDone = totalCount > 0 && completedCount >= totalCount;
+
+    return _buildPill(
+      context: context,
+      activeCategory: activeCategory,
+      completedCount: completedCount,
+      totalCount: totalCount,
+      isAllDone: isAllDone,
+      l10n: l10n,
+      isAr: isAr,
+    );
+  }
+
+  Widget _buildPill({
+    required BuildContext context,
+    required DhikrCategory activeCategory,
+    required int completedCount,
+    required int totalCount,
+    required bool isAllDone,
+    required AppLocalizations l10n,
+    required bool isAr,
+  }) {
+    final accentColor = _getCategoryColor(activeCategory);
 
     return InkWell(
       onTap: () => _handleTap(activeCategory),

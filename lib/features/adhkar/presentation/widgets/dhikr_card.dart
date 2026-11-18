@@ -230,49 +230,122 @@ class DhikrCard extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.primaryLight.withValues(
-                                          alpha: 0.14,
-                                        )
-                                      : AppColors.primary.withValues(
-                                          alpha: 0.08,
-                                        ),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.primaryLight.withValues(
-                                      alpha: 0.25,
-                                    ),
-                                    width: 0.8,
+                              if (item.isApproved)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
                                   ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.verified_rounded,
-                                      size: 13,
-                                      color: isDark
-                                          ? AppColors.primaryLight
-                                          : AppColors.primary,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.primaryLight.withValues(
+                                            alpha: 0.14,
+                                          )
+                                        : AppColors.primary.withValues(
+                                            alpha: 0.08,
+                                          ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: AppColors.primaryLight.withValues(
+                                        alpha: 0.25,
+                                      ),
+                                      width: 0.8,
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Authentic',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.verified_rounded,
+                                        size: 13,
                                         color: isDark
                                             ? AppColors.primaryLight
                                             : AppColors.primary,
                                       ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Authentic',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? AppColors.primaryLight
+                                              : AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withValues(
+                                      alpha: isDark ? 0.18 : 0.12,
                                     ),
-                                  ],
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.amber.withValues(
+                                        alpha: 0.4,
+                                      ),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.hourglass_top_rounded,
+                                        size: 13,
+                                        color: isDark
+                                            ? const Color(0xFFFCD34D)
+                                            : const Color(0xFFD97706),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        l10n.adhkarPendingReview,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark
+                                              ? const Color(0xFFFCD34D)
+                                              : const Color(0xFFD97706),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.white.withValues(alpha: 0.06)
+                                      : Colors.black.withValues(alpha: 0.04),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.12)
+                                        : Colors.black.withValues(alpha: 0.08),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  item.isCountPrescribed
+                                      ? l10n.adhkarPrescribedCount
+                                      : l10n.adhkarRecommendedTarget,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
                                 ),
                               ),
                             ],

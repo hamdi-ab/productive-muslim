@@ -968,6 +968,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarBookmarkRemove => 'إزالة من المحفوظات';
 
   @override
+  String get adhkarPendingReview => 'قيد المراجعة';
+
+  @override
+  String get adhkarPrescribedCount => 'وارد في الأثر';
+
+  @override
+  String get adhkarRecommendedTarget => 'مستحب';
+
+  @override
+  String get adhkarReadAgain => 'إعادة القراءة';
+
+  @override
+  String get adhkarCollectionCompletedDesc =>
+      'أتممت وردك من هذا القسم بحمد الله، وقد حُفظ إنجازك لهذا اليوم.';
+
+  @override
   String get smartNotificationsTitle => 'تذكيرات الأذكار والسنن الذكية';
 
   @override

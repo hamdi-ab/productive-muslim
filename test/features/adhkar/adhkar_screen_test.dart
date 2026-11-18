@@ -11,6 +11,7 @@ import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 void main() {
@@ -53,7 +54,7 @@ void main() {
   }
 
   testWidgets(
-    'renders Adhkar screen with category tabs, Arabic card and counter',
+    'renders Adhkar screen with Phase 1 category tabs and Authentic badge on approved item',
     (tester) async {
       await tester.pumpWidget(
         buildSubject(initialCategory: DhikrCategory.morning),
@@ -61,39 +62,133 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Daily Adhkar & Remembrances'), findsOneWidget);
+
+      // Phase 1 essential collections strictly present
       expect(find.text('Morning'), findsOneWidget);
       expect(find.text('Evening'), findsOneWidget);
-      expect(find.text('Waking Up Remembrance'), findsOneWidget);
+      expect(find.text('Post-Salah'), findsOneWidget);
+      expect(find.text('General'), findsOneWidget);
+      expect(find.text('Bookmarks'), findsOneWidget);
+
+      // Legacy/Phase 2 categories are NOT exposed as top-level tabs
+      expect(find.text('Waking Up'), findsNothing);
+      expect(find.text('Bedtime'), findsNothing);
+      expect(find.text('Daily Sunnah'), findsNothing);
+
+      // Approved item has Authentic badge and Prescribed badge
+      expect(find.text('Authentic'), findsOneWidget);
+      expect(find.text('Prescribed'), findsOneWidget);
       expect(find.text('Tap anywhere to count'), findsOneWidget);
     },
   );
 
+  testWidgets('tapping tap area increments count with NO forced auto-advance', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.morning),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 / 1'), findsOneWidget);
+    expect(find.text('Waking Up Remembrance'), findsOneWidget);
+
+    final tapArea = find.text('Tap anywhere to count');
+    expect(tapArea, findsOneWidget);
+
+    // Tap once to complete the 1-count dhikr
+    await tester.tap(tapArea);
+    await tester.pump(); // immediate frame
+
+    expect(find.text('1 / 1'), findsOneWidget);
+    expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+
+    // NO forced progression: user stays on card 1 to reflect calmly
+    await tester.pump(const Duration(milliseconds: 800));
+    await tester.pumpAndSettle();
+    expect(find.text('Waking Up Remembrance'), findsOneWidget);
+    expect(find.text('1 / 7'), findsOneWidget);
+  });
+
   testWidgets(
-    'tapping full-screen tap area increments count and records completion',
+    'general dhikr items display Pending Review badge and target count classification',
     (tester) async {
       await tester.pumpWidget(
-        buildSubject(initialCategory: DhikrCategory.wakingUp),
+        buildSubject(initialCategory: DhikrCategory.general),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('0 / 1'), findsOneWidget);
+      expect(find.text('Glory and Praise be to Allah'), findsOneWidget);
+      expect(find.textContaining('Muslim 2692'), findsOneWidget);
 
-      final tapArea = find.text('Tap anywhere to count');
-      expect(tapArea, findsOneWidget);
+      // Unreviewed General Dhikr must show Pending Review badge instead of Authentic
+      expect(find.text('Pending Review'), findsOneWidget);
+      expect(find.text('Authentic'), findsNothing);
 
-      // Tap once to complete the 1-count dhikr
-      await tester.tap(tapArea);
-      await tester.pump(); // immediate frame
+      // Muslim 2692 specifies 100 times, so it is Prescribed
+      expect(find.text('Prescribed'), findsOneWidget);
+    },
+  );
 
-      expect(find.text('1 / 1'), findsOneWidget);
-      expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+  testWidgets(
+    'shows calm collection-completion state with Done and Read Again actions',
+    (tester) async {
+      // Complete all items in After Salah collection (2 items: 3x astaghfirullah, 100x tasbih)
+      final repo = getIt<AdhkarRepository>();
+      await repo.saveSession(
+        collectionId: DhikrCategory.postPrayer.name,
+        lastPageIndex: 1,
+        counts: {'post_salah_astaghfirullah': 3, 'post_salah_tasbih': 100},
+        isCompleted: true,
+      );
+      await repo.recordCollectionCompletion(DhikrCategory.postPrayer.name);
 
-      // After 600ms + animation, auto-advances to card 2
-      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pumpWidget(
+        buildSubject(initialCategory: DhikrCategory.postPrayer),
+      );
       await tester.pumpAndSettle();
-      expect(getIt<AdhkarService>().isDhikrCompleted('wake_up_1'), isTrue);
-      expect(find.text('2 / 2'), findsOneWidget);
-      expect(find.text('Affirmation of Tawheed upon Waking'), findsOneWidget);
+
+      // Swipe or navigate to completion page (page index 2 = items.length)
+      final nextBtn = find.text('Next Dhikr');
+      expect(nextBtn, findsOneWidget);
+      await tester.tap(nextBtn);
+      await tester.pumpAndSettle();
+
+      // Completion card is rendered
+      expect(find.byType(AdhkarCollectionCompletionCard), findsOneWidget);
+      expect(
+        find.text('الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'),
+        findsOneWidget,
+      );
+      expect(find.text('تقبل الله طاعتكم'), findsOneWidget);
+      expect(
+        find.text(
+          'You have completed this remembrance collection. Your progress is saved for today.',
+        ),
+        findsOneWidget,
+      );
+
+      final doneBtn = find.byKey(const Key('adhkar_completion_done_button'));
+      expect(doneBtn, findsOneWidget);
+
+      final readAgainBtn = find.byKey(
+        const Key('adhkar_completion_read_again_button'),
+      );
+      expect(readAgainBtn, findsOneWidget);
+
+      // Tapping Read Again resets session counts to 0 and jumps to page 0
+      await tester.tap(readAgainBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AdhkarCollectionCompletionCard), findsNothing);
+      expect(find.text('Seeking Forgiveness after Prayer'), findsOneWidget);
+      expect(find.text('0 / 3'), findsOneWidget);
+
+      // Daily completion history is preserved!
+      final completedToday = await repo.isCollectionCompletedToday(
+        DhikrCategory.postPrayer.name,
+      );
+      expect(completedToday, isTrue);
     },
   );
 
@@ -115,11 +210,16 @@ void main() {
   testWidgets('restores persisted counts and completed state on init', (
     tester,
   ) async {
-    final adhkarService = getIt<AdhkarService>();
-    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
+    final repo = getIt<AdhkarRepository>();
+    await repo.saveSession(
+      collectionId: DhikrCategory.morning.name,
+      lastPageIndex: 0,
+      counts: {'wake_up_1': 1},
+      isCompleted: false,
+    );
 
     await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.wakingUp),
+      buildSubject(initialCategory: DhikrCategory.morning),
     );
     await tester.pumpAndSettle();
 
@@ -127,14 +227,17 @@ void main() {
     expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
   });
 
-  testWidgets('reset button on card resets count and removes completion', (
-    tester,
-  ) async {
-    final adhkarService = getIt<AdhkarService>();
-    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
+  testWidgets('reset button on card resets count in session', (tester) async {
+    final repo = getIt<AdhkarRepository>();
+    await repo.saveSession(
+      collectionId: DhikrCategory.morning.name,
+      lastPageIndex: 0,
+      counts: {'wake_up_1': 1},
+      isCompleted: false,
+    );
 
     await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.wakingUp),
+      buildSubject(initialCategory: DhikrCategory.morning),
     );
     await tester.pumpAndSettle();
 
@@ -146,23 +249,23 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0 / 1'), findsOneWidget);
-    expect(adhkarService.isDhikrCompleted('wake_up_1'), isFalse);
   });
 
   testWidgets('reset category button resets all items in the category', (
     tester,
   ) async {
-    final adhkarService = getIt<AdhkarService>();
-    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_1');
-    await adhkarService.recordDhikrCompletion(dhikrId: 'wake_up_2');
+    final repo = getIt<AdhkarRepository>();
+    await repo.saveSession(
+      collectionId: DhikrCategory.morning.name,
+      lastPageIndex: 0,
+      counts: {'wake_up_1': 1, 'wake_up_2': 1},
+      isCompleted: false,
+    );
 
     await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.wakingUp),
+      buildSubject(initialCategory: DhikrCategory.morning),
     );
     await tester.pumpAndSettle();
-
-    expect(adhkarService.isDhikrCompleted('wake_up_1'), isTrue);
-    expect(adhkarService.isDhikrCompleted('wake_up_2'), isTrue);
 
     final resetCategoryBtn = find.byTooltip('Reset Category');
     expect(resetCategoryBtn, findsOneWidget);
@@ -170,15 +273,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0 / 1'), findsOneWidget);
-    expect(adhkarService.isDhikrCompleted('wake_up_1'), isFalse);
-    expect(adhkarService.isDhikrCompleted('wake_up_2'), isFalse);
   });
 
   testWidgets('transliteration toggle hides and shows transliteration text', (
     tester,
   ) async {
     await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.wakingUp),
+      buildSubject(initialCategory: DhikrCategory.morning),
     );
     await tester.pumpAndSettle();
 
@@ -208,7 +309,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.wakingUp),
+      buildSubject(initialCategory: DhikrCategory.morning),
     );
     await tester.pumpAndSettle();
 
@@ -227,17 +328,5 @@ void main() {
 
     // The bookmarked waking up dhikr is shown in the bookmarks view
     expect(find.text('Waking Up Remembrance'), findsOneWidget);
-  });
-
-  testWidgets('general dhikr collection tab displays general dhikr items', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      buildSubject(initialCategory: DhikrCategory.general),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Glory and Praise be to Allah'), findsOneWidget);
-    expect(find.textContaining('Muslim 2692'), findsOneWidget);
   });
 }

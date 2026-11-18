@@ -8,6 +8,8 @@ enum DhikrCategory {
   general,
 }
 
+enum ContentReviewStatus { approved, pendingReview }
+
 class DhikrItem {
   final String id;
   final DhikrCategory category;
@@ -22,6 +24,8 @@ class DhikrItem {
   final int targetCount;
   final int order;
   final int contentVersion;
+  final ContentReviewStatus reviewStatus;
+  final bool isCountPrescribed;
 
   const DhikrItem({
     required this.id,
@@ -37,5 +41,10 @@ class DhikrItem {
     this.targetCount = 1,
     this.order = 0,
     this.contentVersion = 1,
+    this.reviewStatus = ContentReviewStatus.approved,
+    this.isCountPrescribed = false,
   });
+
+  bool get isApproved => reviewStatus == ContentReviewStatus.approved;
+  bool get isPendingReview => reviewStatus == ContentReviewStatus.pendingReview;
 }
