@@ -4,17 +4,23 @@ import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 
 class AdhkarService {
   final SettingsService _settingsService;
   final HomeWidgetSyncService? _homeWidgetSyncService;
+  final AdhkarRepository? _adhkarRepository;
 
   AdhkarService({
     PrayerTimeService? prayerTimeService,
     required SettingsService settingsService,
     HomeWidgetSyncService? homeWidgetSyncService,
+    AdhkarRepository? adhkarRepository,
   }) : _settingsService = settingsService,
-       _homeWidgetSyncService = homeWidgetSyncService;
+       _homeWidgetSyncService = homeWidgetSyncService,
+       _adhkarRepository = adhkarRepository;
+
+  AdhkarRepository? get repository => _adhkarRepository;
 
   DhikrCategory getCurrentContextCategory({
     DateTime? now,

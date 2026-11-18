@@ -5,6 +5,7 @@ enum DhikrCategory {
   sleeping,
   postPrayer,
   dailySunnah,
+  general,
 }
 
 class DhikrItem {
@@ -20,6 +21,7 @@ class DhikrItem {
   final String virtue;
   final int targetCount;
   final int order;
+  final int contentVersion;
 
   const DhikrItem({
     required this.id,
@@ -34,5 +36,6 @@ class DhikrItem {
     required this.virtue,
     this.targetCount = 1,
     this.order = 0,
+    this.contentVersion = 1,
   });
 }

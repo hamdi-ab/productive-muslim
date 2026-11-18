@@ -3967,6 +3967,928 @@ class MuhasabahEntriesCompanion extends UpdateCompanion<MuhasabahEntryRow> {
   }
 }
 
+class $AdhkarBookmarksTable extends AdhkarBookmarks
+    with TableInfo<$AdhkarBookmarksTable, AdhkarBookmark> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarBookmarksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dhikrIdMeta = const VerificationMeta(
+    'dhikrId',
+  );
+  @override
+  late final GeneratedColumn<String> dhikrId = GeneratedColumn<String>(
+    'dhikr_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [dhikrId, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_bookmarks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarBookmark> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('dhikr_id')) {
+      context.handle(
+        _dhikrIdMeta,
+        dhikrId.isAcceptableOrUnknown(data['dhikr_id']!, _dhikrIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dhikrIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {dhikrId};
+  @override
+  AdhkarBookmark map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarBookmark(
+      dhikrId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dhikr_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AdhkarBookmarksTable createAlias(String alias) {
+    return $AdhkarBookmarksTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarBookmark extends DataClass implements Insertable<AdhkarBookmark> {
+  final String dhikrId;
+  final int createdAt;
+  const AdhkarBookmark({required this.dhikrId, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['dhikr_id'] = Variable<String>(dhikrId);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  AdhkarBookmarksCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarBookmarksCompanion(
+      dhikrId: Value(dhikrId),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory AdhkarBookmark.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarBookmark(
+      dhikrId: serializer.fromJson<String>(json['dhikrId']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'dhikrId': serializer.toJson<String>(dhikrId),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  AdhkarBookmark copyWith({String? dhikrId, int? createdAt}) => AdhkarBookmark(
+    dhikrId: dhikrId ?? this.dhikrId,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  AdhkarBookmark copyWithCompanion(AdhkarBookmarksCompanion data) {
+    return AdhkarBookmark(
+      dhikrId: data.dhikrId.present ? data.dhikrId.value : this.dhikrId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarBookmark(')
+          ..write('dhikrId: $dhikrId, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(dhikrId, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarBookmark &&
+          other.dhikrId == this.dhikrId &&
+          other.createdAt == this.createdAt);
+}
+
+class AdhkarBookmarksCompanion extends UpdateCompanion<AdhkarBookmark> {
+  final Value<String> dhikrId;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const AdhkarBookmarksCompanion({
+    this.dhikrId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AdhkarBookmarksCompanion.insert({
+    required String dhikrId,
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : dhikrId = Value(dhikrId),
+       createdAt = Value(createdAt);
+  static Insertable<AdhkarBookmark> custom({
+    Expression<String>? dhikrId,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (dhikrId != null) 'dhikr_id': dhikrId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AdhkarBookmarksCompanion copyWith({
+    Value<String>? dhikrId,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return AdhkarBookmarksCompanion(
+      dhikrId: dhikrId ?? this.dhikrId,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (dhikrId.present) {
+      map['dhikr_id'] = Variable<String>(dhikrId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarBookmarksCompanion(')
+          ..write('dhikrId: $dhikrId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AdhkarSessionsTable extends AdhkarSessions
+    with TableInfo<$AdhkarSessionsTable, AdhkarSession> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarSessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _collectionIdMeta = const VerificationMeta(
+    'collectionId',
+  );
+  @override
+  late final GeneratedColumn<String> collectionId = GeneratedColumn<String>(
+    'collection_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastPageIndexMeta = const VerificationMeta(
+    'lastPageIndex',
+  );
+  @override
+  late final GeneratedColumn<int> lastPageIndex = GeneratedColumn<int>(
+    'last_page_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _countsJsonMeta = const VerificationMeta(
+    'countsJson',
+  );
+  @override
+  late final GeneratedColumn<String> countsJson = GeneratedColumn<String>(
+    'counts_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _lastAccessedAtMeta = const VerificationMeta(
+    'lastAccessedAt',
+  );
+  @override
+  late final GeneratedColumn<int> lastAccessedAt = GeneratedColumn<int>(
+    'last_accessed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    collectionId,
+    lastPageIndex,
+    countsJson,
+    lastAccessedAt,
+    isCompleted,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarSession> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('collection_id')) {
+      context.handle(
+        _collectionIdMeta,
+        collectionId.isAcceptableOrUnknown(
+          data['collection_id']!,
+          _collectionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionIdMeta);
+    }
+    if (data.containsKey('last_page_index')) {
+      context.handle(
+        _lastPageIndexMeta,
+        lastPageIndex.isAcceptableOrUnknown(
+          data['last_page_index']!,
+          _lastPageIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('counts_json')) {
+      context.handle(
+        _countsJsonMeta,
+        countsJson.isAcceptableOrUnknown(data['counts_json']!, _countsJsonMeta),
+      );
+    }
+    if (data.containsKey('last_accessed_at')) {
+      context.handle(
+        _lastAccessedAtMeta,
+        lastAccessedAt.isAcceptableOrUnknown(
+          data['last_accessed_at']!,
+          _lastAccessedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastAccessedAtMeta);
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {collectionId};
+  @override
+  AdhkarSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarSession(
+      collectionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}collection_id'],
+      )!,
+      lastPageIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_page_index'],
+      )!,
+      countsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}counts_json'],
+      )!,
+      lastAccessedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_accessed_at'],
+      )!,
+      isCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_completed'],
+      )!,
+    );
+  }
+
+  @override
+  $AdhkarSessionsTable createAlias(String alias) {
+    return $AdhkarSessionsTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarSession extends DataClass implements Insertable<AdhkarSession> {
+  final String collectionId;
+  final int lastPageIndex;
+  final String countsJson;
+  final int lastAccessedAt;
+  final bool isCompleted;
+  const AdhkarSession({
+    required this.collectionId,
+    required this.lastPageIndex,
+    required this.countsJson,
+    required this.lastAccessedAt,
+    required this.isCompleted,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['collection_id'] = Variable<String>(collectionId);
+    map['last_page_index'] = Variable<int>(lastPageIndex);
+    map['counts_json'] = Variable<String>(countsJson);
+    map['last_accessed_at'] = Variable<int>(lastAccessedAt);
+    map['is_completed'] = Variable<bool>(isCompleted);
+    return map;
+  }
+
+  AdhkarSessionsCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarSessionsCompanion(
+      collectionId: Value(collectionId),
+      lastPageIndex: Value(lastPageIndex),
+      countsJson: Value(countsJson),
+      lastAccessedAt: Value(lastAccessedAt),
+      isCompleted: Value(isCompleted),
+    );
+  }
+
+  factory AdhkarSession.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarSession(
+      collectionId: serializer.fromJson<String>(json['collectionId']),
+      lastPageIndex: serializer.fromJson<int>(json['lastPageIndex']),
+      countsJson: serializer.fromJson<String>(json['countsJson']),
+      lastAccessedAt: serializer.fromJson<int>(json['lastAccessedAt']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'collectionId': serializer.toJson<String>(collectionId),
+      'lastPageIndex': serializer.toJson<int>(lastPageIndex),
+      'countsJson': serializer.toJson<String>(countsJson),
+      'lastAccessedAt': serializer.toJson<int>(lastAccessedAt),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+    };
+  }
+
+  AdhkarSession copyWith({
+    String? collectionId,
+    int? lastPageIndex,
+    String? countsJson,
+    int? lastAccessedAt,
+    bool? isCompleted,
+  }) => AdhkarSession(
+    collectionId: collectionId ?? this.collectionId,
+    lastPageIndex: lastPageIndex ?? this.lastPageIndex,
+    countsJson: countsJson ?? this.countsJson,
+    lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+    isCompleted: isCompleted ?? this.isCompleted,
+  );
+  AdhkarSession copyWithCompanion(AdhkarSessionsCompanion data) {
+    return AdhkarSession(
+      collectionId: data.collectionId.present
+          ? data.collectionId.value
+          : this.collectionId,
+      lastPageIndex: data.lastPageIndex.present
+          ? data.lastPageIndex.value
+          : this.lastPageIndex,
+      countsJson: data.countsJson.present
+          ? data.countsJson.value
+          : this.countsJson,
+      lastAccessedAt: data.lastAccessedAt.present
+          ? data.lastAccessedAt.value
+          : this.lastAccessedAt,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarSession(')
+          ..write('collectionId: $collectionId, ')
+          ..write('lastPageIndex: $lastPageIndex, ')
+          ..write('countsJson: $countsJson, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('isCompleted: $isCompleted')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    collectionId,
+    lastPageIndex,
+    countsJson,
+    lastAccessedAt,
+    isCompleted,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarSession &&
+          other.collectionId == this.collectionId &&
+          other.lastPageIndex == this.lastPageIndex &&
+          other.countsJson == this.countsJson &&
+          other.lastAccessedAt == this.lastAccessedAt &&
+          other.isCompleted == this.isCompleted);
+}
+
+class AdhkarSessionsCompanion extends UpdateCompanion<AdhkarSession> {
+  final Value<String> collectionId;
+  final Value<int> lastPageIndex;
+  final Value<String> countsJson;
+  final Value<int> lastAccessedAt;
+  final Value<bool> isCompleted;
+  final Value<int> rowid;
+  const AdhkarSessionsCompanion({
+    this.collectionId = const Value.absent(),
+    this.lastPageIndex = const Value.absent(),
+    this.countsJson = const Value.absent(),
+    this.lastAccessedAt = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AdhkarSessionsCompanion.insert({
+    required String collectionId,
+    this.lastPageIndex = const Value.absent(),
+    this.countsJson = const Value.absent(),
+    required int lastAccessedAt,
+    this.isCompleted = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : collectionId = Value(collectionId),
+       lastAccessedAt = Value(lastAccessedAt);
+  static Insertable<AdhkarSession> custom({
+    Expression<String>? collectionId,
+    Expression<int>? lastPageIndex,
+    Expression<String>? countsJson,
+    Expression<int>? lastAccessedAt,
+    Expression<bool>? isCompleted,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (collectionId != null) 'collection_id': collectionId,
+      if (lastPageIndex != null) 'last_page_index': lastPageIndex,
+      if (countsJson != null) 'counts_json': countsJson,
+      if (lastAccessedAt != null) 'last_accessed_at': lastAccessedAt,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AdhkarSessionsCompanion copyWith({
+    Value<String>? collectionId,
+    Value<int>? lastPageIndex,
+    Value<String>? countsJson,
+    Value<int>? lastAccessedAt,
+    Value<bool>? isCompleted,
+    Value<int>? rowid,
+  }) {
+    return AdhkarSessionsCompanion(
+      collectionId: collectionId ?? this.collectionId,
+      lastPageIndex: lastPageIndex ?? this.lastPageIndex,
+      countsJson: countsJson ?? this.countsJson,
+      lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
+      isCompleted: isCompleted ?? this.isCompleted,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (collectionId.present) {
+      map['collection_id'] = Variable<String>(collectionId.value);
+    }
+    if (lastPageIndex.present) {
+      map['last_page_index'] = Variable<int>(lastPageIndex.value);
+    }
+    if (countsJson.present) {
+      map['counts_json'] = Variable<String>(countsJson.value);
+    }
+    if (lastAccessedAt.present) {
+      map['last_accessed_at'] = Variable<int>(lastAccessedAt.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarSessionsCompanion(')
+          ..write('collectionId: $collectionId, ')
+          ..write('lastPageIndex: $lastPageIndex, ')
+          ..write('countsJson: $countsJson, ')
+          ..write('lastAccessedAt: $lastAccessedAt, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AdhkarCompletionsTable extends AdhkarCompletions
+    with TableInfo<$AdhkarCompletionsTable, AdhkarCompletion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarCompletionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _collectionIdMeta = const VerificationMeta(
+    'collectionId',
+  );
+  @override
+  late final GeneratedColumn<String> collectionId = GeneratedColumn<String>(
+    'collection_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<int> completedAt = GeneratedColumn<int>(
+    'completed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, collectionId, date, completedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_completions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarCompletion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('collection_id')) {
+      context.handle(
+        _collectionIdMeta,
+        collectionId.isAcceptableOrUnknown(
+          data['collection_id']!,
+          _collectionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_collectionIdMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_completedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {collectionId, date},
+  ];
+  @override
+  AdhkarCompletion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarCompletion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      collectionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}collection_id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AdhkarCompletionsTable createAlias(String alias) {
+    return $AdhkarCompletionsTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarCompletion extends DataClass
+    implements Insertable<AdhkarCompletion> {
+  final int id;
+  final String collectionId;
+  final String date;
+  final int completedAt;
+  const AdhkarCompletion({
+    required this.id,
+    required this.collectionId,
+    required this.date,
+    required this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['collection_id'] = Variable<String>(collectionId);
+    map['date'] = Variable<String>(date);
+    map['completed_at'] = Variable<int>(completedAt);
+    return map;
+  }
+
+  AdhkarCompletionsCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarCompletionsCompanion(
+      id: Value(id),
+      collectionId: Value(collectionId),
+      date: Value(date),
+      completedAt: Value(completedAt),
+    );
+  }
+
+  factory AdhkarCompletion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarCompletion(
+      id: serializer.fromJson<int>(json['id']),
+      collectionId: serializer.fromJson<String>(json['collectionId']),
+      date: serializer.fromJson<String>(json['date']),
+      completedAt: serializer.fromJson<int>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'collectionId': serializer.toJson<String>(collectionId),
+      'date': serializer.toJson<String>(date),
+      'completedAt': serializer.toJson<int>(completedAt),
+    };
+  }
+
+  AdhkarCompletion copyWith({
+    int? id,
+    String? collectionId,
+    String? date,
+    int? completedAt,
+  }) => AdhkarCompletion(
+    id: id ?? this.id,
+    collectionId: collectionId ?? this.collectionId,
+    date: date ?? this.date,
+    completedAt: completedAt ?? this.completedAt,
+  );
+  AdhkarCompletion copyWithCompanion(AdhkarCompletionsCompanion data) {
+    return AdhkarCompletion(
+      id: data.id.present ? data.id.value : this.id,
+      collectionId: data.collectionId.present
+          ? data.collectionId.value
+          : this.collectionId,
+      date: data.date.present ? data.date.value : this.date,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarCompletion(')
+          ..write('id: $id, ')
+          ..write('collectionId: $collectionId, ')
+          ..write('date: $date, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, collectionId, date, completedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarCompletion &&
+          other.id == this.id &&
+          other.collectionId == this.collectionId &&
+          other.date == this.date &&
+          other.completedAt == this.completedAt);
+}
+
+class AdhkarCompletionsCompanion extends UpdateCompanion<AdhkarCompletion> {
+  final Value<int> id;
+  final Value<String> collectionId;
+  final Value<String> date;
+  final Value<int> completedAt;
+  const AdhkarCompletionsCompanion({
+    this.id = const Value.absent(),
+    this.collectionId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.completedAt = const Value.absent(),
+  });
+  AdhkarCompletionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String collectionId,
+    required String date,
+    required int completedAt,
+  }) : collectionId = Value(collectionId),
+       date = Value(date),
+       completedAt = Value(completedAt);
+  static Insertable<AdhkarCompletion> custom({
+    Expression<int>? id,
+    Expression<String>? collectionId,
+    Expression<String>? date,
+    Expression<int>? completedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (collectionId != null) 'collection_id': collectionId,
+      if (date != null) 'date': date,
+      if (completedAt != null) 'completed_at': completedAt,
+    });
+  }
+
+  AdhkarCompletionsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? collectionId,
+    Value<String>? date,
+    Value<int>? completedAt,
+  }) {
+    return AdhkarCompletionsCompanion(
+      id: id ?? this.id,
+      collectionId: collectionId ?? this.collectionId,
+      date: date ?? this.date,
+      completedAt: completedAt ?? this.completedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (collectionId.present) {
+      map['collection_id'] = Variable<String>(collectionId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(completedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarCompletionsCompanion(')
+          ..write('id: $id, ')
+          ..write('collectionId: $collectionId, ')
+          ..write('date: $date, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3985,6 +4907,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MuhasabahEntriesTable muhasabahEntries = $MuhasabahEntriesTable(
     this,
   );
+  late final $AdhkarBookmarksTable adhkarBookmarks = $AdhkarBookmarksTable(
+    this,
+  );
+  late final $AdhkarSessionsTable adhkarSessions = $AdhkarSessionsTable(this);
+  late final $AdhkarCompletionsTable adhkarCompletions =
+      $AdhkarCompletionsTable(this);
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitCompletionsDao habitCompletionsDao = HabitCompletionsDao(
@@ -3993,6 +4921,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
   late final IntentionDao intentionDao = IntentionDao(this as AppDatabase);
   late final MuhasabahDao muhasabahDao = MuhasabahDao(this as AppDatabase);
+  late final AdhkarDao adhkarDao = AdhkarDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4006,6 +4935,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     intentionEntries,
     barakahDailyResponses,
     muhasabahEntries,
+    adhkarBookmarks,
+    adhkarSessions,
+    adhkarCompletions,
   ];
 }
 
@@ -6131,6 +7063,586 @@ typedef $$MuhasabahEntriesTableProcessedTableManager =
       MuhasabahEntryRow,
       PrefetchHooks Function()
     >;
+typedef $$AdhkarBookmarksTableCreateCompanionBuilder =
+    AdhkarBookmarksCompanion Function({
+      required String dhikrId,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$AdhkarBookmarksTableUpdateCompanionBuilder =
+    AdhkarBookmarksCompanion Function({
+      Value<String> dhikrId,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+class $$AdhkarBookmarksTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarBookmarksTable> {
+  $$AdhkarBookmarksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get dhikrId => $composableBuilder(
+    column: $table.dhikrId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarBookmarksTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarBookmarksTable> {
+  $$AdhkarBookmarksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get dhikrId => $composableBuilder(
+    column: $table.dhikrId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarBookmarksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarBookmarksTable> {
+  $$AdhkarBookmarksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get dhikrId =>
+      $composableBuilder(column: $table.dhikrId, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$AdhkarBookmarksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarBookmarksTable,
+          AdhkarBookmark,
+          $$AdhkarBookmarksTableFilterComposer,
+          $$AdhkarBookmarksTableOrderingComposer,
+          $$AdhkarBookmarksTableAnnotationComposer,
+          $$AdhkarBookmarksTableCreateCompanionBuilder,
+          $$AdhkarBookmarksTableUpdateCompanionBuilder,
+          (
+            AdhkarBookmark,
+            BaseReferences<
+              _$AppDatabase,
+              $AdhkarBookmarksTable,
+              AdhkarBookmark
+            >,
+          ),
+          AdhkarBookmark,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarBookmarksTableTableManager(
+    _$AppDatabase db,
+    $AdhkarBookmarksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarBookmarksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AdhkarBookmarksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AdhkarBookmarksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> dhikrId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarBookmarksCompanion(
+                dhikrId: dhikrId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String dhikrId,
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarBookmarksCompanion.insert(
+                dhikrId: dhikrId,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AdhkarBookmarksTable, AdhkarBookmark>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarBookmarksTable,
+                    AdhkarBookmark
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarBookmarksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarBookmarksTable,
+      AdhkarBookmark,
+      $$AdhkarBookmarksTableFilterComposer,
+      $$AdhkarBookmarksTableOrderingComposer,
+      $$AdhkarBookmarksTableAnnotationComposer,
+      $$AdhkarBookmarksTableCreateCompanionBuilder,
+      $$AdhkarBookmarksTableUpdateCompanionBuilder,
+      (
+        AdhkarBookmark,
+        BaseReferences<_$AppDatabase, $AdhkarBookmarksTable, AdhkarBookmark>,
+      ),
+      AdhkarBookmark,
+      PrefetchHooks Function()
+    >;
+typedef $$AdhkarSessionsTableCreateCompanionBuilder =
+    AdhkarSessionsCompanion Function({
+      required String collectionId,
+      Value<int> lastPageIndex,
+      Value<String> countsJson,
+      required int lastAccessedAt,
+      Value<bool> isCompleted,
+      Value<int> rowid,
+    });
+typedef $$AdhkarSessionsTableUpdateCompanionBuilder =
+    AdhkarSessionsCompanion Function({
+      Value<String> collectionId,
+      Value<int> lastPageIndex,
+      Value<String> countsJson,
+      Value<int> lastAccessedAt,
+      Value<bool> isCompleted,
+      Value<int> rowid,
+    });
+
+class $$AdhkarSessionsTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarSessionsTable> {
+  $$AdhkarSessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastPageIndex => $composableBuilder(
+    column: $table.lastPageIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get countsJson => $composableBuilder(
+    column: $table.countsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarSessionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarSessionsTable> {
+  $$AdhkarSessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastPageIndex => $composableBuilder(
+    column: $table.lastPageIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get countsJson => $composableBuilder(
+    column: $table.countsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarSessionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarSessionsTable> {
+  $$AdhkarSessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastPageIndex => $composableBuilder(
+    column: $table.lastPageIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get countsJson => $composableBuilder(
+    column: $table.countsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastAccessedAt => $composableBuilder(
+    column: $table.lastAccessedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
+}
+
+class $$AdhkarSessionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarSessionsTable,
+          AdhkarSession,
+          $$AdhkarSessionsTableFilterComposer,
+          $$AdhkarSessionsTableOrderingComposer,
+          $$AdhkarSessionsTableAnnotationComposer,
+          $$AdhkarSessionsTableCreateCompanionBuilder,
+          $$AdhkarSessionsTableUpdateCompanionBuilder,
+          (
+            AdhkarSession,
+            BaseReferences<_$AppDatabase, $AdhkarSessionsTable, AdhkarSession>,
+          ),
+          AdhkarSession,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarSessionsTableTableManager(
+    _$AppDatabase db,
+    $AdhkarSessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarSessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AdhkarSessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AdhkarSessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> collectionId = const Value.absent(),
+                Value<int> lastPageIndex = const Value.absent(),
+                Value<String> countsJson = const Value.absent(),
+                Value<int> lastAccessedAt = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarSessionsCompanion(
+                collectionId: collectionId,
+                lastPageIndex: lastPageIndex,
+                countsJson: countsJson,
+                lastAccessedAt: lastAccessedAt,
+                isCompleted: isCompleted,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String collectionId,
+                Value<int> lastPageIndex = const Value.absent(),
+                Value<String> countsJson = const Value.absent(),
+                required int lastAccessedAt,
+                Value<bool> isCompleted = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarSessionsCompanion.insert(
+                collectionId: collectionId,
+                lastPageIndex: lastPageIndex,
+                countsJson: countsJson,
+                lastAccessedAt: lastAccessedAt,
+                isCompleted: isCompleted,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AdhkarSessionsTable, AdhkarSession>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarSessionsTable,
+                    AdhkarSession
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarSessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarSessionsTable,
+      AdhkarSession,
+      $$AdhkarSessionsTableFilterComposer,
+      $$AdhkarSessionsTableOrderingComposer,
+      $$AdhkarSessionsTableAnnotationComposer,
+      $$AdhkarSessionsTableCreateCompanionBuilder,
+      $$AdhkarSessionsTableUpdateCompanionBuilder,
+      (
+        AdhkarSession,
+        BaseReferences<_$AppDatabase, $AdhkarSessionsTable, AdhkarSession>,
+      ),
+      AdhkarSession,
+      PrefetchHooks Function()
+    >;
+typedef $$AdhkarCompletionsTableCreateCompanionBuilder =
+    AdhkarCompletionsCompanion Function({
+      Value<int> id,
+      required String collectionId,
+      required String date,
+      required int completedAt,
+    });
+typedef $$AdhkarCompletionsTableUpdateCompanionBuilder =
+    AdhkarCompletionsCompanion Function({
+      Value<int> id,
+      Value<String> collectionId,
+      Value<String> date,
+      Value<int> completedAt,
+    });
+
+class $$AdhkarCompletionsTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarCompletionsTable> {
+  $$AdhkarCompletionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarCompletionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarCompletionsTable> {
+  $$AdhkarCompletionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarCompletionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarCompletionsTable> {
+  $$AdhkarCompletionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get collectionId => $composableBuilder(
+    column: $table.collectionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$AdhkarCompletionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarCompletionsTable,
+          AdhkarCompletion,
+          $$AdhkarCompletionsTableFilterComposer,
+          $$AdhkarCompletionsTableOrderingComposer,
+          $$AdhkarCompletionsTableAnnotationComposer,
+          $$AdhkarCompletionsTableCreateCompanionBuilder,
+          $$AdhkarCompletionsTableUpdateCompanionBuilder,
+          (
+            AdhkarCompletion,
+            BaseReferences<
+              _$AppDatabase,
+              $AdhkarCompletionsTable,
+              AdhkarCompletion
+            >,
+          ),
+          AdhkarCompletion,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarCompletionsTableTableManager(
+    _$AppDatabase db,
+    $AdhkarCompletionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarCompletionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AdhkarCompletionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AdhkarCompletionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> collectionId = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<int> completedAt = const Value.absent(),
+              }) => AdhkarCompletionsCompanion(
+                id: id,
+                collectionId: collectionId,
+                date: date,
+                completedAt: completedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String collectionId,
+                required String date,
+                required int completedAt,
+              }) => AdhkarCompletionsCompanion.insert(
+                id: id,
+                collectionId: collectionId,
+                date: date,
+                completedAt: completedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AdhkarCompletionsTable, AdhkarCompletion>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarCompletionsTable,
+                    AdhkarCompletion
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarCompletionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarCompletionsTable,
+      AdhkarCompletion,
+      $$AdhkarCompletionsTableFilterComposer,
+      $$AdhkarCompletionsTableOrderingComposer,
+      $$AdhkarCompletionsTableAnnotationComposer,
+      $$AdhkarCompletionsTableCreateCompanionBuilder,
+      $$AdhkarCompletionsTableUpdateCompanionBuilder,
+      (
+        AdhkarCompletion,
+        BaseReferences<
+          _$AppDatabase,
+          $AdhkarCompletionsTable,
+          AdhkarCompletion
+        >,
+      ),
+      AdhkarCompletion,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6151,4 +7663,10 @@ class $AppDatabaseManager {
       $$BarakahDailyResponsesTableTableManager(_db, _db.barakahDailyResponses);
   $$MuhasabahEntriesTableTableManager get muhasabahEntries =>
       $$MuhasabahEntriesTableTableManager(_db, _db.muhasabahEntries);
+  $$AdhkarBookmarksTableTableManager get adhkarBookmarks =>
+      $$AdhkarBookmarksTableTableManager(_db, _db.adhkarBookmarks);
+  $$AdhkarSessionsTableTableManager get adhkarSessions =>
+      $$AdhkarSessionsTableTableManager(_db, _db.adhkarSessions);
+  $$AdhkarCompletionsTableTableManager get adhkarCompletions =>
+      $$AdhkarCompletionsTableTableManager(_db, _db.adhkarCompletions);
 }

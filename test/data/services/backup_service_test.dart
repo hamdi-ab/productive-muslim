@@ -63,13 +63,16 @@ void main() {
           );
 
       final payload = await backupService.createBackupPayload();
-      expect(payload['version'], equals(2));
+      expect(payload['version'], equals(3));
       expect(payload['app'], equals('Productive Muslim'));
 
       final data = payload['data'] as Map<String, dynamic>;
       expect((data['tasks'] as List).length, equals(1));
       expect((data['habits'] as List).length, equals(1));
       expect((data['muhasabahEntries'] as List).length, equals(0));
+      expect((data['adhkarBookmarks'] as List).length, equals(0));
+      expect((data['adhkarSessions'] as List).length, equals(0));
+      expect((data['adhkarCompletions'] as List).length, equals(0));
       expect(data['settings']['notif_morning_adhkar'], isTrue);
       expect(data['settings']['notif_evening_adhkar'], isFalse);
 
@@ -211,6 +214,65 @@ void main() {
         settingsService.getCompletedDhikrIds('2026-09-30'),
         equals(['morning_1', 'morning_2']),
       );
+    });
+
+    test('importBackupFromJson correctly exports and restores version 3 adhkar records', () async {
+      await db
+          .into(db.adhkarBookmarks)
+          .insert(
+            const AdhkarBookmark(dhikrId: 'ayat_al_kursi', createdAt: 1000),
+          );
+      await db
+          .into(db.adhkarSessions)
+          .insert(
+            const AdhkarSession(
+              collectionId: 'morning',
+              lastPageIndex: 2,
+              countsJson: '{"ayat_al_kursi": 1}',
+              lastAccessedAt: 2000,
+              isCompleted: false,
+            ),
+          );
+      await db
+          .into(db.adhkarCompletions)
+          .insert(
+            const AdhkarCompletion(
+              id: 1,
+              collectionId: 'morning',
+              date: '2026-09-30',
+              completedAt: 3000,
+            ),
+          );
+
+      final exported = await backupService.exportBackupToJson();
+      expect(exported, contains('ayat_al_kursi'));
+      expect(exported, contains('"version": 3'));
+
+      // Clear the tables
+      await db.delete(db.adhkarBookmarks).go();
+      await db.delete(db.adhkarSessions).go();
+      await db.delete(db.adhkarCompletions).go();
+
+      expect((await db.select(db.adhkarBookmarks).get()).length, equals(0));
+      expect((await db.select(db.adhkarSessions).get()).length, equals(0));
+      expect((await db.select(db.adhkarCompletions).get()).length, equals(0));
+
+      final success = await backupService.importBackupFromJson(exported);
+      expect(success, isTrue);
+
+      final bookmarks = await db.select(db.adhkarBookmarks).get();
+      expect(bookmarks.length, equals(1));
+      expect(bookmarks.first.dhikrId, equals('ayat_al_kursi'));
+
+      final sessions = await db.select(db.adhkarSessions).get();
+      expect(sessions.length, equals(1));
+      expect(sessions.first.collectionId, equals('morning'));
+      expect(sessions.first.lastPageIndex, equals(2));
+
+      final completions = await db.select(db.adhkarCompletions).get();
+      expect(completions.length, equals(1));
+      expect(completions.first.collectionId, equals('morning'));
+      expect(completions.first.date, equals('2026-09-30'));
     });
 
     test('importBackupFromJson safely returns false on invalid payload without corrupting seeded data', () async {

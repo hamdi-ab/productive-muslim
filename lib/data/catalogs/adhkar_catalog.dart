@@ -3,6 +3,8 @@ import 'package:productive_muslim/domain/models/dhikr.dart';
 class AdhkarCatalog {
   AdhkarCatalog._();
 
+  static const int catalogVersion = 1;
+
   static const List<DhikrItem> all = [
     // 1. WAKING UP
     DhikrItem(
@@ -274,6 +276,81 @@ class AdhkarCatalog {
           'Sunnah intention-setting supplication before studying or deep work.',
       targetCount: 3,
       order: 3,
+    ),
+
+    // 7. GENERAL DHIKR (Phase 1 Essential Remembrance)
+    DhikrItem(
+      id: 'general_subhanallah_bihamdihi',
+      category: DhikrCategory.general,
+      titleEn: 'Glory and Praise be to Allah',
+      titleAr: 'سبحان الله وبحمده',
+      arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
+      transliteration: 'Subhan-Allahi wa bihamdih',
+      translationEn: 'Glory be to Allah and His is the praise.',
+      translationAr: 'سبحان الله وبحمده',
+      reference: 'Sahih Muslim 2692',
+      virtue: 'Whoever says it 100 times a day, their sins are forgiven even if they are like the foam of the sea.',
+      targetCount: 100,
+      order: 1,
+    ),
+    DhikrItem(
+      id: 'general_four_beloved_words',
+      category: DhikrCategory.general,
+      titleEn: 'The Four Beloved Phrases',
+      titleAr: 'أحب الكلام إلى الله أربع',
+      arabic: 'سُبْحَانَ اللَّهِ ، وَالْحَمْدُ لِلَّهِ ، وَلَا إِلَهَ إِلَّا اللَّهُ ، وَاللَّهُ أَكْبَرُ',
+      transliteration:
+          'SubhanAllah, wal-hamdulillah, wa la ilaha illallah, wallahu akbar',
+      translationEn: 'Glory be to Allah, all praise is for Allah, there is no deity except Allah, and Allah is the Greatest.',
+      translationAr: 'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر',
+      reference: 'Sahih Muslim 2137',
+      virtue: 'The dearest words to Allah are four: SubhanAllah, Alhamdulillah, La ilaha illallah, and Allahu Akbar.',
+      targetCount: 33,
+      order: 2,
+    ),
+    DhikrItem(
+      id: 'general_istighfar',
+      category: DhikrCategory.general,
+      titleEn: 'Seeking Forgiveness & Repentance',
+      titleAr: 'أستغفر الله وأتوب إليه',
+      arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+      transliteration: 'Astaghfirullaha wa atubu ilayh',
+      translationEn:
+          'I seek forgiveness from Allah and turn to Him in repentance.',
+      translationAr: 'أستغفر الله وأتوب إليه',
+      reference: 'Sahih al-Bukhari 6307',
+      virtue: 'The Prophet (peace be upon him) sought forgiveness and repented more than 70 times a day.',
+      targetCount: 70,
+      order: 3,
+    ),
+    DhikrItem(
+      id: 'general_la_hawla',
+      category: DhikrCategory.general,
+      titleEn: 'Treasure of Paradise (Hawqalah)',
+      titleAr: 'لا حول ولا قوة إلا بالله',
+      arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
+      transliteration: 'La hawla wa la quwwata illa billah',
+      translationEn: 'There is no might nor power except with Allah.',
+      translationAr: 'لا حول ولا قوة إلا بالله',
+      reference: 'Sahih al-Bukhari 4205, Sahih Muslim 2704',
+      virtue: 'A treasure from beneath the Throne and from the treasures of Paradise.',
+      targetCount: 10,
+      order: 4,
+    ),
+    DhikrItem(
+      id: 'general_salawat',
+      category: DhikrCategory.general,
+      titleEn: 'Blessings upon the Prophet ﷺ',
+      titleAr: 'الصلاة على النبي ﷺ',
+      arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+      transliteration: "Allahumma salli wa sallim 'ala nabiyyina Muhammad",
+      translationEn:
+          'O Allah, send peace and blessings upon our Prophet Muhammad.',
+      translationAr: 'اللهم صل وسلم على نبينا محمد',
+      reference: "Sunan an-Nasa'i 1297, Sahih Muslim 408",
+      virtue: 'Whoever sends blessings upon the Prophet once, Allah will send blessings upon him ten times.',
+      targetCount: 10,
+      order: 5,
     ),
   ];
 

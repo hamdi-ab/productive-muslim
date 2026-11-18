@@ -328,6 +328,21 @@
   "adhkarTabBedtime": "Bedtime",
   "adhkarTabPostSalah": "Post-Salah",
   "adhkarTabSunnah": "Sunnah",
+  "adhkarTabGeneral": "General",
+  "adhkarTabBookmarks": "Bookmarks",
+  "adhkarBookmarksEmpty": "No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.",
+  "adhkarResumePrompt": "Resume from Dhikr {index}",
+  "@adhkarResumePrompt": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarCompletedToday": "Completed today",
+  "adhkarToggleTransliteration": "Toggle transliteration",
+  "adhkarBookmarkAdd": "Bookmark dhikr",
+  "adhkarBookmarkRemove": "Remove bookmark",
   "smartNotificationsTitle": "Smart Adhkar & Sunnah Reminders",
   "smartNotificationsDesc": "Dynamic reminders anchored to solar prayer times and Sunnah schedules.",
   "settingMorningAdhkar": "Morning Adhkar (Post-Fajr)",

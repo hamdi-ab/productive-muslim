@@ -15,7 +15,7 @@ class BackupService {
   }) : _db = db,
        _settingsService = settingsService;
 
-  /// Generate full backup data map (Version 2)
+  /// Generate full backup data map (Version 3)
   Future<Map<String, dynamic>> createBackupPayload() async {
     final tasksList = await _db.select(_db.tasks).get();
     final habitsList = await _db.select(_db.habits).get();
@@ -26,12 +26,15 @@ class BackupService {
     final dailyResponsesList = await _db
         .select(_db.barakahDailyResponses)
         .get();
+    final bookmarksList = await _db.select(_db.adhkarBookmarks).get();
+    final sessionsList = await _db.select(_db.adhkarSessions).get();
+    final adhkarCompletionsList = await _db.select(_db.adhkarCompletions).get();
 
     final settingsMap =
         _settingsService?.exportSettings() ?? <String, dynamic>{};
 
     return {
-      'version': 2,
+      'version': 3,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'app': 'Productive Muslim',
       'data': {
@@ -44,6 +47,11 @@ class BackupService {
         'barakahDailyResponses': dailyResponsesList
             .map((d) => d.toJson())
             .toList(),
+        'adhkarBookmarks': bookmarksList.map((b) => b.toJson()).toList(),
+        'adhkarSessions': sessionsList.map((s) => s.toJson()).toList(),
+        'adhkarCompletions': adhkarCompletionsList
+            .map((c) => c.toJson())
+            .toList(),
         'settings': settingsMap,
       },
     };
@@ -55,13 +63,13 @@ class BackupService {
     return const JsonEncoder.withIndent('  ').convert(payload);
   }
 
-  /// Validate and import backup payload from JSON string (supports v1 and v2)
+  /// Validate and import backup payload from JSON string (supports v1, v2, and v3)
   Future<bool> importBackupFromJson(String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) return false;
       final version = decoded['version'];
-      if ((version != 1 && version != 2) ||
+      if ((version != 1 && version != 2 && version != 3) ||
           decoded['data'] is! Map<String, dynamic>) {
         return false;
       }
@@ -85,11 +93,28 @@ class BackupService {
         }
       }
 
-      if (version == 2) {
+      if (version >= 2) {
         final list = data['muhasabahEntries'];
         if (list is! List) return false;
         for (final item in list) {
           if (item is! Map<String, dynamic>) return false;
+        }
+      }
+
+      if (version == 3) {
+        const v3Tables = [
+          'adhkarBookmarks',
+          'adhkarSessions',
+          'adhkarCompletions',
+        ];
+        for (final table in v3Tables) {
+          if (data.containsKey(table)) {
+            final list = data[table];
+            if (list is! List) return false;
+            for (final item in list) {
+              if (item is! Map<String, dynamic>) return false;
+            }
+          }
         }
       }
 
@@ -121,7 +146,7 @@ class BackupService {
           .toList();
 
       final List<MuhasabahEntryRow> muhasabah;
-      if (version == 2) {
+      if (version >= 2) {
         muhasabah = (data['muhasabahEntries'] as List)
             .map((i) => MuhasabahEntryRow.fromJson(i as Map<String, dynamic>))
             .toList();
@@ -144,6 +169,25 @@ class BackupService {
             );
           }
         }
+      }
+
+      final List<AdhkarBookmark> bookmarks;
+      final List<AdhkarSession> sessions;
+      final List<AdhkarCompletion> adhkarCompletions;
+      if (version == 3) {
+        bookmarks = ((data['adhkarBookmarks'] as List?) ?? [])
+            .map((i) => AdhkarBookmark.fromJson(i as Map<String, dynamic>))
+            .toList();
+        sessions = ((data['adhkarSessions'] as List?) ?? [])
+            .map((i) => AdhkarSession.fromJson(i as Map<String, dynamic>))
+            .toList();
+        adhkarCompletions = ((data['adhkarCompletions'] as List?) ?? [])
+            .map((i) => AdhkarCompletion.fromJson(i as Map<String, dynamic>))
+            .toList();
+      } else {
+        bookmarks = [];
+        sessions = [];
+        adhkarCompletions = [];
       }
 
       final settingsMap = data['settings'] as Map<String, dynamic>?;
@@ -173,6 +217,9 @@ class BackupService {
           await _db.delete(_db.muhasabahEntries).go();
           await _db.delete(_db.barakahEntries).go();
           await _db.delete(_db.barakahDailyResponses).go();
+          await _db.delete(_db.adhkarBookmarks).go();
+          await _db.delete(_db.adhkarSessions).go();
+          await _db.delete(_db.adhkarCompletions).go();
 
           for (final t in tasks) {
             await _db.into(_db.tasks).insert(t);
@@ -210,6 +257,15 @@ class BackupService {
           }
           for (final r in responses) {
             await _db.into(_db.barakahDailyResponses).insert(r);
+          }
+          for (final b in bookmarks) {
+            await _db.into(_db.adhkarBookmarks).insert(b);
+          }
+          for (final s in sessions) {
+            await _db.into(_db.adhkarSessions).insert(s);
+          }
+          for (final c in adhkarCompletions) {
+            await _db.into(_db.adhkarCompletions).insert(c);
           }
 
           // Import settings inside the transaction so any failure rolls back

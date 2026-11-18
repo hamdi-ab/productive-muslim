@@ -36,6 +36,8 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
         return Icons.mosque_rounded;
       case DhikrCategory.dailySunnah:
         return Icons.auto_awesome_rounded;
+      case DhikrCategory.general:
+        return Icons.auto_stories_rounded;
     }
   }
 
@@ -53,6 +55,8 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
         return AppColors.primary;
       case DhikrCategory.dailySunnah:
         return AppColors.secondary;
+      case DhikrCategory.general:
+        return const Color(0xFF0D9488);
     }
   }
 
@@ -70,6 +74,8 @@ class _HomeAdhkarPillState extends State<HomeAdhkarPill> {
         return l10n.adhkarPostPrayer;
       case DhikrCategory.dailySunnah:
         return l10n.adhkarDailySunnah;
+      case DhikrCategory.general:
+        return l10n.adhkarTabGeneral;
     }
   }
 

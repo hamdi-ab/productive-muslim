@@ -1766,6 +1766,54 @@ abstract class AppLocalizations {
   /// **'Sunnah'**
   String get adhkarTabSunnah;
 
+  /// No description provided for @adhkarTabGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get adhkarTabGeneral;
+
+  /// No description provided for @adhkarTabBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get adhkarTabBookmarks;
+
+  /// No description provided for @adhkarBookmarksEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.'**
+  String get adhkarBookmarksEmpty;
+
+  /// No description provided for @adhkarResumePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume from Dhikr {index}'**
+  String adhkarResumePrompt(int index);
+
+  /// No description provided for @adhkarCompletedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today'**
+  String get adhkarCompletedToday;
+
+  /// No description provided for @adhkarToggleTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle transliteration'**
+  String get adhkarToggleTransliteration;
+
+  /// No description provided for @adhkarBookmarkAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark dhikr'**
+  String get adhkarBookmarkAdd;
+
+  /// No description provided for @adhkarBookmarkRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bookmark'**
+  String get adhkarBookmarkRemove;
+
   /// No description provided for @smartNotificationsTitle.
   ///
   /// In en, this message translates to:

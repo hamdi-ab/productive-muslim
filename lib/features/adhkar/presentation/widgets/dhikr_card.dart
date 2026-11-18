@@ -116,6 +116,9 @@ class DhikrCard extends StatelessWidget {
   final VoidCallback onReset;
   final int? index;
   final int? total;
+  final bool isBookmarked;
+  final VoidCallback? onToggleBookmark;
+  final bool showTransliteration;
 
   const DhikrCard({
     super.key,
@@ -125,6 +128,9 @@ class DhikrCard extends StatelessWidget {
     required this.onReset,
     this.index,
     this.total,
+    this.isBookmarked = false,
+    this.onToggleBookmark,
+    this.showTransliteration = false,
   });
 
   @override
@@ -273,29 +279,75 @@ class DhikrCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        AppPressable(
-                          onTap: onReset,
-                          haptic: AppHapticFeedback.light,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Tooltip(
-                            message: l10n.adhkarReset,
-                            child: Container(
-                              padding: const EdgeInsets.all(7.0),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.06)
-                                    : Colors.black.withValues(alpha: 0.04),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (onToggleBookmark != null) ...[
+                              AppPressable(
+                                onTap: onToggleBookmark!,
+                                haptic: AppHapticFeedback.light,
+                                borderRadius: BorderRadius.circular(20),
+                                child: Tooltip(
+                                  message: isBookmarked
+                                      ? l10n.adhkarBookmarkRemove
+                                      : l10n.adhkarBookmarkAdd,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(7.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isBookmarked
+                                          ? AppColors.secondary.withValues(
+                                              alpha: isDark ? 0.25 : 0.15,
+                                            )
+                                          : (isDark
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.06,
+                                                  )
+                                                : Colors.black.withValues(
+                                                    alpha: 0.04,
+                                                  )),
+                                    ),
+                                    child: Icon(
+                                      isBookmarked
+                                          ? Icons.bookmark_rounded
+                                          : Icons.bookmark_outline_rounded,
+                                      size: 18,
+                                      color: isBookmarked
+                                          ? AppColors.secondary
+                                          : (isDark
+                                                ? AppColors.darkTextSecondary
+                                                : AppColors.textSecondary),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              child: Icon(
-                                Icons.restart_alt_rounded,
-                                size: 18,
-                                color: isDark
-                                    ? AppColors.darkTextSecondary
-                                    : AppColors.textSecondary,
+                              const SizedBox(width: 6),
+                            ],
+                            AppPressable(
+                              onTap: onReset,
+                              haptic: AppHapticFeedback.light,
+                              borderRadius: BorderRadius.circular(20),
+                              child: Tooltip(
+                                message: l10n.adhkarReset,
+                                child: Container(
+                                  padding: const EdgeInsets.all(7.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.06)
+                                        : Colors.black.withValues(alpha: 0.04),
+                                  ),
+                                  child: Icon(
+                                    Icons.restart_alt_rounded,
+                                    size: 18,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -352,8 +404,10 @@ class DhikrCard extends StatelessWidget {
 
                     const SizedBox(height: AppSpacing.md),
 
-                    // Transliteration
-                    if (!isArabic && item.transliteration.isNotEmpty) ...[
+                    // Transliteration (optional)
+                    if (showTransliteration &&
+                        !isArabic &&
+                        item.transliteration.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Text(

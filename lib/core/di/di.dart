@@ -5,12 +5,14 @@ import 'package:timezone/data/latest.dart' as tz_data;
 
 import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
+import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_completions_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
 import 'package:productive_muslim/data/local/daos/intention_dao.dart';
 import 'package:productive_muslim/data/local/daos/muhasabah_dao.dart';
 import 'package:productive_muslim/data/local/daos/task_dao.dart';
+import 'package:productive_muslim/data/repositories/adhkar_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/barakah_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/habit_repository_impl.dart';
 import 'package:productive_muslim/data/repositories/intention_repository_impl.dart';
@@ -28,6 +30,7 @@ import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/backup_service.dart';
 import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -74,6 +77,7 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<TaskDao>(() => TaskDao(database));
   getIt.registerLazySingleton<IntentionDao>(() => IntentionDao(database));
   getIt.registerLazySingleton<MuhasabahDao>(() => MuhasabahDao(database));
+  getIt.registerLazySingleton<AdhkarDao>(() => AdhkarDao(database));
 
   // Repositories
   getIt.registerLazySingleton<BarakahRepository>(
@@ -94,6 +98,12 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<MuhasabahRepository>(
     () => MuhasabahRepositoryImpl(muhasabahDao: getIt<MuhasabahDao>()),
   );
+  getIt.registerLazySingleton<AdhkarRepository>(
+    () => AdhkarRepositoryImpl(
+      adhkarDao: getIt<AdhkarDao>(),
+      settingsService: getIt<SettingsService>(),
+    ),
+  );
 
   // Services
   getIt.registerLazySingleton<HomeWidgetSyncService>(
@@ -110,6 +120,7 @@ Future<void> setupDi() async {
       prayerTimeService: getIt<PrayerTimeService>(),
       settingsService: getIt<SettingsService>(),
       homeWidgetSyncService: getIt<HomeWidgetSyncService>(),
+      adhkarRepository: getIt<AdhkarRepository>(),
     ),
   );
   getIt.registerLazySingleton<PrayerNotificationScheduler>(

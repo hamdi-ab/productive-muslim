@@ -351,6 +351,12 @@ class SettingsService {
   Future<void> setAdhkarHapticsEnabled(bool enabled) async =>
       _prefs?.setBool('adhkar_haptics_enabled', enabled);
 
+  bool get adhkarTransliterationEnabled =>
+      _prefs?.getBool('adhkar_transliteration_enabled') ?? false;
+
+  Future<void> setAdhkarTransliterationEnabled(bool enabled) async =>
+      _prefs?.setBool('adhkar_transliteration_enabled', enabled);
+
   // Smart Reminders & Notifications
   bool get morningAdhkarNotificationEnabled =>
       _prefs?.getBool('notif_morning_adhkar') ?? true;

@@ -941,6 +941,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarTabSunnah => 'السنة';
 
   @override
+  String get adhkarTabGeneral => 'عامة';
+
+  @override
+  String get adhkarTabBookmarks => 'المحفوظات';
+
+  @override
+  String get adhkarBookmarksEmpty =>
+      'لا توجد أذكار محفوظة حالياً. اضغط على أيقونة الإشارة المرجعية لحفظ أي ذكر.';
+
+  @override
+  String adhkarResumePrompt(int index) {
+    return 'المتابعة من الذكر $index';
+  }
+
+  @override
+  String get adhkarCompletedToday => 'أُنجز اليوم';
+
+  @override
+  String get adhkarToggleTransliteration => 'عرض/إخفاء النطق الصوتي';
+
+  @override
+  String get adhkarBookmarkAdd => 'حفظ الذكر';
+
+  @override
+  String get adhkarBookmarkRemove => 'إزالة من المحفوظات';
+
+  @override
   String get smartNotificationsTitle => 'تذكيرات الأذكار والسنن الذكية';
 
   @override

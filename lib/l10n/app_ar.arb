@@ -328,6 +328,21 @@
   "adhkarTabBedtime": "النوم",
   "adhkarTabPostSalah": "بعد الصلاة",
   "adhkarTabSunnah": "السنة",
+  "adhkarTabGeneral": "عامة",
+  "adhkarTabBookmarks": "المحفوظات",
+  "adhkarBookmarksEmpty": "لا توجد أذكار محفوظة حالياً. اضغط على أيقونة الإشارة المرجعية لحفظ أي ذكر.",
+  "adhkarResumePrompt": "المتابعة من الذكر {index}",
+  "@adhkarResumePrompt": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarCompletedToday": "أُنجز اليوم",
+  "adhkarToggleTransliteration": "عرض/إخفاء النطق الصوتي",
+  "adhkarBookmarkAdd": "حفظ الذكر",
+  "adhkarBookmarkRemove": "إزالة من المحفوظات",
   "smartNotificationsTitle": "تذكيرات الأذكار والسنن الذكية",
   "smartNotificationsDesc": "تنبيهات تلقائية تتغير بدقة بحسب مواقيت الصلاة وأوقات السنة النبوية.",
   "settingMorningAdhkar": "أذكار الصباح (بعد الفجر)",

@@ -1,27 +1,47 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
+import 'package:productive_muslim/data/local/database/app_database.dart';
+import 'package:productive_muslim/data/repositories/adhkar_repository_impl.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late AppDatabase db;
 
   setUp(() async {
+    await getIt.reset();
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-    if (!getIt.isRegistered<SettingsService>()) {
-      getIt.registerSingleton<SettingsService>(SettingsService(prefs: prefs));
-    }
-    if (!getIt.isRegistered<AdhkarService>()) {
-      getIt.registerSingleton<AdhkarService>(
-        AdhkarService(settingsService: getIt<SettingsService>()),
-      );
-    }
+    final settingsService = SettingsService(prefs: prefs);
+    getIt.registerSingleton<SettingsService>(settingsService);
+
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    final dao = AdhkarDao(db);
+    final repo = AdhkarRepositoryImpl(
+      adhkarDao: dao,
+      settingsService: settingsService,
+    );
+    getIt.registerSingleton<AppDatabase>(db);
+    getIt.registerSingleton<AdhkarDao>(dao);
+    getIt.registerSingleton<AdhkarRepository>(repo);
+
+    getIt.registerSingleton<AdhkarService>(
+      AdhkarService(settingsService: settingsService, adhkarRepository: repo),
+    );
+  });
+
+  tearDown(() async {
+    await db.close();
+    await getIt.reset();
   });
 
   Widget buildSubject({DhikrCategory initialCategory = DhikrCategory.morning}) {
@@ -152,5 +172,72 @@ void main() {
     expect(find.text('0 / 1'), findsOneWidget);
     expect(adhkarService.isDhikrCompleted('wake_up_1'), isFalse);
     expect(adhkarService.isDhikrCompleted('wake_up_2'), isFalse);
+  });
+
+  testWidgets('transliteration toggle hides and shows transliteration text', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.wakingUp),
+    );
+    await tester.pumpAndSettle();
+
+    // Default: transliteration is hidden
+    expect(find.textContaining('Alhamdu lillahil-ladhi ahyana'), findsNothing);
+
+    // Tap toggle transliteration
+    final toggleBtn = find.byTooltip('Toggle transliteration');
+    expect(toggleBtn, findsOneWidget);
+    await tester.tap(toggleBtn);
+    await tester.pumpAndSettle();
+
+    // Transliteration is now visible
+    expect(
+      find.textContaining('Alhamdu lillahil-ladhi ahyana'),
+      findsOneWidget,
+    );
+
+    // Tap toggle again
+    await tester.tap(toggleBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Alhamdu lillahil-ladhi ahyana'), findsNothing);
+  });
+
+  testWidgets('bookmarks tab shows empty state then displays bookmarked item', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.wakingUp),
+    );
+    await tester.pumpAndSettle();
+
+    // Bookmark the first item
+    final bookmarkBtn = find.byTooltip('Bookmark dhikr');
+    expect(bookmarkBtn, findsOneWidget);
+    await tester.tap(bookmarkBtn);
+    await tester.pumpAndSettle();
+
+    // Switch to Bookmarks tab
+    final bookmarksTab = find.text('Bookmarks');
+    expect(bookmarksTab, findsOneWidget);
+    await tester.ensureVisible(bookmarksTab);
+    await tester.tap(bookmarksTab);
+    await tester.pumpAndSettle();
+
+    // The bookmarked waking up dhikr is shown in the bookmarks view
+    expect(find.text('Waking Up Remembrance'), findsOneWidget);
+  });
+
+  testWidgets('general dhikr collection tab displays general dhikr items', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildSubject(initialCategory: DhikrCategory.general),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Glory and Praise be to Allah'), findsOneWidget);
+    expect(find.textContaining('Muslim 2692'), findsOneWidget);
   });
 }

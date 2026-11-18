@@ -951,6 +951,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhkarTabSunnah => 'Sunnah';
 
   @override
+  String get adhkarTabGeneral => 'General';
+
+  @override
+  String get adhkarTabBookmarks => 'Bookmarks';
+
+  @override
+  String get adhkarBookmarksEmpty =>
+      'No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.';
+
+  @override
+  String adhkarResumePrompt(int index) {
+    return 'Resume from Dhikr $index';
+  }
+
+  @override
+  String get adhkarCompletedToday => 'Completed today';
+
+  @override
+  String get adhkarToggleTransliteration => 'Toggle transliteration';
+
+  @override
+  String get adhkarBookmarkAdd => 'Bookmark dhikr';
+
+  @override
+  String get adhkarBookmarkRemove => 'Remove bookmark';
+
+  @override
   String get smartNotificationsTitle => 'Smart Adhkar & Sunnah Reminders';
 
   @override
