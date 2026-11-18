@@ -1529,4 +1529,59 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reflectionPending => 'بانتظار التأمل';
+
+  @override
+  String get muhasabahHeaderTitle => 'المحاسبة المسائية';
+
+  @override
+  String get muhasabahHeaderQuote =>
+      'حَاسِبُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا، وَزِنُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُوزَنُوا';
+
+  @override
+  String get muhasabahPromptsTitle => 'أسئلة ملهمة للتأمل';
+
+  @override
+  String get muhasabahPromptFree => 'كتابة حرة';
+
+  @override
+  String get muhasabahPromptGratitude =>
+      'ما هي النعمة التي أنعم الله بها عليك اليوم وتشعر بالامتنان لها؟';
+
+  @override
+  String get muhasabahPromptPatience =>
+      'أين واجهت صعوبة اليوم، وكيف استعنت بالله وتدربت على الصبر؟';
+
+  @override
+  String get muhasabahPromptForgiveness =>
+      'ما التقصير أو الخطأ الذي تسأل الله المغفرة والاستغفار عنه الليلة؟';
+
+  @override
+  String get muhasabahPromptIhsan =>
+      'كيف سعيت للإحسان وإتقان العمل والتعامل الطيب اليوم؟';
+
+  @override
+  String get muhasabahPromptIntention => 'ما النية الصالحة التي تجددها لغدك؟';
+
+  @override
+  String get muhasabahSaveAction => 'حفظ التأمل';
+
+  @override
+  String get muhasabahInputHint =>
+      'دوّن تأملاتك، نعم الله عليك، أو دروس يومك...';
+
+  @override
+  String get muhasabahSavedToday => 'تأملات اليوم';
+
+  @override
+  String get muhasabahEmptyMessage =>
+      'خذ لحظة هادئة للتأمل ومحاسبة النفس متى شئت. بلا درجات ولا قيود.';
+
+  @override
+  String get muhasabahDeleteConfirmTitle => 'حذف التأمل؟';
+
+  @override
+  String get muhasabahDeleteConfirmMessage => 'هل أنت متأكد من حذف هذا التأمل؟';
+
+  @override
+  String get muhasabahReflectionSavedToast => 'تم حفظ التأمل بنجاح.';
 }

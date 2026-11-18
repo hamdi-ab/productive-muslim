@@ -5,10 +5,12 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/barakah_entry.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/intention_entry.dart';
+import 'package:productive_muslim/domain/models/muhasabah_entry.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
+import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 
 class MockBarakahRepository extends Mock implements BarakahRepository {}
@@ -18,6 +20,8 @@ class MockHabitRepository extends Mock implements HabitRepository {}
 class MockTaskRepository extends Mock implements TaskRepository {}
 
 class MockIntentionRepository extends Mock implements IntentionRepository {}
+
+class MockMuhasabahRepository extends Mock implements MuhasabahRepository {}
 
 class MockSettingsService extends Mock implements SettingsService {}
 
@@ -36,6 +40,7 @@ void stubDefaultRepositoryMocks({
   MockHabitRepository? habitRepo,
   MockTaskRepository? taskRepo,
   MockIntentionRepository? intentionRepo,
+  MockMuhasabahRepository? muhasabahRepo,
 }) {
   if (barakahRepo != null) {
     when(() => barakahRepo.watchEntriesForDate(any()))
@@ -73,6 +78,13 @@ void stubDefaultRepositoryMocks({
     when(() => intentionRepo.watchEntriesForDate(any()))
         .thenAnswer((_) => Stream.value(<IntentionEntry>[]));
     when(() => intentionRepo.getEntriesForDate(any()))
+        .thenAnswer((_) async => []);
+  }
+
+  if (muhasabahRepo != null) {
+    when(() => muhasabahRepo.watchEntriesForDate(any()))
+        .thenAnswer((_) => Stream.value(<MuhasabahEntry>[]));
+    when(() => muhasabahRepo.getEntriesForDate(any()))
         .thenAnswer((_) async => []);
   }
 }

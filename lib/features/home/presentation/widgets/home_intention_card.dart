@@ -42,7 +42,7 @@ class HomeIntentionCard extends StatelessWidget {
         final intention = hasIntention ? entries.first : null;
 
         return InkWell(
-          onTap: () => context.go(AppRoutes.reflect),
+          onTap: () => context.go(AppRoutes.myDay),
           borderRadius: BorderRadius.circular(20),
           child: GlassContainer(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -95,7 +95,7 @@ class HomeIntentionCard extends StatelessWidget {
                         fit: BoxFit.scaleDown,
                         child: Text(
                           hasIntention
-                              ? (isAr ? 'تعديل' : 'Reflect')
+                              ? (isAr ? 'تعديل' : 'Edit')
                               : (isAr ? 'تحديد نية' : 'Set Intention'),
                           style: TextStyle(
                             fontSize: 12,

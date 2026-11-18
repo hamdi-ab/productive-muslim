@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
-import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -15,6 +13,7 @@ import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
+import 'package:productive_muslim/features/intentions/presentation/widgets/intention_create_dialog.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -160,7 +159,10 @@ class MyDayOverviewView extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: TextButton(
-                        onPressed: () => context.go(AppRoutes.reflect),
+                        onPressed: () => showAddIntentionDialog(
+                          context: context,
+                          today: formattedDate,
+                        ),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -171,7 +173,7 @@ class MyDayOverviewView extends StatelessWidget {
                         ),
                         child: Text(
                           hasIntention
-                              ? (isAr ? 'تعديل' : 'Reflect')
+                              ? (isAr ? 'تعديل' : 'Edit')
                               : (isAr ? 'تحديد نية' : 'Set Intention'),
                           style: TextStyle(
                             fontSize: 12,

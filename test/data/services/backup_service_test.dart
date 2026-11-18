@@ -63,12 +63,13 @@ void main() {
           );
 
       final payload = await backupService.createBackupPayload();
-      expect(payload['version'], equals(1));
+      expect(payload['version'], equals(2));
       expect(payload['app'], equals('Productive Muslim'));
 
       final data = payload['data'] as Map<String, dynamic>;
       expect((data['tasks'] as List).length, equals(1));
       expect((data['habits'] as List).length, equals(1));
+      expect((data['muhasabahEntries'] as List).length, equals(0));
       expect(data['settings']['notif_morning_adhkar'], isTrue);
       expect(data['settings']['notif_evening_adhkar'], isFalse);
 
@@ -132,6 +133,7 @@ void main() {
               'statement': 'Study with pure intention for Allah',
               'category': 'Spiritual',
               'completed': 1,
+              'reflection': 'Felt deep peace during Fajr today',
               'createdAt': 0,
             },
           ],
@@ -186,6 +188,14 @@ void main() {
       final intentions = await db.select(db.intentionEntries).get();
       expect(intentions.length, equals(1));
       expect(intentions.first.title, contains('Barakah'));
+
+      final muhasabah = await db.select(db.muhasabahEntries).get();
+      expect(muhasabah.length, equals(1));
+      expect(
+        muhasabah.first.content,
+        equals('Felt deep peace during Fajr today'),
+      );
+      expect(muhasabah.first.date, equals('2026-09-30'));
 
       final barakah = await db.select(db.barakahEntries).get();
       expect(barakah.length, equals(1));

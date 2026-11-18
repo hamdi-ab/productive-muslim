@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
@@ -14,12 +15,13 @@ class BackupService {
   }) : _db = db,
        _settingsService = settingsService;
 
-  /// Generate full backup data map
+  /// Generate full backup data map (Version 2)
   Future<Map<String, dynamic>> createBackupPayload() async {
     final tasksList = await _db.select(_db.tasks).get();
     final habitsList = await _db.select(_db.habits).get();
     final completionsList = await _db.select(_db.habitCompletions).get();
     final intentionsList = await _db.select(_db.intentionEntries).get();
+    final muhasabahList = await _db.select(_db.muhasabahEntries).get();
     final barakahList = await _db.select(_db.barakahEntries).get();
     final dailyResponsesList = await _db
         .select(_db.barakahDailyResponses)
@@ -29,7 +31,7 @@ class BackupService {
         _settingsService?.exportSettings() ?? <String, dynamic>{};
 
     return {
-      'version': 1,
+      'version': 2,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'app': 'Productive Muslim',
       'data': {
@@ -37,6 +39,7 @@ class BackupService {
         'habits': habitsList.map((h) => h.toJson()).toList(),
         'habitCompletions': completionsList.map((c) => c.toJson()).toList(),
         'intentions': intentionsList.map((i) => i.toJson()).toList(),
+        'muhasabahEntries': muhasabahList.map((m) => m.toJson()).toList(),
         'barakahEntries': barakahList.map((b) => b.toJson()).toList(),
         'barakahDailyResponses': dailyResponsesList
             .map((d) => d.toJson())
@@ -52,12 +55,14 @@ class BackupService {
     return const JsonEncoder.withIndent('  ').convert(payload);
   }
 
-  /// Validate and import backup payload from JSON string
+  /// Validate and import backup payload from JSON string (supports v1 and v2)
   Future<bool> importBackupFromJson(String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) return false;
-      if (decoded['version'] != 1 || decoded['data'] is! Map<String, dynamic>) {
+      final version = decoded['version'];
+      if ((version != 1 && version != 2) ||
+          decoded['data'] is! Map<String, dynamic>) {
         return false;
       }
 
@@ -74,6 +79,14 @@ class BackupService {
 
       for (final table in requiredTables) {
         final list = data[table];
+        if (list is! List) return false;
+        for (final item in list) {
+          if (item is! Map<String, dynamic>) return false;
+        }
+      }
+
+      if (version == 2) {
+        final list = data['muhasabahEntries'];
         if (list is! List) return false;
         for (final item in list) {
           if (item is! Map<String, dynamic>) return false;
@@ -107,6 +120,32 @@ class BackupService {
           )
           .toList();
 
+      final List<MuhasabahEntryRow> muhasabah;
+      if (version == 2) {
+        muhasabah = (data['muhasabahEntries'] as List)
+            .map((i) => MuhasabahEntryRow.fromJson(i as Map<String, dynamic>))
+            .toList();
+      } else {
+        // Version 1 backup: migrate non-empty legacy reflections into Muhasabah rows
+        muhasabah = [];
+        for (final rawIntention in (data['intentions'] as List)) {
+          final reflection = rawIntention['reflection'] as String?;
+          if (reflection != null && reflection.trim().isNotEmpty) {
+            final date = rawIntention['date'] as String? ?? '';
+            final createdAt = rawIntention['createdAt'] as int? ?? 0;
+            muhasabah.add(
+              MuhasabahEntryRow(
+                id: 0,
+                date: date,
+                content: reflection,
+                createdAt: createdAt,
+                updatedAt: createdAt,
+              ),
+            );
+          }
+        }
+      }
+
       final settingsMap = data['settings'] as Map<String, dynamic>?;
 
       // Validate bedtime hour/minute in settings if present
@@ -131,6 +170,7 @@ class BackupService {
           await _db.delete(_db.habits).go();
           await _db.delete(_db.habitCompletions).go();
           await _db.delete(_db.intentionEntries).go();
+          await _db.delete(_db.muhasabahEntries).go();
           await _db.delete(_db.barakahEntries).go();
           await _db.delete(_db.barakahDailyResponses).go();
 
@@ -145,6 +185,25 @@ class BackupService {
           }
           for (final i in intentions) {
             await _db.into(_db.intentionEntries).insert(i);
+          }
+          for (final m in muhasabah) {
+            if (m.id == 0) {
+              await _db
+                  .into(_db.muhasabahEntries)
+                  .insert(
+                    MuhasabahEntriesCompanion.insert(
+                      date: m.date,
+                      promptId: Value(m.promptId),
+                      promptText: Value(m.promptText),
+                      content: m.content,
+                      tags: Value(m.tags),
+                      createdAt: Value(m.createdAt),
+                      updatedAt: Value(m.updatedAt),
+                    ),
+                  );
+            } else {
+              await _db.into(_db.muhasabahEntries).insert(m);
+            }
           }
           for (final b in barakah) {
             await _db.into(_db.barakahEntries).insert(b);

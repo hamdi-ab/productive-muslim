@@ -1540,4 +1540,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reflectionPending => 'Reflection pending';
+
+  @override
+  String get muhasabahHeaderTitle => 'Evening Muhasabah';
+
+  @override
+  String get muhasabahHeaderQuote =>
+      'Take account of yourselves before you are taken to account, and weigh your deeds before they are weighed.';
+
+  @override
+  String get muhasabahPromptsTitle => 'Thoughtful Prompts';
+
+  @override
+  String get muhasabahPromptFree => 'Free Reflection';
+
+  @override
+  String get muhasabahPromptGratitude =>
+      'What blessing did you receive today that you are grateful for?';
+
+  @override
+  String get muhasabahPromptPatience =>
+      'Where did you face difficulty today, and how did you seek Allah\'s help?';
+
+  @override
+  String get muhasabahPromptForgiveness =>
+      'What shortcoming can you ask forgiveness (Istighfar) for tonight?';
+
+  @override
+  String get muhasabahPromptIhsan =>
+      'How did you strive for excellence (Ihsan) in your work or dealings?';
+
+  @override
+  String get muhasabahPromptIntention =>
+      'What intention do you renew for tomorrow?';
+
+  @override
+  String get muhasabahSaveAction => 'Save Reflection';
+
+  @override
+  String get muhasabahInputHint =>
+      'Jot down your reflections, gratitude, or lessons learned...';
+
+  @override
+  String get muhasabahSavedToday => 'Today\'s Reflections';
+
+  @override
+  String get muhasabahEmptyMessage =>
+      'Take a quiet moment to reflect whenever you are ready. No scores, no streaks.';
+
+  @override
+  String get muhasabahDeleteConfirmTitle => 'Delete Reflection?';
+
+  @override
+  String get muhasabahDeleteConfirmMessage =>
+      'Are you sure you want to remove this reflection entry?';
+
+  @override
+  String get muhasabahReflectionSavedToast => 'Reflection saved quietly.';
 }
