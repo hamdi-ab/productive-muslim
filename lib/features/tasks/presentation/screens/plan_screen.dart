@@ -15,6 +15,7 @@ import 'package:productive_muslim/features/tasks/logic/task_event.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/create_task_sheet.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
+import 'package:productive_muslim/features/tasks/presentation/widgets/my_day_overview_view.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_atmosphere_background.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_barakah_alignment_meter.dart';
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_date_navigator.dart';
@@ -22,7 +23,7 @@ import 'package:productive_muslim/features/tasks/presentation/widgets/plan_spiri
 import 'package:productive_muslim/features/tasks/presentation/widgets/plan_tab_switcher.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-enum PlanTab { tasks, habits, focus }
+enum PlanTab { overview, tasks, habits, focus }
 
 /// Type alias for My Day overview
 typedef MyDayScreen = PlanScreen;
@@ -32,7 +33,7 @@ typedef MyDayScreen = PlanScreen;
 class PlanScreen extends StatefulWidget {
   final PlanTab initialTab;
 
-  const PlanScreen({super.key, this.initialTab = PlanTab.tasks});
+  const PlanScreen({super.key, this.initialTab = PlanTab.overview});
 
   @override
   State<PlanScreen> createState() => _PlanScreenState();
@@ -154,10 +155,10 @@ class _PlanScreenState extends State<PlanScreen> {
   }
 
   void _showCreateAction(BuildContext context) {
-    if (_selectedTab == PlanTab.tasks) {
-      _showCreateTaskSheet(context);
-    } else {
+    if (_selectedTab == PlanTab.habits) {
       _showCreateHabitSheet(context);
+    } else {
+      _showCreateTaskSheet(context);
     }
   }
 
@@ -196,7 +197,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 backgroundColor: Colors.transparent,
                 icon: const Icon(Icons.add_rounded, color: Color(0xFF241A00)),
                 label: Text(
-                  _selectedTab == PlanTab.tasks ? l10n.newTask : l10n.newHabit,
+                  _selectedTab == PlanTab.habits ? l10n.newHabit : l10n.newTask,
                   style: const TextStyle(
                     color: Color(0xFF241A00),
                     fontWeight: FontWeight.bold,
@@ -242,6 +243,14 @@ class _PlanScreenState extends State<PlanScreen> {
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 220),
                   child: switch (_selectedTab) {
+                    PlanTab.overview => MyDayOverviewView(
+                      key: ValueKey('plan_overview_view_$_formattedDate'),
+                      formattedDate: _formattedDate,
+                      onSwitchTab: _onTabChanged,
+                      onShowCreateTask: () => _showCreateTaskSheet(context),
+                      onShowCreateHabit: () => _showCreateHabitSheet(context),
+                      isDark: isDark,
+                    ),
                     PlanTab.tasks => TaskScreen(
                       key: ValueKey('plan_task_view_$_formattedDate'),
                       date: _formattedDate,

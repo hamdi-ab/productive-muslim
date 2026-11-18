@@ -19,12 +19,19 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_adhkar_pill.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_intention_card.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_prayer_card.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_reflection_card.dart';
+import 'package:productive_muslim/features/home/presentation/widgets/home_today_tasks_card.dart';
 import 'package:productive_muslim/features/intentions/presentation/screens/intention_screen.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/task_screen.dart';
+import 'package:productive_muslim/features/tasks/presentation/widgets/my_day_overview_view.dart';
+import 'package:productive_muslim/features/tasks/presentation/widgets/plan_tab_switcher.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,25 +155,122 @@ void main() {
       expect(find.byType(FloatingGlassNavBar), findsOneWidget);
     });
 
-    testWidgets('My Day toggles between Tasks, Habits, and Focus tabs', (
-      tester,
-    ) async {
-      AppRouter.router.go(AppRoutes.myDay);
-      await pumpRouter(tester);
+    testWidgets(
+      'My Day defaults to Overview (Option C) and toggles between Tasks, Habits, and Focus tabs',
+      (tester) async {
+        AppRouter.router.go(AppRoutes.myDay);
+        await pumpRouter(tester);
 
-      // Initial tab is Tasks
-      expect(find.byType(TaskScreen), findsOneWidget);
+        // Initial tab is Overview (Option C)
+        expect(find.byType(MyDayOverviewView), findsOneWidget);
 
-      // Switch to Habits
-      await tester.tap(find.text('Habits'));
-      await pumpFrames(tester);
-      expect(find.byType(HabitScreen), findsOneWidget);
+        // Switch to Tasks
+        await tester.tap(
+          find.descendant(
+            of: find.byType(PlanTabSwitcher),
+            matching: find.text('Tasks'),
+          ),
+        );
+        await pumpFrames(tester);
+        expect(find.byType(TaskScreen), findsOneWidget);
 
-      // Switch to Focus
-      await tester.tap(find.text('Focus'));
-      await pumpFrames(tester);
-      expect(find.byType(FocusScreen), findsOneWidget);
-    });
+        // Switch to Habits
+        await tester.tap(
+          find.descendant(
+            of: find.byType(PlanTabSwitcher),
+            matching: find.text('Habits'),
+          ),
+        );
+        await pumpFrames(tester);
+        expect(find.byType(HabitScreen), findsOneWidget);
+
+        // Switch to Focus
+        await tester.tap(
+          find.descendant(
+            of: find.byType(PlanTabSwitcher),
+            matching: find.text('Focus'),
+          ),
+        );
+        await pumpFrames(tester);
+        expect(find.byType(FocusScreen), findsOneWidget);
+
+        // Switch back to Overview
+        await tester.tap(
+          find.descendant(
+            of: find.byType(PlanTabSwitcher),
+            matching: find.text('Overview'),
+          ),
+        );
+        await pumpFrames(tester);
+        expect(find.byType(MyDayOverviewView), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Nested /my-day routes directly activate their corresponding tabs',
+      (tester) async {
+        // 1. /my-day/tasks
+        AppRouter.router.go(AppRoutes.myDayTasks);
+        await pumpRouter(tester);
+        expect(find.byType(TaskScreen), findsOneWidget);
+
+        // 2. /my-day/habits
+        AppRouter.router.go(AppRoutes.myDayHabits);
+        await pumpFrames(tester);
+        expect(find.byType(HabitScreen), findsOneWidget);
+
+        // 3. /my-day/focus
+        AppRouter.router.go(AppRoutes.myDayFocus);
+        await pumpFrames(tester);
+        expect(find.byType(FocusScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Nested /reflect routes directly activate Muhasabah and Barakah tabs',
+      (tester) async {
+        // 1. /reflect/muhasabah
+        AppRouter.router.go(AppRoutes.reflectMuhasabah);
+        await pumpRouter(tester);
+        expect(find.byType(IntentionScreen), findsOneWidget);
+
+        // 2. /reflect/barakah
+        AppRouter.router.go(AppRoutes.reflectBarakah);
+        await pumpFrames(tester);
+        expect(find.byType(BarakahScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Simplified Home dashboard prioritizes 5 core elements without clutter',
+      (tester) async {
+        await pumpRouter(tester);
+
+        expect(find.byType(HomeContent), findsOneWidget);
+        expect(find.byType(HomePrayerCard), findsOneWidget);
+        expect(find.byType(HomeAdhkarPill), findsOneWidget);
+        expect(find.byType(HomeIntentionCard), findsOneWidget);
+        expect(find.byType(HomeTodayTasksCard), findsOneWidget);
+        expect(find.byType(HomeReflectionCard), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Adhkar category deep links and query parameters route correctly',
+      (tester) async {
+        // Query param notification
+        AppRouter.handleNotificationPayload('/adhkar?category=evening');
+        await pumpRouter(tester);
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+
+        // Deep link URI
+        AppRouter.handleDeepLinkUri(
+          Uri.parse('productivemuslim://adhkar?category=morning'),
+        );
+        await pumpFrames(tester);
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+      },
+    );
 
     testWidgets('Reflect toggles between Muhasabah and Barakah tabs', (
       tester,
@@ -189,7 +293,10 @@ void main() {
       await pumpRouter(tester);
 
       // Find the spa avatar in the leading app bar
-      final avatar = find.byIcon(Icons.spa_rounded);
+      final avatar = find.descendant(
+        of: find.byType(ProductiveAppBar),
+        matching: find.byIcon(Icons.spa_rounded),
+      );
       expect(avatar, findsOneWidget);
 
       await tester.tap(avatar);

@@ -476,6 +476,12 @@ abstract class AppLocalizations {
   /// **'My Day'**
   String get myDay;
 
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
   /// No description provided for @adhkar.
   ///
   /// In en, this message translates to:

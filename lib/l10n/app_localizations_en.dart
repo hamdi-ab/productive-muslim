@@ -219,6 +219,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myDay => 'My Day';
 
   @override
+  String get overview => 'Overview';
+
+  @override
   String get adhkar => 'Adhkar Studio';
 
   @override

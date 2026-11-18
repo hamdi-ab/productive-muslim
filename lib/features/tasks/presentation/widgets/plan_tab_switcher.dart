@@ -6,7 +6,7 @@ import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/features/tasks/presentation/screens/plan_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// Segmented capsule switcher allowing quick toggling between Tasks and Habits tabs.
+/// Segmented capsule switcher for My Day: Overview, Tasks, Habits, and Focus.
 class PlanTabSwitcher extends StatelessWidget {
   final PlanTab selectedTab;
   final ValueChanged<PlanTab> onTabChanged;
@@ -41,6 +41,16 @@ class PlanTabSwitcher extends StatelessWidget {
         ),
         child: Row(
           children: [
+            Expanded(
+              child: _buildTabPill(
+                context: context,
+                tab: PlanTab.overview,
+                label: l10n.overview,
+                icon: Icons.dashboard_outlined,
+                isSelected: selectedTab == PlanTab.overview,
+              ),
+            ),
+            const SizedBox(width: 4),
             Expanded(
               child: _buildTabPill(
                 context: context,
@@ -122,30 +132,36 @@ class PlanTabSwitcher extends StatelessWidget {
             final unselectedColor = isDark
                 ? const Color(0xFFBFC9C3)
                 : AppColors.textSecondary;
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 17,
-                  color: isSelected ? const Color(0xFFE9C349) : unselectedColor,
-                ),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : unselectedColor,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.w600,
-                      fontSize: 13.5,
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 15,
+                      color: isSelected
+                          ? const Color(0xFFE9C349)
+                          : unselectedColor,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(width: 4),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : unselectedColor,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w600,
+                        fontSize: 12.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         ),

@@ -216,6 +216,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myDay => 'يومي';
 
   @override
+  String get overview => 'نظرة عامة';
+
+  @override
   String get adhkar => 'الأذكار والتلاوة';
 
   @override
