@@ -90,6 +90,25 @@ void main() {
     );
 
     testWidgets(
+      'Explore screen collection search results have zero overflow at 1.5x scale in Arabic RTL',
+      (tester) async {
+        await pumpAndCheckOverflow(
+          tester,
+          child: const SizedBox(height: 900, child: AdhkarExploreScreen()),
+          locale: const Locale('ar'),
+          textScale: 1.5,
+          isDark: true,
+          screenSize: const Size(360, 780),
+        );
+
+        // Enter collection query 'الصباح' to display collection card
+        final input = find.byKey(const Key('adhkar_explore_search_input'));
+        await tester.enterText(input, 'الصباح');
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
       'Explore screen no-results state has zero overflow at 1.5x scale in English',
       (tester) async {
         await pumpAndCheckOverflow(

@@ -100,10 +100,15 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     int initialPage = 0;
     if (widget.initialItemId != null) {
-      final items = AdhkarCatalog.getByCategory(
-        widget.initialCategory,
-        includePendingReview: _isReviewMode,
-      );
+      final items = _adhkarRepo != null
+          ? _adhkarRepo!.getByCategory(
+              widget.initialCategory,
+              includePendingReview: _isReviewMode,
+            )
+          : AdhkarCatalog.getByCategory(
+              widget.initialCategory,
+              includePendingReview: _isReviewMode,
+            );
       final idx = items.indexWhere((i) => i.id == widget.initialItemId);
       if (idx >= 0) {
         initialPage = idx;
