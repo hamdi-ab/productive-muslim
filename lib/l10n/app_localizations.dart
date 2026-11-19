@@ -3067,6 +3067,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reflection saved quietly.'**
   String get muhasabahReflectionSavedToast;
+
+  /// No description provided for @adhkarExploreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore & Search'**
+  String get adhkarExploreTitle;
+
+  /// No description provided for @adhkarExploreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover reviewed Adhkar by collection or topic'**
+  String get adhkarExploreSubtitle;
+
+  /// No description provided for @adhkarSearchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Arabic, translation, or title...'**
+  String get adhkarSearchPlaceholder;
+
+  /// No description provided for @adhkarSearchCollectionsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get adhkarSearchCollectionsTab;
+
+  /// No description provided for @adhkarSearchCategoriesTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get adhkarSearchCategoriesTab;
+
+  /// No description provided for @adhkarSearchResultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 result found} other{{count} results found}}'**
+  String adhkarSearchResultsCount(int count);
+
+  /// No description provided for @adhkarSearchNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No remembrances found'**
+  String get adhkarSearchNoResultsTitle;
+
+  /// No description provided for @adhkarSearchNoResultsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Try searching in Arabic, English translation, or adjusting your keywords.'**
+  String get adhkarSearchNoResultsDesc;
+
+  /// No description provided for @adhkarSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Search'**
+  String get adhkarSearchClear;
+
+  /// No description provided for @adhkarSubjectGratitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude & Praise'**
+  String get adhkarSubjectGratitude;
+
+  /// No description provided for @adhkarSubjectGratitudeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Praises and glorifications of Allah'**
+  String get adhkarSubjectGratitudeDesc;
+
+  /// No description provided for @adhkarSubjectForgiveness.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgiveness & Repentance'**
+  String get adhkarSubjectForgiveness;
+
+  /// No description provided for @adhkarSubjectForgivenessDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Seeking pardon and turning back to Allah'**
+  String get adhkarSubjectForgivenessDesc;
+
+  /// No description provided for @adhkarSubjectProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection & Refuge'**
+  String get adhkarSubjectProtection;
+
+  /// No description provided for @adhkarSubjectProtectionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Seeking safety and refuge in Allah'**
+  String get adhkarSubjectProtectionDesc;
+
+  /// No description provided for @adhkarSubjectSleepWaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep & Waking'**
+  String get adhkarSubjectSleepWaking;
+
+  /// No description provided for @adhkarSubjectSleepWakingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembrances upon waking and resting'**
+  String get adhkarSubjectSleepWakingDesc;
+
+  /// No description provided for @adhkarSubjectEveryday.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday Situations'**
+  String get adhkarSubjectEveryday;
+
+  /// No description provided for @adhkarSubjectEverydayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily routines, knowledge, and movements'**
+  String get adhkarSubjectEverydayDesc;
+
+  /// No description provided for @adhkarItemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 remembrance} other{{count} remembrances}}'**
+  String adhkarItemsCount(int count);
+
+  /// No description provided for @adhkarFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get adhkarFilterAll;
+
+  /// No description provided for @adhkarFilterCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get adhkarFilterCollections;
+
+  /// No description provided for @adhkarFilterCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get adhkarFilterCategories;
 }
 
 class _AppLocalizationsDelegate

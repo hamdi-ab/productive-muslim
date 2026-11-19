@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
@@ -33,12 +35,14 @@ String _toArabicDigits(String input) {
 
 class AdhkarScreen extends StatefulWidget {
   final DhikrCategory initialCategory;
+  final String? initialItemId;
   final bool? isReviewModeEnabled;
   final bool? isInternalReviewAvailable;
 
   const AdhkarScreen({
     super.key,
     this.initialCategory = DhikrCategory.morning,
+    this.initialItemId,
     this.isReviewModeEnabled,
     this.isInternalReviewAvailable,
   });
@@ -85,7 +89,6 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   void initState() {
     super.initState();
     _selectedCategory = widget.initialCategory;
-    _pageController = PageController();
     _showTransliteration =
         _settingsService?.adhkarTransliterationEnabled ?? false;
     _isReviewMode =
@@ -94,6 +97,21 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
             (_adhkarRepo?.isReviewModeEnabled ??
                 _settingsService?.adhkarReviewModeEnabled ??
                 false));
+
+    int initialPage = 0;
+    if (widget.initialItemId != null) {
+      final items = AdhkarCatalog.getByCategory(
+        widget.initialCategory,
+        includePendingReview: _isReviewMode,
+      );
+      final idx = items.indexWhere((i) => i.id == widget.initialItemId);
+      if (idx >= 0) {
+        initialPage = idx;
+      }
+    }
+    _currentPageIndex = initialPage;
+    _pageController = PageController(initialPage: initialPage);
+
     _initData();
   }
 
@@ -172,16 +190,26 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           _isCompletedToday = isCompleted;
           if (session != null) {
             _counts.addAll(session.counts);
-            final items = _currentItems;
-            if (session.lastPageIndex > 0 &&
-                session.lastPageIndex < items.length) {
-              _currentPageIndex = session.lastPageIndex;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && _pageController.hasClients) {
-                  _pageController.jumpToPage(_currentPageIndex);
-                }
-              });
-            }
+          }
+          final items = _currentItems;
+          int targetIndex = -1;
+          if (widget.initialItemId != null) {
+            targetIndex = items.indexWhere((i) => i.id == widget.initialItemId);
+          }
+          if (targetIndex >= 0) {
+            _currentPageIndex = targetIndex;
+          } else if (session != null &&
+              session.lastPageIndex > 0 &&
+              session.lastPageIndex < items.length) {
+            _currentPageIndex = session.lastPageIndex;
+          }
+
+          if (_currentPageIndex > 0) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && _pageController.hasClients) {
+                _pageController.jumpToPage(_currentPageIndex);
+              }
+            });
           }
         });
       }
@@ -443,6 +471,11 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     onTap: _toggleReviewMode,
                   ),
                 ProductiveAppBarAction(
+                  tooltip: l10n.adhkarExploreTitle,
+                  icon: Icons.explore_outlined,
+                  onTap: () => context.push(AppRoutes.adhkarExplore),
+                ),
+                ProductiveAppBarAction(
                   tooltip: l10n.adhkarToggleTransliteration,
                   icon: _showTransliteration
                       ? Icons.subtitles_rounded
@@ -507,6 +540,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   isBookmarksSelected: _isBookmarksView,
                   onCategorySelected: _onCategorySelected,
                   onBookmarksSelected: _onBookmarksSelected,
+                  onExploreTap: () => context.push(AppRoutes.adhkarExplore),
                   l10n: l10n,
                   isDark: isDark,
                 ),

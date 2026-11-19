@@ -68,6 +68,15 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   }
 
   @override
+  List<DhikrItem> getBySubject(
+    DhikrSubject subject, {
+    bool? includePendingReview,
+  }) {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    return AdhkarCatalog.getBySubject(subject, includePendingReview: include);
+  }
+
+  @override
   DhikrItem? getById(String id, {bool? includePendingReview}) {
     final include = includePendingReview ?? isReviewModeEnabled;
     return AdhkarCatalog.getById(id, includePendingReview: include);

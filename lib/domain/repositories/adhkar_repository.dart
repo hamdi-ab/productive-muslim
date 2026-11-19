@@ -9,6 +9,10 @@ abstract class AdhkarRepository {
     DhikrCategory category, {
     bool? includePendingReview,
   });
+  List<DhikrItem> getBySubject(
+    DhikrSubject subject, {
+    bool? includePendingReview,
+  });
   DhikrItem? getById(String id, {bool? includePendingReview});
   int get catalogVersion;
 

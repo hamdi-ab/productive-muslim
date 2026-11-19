@@ -526,4 +526,17 @@ class AdhkarCatalog {
     if (!includePendingReview && !item.isApproved) return null;
     return item;
   }
+
+  static List<DhikrItem> getBySubject(
+    DhikrSubject subject, {
+    bool includePendingReview = false,
+  }) {
+    final info = DhikrSubjectInfo.getBySubject(subject);
+    if (info == null) return const [];
+    final items = all.where((d) => info.itemIds.contains(d.id)).toList();
+    if (!includePendingReview) {
+      return items.where((d) => d.isApproved).toList();
+    }
+    return items;
+  }
 }
