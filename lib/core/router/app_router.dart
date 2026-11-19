@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -204,7 +205,25 @@ class AppRouter {
                   );
                 }
               }
-              return AdhkarScreen(initialCategory: category);
+              bool? isReviewMode;
+              final settingsService = getIt.isRegistered<SettingsService>()
+                  ? getIt<SettingsService>()
+                  : null;
+              final isAvailable =
+                  settingsService?.isAdhkarReviewModeAvailable ?? !kReleaseMode;
+              if (isAvailable) {
+                if (state.extra is Map &&
+                    (state.extra as Map)['reviewMode'] is bool) {
+                  isReviewMode = (state.extra as Map)['reviewMode'] as bool;
+                } else if (state.uri.queryParameters['reviewMode'] == 'true' ||
+                    state.uri.queryParameters['internalReview'] == 'true') {
+                  isReviewMode = true;
+                }
+              }
+              return AdhkarScreen(
+                initialCategory: category,
+                isReviewModeEnabled: isReviewMode,
+              );
             },
           ),
           GoRoute(

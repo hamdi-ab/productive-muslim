@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,8 @@ class SettingsService {
   factory SettingsService.empty() => SettingsService._empty();
 
   final SharedPreferences? _prefs;
+
+  SharedPreferences? get prefs => _prefs;
 
   static const _themeModeKey = 'app_theme_mode';
   static const _localeKey = 'app_locale';
@@ -350,6 +353,43 @@ class SettingsService {
 
   Future<void> setAdhkarHapticsEnabled(bool enabled) async =>
       _prefs?.setBool('adhkar_haptics_enabled', enabled);
+
+  bool get adhkarTransliterationEnabled =>
+      _prefs?.getBool('adhkar_transliteration_enabled') ?? false;
+
+  Future<void> setAdhkarTransliterationEnabled(bool enabled) async =>
+      _prefs?.setBool('adhkar_transliteration_enabled', enabled);
+
+  @visibleForTesting
+  static bool allowReviewModeInReleaseForTesting = false;
+
+  /// Whether internal editorial review mode is available in the current environment.
+  /// Strictly false in ordinary release builds unless explicitly overridden for internal testing.
+  bool get isAdhkarReviewModeAvailable =>
+      !kReleaseMode || allowReviewModeInReleaseForTesting;
+
+  static const _adhkarReviewModeKey = 'adhkar_internal_review_mode_enabled';
+  bool _adhkarReviewModeFallback = false;
+
+  /// Internal-only flag for editorial review of unapproved religious content.
+  /// In ordinary release builds, this is inaccessible and always returns false.
+  bool get adhkarReviewModeEnabled {
+    if (!isAdhkarReviewModeAvailable) {
+      return false;
+    }
+    return _prefs?.getBool(_adhkarReviewModeKey) ?? _adhkarReviewModeFallback;
+  }
+
+  /// Internal-only setter for editorial review mode.
+  /// In ordinary release builds, this has no effect.
+  Future<void> setAdhkarReviewModeEnabled(bool enabled) async {
+    if (!isAdhkarReviewModeAvailable) {
+      _adhkarReviewModeFallback = false;
+      return;
+    }
+    _adhkarReviewModeFallback = enabled;
+    await _prefs?.setBool(_adhkarReviewModeKey, enabled);
+  }
 
   // Smart Reminders & Notifications
   bool get morningAdhkarNotificationEnabled =>

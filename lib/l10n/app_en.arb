@@ -328,6 +328,39 @@
   "adhkarTabBedtime": "Bedtime",
   "adhkarTabPostSalah": "Post-Salah",
   "adhkarTabSunnah": "Sunnah",
+  "adhkarTabGeneral": "General",
+  "adhkarTabBookmarks": "Bookmarks",
+  "adhkarBookmarksEmpty": "No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.",
+  "adhkarResumePrompt": "Resume from Dhikr {index}",
+  "@adhkarResumePrompt": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarCompletedToday": "Completed today",
+  "adhkarToggleTransliteration": "Toggle transliteration",
+  "adhkarBookmarkAdd": "Bookmark dhikr",
+  "adhkarBookmarkRemove": "Remove bookmark",
+  "adhkarPendingReview": "Pending Review",
+  "adhkarPrescribedCount": "Prescribed",
+  "adhkarRecommendedTarget": "Target",
+  "adhkarReadAgain": "Read again",
+  "adhkarCollectionCompletedDesc": "You have completed this remembrance collection. Your progress is saved for today.",
+  "adhkarEditorialReviewMode": "Editorial Review Mode",
+  "adhkarReviewModeBanner": "Editorial Review Mode: Viewing unreviewed entries for scholarly verification.",
+  "adhkarContentUnderReview": "Content Under Editorial Review",
+  "adhkarContentUnderReviewDesc": "Remembrances in this collection are currently undergoing verification and will be available once approved.",
+  "adhkarEnableReviewMode": "Preview Draft Content",
+  "adhkarDisableReviewMode": "Exit Review Mode",
+  "adhkarStepIndicator": "Step {current} of {total}",
+  "@adhkarStepIndicator": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "smartNotificationsTitle": "Smart Adhkar & Sunnah Reminders",
   "smartNotificationsDesc": "Dynamic reminders anchored to solar prayer times and Sunnah schedules.",
   "settingMorningAdhkar": "Morning Adhkar (Post-Fajr)",

@@ -1,5 +1,8 @@
 import 'package:drift/drift.dart';
 
+import 'package:productive_muslim/data/local/database/tables/adhkar_bookmarks.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_completions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_sessions.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_daily_responses.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_entries.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_prompts.dart';
@@ -8,6 +11,7 @@ import 'package:productive_muslim/data/local/database/tables/habits.dart';
 import 'package:productive_muslim/data/local/database/tables/intention_entries.dart';
 import 'package:productive_muslim/data/local/database/tables/muhasabah_entries.dart';
 import 'package:productive_muslim/data/local/database/tables/tasks.dart';
+import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/daos/barakah_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_dao.dart';
 import 'package:productive_muslim/data/local/daos/habit_completions_dao.dart';
@@ -31,6 +35,9 @@ part 'app_database.g.dart';
     IntentionEntries,
     BarakahDailyResponses,
     MuhasabahEntries,
+    AdhkarBookmarks,
+    AdhkarSessions,
+    AdhkarCompletions,
   ],
   daos: [
     BarakahDao,
@@ -39,6 +46,7 @@ part 'app_database.g.dart';
     TaskDao,
     IntentionDao,
     MuhasabahDao,
+    AdhkarDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -47,7 +55,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -83,6 +91,11 @@ class AppDatabase extends _$AppDatabase {
             ),
           );
         }
+      }
+      if (from < 5) {
+        await m.createTable(adhkarBookmarks);
+        await m.createTable(adhkarSessions);
+        await m.createTable(adhkarCompletions);
       }
     },
   );

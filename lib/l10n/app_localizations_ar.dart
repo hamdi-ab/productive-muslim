@@ -941,6 +941,74 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhkarTabSunnah => 'السنة';
 
   @override
+  String get adhkarTabGeneral => 'عامة';
+
+  @override
+  String get adhkarTabBookmarks => 'المحفوظات';
+
+  @override
+  String get adhkarBookmarksEmpty =>
+      'لا توجد أذكار محفوظة حالياً. اضغط على أيقونة الإشارة المرجعية لحفظ أي ذكر.';
+
+  @override
+  String adhkarResumePrompt(int index) {
+    return 'المتابعة من الذكر $index';
+  }
+
+  @override
+  String get adhkarCompletedToday => 'أُنجز اليوم';
+
+  @override
+  String get adhkarToggleTransliteration => 'عرض/إخفاء النطق الصوتي';
+
+  @override
+  String get adhkarBookmarkAdd => 'حفظ الذكر';
+
+  @override
+  String get adhkarBookmarkRemove => 'إزالة من المحفوظات';
+
+  @override
+  String get adhkarPendingReview => 'قيد المراجعة';
+
+  @override
+  String get adhkarPrescribedCount => 'وارد في الأثر';
+
+  @override
+  String get adhkarRecommendedTarget => 'مستحب';
+
+  @override
+  String get adhkarReadAgain => 'إعادة القراءة';
+
+  @override
+  String get adhkarCollectionCompletedDesc =>
+      'أتممت وردك من هذا القسم بحمد الله، وقد حُفظ إنجازك لهذا اليوم.';
+
+  @override
+  String get adhkarEditorialReviewMode => 'وضع المراجعة التحريرية';
+
+  @override
+  String get adhkarReviewModeBanner =>
+      'وضع المراجعة التحريرية: عرض الأذكار قيد التدقيق الشرعي.';
+
+  @override
+  String get adhkarContentUnderReview => 'المحتوى قيد المراجعة والتدقيق';
+
+  @override
+  String get adhkarContentUnderReviewDesc =>
+      'أذكار هذا القسم تخضع حالياً للمراجعة والتدقيق الشرعي وستتاح فور اعتمادها.';
+
+  @override
+  String get adhkarEnableReviewMode => 'معاينة مسودة الأذكار';
+
+  @override
+  String get adhkarDisableReviewMode => 'الخروج من وضع المراجعة';
+
+  @override
+  String adhkarStepIndicator(int current, int total) {
+    return 'الخطوة $current من $total';
+  }
+
+  @override
   String get smartNotificationsTitle => 'تذكيرات الأذكار والسنن الذكية';
 
   @override

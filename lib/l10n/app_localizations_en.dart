@@ -951,6 +951,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhkarTabSunnah => 'Sunnah';
 
   @override
+  String get adhkarTabGeneral => 'General';
+
+  @override
+  String get adhkarTabBookmarks => 'Bookmarks';
+
+  @override
+  String get adhkarBookmarksEmpty =>
+      'No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.';
+
+  @override
+  String adhkarResumePrompt(int index) {
+    return 'Resume from Dhikr $index';
+  }
+
+  @override
+  String get adhkarCompletedToday => 'Completed today';
+
+  @override
+  String get adhkarToggleTransliteration => 'Toggle transliteration';
+
+  @override
+  String get adhkarBookmarkAdd => 'Bookmark dhikr';
+
+  @override
+  String get adhkarBookmarkRemove => 'Remove bookmark';
+
+  @override
+  String get adhkarPendingReview => 'Pending Review';
+
+  @override
+  String get adhkarPrescribedCount => 'Prescribed';
+
+  @override
+  String get adhkarRecommendedTarget => 'Target';
+
+  @override
+  String get adhkarReadAgain => 'Read again';
+
+  @override
+  String get adhkarCollectionCompletedDesc =>
+      'You have completed this remembrance collection. Your progress is saved for today.';
+
+  @override
+  String get adhkarEditorialReviewMode => 'Editorial Review Mode';
+
+  @override
+  String get adhkarReviewModeBanner =>
+      'Editorial Review Mode: Viewing unreviewed entries for scholarly verification.';
+
+  @override
+  String get adhkarContentUnderReview => 'Content Under Editorial Review';
+
+  @override
+  String get adhkarContentUnderReviewDesc =>
+      'Remembrances in this collection are currently undergoing verification and will be available once approved.';
+
+  @override
+  String get adhkarEnableReviewMode => 'Preview Draft Content';
+
+  @override
+  String get adhkarDisableReviewMode => 'Exit Review Mode';
+
+  @override
+  String adhkarStepIndicator(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
   String get smartNotificationsTitle => 'Smart Adhkar & Sunnah Reminders';
 
   @override

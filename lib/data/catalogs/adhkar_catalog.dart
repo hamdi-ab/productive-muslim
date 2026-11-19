@@ -3,6 +3,8 @@ import 'package:productive_muslim/domain/models/dhikr.dart';
 class AdhkarCatalog {
   AdhkarCatalog._();
 
+  static const int catalogVersion = 1;
+
   static const List<DhikrItem> all = [
     // 1. WAKING UP
     DhikrItem(
@@ -19,6 +21,8 @@ class AdhkarCatalog {
       virtue: 'Expresses gratitude for the blessing of renewed life and consciousness.',
       targetCount: 1,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'wake_up_2',
@@ -33,6 +37,8 @@ class AdhkarCatalog {
       virtue: 'Whoever says this upon waking and supplicates, their prayer is answered.',
       targetCount: 1,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 2. MORNING ADHKAR
@@ -49,6 +55,8 @@ class AdhkarCatalog {
       virtue: 'Whoever recites it in the morning is protected from jinn until evening.',
       targetCount: 1,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'sayyid_al_istighfar',
@@ -63,6 +71,8 @@ class AdhkarCatalog {
       virtue: 'Whoever recites it with conviction in the morning and dies before evening will enter Paradise.',
       targetCount: 1,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'bismillah_alladhi_morning',
@@ -78,6 +88,8 @@ class AdhkarCatalog {
           'Recited 3 times; nothing will harm the reciter throughout the day.',
       targetCount: 3,
       order: 3,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'raditu_billahi_morning',
@@ -93,6 +105,8 @@ class AdhkarCatalog {
       virtue: 'Recited 3 times; Allah promises to make the reciter pleased on the Day of Resurrection.',
       targetCount: 3,
       order: 4,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'subhanallahi_wa_bihamdihi_100',
@@ -107,6 +121,8 @@ class AdhkarCatalog {
       virtue: 'Whoever says it 100 times will have their sins forgiven even if they were like the foam of the sea.',
       targetCount: 100,
       order: 5,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 3. EVENING ADHKAR
@@ -123,6 +139,8 @@ class AdhkarCatalog {
       virtue: 'Supplication for safety and protection throughout the night.',
       targetCount: 1,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'bismillah_alladhi_evening',
@@ -138,6 +156,8 @@ class AdhkarCatalog {
           'Recited 3 times; protects against any sudden harm until morning.',
       targetCount: 3,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'audhu_bikalimatillah',
@@ -152,6 +172,8 @@ class AdhkarCatalog {
       virtue: 'Recited 3 times; no harm or poison will touch the person during the night.',
       targetCount: 3,
       order: 3,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 4. SLEEPING & BEDTIME
@@ -168,6 +190,8 @@ class AdhkarCatalog {
       virtue: 'Sunnah remembrance before falling asleep on your right side.',
       targetCount: 1,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'sleep_33_tasbih',
@@ -185,6 +209,40 @@ class AdhkarCatalog {
           'Better for physical energy, stamina, and resilience than a servant.',
       targetCount: 100,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'sleep_subhanallah',
+          titleEn: 'SubhanAllah',
+          titleAr: 'سبحان الله',
+          arabic: 'سُبْحَانَ اللَّهِ',
+          transliteration: 'SubhanAllah',
+          translationEn: 'Glory be to Allah.',
+          translationAr: 'سبحان الله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'sleep_alhamdulillah',
+          titleEn: 'Alhamdulillah',
+          titleAr: 'الحمد لله',
+          arabic: 'الْحَمْدُ لِلَّهِ',
+          transliteration: 'Alhamdulillah',
+          translationEn: 'All praise is for Allah.',
+          translationAr: 'الحمد لله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'sleep_allahu_akbar',
+          titleEn: 'Allahu Akbar',
+          titleAr: 'الله أكبر',
+          arabic: 'اللَّهُ أَكْبَرُ',
+          transliteration: 'Allahu Akbar',
+          translationEn: 'Allah is the Greatest.',
+          translationAr: 'الله أكبر',
+          targetCount: 34,
+        ),
+      ],
     ),
     DhikrItem(
       id: 'sleep_ayat_kursi',
@@ -192,13 +250,15 @@ class AdhkarCatalog {
       titleEn: 'Ayat al-Kursi before Sleep',
       titleAr: 'آية الكرسي قبل النوم',
       arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...',
-      transliteration: "Allahu la ilaha illa Huwa, Al-Hayyul-Qayyum...",
+      transliteration: 'Allahu la ilaha illa Huwa, Al-Hayyul-Qayyum...',
       translationEn: 'Allah! There is no deity except Him, the Ever-Living, the Sustainer of all existence...',
       translationAr: 'الله لا إله إلا هو الحي القيوم...',
       reference: 'Sahih al-Bukhari 2311',
       virtue: 'An angel will guard you all night, and Satan will not come near you until dawn.',
       targetCount: 1,
       order: 3,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
 
     // 5. POST-SALAH ADHKAR
@@ -213,8 +273,33 @@ class AdhkarCatalog {
       translationAr: 'أستغفر الله (٣ مرات)، اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام',
       reference: 'Sahih Muslim 591',
       virtue: 'Direct Sunnah practice immediately after completing the final salam.',
-      targetCount: 3,
+      targetCount: 4,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'post_salah_istighfar_phrase',
+          titleEn: 'Astaghfirullah',
+          titleAr: 'أستغفر الله',
+          arabic: 'أَسْتَغْفِرُ اللَّهَ',
+          transliteration: 'Astaghfirullah',
+          translationEn: 'I seek forgiveness from Allah.',
+          translationAr: 'أستغفر الله',
+          targetCount: 3,
+        ),
+        DhikrStep(
+          id: 'post_salah_antas_salam',
+          titleEn: 'Allahumma Antas-Salam',
+          titleAr: 'اللهم أنت السلام',
+          arabic: 'اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ',
+          transliteration: "Allahumma Antas-Salam wa minkas-Salam, tabarakta ya Dhal-Jalali wal-Ikram",
+          translationEn: 'O Allah, You are Peace and from You comes peace. Blessed are You, O Owner of majesty and honor.',
+          translationAr:
+              'اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام',
+          targetCount: 1,
+        ),
+      ],
     ),
     DhikrItem(
       id: 'post_salah_tasbih',
@@ -229,6 +314,50 @@ class AdhkarCatalog {
       virtue: 'Sins are forgiven even if they are like the foam of the sea.',
       targetCount: 100,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
+      steps: [
+        DhikrStep(
+          id: 'tasbih_subhanallah',
+          titleEn: 'SubhanAllah',
+          titleAr: 'سبحان الله',
+          arabic: 'سُبْحَانَ اللَّهِ',
+          transliteration: 'SubhanAllah',
+          translationEn: 'Glory be to Allah.',
+          translationAr: 'سبحان الله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_alhamdulillah',
+          titleEn: 'Alhamdulillah',
+          titleAr: 'الحمد لله',
+          arabic: 'الْحَمْدُ لِلَّهِ',
+          transliteration: 'Alhamdulillah',
+          translationEn: 'All praise is for Allah.',
+          translationAr: 'الحمد لله',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_allahu_akbar',
+          titleEn: 'Allahu Akbar',
+          titleAr: 'الله أكبر',
+          arabic: 'اللَّهُ أَكْبَرُ',
+          transliteration: 'Allahu Akbar',
+          translationEn: 'Allah is the Greatest.',
+          translationAr: 'الله أكبر',
+          targetCount: 33,
+        ),
+        DhikrStep(
+          id: 'tasbih_kalimah_tawheed',
+          titleEn: 'Kalimah of Tawheed (Completion of 100)',
+          titleAr: 'تمام المائة: لا إله إلا الله وحده لا شريك له',
+          arabic: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+          transliteration: "La ilaha illallahu wahdahu la sharika lahu, lahul-mulku wa lahul-hamdu wa Huwa 'ala kulli shay'in Qadir",
+          translationEn: 'None has the right to be worshipped but Allah alone, without partner. His is the dominion and His is the praise, and He is Able to do all things.',
+          translationAr: 'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير',
+          targetCount: 1,
+        ),
+      ],
     ),
 
     // 6. DAILY SUNNAH REMEMBRANCES
@@ -245,6 +374,8 @@ class AdhkarCatalog {
       virtue: 'It is said to him: You are guided, defended, and protected, and Satan moves away.',
       targetCount: 1,
       order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'entering_home',
@@ -259,6 +390,8 @@ class AdhkarCatalog {
       virtue: 'Prevents Satan from lodging or eating in the house.',
       targetCount: 1,
       order: 2,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
     DhikrItem(
       id: 'dua_knowledge_focus',
@@ -274,10 +407,101 @@ class AdhkarCatalog {
           'Sunnah intention-setting supplication before studying or deep work.',
       targetCount: 3,
       order: 3,
+      isCountPrescribed: false,
+      reviewStatus: ContentReviewStatus.pendingReview,
+    ),
+
+    // 7. GENERAL DHIKR (Phase 1 Essential Remembrance - Under Editorial Review)
+    DhikrItem(
+      id: 'general_subhanallah_bihamdihi',
+      category: DhikrCategory.general,
+      titleEn: 'Glory and Praise be to Allah',
+      titleAr: 'سبحان الله وبحمده',
+      arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
+      transliteration: 'Subhan-Allahi wa bihamdih',
+      translationEn: 'Glory be to Allah and His is the praise.',
+      translationAr: 'سبحان الله وبحمده',
+      reference: 'Sahih Muslim 2692',
+      virtue: 'Whoever says it 100 times a day, their sins are forgiven even if they are like the foam of the sea.',
+      targetCount: 100,
+      order: 1,
+      isCountPrescribed: true,
+      reviewStatus: ContentReviewStatus.pendingReview,
+    ),
+    DhikrItem(
+      id: 'general_four_beloved_words',
+      category: DhikrCategory.general,
+      titleEn: 'The Four Beloved Phrases',
+      titleAr: 'أحب الكلام إلى الله أربع',
+      arabic: 'سُبْحَانَ اللَّهِ ، وَالْحَمْدُ لِلَّهِ ، وَلَا إِلَهَ إِلَّا اللَّهُ ، وَاللَّهُ أَكْبَرُ',
+      transliteration:
+          'SubhanAllah, wal-hamdulillah, wa la ilaha illallah, wallahu akbar',
+      translationEn: 'Glory be to Allah, all praise is for Allah, there is no deity except Allah, and Allah is the Greatest.',
+      translationAr: 'سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر',
+      reference: 'Sahih Muslim 2137',
+      virtue: 'The dearest words to Allah are four: SubhanAllah, Alhamdulillah, La ilaha illallah, and Allahu Akbar.',
+      targetCount: 33,
+      order: 2,
+      isCountPrescribed: false,
+      reviewStatus: ContentReviewStatus.pendingReview,
+    ),
+    DhikrItem(
+      id: 'general_istighfar',
+      category: DhikrCategory.general,
+      titleEn: 'Seeking Forgiveness & Repentance',
+      titleAr: 'أستغفر الله وأتوب إليه',
+      arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+      transliteration: 'Astaghfirullaha wa atubu ilayh',
+      translationEn:
+          'I seek forgiveness from Allah and turn to Him in repentance.',
+      translationAr: 'أستغفر الله وأتوب إليه',
+      reference: 'Sahih al-Bukhari 6307',
+      virtue: 'The Prophet (peace be upon him) sought forgiveness and repented more than 70 times a day.',
+      targetCount: 70,
+      order: 3,
+      isCountPrescribed: false,
+      reviewStatus: ContentReviewStatus.pendingReview,
+    ),
+    DhikrItem(
+      id: 'general_la_hawla',
+      category: DhikrCategory.general,
+      titleEn: 'Treasure of Paradise (Hawqalah)',
+      titleAr: 'لا حول ولا قوة إلا بالله',
+      arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
+      transliteration: 'La hawla wa la quwwata illa billah',
+      translationEn: 'There is no might nor power except with Allah.',
+      translationAr: 'لا حول ولا قوة إلا بالله',
+      reference: 'Sahih al-Bukhari 4205, Sahih Muslim 2704',
+      virtue: 'A treasure from beneath the Throne and from the treasures of Paradise.',
+      targetCount: 10,
+      order: 4,
+      isCountPrescribed: false,
+      reviewStatus: ContentReviewStatus.pendingReview,
+    ),
+    DhikrItem(
+      id: 'general_salawat',
+      category: DhikrCategory.general,
+      titleEn: 'Blessings upon the Prophet ﷺ',
+      titleAr: 'الصلاة على النبي ﷺ',
+      arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+      transliteration: "Allahumma salli wa sallim 'ala nabiyyina Muhammad",
+      translationEn:
+          'O Allah, send peace and blessings upon our Prophet Muhammad.',
+      translationAr: 'اللهم صل وسلم على نبينا محمد',
+      reference: "Sunan an-Nasa'i 1297, Sahih Muslim 408",
+      virtue: 'Whoever sends blessings upon the Prophet once, Allah will send blessings upon him ten times.',
+      targetCount: 10,
+      order: 5,
+      isCountPrescribed: false,
+      reviewStatus: ContentReviewStatus.pendingReview,
     ),
   ];
 
-  static List<DhikrItem> getByCategory(DhikrCategory category) {
+  static List<DhikrItem> getByCategory(
+    DhikrCategory category, {
+    bool includePendingReview = false,
+  }) {
+    List<DhikrItem> items;
     if (category == DhikrCategory.morning) {
       final waking =
           all.where((d) => d.category == DhikrCategory.wakingUp).toList()
@@ -285,13 +509,21 @@ class AdhkarCatalog {
       final morning =
           all.where((d) => d.category == DhikrCategory.morning).toList()
             ..sort((a, b) => a.order.compareTo(b.order));
-      return [...waking, ...morning];
+      items = [...waking, ...morning];
+    } else {
+      items = all.where((d) => d.category == category).toList()
+        ..sort((a, b) => a.order.compareTo(b.order));
     }
-    return all.where((d) => d.category == category).toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    if (!includePendingReview) {
+      return items.where((d) => d.isApproved).toList();
+    }
+    return items;
   }
 
-  static DhikrItem? getById(String id) {
-    return all.where((d) => d.id == id).firstOrNull;
+  static DhikrItem? getById(String id, {bool includePendingReview = false}) {
+    final item = all.where((d) => d.id == id).firstOrNull;
+    if (item == null) return null;
+    if (!includePendingReview && !item.isApproved) return null;
+    return item;
   }
 }

@@ -1766,6 +1766,126 @@ abstract class AppLocalizations {
   /// **'Sunnah'**
   String get adhkarTabSunnah;
 
+  /// No description provided for @adhkarTabGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get adhkarTabGeneral;
+
+  /// No description provided for @adhkarTabBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get adhkarTabBookmarks;
+
+  /// No description provided for @adhkarBookmarksEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarked adhkar yet. Tap the bookmark icon to save any remembrance.'**
+  String get adhkarBookmarksEmpty;
+
+  /// No description provided for @adhkarResumePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume from Dhikr {index}'**
+  String adhkarResumePrompt(int index);
+
+  /// No description provided for @adhkarCompletedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed today'**
+  String get adhkarCompletedToday;
+
+  /// No description provided for @adhkarToggleTransliteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle transliteration'**
+  String get adhkarToggleTransliteration;
+
+  /// No description provided for @adhkarBookmarkAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark dhikr'**
+  String get adhkarBookmarkAdd;
+
+  /// No description provided for @adhkarBookmarkRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bookmark'**
+  String get adhkarBookmarkRemove;
+
+  /// No description provided for @adhkarPendingReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Review'**
+  String get adhkarPendingReview;
+
+  /// No description provided for @adhkarPrescribedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescribed'**
+  String get adhkarPrescribedCount;
+
+  /// No description provided for @adhkarRecommendedTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get adhkarRecommendedTarget;
+
+  /// No description provided for @adhkarReadAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Read again'**
+  String get adhkarReadAgain;
+
+  /// No description provided for @adhkarCollectionCompletedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have completed this remembrance collection. Your progress is saved for today.'**
+  String get adhkarCollectionCompletedDesc;
+
+  /// No description provided for @adhkarEditorialReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Editorial Review Mode'**
+  String get adhkarEditorialReviewMode;
+
+  /// No description provided for @adhkarReviewModeBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Editorial Review Mode: Viewing unreviewed entries for scholarly verification.'**
+  String get adhkarReviewModeBanner;
+
+  /// No description provided for @adhkarContentUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Under Editorial Review'**
+  String get adhkarContentUnderReview;
+
+  /// No description provided for @adhkarContentUnderReviewDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembrances in this collection are currently undergoing verification and will be available once approved.'**
+  String get adhkarContentUnderReviewDesc;
+
+  /// No description provided for @adhkarEnableReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Draft Content'**
+  String get adhkarEnableReviewMode;
+
+  /// No description provided for @adhkarDisableReviewMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Review Mode'**
+  String get adhkarDisableReviewMode;
+
+  /// No description provided for @adhkarStepIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String adhkarStepIndicator(int current, int total);
+
   /// No description provided for @smartNotificationsTitle.
   ///
   /// In en, this message translates to:
