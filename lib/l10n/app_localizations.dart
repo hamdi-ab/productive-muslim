@@ -2702,6 +2702,30 @@ abstract class AppLocalizations {
   /// **'Lifetime Momentum'**
   String get lifetimeMomentum;
 
+  /// No description provided for @recentActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Days (12w)'**
+  String get recentActiveDays;
+
+  /// No description provided for @recentActiveDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged in last 12 weeks'**
+  String get recentActiveDaysDesc;
+
+  /// No description provided for @defaultProfileIntentionText.
+  ///
+  /// In en, this message translates to:
+  /// **'“O Allah, bless my Ummah in its early mornings.”'**
+  String get defaultProfileIntentionText;
+
+  /// No description provided for @defaultProfileIntentionSource.
+  ///
+  /// In en, this message translates to:
+  /// **'— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)'**
+  String get defaultProfileIntentionSource;
+
   /// No description provided for @lifetimeActiveDays.
   ///
   /// In en, this message translates to:

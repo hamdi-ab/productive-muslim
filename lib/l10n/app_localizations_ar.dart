@@ -1479,6 +1479,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lifetimeMomentum => 'سجل الإنجاز والهمة';
 
   @override
+  String get recentActiveDays => 'أيام النشاط (١٢ أسبوعاً)';
+
+  @override
+  String get recentActiveDaysDesc => 'خلال آخر ١٢ أسبوعاً';
+
+  @override
+  String get defaultProfileIntentionText =>
+      '«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»';
+
+  @override
+  String get defaultProfileIntentionSource => '— النبي ﷺ · سنن أبي داود (٢٦٠٦)';
+
+  @override
   String get lifetimeActiveDays => 'أيام النشاط';
 
   @override

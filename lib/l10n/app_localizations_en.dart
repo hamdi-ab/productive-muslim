@@ -1488,6 +1488,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lifetimeMomentum => 'Lifetime Momentum';
 
   @override
+  String get recentActiveDays => 'Active Days (12w)';
+
+  @override
+  String get recentActiveDaysDesc => 'Logged in last 12 weeks';
+
+  @override
+  String get defaultProfileIntentionText =>
+      '“O Allah, bless my Ummah in its early mornings.”';
+
+  @override
+  String get defaultProfileIntentionSource =>
+      '— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)';
+
+  @override
   String get lifetimeActiveDays => 'Active Days';
 
   @override

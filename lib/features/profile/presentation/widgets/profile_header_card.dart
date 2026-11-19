@@ -255,12 +255,16 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
         ? userName.trim()
         : (widget.isAr ? 'طالب البركة' : 'Productive Seeker');
 
-    final displayIntention =
-        (userIntention != null && userIntention.trim().isNotEmpty)
+    final hasCustomIntention =
+        userIntention != null && userIntention.trim().isNotEmpty;
+
+    final displayIntention = hasCustomIntention
         ? userIntention.trim()
-        : (widget.isAr
-              ? '«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»'
-              : '“O Allah, bless my Ummah in its early mornings.”');
+        : l10n.defaultProfileIntentionText;
+
+    final displaySource = hasCustomIntention
+        ? null
+        : l10n.defaultProfileIntentionSource;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -433,26 +437,56 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                 ),
               ),
               child: Row(
+                crossAxisAlignment: displaySource != null
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.auto_awesome_rounded,
-                    size: 13,
-                    color: AppColors.secondary,
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: displaySource != null ? 2 : 0,
+                    ),
+                    child: const Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 13,
+                      color: AppColors.secondary,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      displayIntention,
-                      style: TextStyle(
-                        fontFamily: widget.isAr ? 'amiri' : null,
-                        fontSize: 11.5,
-                        fontStyle: widget.isAr
-                            ? FontStyle.normal
-                            : FontStyle.italic,
-                        color: widget.isDark ? Colors.white70 : Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayIntention,
+                          style: TextStyle(
+                            fontFamily: widget.isAr ? 'amiri' : null,
+                            fontSize: 11.5,
+                            fontStyle: widget.isAr
+                                ? FontStyle.normal
+                                : FontStyle.italic,
+                            color: widget.isDark
+                                ? Colors.white70
+                                : Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (displaySource != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            displaySource,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              color: widget.isDark
+                                  ? AppColors.primaryLight
+                                  : AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],

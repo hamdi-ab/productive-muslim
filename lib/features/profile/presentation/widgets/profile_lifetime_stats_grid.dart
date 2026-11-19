@@ -62,9 +62,9 @@ class ProfileLifetimeStatsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _StatCard(
-                title: l10n.lifetimeActiveDays,
+                title: l10n.recentActiveDays,
                 value: '$activeDays ${isAr ? 'يوم' : 'days'}',
-                subtitle: l10n.lifetimeActiveDaysDesc,
+                subtitle: l10n.recentActiveDaysDesc,
                 icon: Icons.calendar_today_rounded,
                 iconColor: const Color(0xFF059669),
                 isDark: isDark,
