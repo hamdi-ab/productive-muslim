@@ -524,7 +524,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "Activity score: {count}",
+  "heatmapScoreLabel": "{count, plural, =1{1 activity logged} other{{count} activities logged}}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}
@@ -582,6 +582,12 @@
   "spiritualRank": "Spiritual Rank",
   "nextRankProgress": "Progress to next rank",
   "lifetimeMomentum": "Lifetime Momentum",
+  "recentActiveDays": "Active Days (12w)",
+  "recentActiveDaysDesc": "Logged in last 12 weeks",
+  "defaultProfileIntentionText": "“O Allah, bless my Ummah in its early mornings.”",
+  "defaultProfileIntentionSource": "— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)",
+  "lifetimeActiveDays": "Active Days",
+  "lifetimeActiveDaysDesc": "Days with logged activity",
   "currentStreak": "Current Streak",
   "bestStreak": "Best: {days}d",
   "@bestStreak": {
@@ -619,6 +625,8 @@
   "badgeMuhasabahDevoteeDesc": "Completed 4 consecutive weekly spiritual self-audits.",
   "barakahReflectiveHeaderTitle": "Barakah & Reflection",
   "barakahReflectiveSubtitle": "Mindful intention, sincere action, and gratitude.",
+  "barakahDuaText": "“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”",
+  "barakahDuaSource": "— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)",
   "barakahActivityRecordDisclaimer": "Activity counts describe self-reported app usage, not a measure of divine blessing, faith, or sincerity.",
   "todayRecordedActivity": "Today's Recorded Activity",
   "habitsLoggedCount": "{count} habits kept",

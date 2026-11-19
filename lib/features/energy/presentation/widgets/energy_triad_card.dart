@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:productive_muslim/core/di/di.dart';
@@ -9,8 +7,8 @@ import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// Card orchestrating the 3 Energy Dimensions (Ruh, Jism, Aql),
-/// the circular Barakah battery gauge, and composite energy tiering.
+/// Card orchestrating the 3 Energy Dimensions (Ruh, Jism, Aql)
+/// for personal daily reflection and energy balance.
 class EnergyTriadCard extends StatefulWidget {
   final VoidCallback? onSaved;
 
@@ -43,22 +41,6 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
     } catch (_) {
       return SettingsService.empty();
     }
-  }
-
-  int get _compositeScore {
-    return ((_spiritual * 40 + _physical * 30 + _mental * 30) / 5)
-        .round()
-        .clamp(0, 100);
-  }
-
-  String _getCompositeTier(bool isAr) {
-    if (_compositeScore >= 80) {
-      return isAr ? 'رتبة القوي' : 'Al-Qawiyy Tier';
-    }
-    if (_compositeScore >= 60) {
-      return isAr ? 'تدفق البركة' : 'Barakah Flow Tier';
-    }
-    return isAr ? 'بحاجة للشحن' : 'Recharge Needed';
   }
 
   Future<void> _saveEnergy() async {
@@ -152,10 +134,10 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE9C349).withValues(alpha: 0.15),
+                      color: const Color(0xFF4EDEA3).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFE9C349).withValues(alpha: 0.5),
+                        color: const Color(0xFF4EDEA3).withValues(alpha: 0.4),
                         width: 0.8,
                       ),
                     ),
@@ -163,17 +145,17 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
-                          Icons.military_tech_rounded,
+                          Icons.spa_rounded,
                           size: 13,
-                          color: Color(0xFFE9C349),
+                          color: Color(0xFF4EDEA3),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _getCompositeTier(isAr),
+                          isAr ? 'توازن واعي' : 'Daily Check-in',
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFE9C349),
+                            color: Color(0xFF4EDEA3),
                           ),
                         ),
                       ],
@@ -182,55 +164,6 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                 ),
               ),
             ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Circular Battery Gauge
-          Center(
-            child: SizedBox(
-              width: 140,
-              height: 140,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  CustomPaint(
-                    size: const Size(140, 140),
-                    painter: BarakahBatteryGaugePainter(
-                      progress: _compositeScore / 100.0,
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.bolt_rounded,
-                        size: 18,
-                        color: Color(0xFFE9C349),
-                      ),
-                      Text(
-                        '$_compositeScore%',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.white : AppColors.textPrimary,
-                          letterSpacing: -0.5,
-                          height: 1.1,
-                        ),
-                      ),
-                      const Text(
-                        'Barakah Battery',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF8A938D),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           ),
 
           const SizedBox(height: 12),
@@ -464,50 +397,4 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
       ),
     );
   }
-}
-
-/// Custom painter for the circular sweep-gradient battery gauge.
-class BarakahBatteryGaugePainter extends CustomPainter {
-  final double progress; // 0.0 to 1.0
-
-  const BarakahBatteryGaugePainter({required this.progress});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width / 2) - 8;
-
-    final backgroundPaint = Paint()
-      ..color = const Color(0xFF2D3733).withValues(alpha: 0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8.0;
-
-    canvas.drawCircle(center, radius, backgroundPaint);
-
-    final sweepAngle = 2 * math.pi * progress.clamp(0.0, 1.0);
-    const gradient = SweepGradient(
-      colors: [Color(0xFF4EDEA3), Color(0xFF99D3BA), Color(0xFFE9C349)],
-      stops: [0.0, 0.6, 1.0],
-    );
-
-    final activePaint = Paint()
-      ..shader = gradient.createShader(
-        Rect.fromCircle(center: center, radius: radius),
-      )
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 8.0;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      sweepAngle,
-      false,
-      activePaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant BarakahBatteryGaugePainter oldDelegate) =>
-      oldDelegate.progress != progress;
 }

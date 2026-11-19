@@ -2411,7 +2411,7 @@ abstract class AppLocalizations {
   /// No description provided for @heatmapScoreLabel.
   ///
   /// In en, this message translates to:
-  /// **'Activity score: {count}'**
+  /// **'{count, plural, =1{1 activity logged} other{{count} activities logged}}'**
   String heatmapScoreLabel(int count);
 
   /// No description provided for @backupRestoreTitle.
@@ -2702,6 +2702,42 @@ abstract class AppLocalizations {
   /// **'Lifetime Momentum'**
   String get lifetimeMomentum;
 
+  /// No description provided for @recentActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Days (12w)'**
+  String get recentActiveDays;
+
+  /// No description provided for @recentActiveDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged in last 12 weeks'**
+  String get recentActiveDaysDesc;
+
+  /// No description provided for @defaultProfileIntentionText.
+  ///
+  /// In en, this message translates to:
+  /// **'“O Allah, bless my Ummah in its early mornings.”'**
+  String get defaultProfileIntentionText;
+
+  /// No description provided for @defaultProfileIntentionSource.
+  ///
+  /// In en, this message translates to:
+  /// **'— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)'**
+  String get defaultProfileIntentionSource;
+
+  /// No description provided for @lifetimeActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Days'**
+  String get lifetimeActiveDays;
+
+  /// No description provided for @lifetimeActiveDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Days with logged activity'**
+  String get lifetimeActiveDaysDesc;
+
   /// No description provided for @currentStreak.
   ///
   /// In en, this message translates to:
@@ -2881,6 +2917,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mindful intention, sincere action, and gratitude.'**
   String get barakahReflectiveSubtitle;
+
+  /// No description provided for @barakahDuaText.
+  ///
+  /// In en, this message translates to:
+  /// **'“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”'**
+  String get barakahDuaText;
+
+  /// No description provided for @barakahDuaSource.
+  ///
+  /// In en, this message translates to:
+  /// **'— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)'**
+  String get barakahDuaSource;
 
   /// No description provided for @barakahActivityRecordDisclaimer.
   ///

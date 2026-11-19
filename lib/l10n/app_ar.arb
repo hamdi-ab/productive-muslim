@@ -448,7 +448,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "نقاط النشاط: {count}",
+  "heatmapScoreLabel": "{count, plural, =1{نشاط واحد مسجل} =2{نشاطان مسجلان} few{{count} أنشطة مسجلة} other{{count} نشاط مسجل}}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}
@@ -506,6 +506,12 @@
   "spiritualRank": "المرتبة الإيمانية",
   "nextRankProgress": "التقدم إلى المرتبة التالية",
   "lifetimeMomentum": "سجل الإنجاز والهمة",
+  "recentActiveDays": "أيام النشاط (١٢ أسبوعاً)",
+  "recentActiveDaysDesc": "خلال آخر ١٢ أسبوعاً",
+  "defaultProfileIntentionText": "«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»",
+  "defaultProfileIntentionSource": "— النبي ﷺ · سنن أبي داود (٢٦٠٦)",
+  "lifetimeActiveDays": "أيام النشاط",
+  "lifetimeActiveDaysDesc": "أيام تم فيها تسجيل نشاط",
   "currentStreak": "سلسلة الاستقامة",
   "bestStreak": "الأفضل: {days} يوم",
   "@bestStreak": {
@@ -543,6 +549,8 @@
   "badgeMuhasabahDevoteeDesc": "إتمام المحاسبة والمراجعة الأسبوعية 4 مرات متتالية.",
   "barakahReflectiveHeaderTitle": "البركة والتأمل اليومي",
   "barakahReflectiveSubtitle": "حضور النية، إتقان العمل، وشكر النعم.",
+  "barakahDuaText": "«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»",
+  "barakahDuaSource": "— النبي ﷺ · سنن ابن ماجه (٩٢٥)",
   "barakahActivityRecordDisclaimer": "يعكس هذا السجل نشاطك الذاتي في التطبيق، وليس مقياساً لمكانتك الإيمانية أو إخلاصك أمام الله.",
   "todayRecordedActivity": "النشاط المسجل لهذا اليوم",
   "habitsLoggedCount": "{count} عادات منجزة",

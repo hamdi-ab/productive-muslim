@@ -13,7 +13,6 @@ import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/focus/presentation/widgets/focus_soundscape_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_daily_ayah_card.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_daily_progress_section.dart';
-import 'package:productive_muslim/features/home/presentation/widgets/home_energy_khushu_meter.dart';
 import 'package:productive_muslim/features/home/presentation/widgets/home_qualities_carousel.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -254,31 +253,6 @@ void main() {
 
       expect(find.text('تم إنجاز ١ من ٢'), findsOneWidget);
       expect(find.text('تم إنجاز ١ من ١'), findsOneWidget);
-    });
-
-    testWidgets('DailyEnergyKhushuMeter renders in Arabic and English', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        wrapWithProviders(const DailyEnergyKhushuMeter()),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text("Daily Energy & Khushu' Level"), findsOneWidget);
-      expect(find.textContaining('Physical Energy'), findsOneWidget);
-      expect(find.textContaining('Spiritual Focus'), findsOneWidget);
-
-      await tester.pumpWidget(
-        wrapWithProviders(
-          const DailyEnergyKhushuMeter(),
-          locale: const Locale('ar'),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text("مستوى الطاقة والخشوع اليومي"), findsOneWidget);
-      expect(find.textContaining('الطاقة البدنية'), findsOneWidget);
-      expect(find.textContaining('التركيز الروحي'), findsOneWidget);
     });
 
     testWidgets('FocusSoundscapeCard renders localized in Arabic and English', (

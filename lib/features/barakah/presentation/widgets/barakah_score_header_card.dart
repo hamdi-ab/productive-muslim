@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
-import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/data/services/barakah_activity_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Peaceful, reflective header card displaying the user's daily intention,
@@ -106,9 +106,9 @@ class BarakahScoreHeaderCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // 2. Sacred Contemplation / Dua Callout
+          // 2. Sacred Contemplation / Dua Callout with Verified Attribution
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(12),
@@ -118,26 +118,46 @@ class BarakahScoreHeaderCard extends StatelessWidget {
               ),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.spa_rounded,
-                  size: 15,
-                  color: AppColors.secondary,
+                const Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Icon(
+                    Icons.spa_rounded,
+                    size: 15,
+                    color: AppColors.secondary,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    isAr
-                        ? '«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»'
-                        : '“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”',
-                    style: TextStyle(
-                      fontFamily: isAr ? 'amiri' : null,
-                      fontSize: isAr ? 13 : 11,
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.barakahDuaText,
+                        style: TextStyle(
+                          fontFamily: isAr ? 'amiri' : null,
+                          fontSize: isAr ? 13 : 11,
+                          color: Colors.white.withValues(alpha: 0.95),
+                          fontStyle: isAr ? FontStyle.normal : FontStyle.italic,
+                          height: 1.35,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.barakahDuaSource,
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          color: Color(0xFFB4EFD6),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -253,3 +273,6 @@ class BarakahScoreHeaderCard extends StatelessWidget {
     );
   }
 }
+
+/// Reflective header card alias
+typedef BarakahActivityHeaderCard = BarakahScoreHeaderCard;

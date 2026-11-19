@@ -12,10 +12,10 @@ import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_action_hub.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockBarakahRepository extends Mock implements BarakahRepository {}
 
@@ -39,7 +39,7 @@ void main() {
     registerFallbackValue(testEntry);
   });
 
-  setUp(() {
+  setUp(() async {
     mockRepository = MockBarakahRepository();
     when(() => mockRepository.getEntriesForDate(any()))
         .thenAnswer((_) async => [testEntry]);
@@ -73,9 +73,14 @@ void main() {
     }
     getIt.registerSingleton<TaskRepository>(mockTaskRepository);
 
-    if (!getIt.isRegistered<SettingsService>()) {
-      getIt.registerSingleton<SettingsService>(SettingsService.empty());
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final settingsService = SettingsService(prefs: prefs);
+
+    if (getIt.isRegistered<SettingsService>()) {
+      getIt.unregister<SettingsService>();
     }
+    getIt.registerSingleton<SettingsService>(settingsService);
   });
 
   tearDown(() {
@@ -84,6 +89,9 @@ void main() {
     }
     if (getIt.isRegistered<TaskRepository>()) {
       getIt.unregister<TaskRepository>();
+    }
+    if (getIt.isRegistered<SettingsService>()) {
+      getIt.unregister<SettingsService>();
     }
   });
 
@@ -105,7 +113,7 @@ void main() {
   }
 
   testWidgets(
-    'renders Profile screen with hero identity card and consistency streak badge without spiritual ranks',
+    'renders Profile screen with hero identity card without streak badges or spiritual ranks',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -115,7 +123,18 @@ void main() {
 
       expect(find.byType(ProfileHeaderCard), findsOneWidget);
       expect(find.text('Productive Seeker'), findsOneWidget);
-      expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+      expect(find.byKey(const Key('profile_streak_badge')), findsNothing);
+      expect(find.text('Current Streak'), findsNothing);
+      expect(find.text('Active Days (12w)'), findsOneWidget);
+      expect(find.text('Logged in last 12 weeks'), findsOneWidget);
+      expect(
+        find.text('“O Allah, bless my Ummah in its early mornings.”'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)'),
+        findsOneWidget,
+      );
       expect(find.textContaining('Al-Mubarak'), findsNothing);
       expect(find.textContaining('Level'), findsNothing);
     },
@@ -132,9 +151,11 @@ void main() {
 
       expect(find.byType(ProfileHeaderCard), findsOneWidget);
       expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
-      expect(find.byType(ProfileBadgesCard), findsOneWidget);
       expect(find.byType(BarakahHeatmapCard), findsOneWidget);
       expect(find.byType(ProfileActionHub), findsOneWidget);
+      // Verify no spiritual badges cabinet exists
+      expect(find.text('Fajr Vanguard'), findsNothing);
+      expect(find.text('Istiqamah Master'), findsNothing);
     },
   );
 
@@ -165,26 +186,6 @@ void main() {
     expect(find.text('Edit Profile'), findsNothing);
   });
 
-  testWidgets('tapping a milestone badge opens bottom sheet detail', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 3200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    await tester.pumpWidget(buildScreen());
-    await tester.pumpAndSettle();
-
-    // Tap the Fajr Vanguard badge
-    final fajrFinder = find.text('Fajr Vanguard');
-    expect(fajrFinder, findsOneWidget);
-    await tester.tap(fajrFinder);
-    await tester.pumpAndSettle();
-
-    // Verify modal bottom sheet opened with Hadith
-    expect(find.text('Unlocked'), findsOneWidget);
-    expect(find.textContaining('rak\'ahs of Fajr'), findsOneWidget);
-  });
-
   testWidgets('renders Arabic RTL locale correctly with all widgets', (
     tester,
   ) async {
@@ -196,10 +197,40 @@ void main() {
 
     expect(find.byType(ProfileHeaderCard), findsOneWidget);
     expect(find.text('طالب البركة'), findsOneWidget);
-    expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+    expect(find.byKey(const Key('profile_streak_badge')), findsNothing);
+    expect(find.text('أيام النشاط (١٢ أسبوعاً)'), findsOneWidget);
+    expect(find.text('خلال آخر ١٢ أسبوعاً'), findsOneWidget);
+    expect(
+      find.text('«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»'),
+      findsOneWidget,
+    );
+    expect(find.text('— النبي ﷺ · سنن أبي داود (٢٦٠٦)'), findsOneWidget);
     expect(find.textContaining('الـمُبـارك'), findsNothing);
     expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
-    expect(find.byType(ProfileBadgesCard), findsOneWidget);
     expect(find.byType(ProfileActionHub), findsOneWidget);
   });
+
+  testWidgets(
+    'custom user intention replaces default quotation and hides attribution',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final settings = getIt<SettingsService>();
+      await settings.setUserIntention('Striving for Ihsan in every deed');
+
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Striving for Ihsan in every deed'), findsOneWidget);
+      expect(
+        find.text('“O Allah, bless my Ummah in its early mornings.”'),
+        findsNothing,
+      );
+      expect(
+        find.text('— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)'),
+        findsNothing,
+      );
+    },
+  );
 }

@@ -8,8 +8,6 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
-import 'package:productive_muslim/domain/repositories/habit_repository.dart';
-import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Hero identity card for the user's spiritual profile, showcasing avatar,
@@ -257,12 +255,16 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
         ? userName.trim()
         : (widget.isAr ? 'طالب البركة' : 'Productive Seeker');
 
-    final displayIntention =
-        (userIntention != null && userIntention.trim().isNotEmpty)
+    final hasCustomIntention =
+        userIntention != null && userIntention.trim().isNotEmpty;
+
+    final displayIntention = hasCustomIntention
         ? userIntention.trim()
-        : (widget.isAr
-              ? '«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»'
-              : '“O Allah, bless my Ummah in its early mornings.”');
+        : l10n.defaultProfileIntentionText;
+
+    final displaySource = hasCustomIntention
+        ? null
+        : l10n.defaultProfileIntentionSource;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -377,62 +379,6 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    StreamBuilder<int>(
-                      stream: getIt.isRegistered<HabitRepository>()
-                          ? getIt<HabitRepository>().watchOverallStreak()
-                          : null,
-                      initialData: 0,
-                      builder: (context, snapshot) {
-                        final streak = snapshot.data ?? 0;
-
-                        return AppPressable(
-                          onTap: () => IstiqamahStreakSheet.show(context),
-                          pressedScale: 0.92,
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            key: const Key('profile_streak_badge'),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B)
-                                  .withValues(alpha: 0.16),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xFFF59E0B)
-                                    .withValues(alpha: 0.35),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.local_fire_department_rounded,
-                                  size: 12,
-                                  color: Color(0xFFD97706),
-                                ),
-                                const SizedBox(width: 3),
-                                Flexible(
-                                  child: Text(
-                                    l10n.streak(streak),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFD97706),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),
@@ -491,26 +437,56 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                 ),
               ),
               child: Row(
+                crossAxisAlignment: displaySource != null
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.auto_awesome_rounded,
-                    size: 13,
-                    color: AppColors.secondary,
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: displaySource != null ? 2 : 0,
+                    ),
+                    child: const Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 13,
+                      color: AppColors.secondary,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      displayIntention,
-                      style: TextStyle(
-                        fontFamily: widget.isAr ? 'amiri' : null,
-                        fontSize: 11.5,
-                        fontStyle: widget.isAr
-                            ? FontStyle.normal
-                            : FontStyle.italic,
-                        color: widget.isDark ? Colors.white70 : Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayIntention,
+                          style: TextStyle(
+                            fontFamily: widget.isAr ? 'amiri' : null,
+                            fontSize: 11.5,
+                            fontStyle: widget.isAr
+                                ? FontStyle.normal
+                                : FontStyle.italic,
+                            color: widget.isDark
+                                ? Colors.white70
+                                : Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (displaySource != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            displaySource,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              color: widget.isDark
+                                  ? AppColors.primaryLight
+                                  : AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],

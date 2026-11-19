@@ -1315,7 +1315,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String heatmapScoreLabel(int count) {
-    return 'نقاط النشاط: $count';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نشاط مسجل',
+      few: '$count أنشطة مسجلة',
+      two: 'نشاطان مسجلان',
+      one: 'نشاط واحد مسجل',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1471,6 +1479,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lifetimeMomentum => 'سجل الإنجاز والهمة';
 
   @override
+  String get recentActiveDays => 'أيام النشاط (١٢ أسبوعاً)';
+
+  @override
+  String get recentActiveDaysDesc => 'خلال آخر ١٢ أسبوعاً';
+
+  @override
+  String get defaultProfileIntentionText =>
+      '«اللَّهُمَّ بَارِكْ لِأُمَّتِي فِي بُكُورِهَا»';
+
+  @override
+  String get defaultProfileIntentionSource => '— النبي ﷺ · سنن أبي داود (٢٦٠٦)';
+
+  @override
+  String get lifetimeActiveDays => 'أيام النشاط';
+
+  @override
+  String get lifetimeActiveDaysDesc => 'أيام تم فيها تسجيل نشاط';
+
+  @override
   String get currentStreak => 'سلسلة الاستقامة';
 
   @override
@@ -1569,6 +1596,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get barakahReflectiveSubtitle =>
       'حضور النية، إتقان العمل، وشكر النعم.';
+
+  @override
+  String get barakahDuaText =>
+      '«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»';
+
+  @override
+  String get barakahDuaSource => '— النبي ﷺ · سنن ابن ماجه (٩٢٥)';
 
   @override
   String get barakahActivityRecordDisclaimer =>

@@ -1325,7 +1325,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String heatmapScoreLabel(int count) {
-    return 'Activity score: $count';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count activities logged',
+      one: '1 activity logged',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -1482,6 +1488,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lifetimeMomentum => 'Lifetime Momentum';
 
   @override
+  String get recentActiveDays => 'Active Days (12w)';
+
+  @override
+  String get recentActiveDaysDesc => 'Logged in last 12 weeks';
+
+  @override
+  String get defaultProfileIntentionText =>
+      '“O Allah, bless my Ummah in its early mornings.”';
+
+  @override
+  String get defaultProfileIntentionSource =>
+      '— Prophet Muhammad ﷺ · Sunan Abi Dawud (2606)';
+
+  @override
+  String get lifetimeActiveDays => 'Active Days';
+
+  @override
+  String get lifetimeActiveDaysDesc => 'Days with logged activity';
+
+  @override
   String get currentStreak => 'Current Streak';
 
   @override
@@ -1580,6 +1606,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get barakahReflectiveSubtitle =>
       'Mindful intention, sincere action, and gratitude.';
+
+  @override
+  String get barakahDuaText =>
+      '“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”';
+
+  @override
+  String get barakahDuaSource => '— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)';
 
   @override
   String get barakahActivityRecordDisclaimer =>

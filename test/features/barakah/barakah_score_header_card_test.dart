@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/data/services/barakah_activity_service.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -52,6 +52,18 @@ void main() {
           findsOneWidget,
         );
 
+        // Verified Hadith dua and scholarly attribution
+        expect(
+          find.text(
+            '“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text('— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)'),
+          findsOneWidget,
+        );
+
         // Factual activity chips
         expect(find.text("Today's Recorded Activity"), findsOneWidget);
         expect(find.text('3 habits kept'), findsOneWidget);
@@ -86,6 +98,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('البركة والتأمل اليومي'), findsOneWidget);
+      expect(
+        find.text(
+          '«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('— النبي ﷺ · سنن ابن ماجه (٩٢٥)'), findsOneWidget);
       expect(find.text('النشاط المسجل لهذا اليوم'), findsOneWidget);
       expect(find.text('2 عادات منجزة'), findsOneWidget);
       expect(find.text('30 دقيقة تركيز'), findsOneWidget);

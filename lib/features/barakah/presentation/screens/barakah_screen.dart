@@ -5,7 +5,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
-import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/data/services/barakah_activity_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_bloc.dart';
 import 'package:productive_muslim/features/barakah/logic/barakah_event.dart';
@@ -14,7 +14,6 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_atmosphere_background.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_daily_prompt_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_entry_form_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_muhasabah_audit_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_weekly_review_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -80,8 +79,8 @@ class _BarakahScreenState extends State<BarakahScreen> {
                               // 1. Live Barakah Activity Overview & Humility Disclaimer
                               FutureBuilder<BarakahActivitySummary>(
                                 future:
-                                    getIt.isRegistered<BarakahScoreService>()
-                                    ? getIt<BarakahScoreService>()
+                                    getIt.isRegistered<BarakahActivityService>()
+                                    ? getIt<BarakahActivityService>()
                                           .calculateLiveSummary(date: today)
                                     : null,
                                 builder: (context, scoreSnapshot) {
@@ -108,11 +107,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
                               ),
                               const SizedBox(height: AppSpacing.md),
 
-                              // 4. Spiritual Focus & Khushu' Audit Card
-                              const BarakahMuhasabahAuditCard(),
-                              const SizedBox(height: AppSpacing.md),
-
-                              // 5. Weekly Muhasabah Review Launchpad Card
+                              // 4. Weekly Reflection Review Launchpad Card
                               const BarakahWeeklyReviewCard(),
                               const SizedBox(height: AppSpacing.xl),
                             ],
