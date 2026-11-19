@@ -24,6 +24,7 @@ import 'package:productive_muslim/data/services/local_barakah_reminder_scheduler
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
 import 'package:productive_muslim/data/services/adhan_notification_service.dart';
+import 'package:productive_muslim/data/services/adhkar_search_service.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
@@ -123,6 +124,9 @@ Future<void> setupDi() async {
       homeWidgetSyncService: getIt<HomeWidgetSyncService>(),
       adhkarRepository: getIt<AdhkarRepository>(),
     ),
+  );
+  getIt.registerLazySingleton<AdhkarSearchService>(
+    () => AdhkarSearchService(repository: getIt<AdhkarRepository>()),
   );
   getIt.registerLazySingleton<PrayerNotificationScheduler>(
     () => PrayerNotificationScheduler(

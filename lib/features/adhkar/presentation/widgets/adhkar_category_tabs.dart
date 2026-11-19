@@ -19,6 +19,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
   final ValueChanged<DhikrCategory> onCategorySelected;
   final bool isBookmarksSelected;
   final VoidCallback? onBookmarksSelected;
+  final VoidCallback? onExploreTap;
   final AppLocalizations l10n;
   final bool isDark;
 
@@ -29,6 +30,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
     required this.onCategorySelected,
     this.isBookmarksSelected = false,
     this.onBookmarksSelected,
+    this.onExploreTap,
     required this.l10n,
     required this.isDark,
   });
@@ -196,6 +198,57 @@ class AdhkarCategoryTabs extends StatelessWidget {
                               : (isDark
                                     ? AppColors.darkTextSecondary
                                     : AppColors.textSecondary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (onExploreTap != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: AppPressable(
+                key: const Key('adhkar_explore_chip'),
+                onTap: onExploreTap!,
+                pressedScale: 0.95,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.primaryLight.withValues(alpha: 0.14)
+                        : AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.primaryLight.withValues(alpha: 0.3)
+                          : AppColors.primary.withValues(alpha: 0.2),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.explore_outlined,
+                        size: 15,
+                        color: isDark
+                            ? AppColors.primaryLight
+                            : AppColors.primary,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        l10n.adhkarExploreTitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
                         ),
                       ),
                     ],

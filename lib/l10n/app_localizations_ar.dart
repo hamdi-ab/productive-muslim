@@ -1686,4 +1686,104 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get muhasabahReflectionSavedToast => 'تم حفظ التأمل بنجاح.';
+
+  @override
+  String get adhkarExploreTitle => 'استكشاف وبحث';
+
+  @override
+  String get adhkarExploreSubtitle =>
+      'تصفح الأذكار المعتمدة حسب المجموعات أو الموضوعات';
+
+  @override
+  String get adhkarSearchPlaceholder =>
+      'ابحث بالنص العربي أو المعنى أو العنوان...';
+
+  @override
+  String get adhkarSearchCollectionsTab => 'المجموعات';
+
+  @override
+  String get adhkarSearchCategoriesTab => 'الموضوعات';
+
+  @override
+  String adhkarSearchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نتيجة',
+      many: '$count نتيجة',
+      few: '$count نتائج',
+      two: 'نتيجتان',
+      one: 'نتيجة واحدة',
+      zero: 'لا توجد نتائج',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adhkarSearchNoResultsTitle => 'لم يتم العثور على أذكار';
+
+  @override
+  String get adhkarSearchNoResultsDesc =>
+      'جرب البحث باللغة العربية أو الترجمة أو استخدم كلمات بحث مختلفة.';
+
+  @override
+  String get adhkarSearchClear => 'مسح البحث';
+
+  @override
+  String get adhkarSubjectGratitude => 'الحمد والثناء';
+
+  @override
+  String get adhkarSubjectGratitudeDesc =>
+      'أذكار التحميد والتمجيد والثناء على الله';
+
+  @override
+  String get adhkarSubjectForgiveness => 'الاستغفار والتوبة';
+
+  @override
+  String get adhkarSubjectForgivenessDesc =>
+      'طلب المغفرة والإنابة إلى الله تعالى';
+
+  @override
+  String get adhkarSubjectProtection => 'الحفظ والاستعاذة';
+
+  @override
+  String get adhkarSubjectProtectionDesc =>
+      'أدعية التحصين والاستعاذة بالله من الشرور';
+
+  @override
+  String get adhkarSubjectSleepWaking => 'النوم والاستيقاظ';
+
+  @override
+  String get adhkarSubjectSleepWakingDesc => 'أذكار النوم والاضطجاع والاستيقاظ';
+
+  @override
+  String get adhkarSubjectEveryday => 'أحوال وأوقات اليوم';
+
+  @override
+  String get adhkarSubjectEverydayDesc =>
+      'الأذكار اليومية وطلب العلم ومجريات الحياة';
+
+  @override
+  String adhkarItemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكر',
+      many: '$count ذكراً',
+      few: '$count أذكار',
+      two: 'ذكران',
+      one: 'ذكر واحد',
+      zero: 'لا توجد أذكار',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adhkarFilterAll => 'الكل';
+
+  @override
+  String get adhkarFilterCollections => 'المجموعات';
+
+  @override
+  String get adhkarFilterCategories => 'الموضوعات';
 }

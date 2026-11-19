@@ -192,6 +192,13 @@ class HomeScreen extends StatelessWidget {
                 tooltip: l10n.settings,
                 onTap: () => context.push(AppRoutes.settings),
               ),
+            ] else if (location.startsWith(AppRoutes.adhkar)) ...[
+              ProductiveAppBarAction(
+                key: const Key('open-adhkar-explore'),
+                tooltip: l10n.adhkarExploreTitle,
+                icon: Icons.explore_outlined,
+                onTap: () => context.push(AppRoutes.adhkarExplore),
+              ),
             ] else if (location.startsWith(AppRoutes.reflect) ||
                 location == AppRoutes.barakah ||
                 location == AppRoutes.journal) ...[

@@ -670,5 +670,42 @@
   "muhasabahEmptyMessage": "Take a quiet moment to reflect whenever you are ready. No scores, no streaks.",
   "muhasabahDeleteConfirmTitle": "Delete Reflection?",
   "muhasabahDeleteConfirmMessage": "Are you sure you want to remove this reflection entry?",
-  "muhasabahReflectionSavedToast": "Reflection saved quietly."
+  "muhasabahReflectionSavedToast": "Reflection saved quietly.",
+  "adhkarExploreTitle": "Explore & Search",
+  "adhkarExploreSubtitle": "Discover reviewed Adhkar by collection or topic",
+  "adhkarSearchPlaceholder": "Search Arabic, translation, or title...",
+  "adhkarSearchCollectionsTab": "Collections",
+  "adhkarSearchCategoriesTab": "Categories",
+  "adhkarSearchResultsCount": "{count, plural, =1{1 result found} other{{count} results found}}",
+  "@adhkarSearchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarSearchNoResultsTitle": "No remembrances found",
+  "adhkarSearchNoResultsDesc": "Try searching in Arabic, English translation, or adjusting your keywords.",
+  "adhkarSearchClear": "Clear Search",
+  "adhkarSubjectGratitude": "Gratitude & Praise",
+  "adhkarSubjectGratitudeDesc": "Praises and glorifications of Allah",
+  "adhkarSubjectForgiveness": "Forgiveness & Repentance",
+  "adhkarSubjectForgivenessDesc": "Seeking pardon and turning back to Allah",
+  "adhkarSubjectProtection": "Protection & Refuge",
+  "adhkarSubjectProtectionDesc": "Seeking safety and refuge in Allah",
+  "adhkarSubjectSleepWaking": "Sleep & Waking",
+  "adhkarSubjectSleepWakingDesc": "Remembrances upon waking and resting",
+  "adhkarSubjectEveryday": "Everyday Situations",
+  "adhkarSubjectEverydayDesc": "Daily routines, knowledge, and movements",
+  "adhkarItemsCount": "{count, plural, =1{1 remembrance} other{{count} remembrances}}",
+  "@adhkarItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarFilterAll": "All",
+  "adhkarFilterCollections": "Collections",
+  "adhkarFilterCategories": "Categories"
 }

@@ -15,6 +15,7 @@ abstract final class AppRoutes {
   static const energy = '/energy';
   static const fasting = '/fasting';
   static const barakahReview = '/barakah/review';
+  static const adhkarExplore = '/adhkar/explore';
 
   // My Day sub-destinations / nested paths
   static const myDayTasks = '/my-day/tasks';

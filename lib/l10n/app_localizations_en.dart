@@ -1698,4 +1698,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get muhasabahReflectionSavedToast => 'Reflection saved quietly.';
+
+  @override
+  String get adhkarExploreTitle => 'Explore & Search';
+
+  @override
+  String get adhkarExploreSubtitle =>
+      'Discover reviewed Adhkar by collection or topic';
+
+  @override
+  String get adhkarSearchPlaceholder =>
+      'Search Arabic, translation, or title...';
+
+  @override
+  String get adhkarSearchCollectionsTab => 'Collections';
+
+  @override
+  String get adhkarSearchCategoriesTab => 'Categories';
+
+  @override
+  String adhkarSearchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results found',
+      one: '1 result found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adhkarSearchNoResultsTitle => 'No remembrances found';
+
+  @override
+  String get adhkarSearchNoResultsDesc =>
+      'Try searching in Arabic, English translation, or adjusting your keywords.';
+
+  @override
+  String get adhkarSearchClear => 'Clear Search';
+
+  @override
+  String get adhkarSubjectGratitude => 'Gratitude & Praise';
+
+  @override
+  String get adhkarSubjectGratitudeDesc =>
+      'Praises and glorifications of Allah';
+
+  @override
+  String get adhkarSubjectForgiveness => 'Forgiveness & Repentance';
+
+  @override
+  String get adhkarSubjectForgivenessDesc =>
+      'Seeking pardon and turning back to Allah';
+
+  @override
+  String get adhkarSubjectProtection => 'Protection & Refuge';
+
+  @override
+  String get adhkarSubjectProtectionDesc =>
+      'Seeking safety and refuge in Allah';
+
+  @override
+  String get adhkarSubjectSleepWaking => 'Sleep & Waking';
+
+  @override
+  String get adhkarSubjectSleepWakingDesc =>
+      'Remembrances upon waking and resting';
+
+  @override
+  String get adhkarSubjectEveryday => 'Everyday Situations';
+
+  @override
+  String get adhkarSubjectEverydayDesc =>
+      'Daily routines, knowledge, and movements';
+
+  @override
+  String adhkarItemsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count remembrances',
+      one: '1 remembrance',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adhkarFilterAll => 'All';
+
+  @override
+  String get adhkarFilterCollections => 'Collections';
+
+  @override
+  String get adhkarFilterCategories => 'Categories';
 }

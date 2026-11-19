@@ -21,6 +21,7 @@ import 'package:productive_muslim/features/tasks/presentation/screens/plan_scree
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_explore_screen.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
 import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
@@ -196,6 +197,9 @@ class AppRouter {
               DhikrCategory category = DhikrCategory.morning;
               if (state.extra is DhikrCategory) {
                 category = state.extra as DhikrCategory;
+              } else if (state.extra is Map &&
+                  (state.extra as Map)['category'] is DhikrCategory) {
+                category = (state.extra as Map)['category'] as DhikrCategory;
               } else {
                 final queryCat = state.uri.queryParameters['category'];
                 if (queryCat != null) {
@@ -205,6 +209,15 @@ class AppRouter {
                   );
                 }
               }
+
+              String? itemId;
+              if (state.extra is Map &&
+                  (state.extra as Map)['itemId'] is String) {
+                itemId = (state.extra as Map)['itemId'] as String;
+              } else {
+                itemId = state.uri.queryParameters['itemId'];
+              }
+
               bool? isReviewMode;
               final settingsService = getIt.isRegistered<SettingsService>()
                   ? getIt<SettingsService>()
@@ -222,6 +235,7 @@ class AppRouter {
               }
               return AdhkarScreen(
                 initialCategory: category,
+                initialItemId: itemId,
                 isReviewModeEnabled: isReviewMode,
               );
             },
@@ -346,6 +360,21 @@ class AppRouter {
         path: AppRoutes.barakahReview,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const BarakahReviewScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adhkarExplore,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          bool? isReviewMode;
+          if (state.extra is Map &&
+              (state.extra as Map)['reviewMode'] is bool) {
+            isReviewMode = (state.extra as Map)['reviewMode'] as bool;
+          } else if (state.uri.queryParameters['reviewMode'] == 'true' ||
+              state.uri.queryParameters['internalReview'] == 'true') {
+            isReviewMode = true;
+          }
+          return AdhkarExploreScreen(isReviewModeEnabled: isReviewMode);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
