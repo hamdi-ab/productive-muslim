@@ -59,7 +59,7 @@ class ProfileLifetimeStatsGrid extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        // Row 1: Streak & Habits
+        // Row 1: Steadfastness & Habits
         Row(
           children: [
             Expanded(
@@ -67,8 +67,8 @@ class ProfileLifetimeStatsGrid extends StatelessWidget {
                 title: l10n.currentStreak,
                 value: '$currentStreak ${isAr ? 'يوم' : 'days'}',
                 subtitle: l10n.bestStreak(longestStreak),
-                icon: Icons.local_fire_department_rounded,
-                iconColor: const Color(0xFFF59E0B),
+                icon: Icons.eco_rounded,
+                iconColor: const Color(0xFF059669),
                 isDark: isDark,
               ),
             ),

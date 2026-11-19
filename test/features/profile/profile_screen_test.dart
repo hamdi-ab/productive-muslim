@@ -12,7 +12,6 @@ import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/features/profile/presentation/screens/profile_screen.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_action_hub.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -132,9 +131,11 @@ void main() {
 
       expect(find.byType(ProfileHeaderCard), findsOneWidget);
       expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
-      expect(find.byType(ProfileBadgesCard), findsOneWidget);
       expect(find.byType(BarakahHeatmapCard), findsOneWidget);
       expect(find.byType(ProfileActionHub), findsOneWidget);
+      // Verify no spiritual badges cabinet exists
+      expect(find.text('Fajr Vanguard'), findsNothing);
+      expect(find.text('Istiqamah Master'), findsNothing);
     },
   );
 
@@ -165,26 +166,6 @@ void main() {
     expect(find.text('Edit Profile'), findsNothing);
   });
 
-  testWidgets('tapping a milestone badge opens bottom sheet detail', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 3200));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    await tester.pumpWidget(buildScreen());
-    await tester.pumpAndSettle();
-
-    // Tap the Fajr Vanguard badge
-    final fajrFinder = find.text('Fajr Vanguard');
-    expect(fajrFinder, findsOneWidget);
-    await tester.tap(fajrFinder);
-    await tester.pumpAndSettle();
-
-    // Verify modal bottom sheet opened with Hadith
-    expect(find.text('Unlocked'), findsOneWidget);
-    expect(find.textContaining('rak\'ahs of Fajr'), findsOneWidget);
-  });
-
   testWidgets('renders Arabic RTL locale correctly with all widgets', (
     tester,
   ) async {
@@ -199,7 +180,6 @@ void main() {
     expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
     expect(find.textContaining('الـمُبـارك'), findsNothing);
     expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
-    expect(find.byType(ProfileBadgesCard), findsOneWidget);
     expect(find.byType(ProfileActionHub), findsOneWidget);
   });
 }

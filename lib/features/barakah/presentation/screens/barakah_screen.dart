@@ -14,7 +14,6 @@ import 'package:productive_muslim/features/barakah/presentation/screens/barakah_
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_atmosphere_background.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_daily_prompt_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_entry_form_card.dart';
-import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_muhasabah_audit_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_score_header_card.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_weekly_review_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -108,11 +107,7 @@ class _BarakahScreenState extends State<BarakahScreen> {
                               ),
                               const SizedBox(height: AppSpacing.md),
 
-                              // 4. Spiritual Focus & Khushu' Audit Card
-                              const BarakahMuhasabahAuditCard(),
-                              const SizedBox(height: AppSpacing.md),
-
-                              // 5. Weekly Muhasabah Review Launchpad Card
+                              // 4. Weekly Reflection Review Launchpad Card
                               const BarakahWeeklyReviewCard(),
                               const SizedBox(height: AppSpacing.xl),
                             ],

@@ -1325,7 +1325,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String heatmapScoreLabel(int count) {
-    return 'Activity score: $count';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count activities logged',
+      one: '1 activity logged',
+    );
+    return '$_temp0';
   }
 
   @override

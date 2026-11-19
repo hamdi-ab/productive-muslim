@@ -2411,7 +2411,7 @@ abstract class AppLocalizations {
   /// No description provided for @heatmapScoreLabel.
   ///
   /// In en, this message translates to:
-  /// **'Activity score: {count}'**
+  /// **'{count, plural, =1{1 activity logged} other{{count} activities logged}}'**
   String heatmapScoreLabel(int count);
 
   /// No description provided for @backupRestoreTitle.

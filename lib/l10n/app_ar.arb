@@ -448,7 +448,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "نقاط النشاط: {count}",
+  "heatmapScoreLabel": "{count, plural, =1{نشاط واحد مسجل} =2{نشاطان مسجلان} few{{count} أنشطة مسجلة} other{{count} نشاط مسجل}}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}

@@ -524,7 +524,7 @@
       "total": {"type": "int"}
     }
   },
-  "heatmapScoreLabel": "Activity score: {count}",
+  "heatmapScoreLabel": "{count, plural, =1{1 activity logged} other{{count} activities logged}}",
   "@heatmapScoreLabel": {
     "placeholders": {
       "count": {"type": "int"}

@@ -15,7 +15,6 @@ import 'package:productive_muslim/features/barakah/logic/barakah_state.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_atmosphere_background.dart';
 import 'package:productive_muslim/features/barakah/presentation/widgets/barakah_heatmap_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_action_hub.dart';
-import 'package:productive_muslim/features/profile/presentation/widgets/profile_badges_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:productive_muslim/features/profile/presentation/widgets/profile_lifetime_stats_grid.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -112,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
                 ProfileHeaderCard(isDark: isDark, isAr: isAr),
                 const SizedBox(height: AppSpacing.md),
 
-                // 2. 2x2 Lifetime Achievement Momentum Grid
+                // 2. 2x2 Lifetime Activity Grid
                 ProfileLifetimeStatsGrid(
                   currentStreak: streak,
                   longestStreak: longestStreak,
@@ -124,18 +123,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // 3. Consistency Milestones & Badges Cabinet
-                ProfileBadgesCard(
-                  streak: streak,
-                  lifetimeHabitCompletions: lifetimeHabits,
-                  lifetimeTasksCompleted: lifetimeTasks,
-                  totalFocusMinutes: focusMinutes,
-                  isDark: isDark,
-                  isAr: isAr,
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // 4. 12-Week Consistency & Growth Momentum Heatmap
+                // 3. 12-Week Consistency & Growth Momentum Heatmap
                 BarakahHeatmapCard(activityByDate: totalActivity),
                 const SizedBox(height: AppSpacing.md),
 

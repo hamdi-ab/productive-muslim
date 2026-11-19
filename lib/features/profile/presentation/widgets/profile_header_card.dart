@@ -397,12 +397,12 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                               vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B)
-                                  .withValues(alpha: 0.16),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.14),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(0xFFF59E0B)
-                                    .withValues(alpha: 0.35),
+                                color: const Color(0xFF10B981)
+                                    .withValues(alpha: 0.32),
                                 width: 0.8,
                               ),
                             ),
@@ -410,9 +410,9 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
-                                  Icons.local_fire_department_rounded,
+                                  Icons.eco_rounded,
                                   size: 12,
-                                  color: Color(0xFFD97706),
+                                  color: Color(0xFF059669),
                                 ),
                                 const SizedBox(width: 3),
                                 Flexible(
@@ -423,7 +423,7 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                                     style: const TextStyle(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFFD97706),
+                                      color: Color(0xFF059669),
                                     ),
                                   ),
                                 ),
