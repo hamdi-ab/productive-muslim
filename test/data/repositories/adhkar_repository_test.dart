@@ -143,6 +143,38 @@ void main() {
       await repository.setReviewModeEnabled(false);
       expect(repository.getById('ayat_al_kursi'), isNull);
     });
+
+    test('review mode remains enabled after repository recreation using the same settings preferences', () async {
+      // Initially review mode is disabled
+      expect(repository.isReviewModeEnabled, isFalse);
+      expect(settingsService.adhkarReviewModeEnabled, isFalse);
+
+      // Enable review mode
+      await repository.setReviewModeEnabled(true);
+      expect(repository.isReviewModeEnabled, isTrue);
+      expect(settingsService.adhkarReviewModeEnabled, isTrue);
+
+      // Recreate repository with the same settingsService/preferences (simulating app restart)
+      final recreatedRepo = AdhkarRepositoryImpl(
+        adhkarDao: dao,
+        settingsService: settingsService,
+      );
+      expect(recreatedRepo.isReviewModeEnabled, isTrue);
+      expect(recreatedRepo.getAll().length, equals(AdhkarCatalog.all.length));
+
+      // Disable review mode on recreated repo
+      await recreatedRepo.setReviewModeEnabled(false);
+      expect(recreatedRepo.isReviewModeEnabled, isFalse);
+      expect(settingsService.adhkarReviewModeEnabled, isFalse);
+
+      // Recreate repository again
+      final secondRecreatedRepo = AdhkarRepositoryImpl(
+        adhkarDao: dao,
+        settingsService: settingsService,
+      );
+      expect(secondRecreatedRepo.isReviewModeEnabled, isFalse);
+      expect(secondRecreatedRepo.getAll(), isEmpty);
+    });
   });
 
   group('AdhkarRepository - Bookmarks', () {

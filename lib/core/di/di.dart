@@ -102,6 +102,7 @@ Future<void> setupDi() async {
     () => AdhkarRepositoryImpl(
       adhkarDao: getIt<AdhkarDao>(),
       prefs: getIt<SharedPreferences>(),
+      settingsService: getIt<SettingsService>(),
     ),
   );
 

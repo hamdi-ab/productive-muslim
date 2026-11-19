@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productive_muslim/core/router/app_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -36,5 +37,19 @@ void main() {
 
   test('DI container registers SettingsService after setupDi', () {
     expect(GetIt.I.isRegistered<SettingsService>(), isTrue);
+  });
+
+  test('DI container registers AdhkarRepository with SettingsService review mode synchronization', () async {
+    expect(GetIt.I.isRegistered<AdhkarRepository>(), isTrue);
+    final repo = GetIt.I<AdhkarRepository>();
+    final settings = GetIt.I<SettingsService>();
+
+    expect(repo.isReviewModeEnabled, equals(settings.adhkarReviewModeEnabled));
+
+    await repo.setReviewModeEnabled(true);
+    expect(settings.adhkarReviewModeEnabled, isTrue);
+
+    await repo.setReviewModeEnabled(false);
+    expect(settings.adhkarReviewModeEnabled, isFalse);
   });
 }
