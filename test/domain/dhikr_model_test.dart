@@ -161,7 +161,10 @@ void main() {
 
     test('multi-part recitations have structured sub-steps and correct target counts', () {
       // 1. Post-Salah Tasbih (33 / 33 / 33 + 1 = 100)
-      final tasbih = AdhkarCatalog.getById('post_salah_tasbih')!;
+      final tasbih = AdhkarCatalog.getById(
+        'post_salah_tasbih',
+        includePendingReview: true,
+      )!;
       expect(tasbih.hasSteps, isTrue);
       expect(tasbih.targetCount, equals(100));
       expect(tasbih.steps.length, equals(4));
@@ -177,6 +180,7 @@ void main() {
       // 2. Post-Salah Astaghfirullah (3 + 1 = 4)
       final astaghfirullah = AdhkarCatalog.getById(
         'post_salah_astaghfirullah',
+        includePendingReview: true,
       )!;
       expect(astaghfirullah.hasSteps, isTrue);
       expect(astaghfirullah.targetCount, equals(4));
@@ -187,7 +191,10 @@ void main() {
       expect(astaghfirullah.steps[1].targetCount, equals(1));
 
       // 3. Bedtime Fatima Tasbih (33 / 33 / 34 = 100)
-      final sleepTasbih = AdhkarCatalog.getById('sleep_33_tasbih')!;
+      final sleepTasbih = AdhkarCatalog.getById(
+        'sleep_33_tasbih',
+        includePendingReview: true,
+      )!;
       expect(sleepTasbih.hasSteps, isTrue);
       expect(sleepTasbih.targetCount, equals(100));
       expect(sleepTasbih.steps.length, equals(3));
@@ -213,12 +220,23 @@ void main() {
       },
     );
 
-    test('getById returns matching item or null for unknown ID', () {
-      final item = AdhkarCatalog.getById('ayat_al_kursi');
-      expect(item, isNotNull);
-      expect(item?.id, 'ayat_al_kursi');
+    test('getById excludes pending review content by default matching getByCategory', () {
+      // By default, pending items return null through AdhkarCatalog.getById
+      final defaultItem = AdhkarCatalog.getById('ayat_al_kursi');
+      expect(defaultItem, isNull);
 
-      final nonExistent = AdhkarCatalog.getById('unknown_dhikr_xyz');
+      // Explicitly including pending review resolves the item
+      final reviewItem = AdhkarCatalog.getById(
+        'ayat_al_kursi',
+        includePendingReview: true,
+      );
+      expect(reviewItem, isNotNull);
+      expect(reviewItem?.id, 'ayat_al_kursi');
+
+      final nonExistent = AdhkarCatalog.getById(
+        'unknown_dhikr_xyz',
+        includePendingReview: true,
+      );
       expect(nonExistent, isNull);
     });
   });

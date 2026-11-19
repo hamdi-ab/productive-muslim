@@ -329,7 +329,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
         final date = key.replaceFirst('adhkar_done_', '');
         final completedIds = prefs.getStringList(key) ?? [];
         for (final id in completedIds) {
-          final item = AdhkarCatalog.getById(id);
+          final item = AdhkarCatalog.getById(id, includePendingReview: true);
           if (item != null) {
             final colId = _categoryToCollectionId(item.category);
             if (date == todayStr) {
@@ -365,7 +365,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
           final dhikrId = parts.sublist(3).join('_');
           final count = prefs.getInt(key) ?? 0;
           if (date == todayStr && count > 0) {
-            final item = AdhkarCatalog.getById(dhikrId);
+            final item = AdhkarCatalog.getById(
+              dhikrId,
+              includePendingReview: true,
+            );
             if (item != null) {
               final colId = _categoryToCollectionId(item.category);
               sessionsToSave.putIfAbsent(colId, () => {})[dhikrId] = count;

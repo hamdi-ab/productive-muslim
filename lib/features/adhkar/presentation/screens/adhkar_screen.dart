@@ -307,7 +307,15 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       if (getIt.isRegistered<HomeWidgetSyncService>()) {
         try {
           final completedCount = _counts.entries.where((entry) {
-            final d = AdhkarCatalog.getById(entry.key);
+            final d =
+                _adhkarRepo?.getById(
+                  entry.key,
+                  includePendingReview: _isReviewMode,
+                ) ??
+                AdhkarCatalog.getById(
+                  entry.key,
+                  includePendingReview: _isReviewMode,
+                );
             return d != null && entry.value >= d.targetCount;
           }).length;
           getIt<HomeWidgetSyncService>().syncDhikrCount(completedCount);

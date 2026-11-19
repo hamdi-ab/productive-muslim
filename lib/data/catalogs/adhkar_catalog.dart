@@ -520,7 +520,7 @@ class AdhkarCatalog {
     return items;
   }
 
-  static DhikrItem? getById(String id, {bool includePendingReview = true}) {
+  static DhikrItem? getById(String id, {bool includePendingReview = false}) {
     final item = all.where((d) => d.id == id).firstOrNull;
     if (item == null) return null;
     if (!includePendingReview && !item.isApproved) return null;
