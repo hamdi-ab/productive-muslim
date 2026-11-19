@@ -9,19 +9,20 @@ abstract class AdhkarRepository {
     DhikrCategory category, {
     bool? includePendingReview,
   });
-  DhikrItem? getById(String id);
+  DhikrItem? getById(String id, {bool? includePendingReview});
   int get catalogVersion;
 
   // Review Mode
+  bool get isReviewModeAvailable;
   bool get isReviewModeEnabled;
   Future<void> setReviewModeEnabled(bool enabled);
 
   // Bookmarks
   Future<void> toggleBookmark(String dhikrId);
-  Future<bool> isBookmarked(String dhikrId);
-  Future<List<DhikrItem>> getBookmarkedItems();
-  Stream<List<String>> watchBookmarkedIds();
-  Stream<List<DhikrItem>> watchBookmarkedItems();
+  Future<bool> isBookmarked(String dhikrId, {bool? includePendingReview});
+  Future<List<DhikrItem>> getBookmarkedItems({bool? includePendingReview});
+  Stream<List<String>> watchBookmarkedIds({bool? includePendingReview});
+  Stream<List<DhikrItem>> watchBookmarkedItems({bool? includePendingReview});
 
   // Sessions
   Future<AdhkarSessionRecord?> getSession(String collectionId);

@@ -125,27 +125,93 @@ void main() {
       },
     );
 
-    test('getById returns matching item or null', () {
-      expect(repository.getById('ayat_al_kursi'), isNotNull);
+    test('getById respects approval status and returns matching item only when approved or in review mode', () async {
+      // When review mode is off, unapproved items return null through normal lookup
+      expect(repository.getById('ayat_al_kursi'), isNull);
       expect(repository.getById('non_existent_id'), isNull);
+
+      // Explicit includePendingReview returns the item
+      expect(
+        repository.getById('ayat_al_kursi', includePendingReview: true),
+        isNotNull,
+      );
+
+      // When review mode is enabled, getById returns the item
+      await repository.setReviewModeEnabled(true);
+      expect(repository.getById('ayat_al_kursi'), isNotNull);
+
+      await repository.setReviewModeEnabled(false);
+      expect(repository.getById('ayat_al_kursi'), isNull);
     });
   });
 
   group('AdhkarRepository - Bookmarks', () {
-    test('toggleBookmark toggles state and updates streams', () async {
+    test('toggleBookmark toggles state, and bookmarks strictly filter unapproved items when review mode is off', () async {
       expect(await repository.isBookmarked('ayat_al_kursi'), isFalse);
       expect(await repository.getBookmarkedItems(), isEmpty);
 
+      // Toggle bookmark while review mode is off
       await repository.toggleBookmark('ayat_al_kursi');
+
+      // Unapproved item must NOT be reported as bookmarked in normal mode
+      expect(await repository.isBookmarked('ayat_al_kursi'), isFalse);
+      expect(await repository.getBookmarkedItems(), isEmpty);
+
+      // However, in internal review mode or with includePendingReview, the bookmark is retained
+      expect(
+        await repository.isBookmarked(
+          'ayat_al_kursi',
+          includePendingReview: true,
+        ),
+        isTrue,
+      );
+      final reviewBookmarks = await repository.getBookmarkedItems(
+        includePendingReview: true,
+      );
+      expect(reviewBookmarks.length, equals(1));
+      expect(reviewBookmarks.first.id, equals('ayat_al_kursi'));
+
+      // Turning on review mode exposes the bookmarked item
+      await repository.setReviewModeEnabled(true);
       expect(await repository.isBookmarked('ayat_al_kursi'), isTrue);
+      expect((await repository.getBookmarkedItems()).length, equals(1));
 
-      final bookmarkedItems = await repository.getBookmarkedItems();
-      expect(bookmarkedItems.length, equals(1));
-      expect(bookmarkedItems.first.id, equals('ayat_al_kursi'));
-
-      await repository.toggleBookmark('ayat_al_kursi');
+      // Turning off review mode hides it again immediately
+      await repository.setReviewModeEnabled(false);
       expect(await repository.isBookmarked('ayat_al_kursi'), isFalse);
       expect(await repository.getBookmarkedItems(), isEmpty);
+
+      // Untoggle bookmark
+      await repository.toggleBookmark('ayat_al_kursi');
+      expect(
+        await repository.isBookmarked(
+          'ayat_al_kursi',
+          includePendingReview: true,
+        ),
+        isFalse,
+      );
+      expect(
+        await repository.getBookmarkedItems(includePendingReview: true),
+        isEmpty,
+      );
+    });
+
+    test('watchBookmarkedItems and watchBookmarkedIds filter pending items when review mode is off', () async {
+      await repository.toggleBookmark('ayat_al_kursi');
+
+      // Streams with review mode off emit empty list for unapproved items
+      expect(await repository.watchBookmarkedItems().first, isEmpty);
+      expect(await repository.watchBookmarkedIds().first, isEmpty);
+
+      // With includePendingReview: true, emissions include the item
+      final reviewItems = await repository
+          .watchBookmarkedItems(includePendingReview: true)
+          .first;
+      expect(reviewItems.map((i) => i.id), contains('ayat_al_kursi'));
+      final reviewIds = await repository
+          .watchBookmarkedIds(includePendingReview: true)
+          .first;
+      expect(reviewIds, contains('ayat_al_kursi'));
     });
   });
 

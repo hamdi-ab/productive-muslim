@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
@@ -31,11 +32,20 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   bool _adhkarReviewModeFallback = false;
 
   @override
+  bool get isReviewModeAvailable =>
+      _settingsService?.isAdhkarReviewModeAvailable ?? !kReleaseMode;
+
+  @override
   bool get isReviewModeEnabled =>
-      _settingsService?.adhkarReviewModeEnabled ?? _adhkarReviewModeFallback;
+      isReviewModeAvailable &&
+      (_settingsService?.adhkarReviewModeEnabled ?? _adhkarReviewModeFallback);
 
   @override
   Future<void> setReviewModeEnabled(bool enabled) async {
+    if (!isReviewModeAvailable) {
+      _adhkarReviewModeFallback = false;
+      return;
+    }
     _adhkarReviewModeFallback = enabled;
     await _settingsService?.setAdhkarReviewModeEnabled(enabled);
   }
@@ -58,7 +68,10 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   }
 
   @override
-  DhikrItem? getById(String id) => AdhkarCatalog.getById(id);
+  DhikrItem? getById(String id, {bool? includePendingReview}) {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    return AdhkarCatalog.getById(id, includePendingReview: include);
+  }
 
   @override
   int get catalogVersion => AdhkarCatalog.catalogVersion;
@@ -76,27 +89,49 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
   }
 
   @override
-  Future<bool> isBookmarked(String dhikrId) => _adhkarDao.isBookmarked(dhikrId);
+  Future<bool> isBookmarked(
+    String dhikrId, {
+    bool? includePendingReview,
+  }) async {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    final item = AdhkarCatalog.getById(dhikrId, includePendingReview: include);
+    if (item == null) return false;
+    return _adhkarDao.isBookmarked(dhikrId);
+  }
 
   @override
-  Future<List<DhikrItem>> getBookmarkedItems() async {
+  Future<List<DhikrItem>> getBookmarkedItems({
+    bool? includePendingReview,
+  }) async {
+    final include = includePendingReview ?? isReviewModeEnabled;
     final ids = await _adhkarDao.getBookmarkedDhikrIds();
     return ids
-        .map((id) => AdhkarCatalog.getById(id))
+        .map((id) => AdhkarCatalog.getById(id, includePendingReview: include))
         .whereType<DhikrItem>()
+        .where((d) => include || d.isApproved)
         .toList();
   }
 
   @override
-  Stream<List<String>> watchBookmarkedIds() =>
-      _adhkarDao.watchBookmarkedDhikrIds();
+  Stream<List<String>> watchBookmarkedIds({bool? includePendingReview}) {
+    final include = includePendingReview ?? isReviewModeEnabled;
+    return _adhkarDao.watchBookmarkedDhikrIds().map((ids) {
+      if (include) return ids;
+      return ids.where((id) {
+        final item = AdhkarCatalog.getById(id, includePendingReview: false);
+        return item != null && item.isApproved;
+      }).toList();
+    });
+  }
 
   @override
-  Stream<List<DhikrItem>> watchBookmarkedItems() {
+  Stream<List<DhikrItem>> watchBookmarkedItems({bool? includePendingReview}) {
+    final include = includePendingReview ?? isReviewModeEnabled;
     return _adhkarDao.watchBookmarkedDhikrIds().map((ids) {
       return ids
-          .map((id) => AdhkarCatalog.getById(id))
+          .map((id) => AdhkarCatalog.getById(id, includePendingReview: include))
           .whereType<DhikrItem>()
+          .where((d) => include || d.isApproved)
           .toList();
     });
   }

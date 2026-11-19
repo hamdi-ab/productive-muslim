@@ -49,6 +49,7 @@ void main() {
   Widget buildSubject({
     DhikrCategory initialCategory = DhikrCategory.morning,
     bool isReviewModeEnabled = true,
+    bool? isInternalReviewAvailable,
   }) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -56,6 +57,7 @@ void main() {
       home: AdhkarScreen(
         initialCategory: initialCategory,
         isReviewModeEnabled: isReviewModeEnabled,
+        isInternalReviewAvailable: isInternalReviewAvailable,
       ),
     );
   }
@@ -67,6 +69,7 @@ void main() {
         buildSubject(
           initialCategory: DhikrCategory.morning,
           isReviewModeEnabled: false,
+          isInternalReviewAvailable: true,
         ),
       );
       await tester.pumpAndSettle();
@@ -98,6 +101,79 @@ void main() {
       expect(find.text('Authentic'), findsNothing);
       expect(find.text('Prescribed'), findsOneWidget);
       expect(find.textContaining('Tap anywhere to count'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'ordinary user build strictly hides review toggles and draft preview action',
+    (tester) async {
+      await tester.pumpWidget(
+        buildSubject(
+          initialCategory: DhikrCategory.morning,
+          isReviewModeEnabled: false,
+          isInternalReviewAvailable: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Content Under Editorial Review message is present
+      expect(find.text('Content Under Editorial Review'), findsOneWidget);
+      expect(find.textContaining('undergoing verification'), findsOneWidget);
+
+      // Ordinary users NEVER see review toggles or draft preview buttons
+      expect(find.text('Preview Draft Content'), findsNothing);
+      expect(
+        find.byKey(const Key('adhkar_enable_review_mode_button')),
+        findsNothing,
+      );
+      expect(find.byTooltip('Editorial Review Mode'), findsNothing);
+      expect(find.byTooltip('Exit Review Mode'), findsNothing);
+      expect(find.byKey(const Key('adhkar_review_mode_banner')), findsNothing);
+      expect(
+        find.byKey(const Key('adhkar_review_mode_toggle_shell')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'pending item bookmarked in review mode does NOT appear in Bookmarks view when review mode is off',
+    (tester) async {
+      // 1. Start with review mode enabled to bookmark a pending item
+      await tester.pumpWidget(
+        buildSubject(
+          initialCategory: DhikrCategory.morning,
+          isReviewModeEnabled: true,
+          isInternalReviewAvailable: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Bookmark the pending item
+      final bookmarkBtn = find.byTooltip('Bookmark dhikr');
+      expect(bookmarkBtn, findsOneWidget);
+      await tester.tap(bookmarkBtn);
+      await tester.pumpAndSettle();
+
+      // 2. Now toggle review mode OFF via the banner close button
+      final closeReviewBannerBtn = find.descendant(
+        of: find.byKey(const Key('adhkar_review_mode_banner')),
+        matching: find.byIcon(Icons.close_rounded),
+      );
+      expect(closeReviewBannerBtn, findsOneWidget);
+      await tester.tap(closeReviewBannerBtn);
+      await tester.pumpAndSettle();
+
+      // 3. Switch to Bookmarks tab
+      final bookmarksTab = find.text('Bookmarks');
+      expect(bookmarksTab, findsOneWidget);
+      await tester.ensureVisible(bookmarksTab);
+      await tester.tap(bookmarksTab);
+      await tester.pumpAndSettle();
+
+      // 4. In normal mode (review mode off), pending item MUST NOT appear in Bookmarks view!
+      expect(find.text('Waking Up Remembrance'), findsNothing);
+      expect(find.textContaining('No bookmarked adhkar yet'), findsOneWidget);
     },
   );
 

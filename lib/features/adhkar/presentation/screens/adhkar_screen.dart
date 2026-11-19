@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
@@ -33,11 +34,13 @@ String _toArabicDigits(String input) {
 class AdhkarScreen extends StatefulWidget {
   final DhikrCategory initialCategory;
   final bool? isReviewModeEnabled;
+  final bool? isInternalReviewAvailable;
 
   const AdhkarScreen({
     super.key,
     this.initialCategory = DhikrCategory.morning,
     this.isReviewModeEnabled,
+    this.isInternalReviewAvailable,
   });
 
   @override
@@ -62,6 +65,22 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   SettingsService? get _settingsService =>
       getIt.isRegistered<SettingsService>() ? getIt<SettingsService>() : null;
 
+  bool get _isInternalReviewAvailable {
+    if (widget.isInternalReviewAvailable != null) {
+      return widget.isInternalReviewAvailable!;
+    }
+    if (widget.isReviewModeEnabled != null) {
+      return true;
+    }
+    if (_adhkarRepo != null) {
+      return _adhkarRepo!.isReviewModeAvailable;
+    }
+    if (_settingsService != null) {
+      return _settingsService!.isAdhkarReviewModeAvailable;
+    }
+    return !kReleaseMode;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,14 +89,16 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     _showTransliteration =
         _settingsService?.adhkarTransliterationEnabled ?? false;
     _isReviewMode =
-        widget.isReviewModeEnabled ??
-        (_adhkarRepo?.isReviewModeEnabled ??
-            _settingsService?.adhkarReviewModeEnabled ??
-            false);
+        _isInternalReviewAvailable &&
+        (widget.isReviewModeEnabled ??
+            (_adhkarRepo?.isReviewModeEnabled ??
+                _settingsService?.adhkarReviewModeEnabled ??
+                false));
     _initData();
   }
 
   Future<void> _toggleReviewMode() async {
+    if (!_isInternalReviewAvailable) return;
     AppHaptics.selectionClick();
     final next = !_isReviewMode;
     setState(() {
@@ -91,6 +112,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       await _adhkarRepo?.setReviewModeEnabled(next);
       await _settingsService?.setAdhkarReviewModeEnabled(next);
     } catch (_) {}
+    await _loadBookmarks();
     _loadSessionForCollection(_selectedCategory.name);
   }
 
@@ -105,7 +127,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   Future<void> _loadBookmarks() async {
     if (_adhkarRepo != null) {
       try {
-        final bookmarks = await _adhkarRepo!.getBookmarkedItems();
+        final bookmarks = await _adhkarRepo!.getBookmarkedItems(
+          includePendingReview: _isReviewMode,
+        );
         if (mounted) {
           setState(() {
             _bookmarkedIds.clear();
@@ -173,8 +197,13 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   List<DhikrItem> get _currentItems {
     if (_isBookmarksView) {
       return _bookmarkedIds
-          .map((id) => AdhkarCatalog.getById(id))
+          .map(
+            (id) =>
+                _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
+                AdhkarCatalog.getById(id, includePendingReview: _isReviewMode),
+          )
           .whereType<DhikrItem>()
+          .where((d) => _isReviewMode || d.isApproved)
           .toList();
     }
     if (_adhkarRepo != null) {
@@ -395,15 +424,16 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
               subtitle: l10n.adhkarSubtitle,
               showBackButton: true,
               actions: [
-                ProductiveAppBarAction(
-                  tooltip: _isReviewMode
-                      ? l10n.adhkarDisableReviewMode
-                      : l10n.adhkarEditorialReviewMode,
-                  icon: _isReviewMode
-                      ? Icons.rate_review_rounded
-                      : Icons.rate_review_outlined,
-                  onTap: _toggleReviewMode,
-                ),
+                if (_isInternalReviewAvailable)
+                  ProductiveAppBarAction(
+                    tooltip: _isReviewMode
+                        ? l10n.adhkarDisableReviewMode
+                        : l10n.adhkarEditorialReviewMode,
+                    icon: _isReviewMode
+                        ? Icons.rate_review_rounded
+                        : Icons.rate_review_outlined,
+                    onTap: _toggleReviewMode,
+                  ),
                 ProductiveAppBarAction(
                   tooltip: l10n.adhkarToggleTransliteration,
                   icon: _showTransliteration
@@ -631,26 +661,27 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                key: const Key(
-                                  'adhkar_review_mode_toggle_shell',
+                              if (_isInternalReviewAvailable)
+                                IconButton(
+                                  key: const Key(
+                                    'adhkar_review_mode_toggle_shell',
+                                  ),
+                                  tooltip: _isReviewMode
+                                      ? l10n.adhkarDisableReviewMode
+                                      : l10n.adhkarEditorialReviewMode,
+                                  icon: Icon(
+                                    _isReviewMode
+                                        ? Icons.rate_review_rounded
+                                        : Icons.rate_review_outlined,
+                                    size: 20,
+                                    color: _isReviewMode
+                                        ? (isDark
+                                              ? const Color(0xFFFCD34D)
+                                              : const Color(0xFFD97706))
+                                        : null,
+                                  ),
+                                  onPressed: _toggleReviewMode,
                                 ),
-                                tooltip: _isReviewMode
-                                    ? l10n.adhkarDisableReviewMode
-                                    : l10n.adhkarEditorialReviewMode,
-                                icon: Icon(
-                                  _isReviewMode
-                                      ? Icons.rate_review_rounded
-                                      : Icons.rate_review_outlined,
-                                  size: 20,
-                                  color: _isReviewMode
-                                      ? (isDark
-                                            ? const Color(0xFFFCD34D)
-                                            : const Color(0xFFD97706))
-                                      : null,
-                                ),
-                                onPressed: _toggleReviewMode,
-                              ),
                               IconButton(
                                 tooltip: l10n.adhkarToggleTransliteration,
                                 icon: Icon(
@@ -738,28 +769,30 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                           : AppColors.textSecondary,
                                     ),
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  OutlinedButton.icon(
-                                    key: const Key(
-                                      'adhkar_enable_review_mode_button',
-                                    ),
-                                    onPressed: _toggleReviewMode,
-                                    icon: const Icon(
-                                      Icons.preview_rounded,
-                                      size: 16,
-                                    ),
-                                    label: Text(l10n.adhkarEnableReviewMode),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: isDark
-                                          ? AppColors.secondary
-                                          : AppColors.secondaryDark,
-                                      side: BorderSide(
-                                        color: AppColors.secondary.withValues(
-                                          alpha: 0.4,
+                                  if (_isInternalReviewAvailable) ...[
+                                    const SizedBox(height: AppSpacing.md),
+                                    OutlinedButton.icon(
+                                      key: const Key(
+                                        'adhkar_enable_review_mode_button',
+                                      ),
+                                      onPressed: _toggleReviewMode,
+                                      icon: const Icon(
+                                        Icons.preview_rounded,
+                                        size: 16,
+                                      ),
+                                      label: Text(l10n.adhkarEnableReviewMode),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: isDark
+                                            ? AppColors.secondary
+                                            : AppColors.secondaryDark,
+                                        side: BorderSide(
+                                          color: AppColors.secondary.withValues(
+                                            alpha: 0.4,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ],
                               ],
                             ),
