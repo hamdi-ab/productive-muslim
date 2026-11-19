@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/data/services/adhkar_search_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
@@ -239,6 +241,58 @@ void main() {
       ],
       supportedLocales: const [Locale('en'), Locale('ar')],
       home: home ?? const AdhkarExploreScreen(),
+    );
+  }
+
+  Widget buildTestAppWithRouter({
+    String initialLocation = AppRoutes.adhkarExplore,
+    Locale locale = const Locale('en'),
+  }) {
+    final router = GoRouter(
+      initialLocation: initialLocation,
+      routes: [
+        GoRoute(
+          path: AppRoutes.adhkarExplore,
+          builder: (context, state) => const AdhkarExploreScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.adhkar,
+          builder: (context, state) {
+            DhikrCategory category = DhikrCategory.morning;
+            String? itemId;
+            bool? isReviewMode;
+            if (state.extra is Map) {
+              final map = state.extra as Map;
+              if (map['category'] is DhikrCategory) {
+                category = map['category'] as DhikrCategory;
+              }
+              if (map['itemId'] is String) {
+                itemId = map['itemId'] as String;
+              }
+              if (map['reviewMode'] is bool) {
+                isReviewMode = map['reviewMode'] as bool;
+              }
+            }
+            return AdhkarScreen(
+              initialCategory: category,
+              initialItemId: itemId,
+              isReviewModeEnabled: isReviewMode,
+            );
+          },
+        ),
+      ],
+    );
+
+    return MaterialApp.router(
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      routerConfig: router,
     );
   }
 
@@ -574,5 +628,125 @@ void main() {
 
       expect(find.byKey(const Key('adhkar_explore_chip')), findsOneWidget);
     });
+
+    testWidgets(
+      'unified offline search renders collection card and tapping it opens that collection in reader',
+      (tester) async {
+        await tester.pumpWidget(buildTestAppWithRouter());
+        await tester.pumpAndSettle();
+
+        // Search for 'Evening'
+        await tester.enterText(
+          find.byKey(const Key('adhkar_explore_search_input')),
+          'Evening',
+        );
+        await tester.pumpAndSettle();
+
+        // Collection card should appear in search results
+        final collectionCardKey = find.byKey(
+          const Key('adhkar_search_collection_card_evening'),
+        );
+        expect(collectionCardKey, findsOneWidget);
+
+        // Tap collection card
+        await tester.tap(collectionCardKey);
+        await tester.pumpAndSettle();
+
+        // Verifies reader screen opened with Evening collection
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+        expect(find.text('Seeking Forgiveness'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'selecting a remembrance search result opens the reader with the item active and current',
+      (tester) async {
+        await tester.pumpWidget(buildTestAppWithRouter());
+        await tester.pumpAndSettle();
+
+        // Search for 'worship' (only matches approvedItem2)
+        await tester.enterText(
+          find.byKey(const Key('adhkar_explore_search_input')),
+          'worship',
+        );
+        await tester.pumpAndSettle();
+
+        final itemCardKey = find.byKey(
+          const Key('adhkar_result_card_test_dhikr_2'),
+        );
+        expect(itemCardKey, findsOneWidget);
+
+        // Tap search result card
+        await tester.tap(itemCardKey);
+        await tester.pumpAndSettle();
+
+        // Reader screen is open
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+
+        // Requested remembrance is current and visible
+        expect(find.text('Seeking Forgiveness'), findsOneWidget);
+        expect(
+          find.text('اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'saved count and session progress for an item survives navigation from Explore to the reader',
+      (tester) async {
+        // Return existing saved progress for Evening collection
+        when(() => mockRepo.getSession(DhikrCategory.evening.name)).thenAnswer(
+          (_) async => AdhkarSessionRecord(
+            collectionId: DhikrCategory.evening.name,
+            lastPageIndex: 0,
+            counts: {'test_dhikr_2': 1},
+            isCompleted: true,
+            lastAccessedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(buildTestAppWithRouter());
+        await tester.pumpAndSettle();
+
+        // Search for 'Seeking Forgiveness'
+        await tester.enterText(
+          find.byKey(const Key('adhkar_explore_search_input')),
+          'Seeking Forgiveness',
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('adhkar_result_card_test_dhikr_2')),
+        );
+        await tester.pumpAndSettle();
+
+        // In the reader, the item's completed/progress state is retained
+        expect(find.byType(AdhkarScreen), findsOneWidget);
+        expect(find.text('Seeking Forgiveness'), findsOneWidget);
+        // Completed icon or progress state is rendered because count reached targetCount (1)
+        expect(find.byIcon(Icons.check_circle_rounded), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'pending-review remembrance cannot be navigated to or viewed when review mode is disabled',
+      (tester) async {
+        // Direct attempt to open AdhkarScreen with initialItemId pointing to pending item
+        await tester.pumpWidget(
+          buildTestWidget(
+            home: const AdhkarScreen(
+              initialCategory: DhikrCategory.general,
+              initialItemId: 'test_pending_dhikr',
+              isReviewModeEnabled: false,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The pending item title must never appear
+        expect(find.text('Draft Supplication'), findsNothing);
+      },
+    );
   });
 }

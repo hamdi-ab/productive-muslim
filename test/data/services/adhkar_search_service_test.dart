@@ -7,6 +7,10 @@ import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 class MockAdhkarRepository extends Mock implements AdhkarRepository {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(DhikrCategory.morning);
+  });
+
   late MockAdhkarRepository mockRepo;
   late AdhkarSearchService service;
 
@@ -89,6 +93,20 @@ void main() {
     ],
   );
 
+  final pendingSleepItem = DhikrItem(
+    id: 'pending_sleep_1',
+    category: DhikrCategory.sleeping,
+    titleEn: 'Draft Bedtime Supplication',
+    titleAr: 'دعاء النوم قيد المراجعة',
+    arabic: 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي',
+    transliteration: "Bismika Rabbi wada'tu janbi",
+    translationEn: 'In Your name my Lord I lie down',
+    translationAr: 'باسمك ربي وضعت جنبي',
+    reference: 'Sahih al-Bukhari 6320',
+    virtue: 'Bedtime',
+    reviewStatus: ContentReviewStatus.pendingReview,
+  );
+
   setUp(() {
     mockRepo = MockAdhkarRepository();
     service = AdhkarSearchService(repository: mockRepo);
@@ -101,8 +119,35 @@ void main() {
       final include =
           invocation.namedArguments[#includePendingReview] as bool? ?? false;
       return include
-          ? [approvedItem1, approvedItem2, pendingReviewItem, multiStepItem]
+          ? [
+              approvedItem1,
+              approvedItem2,
+              pendingReviewItem,
+              multiStepItem,
+              pendingSleepItem,
+            ]
           : [approvedItem1, approvedItem2, multiStepItem];
+    });
+
+    when(
+      () => mockRepo.getByCategory(
+        any(),
+        includePendingReview: any(named: 'includePendingReview'),
+      ),
+    ).thenAnswer((invocation) {
+      final category = invocation.positionalArguments[0] as DhikrCategory;
+      final include =
+          invocation.namedArguments[#includePendingReview] as bool? ?? false;
+      final allItems = include
+          ? [
+              approvedItem1,
+              approvedItem2,
+              pendingReviewItem,
+              multiStepItem,
+              pendingSleepItem,
+            ]
+          : [approvedItem1, approvedItem2, multiStepItem];
+      return allItems.where((d) => d.category == category).toList();
     });
   });
 
@@ -189,6 +234,60 @@ void main() {
         includePendingReview: true,
       );
       expect(results.any((r) => r.item.id == 'pending_1'), isTrue);
+    });
+
+    test('searchCollections matches English titles and aliases', () {
+      final morning = service.searchCollections(query: 'Morning');
+      expect(morning.length, equals(1));
+      expect(morning.first.category, equals(DhikrCategory.morning));
+      expect(morning.first.itemCount, equals(1)); // only approvedItem1
+
+      final salah = service.searchCollections(query: 'Salah');
+      expect(salah.length, equals(1));
+      expect(salah.first.category, equals(DhikrCategory.postPrayer));
+      expect(salah.first.itemCount, equals(1)); // multiStepItem
+    });
+
+    test('searchCollections matches Arabic normalized titles and aliases', () {
+      final results = service.searchCollections(query: 'الصباح');
+      expect(results.length, equals(1));
+      expect(results.first.category, equals(DhikrCategory.morning));
+
+      final afterSalah = service.searchCollections(query: 'بعد الصلاة');
+      expect(afterSalah.length, equals(1));
+      expect(afterSalah.first.category, equals(DhikrCategory.postPrayer));
+    });
+
+    test('searchCollections strictly excludes collections with 0 approved items in normal search', () {
+      // Bedtime only has pendingSleepItem in mockRepo
+      final bedtimeNormal = service.searchCollections(query: 'Bedtime');
+      expect(bedtimeNormal, isEmpty);
+
+      final bedtimeReview = service.searchCollections(
+        query: 'Bedtime',
+        includePendingReview: true,
+      );
+      expect(bedtimeReview.length, equals(1));
+      expect(bedtimeReview.first.category, equals(DhikrCategory.sleeping));
+      expect(bedtimeReview.first.itemCount, equals(1));
+    });
+
+    test('unifiedSearch returns matched collections alongside items', () {
+      final unified = service.unifiedSearch(query: 'Morning');
+      expect(unified.collections.length, equals(1));
+      expect(unified.collections.first.category, equals(DhikrCategory.morning));
+      expect(unified.items.length, equals(1));
+      expect(unified.items.first.item.id, equals('appr_1'));
+      expect(unified.totalCount, equals(2));
+      expect(unified.isNotEmpty, isTrue);
+    });
+
+    test('unifiedSearch returns empty container for unmatched query', () {
+      final unified = service.unifiedSearch(query: 'UnknownXYZ123');
+      expect(unified.isEmpty, isTrue);
+      expect(unified.collections, isEmpty);
+      expect(unified.items, isEmpty);
+      expect(unified.totalCount, equals(0));
     });
   });
 }

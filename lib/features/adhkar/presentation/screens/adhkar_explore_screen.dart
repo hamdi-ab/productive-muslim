@@ -248,8 +248,8 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
     context.push(AppRoutes.adhkar, extra: extra);
   }
 
-  List<DhikrSearchResult> _getFilteredSearchResults() {
-    final rawResults = _searchService.search(
+  AdhkarUnifiedSearchResult _getFilteredSearchResults() {
+    final rawResults = _searchService.unifiedSearch(
       query: _query,
       includePendingReview: _isReviewMode,
     );
@@ -258,7 +258,7 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
       case _ExploreFilter.all:
         return rawResults;
       case _ExploreFilter.collections:
-        return rawResults.where((r) {
+        final filteredItems = rawResults.items.where((r) {
           return r.item.category == DhikrCategory.morning ||
               r.item.category == DhikrCategory.evening ||
               r.item.category == DhikrCategory.postPrayer ||
@@ -266,15 +266,23 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
               r.item.category == DhikrCategory.wakingUp ||
               r.item.category == DhikrCategory.general;
         }).toList();
+        return AdhkarUnifiedSearchResult(
+          collections: rawResults.collections,
+          items: filteredItems,
+        );
       case _ExploreFilter.categories:
         final allSubjectItemIds = <String>{};
         for (final s in DhikrSubject.values) {
           final info = DhikrSubjectInfo.getBySubject(s);
           if (info != null) allSubjectItemIds.addAll(info.itemIds);
         }
-        return rawResults
+        final filteredItems = rawResults.items
             .where((r) => allSubjectItemIds.contains(r.item.id))
             .toList();
+        return AdhkarUnifiedSearchResult(
+          collections: const [],
+          items: filteredItems,
+        );
     }
   }
 
@@ -1096,6 +1104,8 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
       );
     }
 
+    final totalCount = results.totalCount;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1105,7 +1115,7 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
             vertical: 4,
           ),
           child: Text(
-            l10n.adhkarSearchResultsCount(results.length),
+            l10n.adhkarSearchResultsCount(totalCount),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -1122,20 +1132,155 @@ class _AdhkarExploreScreenState extends State<AdhkarExploreScreen>
               horizontal: AppSpacing.md,
               vertical: AppSpacing.xs,
             ),
-            itemCount: results.length,
+            itemCount: results.collections.length + results.items.length,
             itemBuilder: (context, index) {
-              final result = results[index];
+              if (index < results.collections.length) {
+                final collection = results.collections[index];
+                return _buildCollectionSearchResultCard(
+                  collection,
+                  l10n,
+                  isDark,
+                  isAr,
+                );
+              }
+              final itemResult =
+                  results.items[index - results.collections.length];
               return _buildDhikrItemCard(
-                result.item,
+                itemResult.item,
                 l10n,
                 isDark,
                 isAr,
-                matchedField: result.matchedField,
+                matchedField: itemResult.matchedField,
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCollectionSearchResultCard(
+    DhikrCollectionSearchResult collection,
+    AppLocalizations l10n,
+    bool isDark,
+    bool isAr,
+  ) {
+    final title = AdhkarCategoryTabs.getCategoryLabel(
+      collection.category,
+      l10n,
+    );
+    final icon = _getCollectionIcon(collection.category);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: AppPressable(
+        key: Key('adhkar_search_collection_card_${collection.category.name}'),
+        onTap: () => _openReader(category: collection.category),
+        pressedScale: 0.98,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.darkSurface.withValues(alpha: 0.85)
+                : AppColors.surface.withValues(alpha: 0.95),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.4)
+                  : AppColors.primary.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.primary.withValues(alpha: 0.3)
+                      : AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: isDark ? AppColors.primaryLight : AppColors.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.secondary.withValues(alpha: 0.25)
+                                : AppColors.secondary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            l10n.adhkarFilterCollections,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.3,
+                              color: isDark
+                                  ? AppColors.secondary
+                                  : AppColors.secondaryDark,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.adhkarItemsCount(collection.itemCount),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                isAr ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                color: isDark
+                    ? AppColors.darkTextSecondary.withValues(alpha: 0.6)
+                    : AppColors.textSecondary.withValues(alpha: 0.6),
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
