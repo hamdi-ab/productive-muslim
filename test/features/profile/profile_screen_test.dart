@@ -104,7 +104,7 @@ void main() {
   }
 
   testWidgets(
-    'renders Profile screen with hero identity card and consistency streak badge without spiritual ranks',
+    'renders Profile screen with hero identity card without streak badges or spiritual ranks',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 1200));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -114,7 +114,9 @@ void main() {
 
       expect(find.byType(ProfileHeaderCard), findsOneWidget);
       expect(find.text('Productive Seeker'), findsOneWidget);
-      expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+      expect(find.byKey(const Key('profile_streak_badge')), findsNothing);
+      expect(find.text('Current Streak'), findsNothing);
+      expect(find.text('Active Days'), findsOneWidget);
       expect(find.textContaining('Al-Mubarak'), findsNothing);
       expect(find.textContaining('Level'), findsNothing);
     },
@@ -177,7 +179,8 @@ void main() {
 
     expect(find.byType(ProfileHeaderCard), findsOneWidget);
     expect(find.text('طالب البركة'), findsOneWidget);
-    expect(find.byKey(const Key('profile_streak_badge')), findsOneWidget);
+    expect(find.byKey(const Key('profile_streak_badge')), findsNothing);
+    expect(find.text('أيام النشاط'), findsOneWidget);
     expect(find.textContaining('الـمُبـارك'), findsNothing);
     expect(find.byType(ProfileLifetimeStatsGrid), findsOneWidget);
     expect(find.byType(ProfileActionHub), findsOneWidget);

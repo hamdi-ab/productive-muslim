@@ -4,10 +4,9 @@ import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// 2x2 Lifetime Achievement and Spiritual Momentum Grid for the user's profile.
+/// 2x2 Lifetime Activity and Consistency Grid for the user's profile.
 class ProfileLifetimeStatsGrid extends StatelessWidget {
-  final int currentStreak;
-  final int longestStreak;
+  final int activeDays;
   final int lifetimeHabitCompletions;
   final int lifetimeTasksCompleted;
   final int totalFocusMinutes;
@@ -16,8 +15,7 @@ class ProfileLifetimeStatsGrid extends StatelessWidget {
 
   const ProfileLifetimeStatsGrid({
     super.key,
-    required this.currentStreak,
-    required this.longestStreak,
+    required this.activeDays,
     required this.lifetimeHabitCompletions,
     required this.lifetimeTasksCompleted,
     required this.totalFocusMinutes,
@@ -59,15 +57,15 @@ class ProfileLifetimeStatsGrid extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        // Row 1: Steadfastness & Habits
+        // Row 1: Active Days & Habits
         Row(
           children: [
             Expanded(
               child: _StatCard(
-                title: l10n.currentStreak,
-                value: '$currentStreak ${isAr ? 'يوم' : 'days'}',
-                subtitle: l10n.bestStreak(longestStreak),
-                icon: Icons.eco_rounded,
+                title: l10n.lifetimeActiveDays,
+                value: '$activeDays ${isAr ? 'يوم' : 'days'}',
+                subtitle: l10n.lifetimeActiveDaysDesc,
+                icon: Icons.calendar_today_rounded,
                 iconColor: const Color(0xFF059669),
                 isDark: isDark,
               ),

@@ -21,15 +21,13 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 
 typedef _ProfileData = ({
   Map<String, int> habitCounts,
-  int streak,
-  int longestStreak,
   int lifetimeHabits,
   int lifetimeTasks,
   int focusMinutes,
 });
 
 /// Screen representing the user's personal sovereignty & account hub,
-/// combining identity, lifetime activity metrics, consistency badges,
+/// combining identity, lifetime activity metrics,
 /// consistency heatmap, and sovereign data settings.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -53,14 +51,10 @@ class ProfileScreen extends StatelessWidget {
         return FutureBuilder<_ProfileData>(
           future: () async {
             Map<String, int> habitCounts = const {};
-            int streak = 0;
-            int longestStreak = 0;
             int lifetimeHabits = 0;
             if (getIt.isRegistered<HabitRepository>()) {
               final habitRepo = getIt<HabitRepository>();
               habitCounts = await habitRepo.getCompletionsCountByDate(days: 84);
-              streak = await habitRepo.getOverallStreak();
-              longestStreak = await habitRepo.getLongestStreak();
               lifetimeHabits = await habitRepo.getLifetimeCompletionsCount();
             }
 
@@ -77,8 +71,6 @@ class ProfileScreen extends StatelessWidget {
 
             return (
               habitCounts: habitCounts,
-              streak: streak,
-              longestStreak: longestStreak,
               lifetimeHabits: lifetimeHabits,
               lifetimeTasks: lifetimeTasks,
               focusMinutes: focusMinutes,
@@ -87,8 +79,6 @@ class ProfileScreen extends StatelessWidget {
           builder: (context, snapshot) {
             final data = snapshot.data;
             final habitCounts = data?.habitCounts ?? const {};
-            final streak = data?.streak ?? 0;
-            final longestStreak = data?.longestStreak ?? 0;
             final lifetimeHabits = data?.lifetimeHabits ?? 0;
             final lifetimeTasks = data?.lifetimeTasks ?? 0;
             final focusMinutes = data?.focusMinutes ?? 0;
@@ -100,6 +90,9 @@ class ProfileScreen extends StatelessWidget {
               totalActivity[entry.key] =
                   (totalActivity[entry.key] ?? 0) + entry.value;
             }
+            final activeDays = totalActivity.values
+                .where((count) => count > 0)
+                .length;
 
             return ListView(
               padding: const EdgeInsets.symmetric(
@@ -113,8 +106,7 @@ class ProfileScreen extends StatelessWidget {
 
                 // 2. 2x2 Lifetime Activity Grid
                 ProfileLifetimeStatsGrid(
-                  currentStreak: streak,
-                  longestStreak: longestStreak,
+                  activeDays: activeDays,
                   lifetimeHabitCompletions: lifetimeHabits,
                   lifetimeTasksCompleted: lifetimeTasks,
                   totalFocusMinutes: focusMinutes,

@@ -1479,6 +1479,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lifetimeMomentum => 'سجل الإنجاز والهمة';
 
   @override
+  String get lifetimeActiveDays => 'أيام النشاط';
+
+  @override
+  String get lifetimeActiveDaysDesc => 'أيام تم فيها تسجيل نشاط';
+
+  @override
   String get currentStreak => 'سلسلة الاستقامة';
 
   @override
@@ -1577,6 +1583,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get barakahReflectiveSubtitle =>
       'حضور النية، إتقان العمل، وشكر النعم.';
+
+  @override
+  String get barakahDuaText =>
+      '«اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا»';
+
+  @override
+  String get barakahDuaSource => '— النبي ﷺ · سنن ابن ماجه (٩٢٥)';
 
   @override
   String get barakahActivityRecordDisclaimer =>

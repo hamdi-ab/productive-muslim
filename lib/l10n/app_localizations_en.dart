@@ -1488,6 +1488,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lifetimeMomentum => 'Lifetime Momentum';
 
   @override
+  String get lifetimeActiveDays => 'Active Days';
+
+  @override
+  String get lifetimeActiveDaysDesc => 'Days with logged activity';
+
+  @override
   String get currentStreak => 'Current Streak';
 
   @override
@@ -1586,6 +1592,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get barakahReflectiveSubtitle =>
       'Mindful intention, sincere action, and gratitude.';
+
+  @override
+  String get barakahDuaText =>
+      '“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”';
+
+  @override
+  String get barakahDuaSource => '— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)';
 
   @override
   String get barakahActivityRecordDisclaimer =>

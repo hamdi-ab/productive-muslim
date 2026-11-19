@@ -2702,6 +2702,18 @@ abstract class AppLocalizations {
   /// **'Lifetime Momentum'**
   String get lifetimeMomentum;
 
+  /// No description provided for @lifetimeActiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Days'**
+  String get lifetimeActiveDays;
+
+  /// No description provided for @lifetimeActiveDaysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Days with logged activity'**
+  String get lifetimeActiveDaysDesc;
+
   /// No description provided for @currentStreak.
   ///
   /// In en, this message translates to:
@@ -2881,6 +2893,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mindful intention, sincere action, and gratitude.'**
   String get barakahReflectiveSubtitle;
+
+  /// No description provided for @barakahDuaText.
+  ///
+  /// In en, this message translates to:
+  /// **'“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”'**
+  String get barakahDuaText;
+
+  /// No description provided for @barakahDuaSource.
+  ///
+  /// In en, this message translates to:
+  /// **'— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)'**
+  String get barakahDuaSource;
 
   /// No description provided for @barakahActivityRecordDisclaimer.
   ///

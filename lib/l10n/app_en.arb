@@ -582,6 +582,8 @@
   "spiritualRank": "Spiritual Rank",
   "nextRankProgress": "Progress to next rank",
   "lifetimeMomentum": "Lifetime Momentum",
+  "lifetimeActiveDays": "Active Days",
+  "lifetimeActiveDaysDesc": "Days with logged activity",
   "currentStreak": "Current Streak",
   "bestStreak": "Best: {days}d",
   "@bestStreak": {
@@ -619,6 +621,8 @@
   "badgeMuhasabahDevoteeDesc": "Completed 4 consecutive weekly spiritual self-audits.",
   "barakahReflectiveHeaderTitle": "Barakah & Reflection",
   "barakahReflectiveSubtitle": "Mindful intention, sincere action, and gratitude.",
+  "barakahDuaText": "“O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”",
+  "barakahDuaSource": "— Prophet Muhammad ﷺ · Sunan Ibn Majah (925)",
   "barakahActivityRecordDisclaimer": "Activity counts describe self-reported app usage, not a measure of divine blessing, faith, or sincerity.",
   "todayRecordedActivity": "Today's Recorded Activity",
   "habitsLoggedCount": "{count} habits kept",

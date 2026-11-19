@@ -29,7 +29,7 @@ import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/qibla_service.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/backup_service.dart';
-import 'package:productive_muslim/data/services/barakah_score_service.dart';
+import 'package:productive_muslim/data/services/barakah_activity_service.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/domain/repositories/barakah_reminder_scheduler.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
@@ -140,8 +140,8 @@ Future<void> setupDi() async {
       settingsService: getIt<SettingsService>(),
     ),
   );
-  getIt.registerLazySingleton<BarakahScoreService>(
-    () => BarakahScoreService(
+  getIt.registerLazySingleton<BarakahActivityService>(
+    () => BarakahActivityService(
       habitRepo: getIt<HabitRepository>(),
       taskRepo: getIt<TaskRepository>(),
       barakahRepo: getIt<BarakahRepository>(),

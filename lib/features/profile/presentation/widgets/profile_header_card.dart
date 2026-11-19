@@ -8,8 +8,6 @@ import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
-import 'package:productive_muslim/domain/repositories/habit_repository.dart';
-import 'package:productive_muslim/features/habits/presentation/screens/istiqamah_streak_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Hero identity card for the user's spiritual profile, showcasing avatar,
@@ -376,62 +374,6 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 4),
-                    StreamBuilder<int>(
-                      stream: getIt.isRegistered<HabitRepository>()
-                          ? getIt<HabitRepository>().watchOverallStreak()
-                          : null,
-                      initialData: 0,
-                      builder: (context, snapshot) {
-                        final streak = snapshot.data ?? 0;
-
-                        return AppPressable(
-                          onTap: () => IstiqamahStreakSheet.show(context),
-                          pressedScale: 0.92,
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            key: const Key('profile_streak_badge'),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2.5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981)
-                                  .withValues(alpha: 0.14),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xFF10B981)
-                                    .withValues(alpha: 0.32),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.eco_rounded,
-                                  size: 12,
-                                  color: Color(0xFF059669),
-                                ),
-                                const SizedBox(width: 3),
-                                Flexible(
-                                  child: Text(
-                                    l10n.streak(streak),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF059669),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
                     ),
                   ],
                 ),
