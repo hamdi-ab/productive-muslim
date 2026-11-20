@@ -13,6 +13,7 @@ import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_search_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
@@ -144,6 +145,53 @@ class _CatalogFallbackRepository implements AdhkarRepository {
     String collectionId, {
     String? date,
   }) async {}
+
+  @override
+  Future<List<AdhkarRoutine>> getRoutines() async => [];
+
+  @override
+  Stream<List<AdhkarRoutine>> watchRoutines() => Stream.value([]);
+
+  @override
+  Future<AdhkarRoutine?> getRoutineById(String id) async => null;
+
+  @override
+  Future<void> saveRoutine(AdhkarRoutine routine) async {}
+
+  @override
+  Future<void> updateRoutineWithProgressPreservation(
+    AdhkarRoutine updatedRoutine,
+  ) async {}
+
+  @override
+  Future<void> deleteRoutine(String id) async {}
+
+  @override
+  Future<void> recordRoutineCompletion({
+    required String routineId,
+    required String routineName,
+    String? date,
+  }) async {}
+
+  @override
+  Future<bool> isRoutineCompletedToday(
+    String routineId, {
+    String? date,
+  }) async => false;
+
+  @override
+  Stream<bool> watchIsRoutineCompletedToday(String routineId, {String? date}) =>
+      Stream.value(false);
+
+  @override
+  Future<List<AdhkarRoutineCompletion>> getRoutineCompletionsForDate(
+    String date,
+  ) async => [];
+
+  @override
+  Future<List<AdhkarRoutineCompletion>> getRoutineCompletionHistory({
+    String? routineId,
+  }) async => [];
 
   @override
   Future<void> migrateFromSharedPreferencesIfNeeded(

@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import 'package:productive_muslim/data/local/database/tables/adhkar_bookmarks.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_completions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_routine_completions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_routines.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_sessions.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_daily_responses.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_entries.dart';
@@ -38,6 +40,8 @@ part 'app_database.g.dart';
     AdhkarBookmarks,
     AdhkarSessions,
     AdhkarCompletions,
+    AdhkarRoutines,
+    AdhkarRoutineCompletions,
   ],
   daos: [
     BarakahDao,
@@ -55,7 +59,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,6 +100,10 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(adhkarBookmarks);
         await m.createTable(adhkarSessions);
         await m.createTable(adhkarCompletions);
+      }
+      if (from < 6) {
+        await m.createTable(adhkarRoutines);
+        await m.createTable(adhkarRoutineCompletions);
       }
     },
   );

@@ -1786,4 +1786,128 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarFilterCategories => 'الموضوعات';
+
+  @override
+  String get adhkarTabRoutines => 'أورادي';
+
+  @override
+  String get adhkarMyRoutinesTitle => 'أورادي الخاصة';
+
+  @override
+  String get adhkarMyRoutinesSubtitle => 'ترتيبات خاصة من الأذكار المعتمدة';
+
+  @override
+  String get adhkarMyRoutinesEmptyTitle => 'لا توجد أوراد خاصة';
+
+  @override
+  String get adhkarMyRoutinesEmptyDesc =>
+      'أنشئ ورداً خاصاً بك من الأذكار المعتمدة واقرأها بالترتيب الذي تفضله.';
+
+  @override
+  String get adhkarCreateRoutineButton => 'إنشاء ورد خاص';
+
+  @override
+  String get adhkarNewRoutineTitle => 'ورد جديد';
+
+  @override
+  String get adhkarEditRoutineTitle => 'تعديل الورد';
+
+  @override
+  String get adhkarRoutineNameLabel => 'اسم الورد';
+
+  @override
+  String get adhkarRoutineNameHint => 'مثال: ورد الصباح، ورد السكينة';
+
+  @override
+  String get adhkarRoutineNameRequired => 'يرجى إدخال اسم الورد';
+
+  @override
+  String get adhkarRoutineItemsTitle => 'الأذكار المختارة';
+
+  @override
+  String get adhkarRoutineAddItems => 'إضافة أذكار';
+
+  @override
+  String get adhkarRoutineNoItemsError => 'أضف ذكراً واحداً على الأقل إلى وردك';
+
+  @override
+  String get adhkarRoutineDuplicateItemError =>
+      'هذا الذكر مضاف مسبقاً في هذا الورد';
+
+  @override
+  String get adhkarRoutineScheduleOptional => 'التوقيت (اختياري)';
+
+  @override
+  String get adhkarRoutineScheduleDesc =>
+      'تنظيمي فقط لمساعدتك على ترتيب يومك بدون إشعارات';
+
+  @override
+  String get adhkarRoutinePreferredTime => 'الوقت المفضل';
+
+  @override
+  String get adhkarRoutinePreferredDays => 'الأيام المفضلة';
+
+  @override
+  String get adhkarRoutineNoTime => 'لم يحدد وقت';
+
+  @override
+  String get adhkarRoutineClearTime => 'إلغاء الوقت';
+
+  @override
+  String get adhkarRoutineSelectAdhkar => 'اختيار الأذكار';
+
+  @override
+  String get adhkarRoutineSearchAdhkar => 'ابحث في الأذكار المعتمدة...';
+
+  @override
+  String get adhkarRoutineAlreadyAdded => 'مضاف مسبقاً';
+
+  @override
+  String get adhkarRoutineDeleteConfirmTitle => 'حذف الورد؟';
+
+  @override
+  String get adhkarRoutineDeleteConfirmDesc =>
+      'سيتم حذف هذا الورد وجلسة قراءته الحالية غير المكتملة. وسيبقى سجل إنجازاتك السابقة ومحفوظاتك كما هي.';
+
+  @override
+  String get adhkarRoutineSave => 'حفظ الورد';
+
+  @override
+  String get adhkarRoutineDelete => 'حذف';
+
+  @override
+  String get adhkarRoutineStart => 'ابدأ';
+
+  @override
+  String get adhkarRoutineContinue => 'متابعة';
+
+  @override
+  String get adhkarRoutinePersonalTag => 'خاص';
+
+  @override
+  String get adhkarRoutineRetiredNotice =>
+      'تم إيقاف أو تعديل هذا الذكر في المكتبة المعتمدة.';
+
+  @override
+  String get adhkarRoutineRetiredExplanation =>
+      'حفاظاً على صحة الأذكار، يرجى مراجعة هذه الخطوة. يمكنك تخطي الذكر، أو استبداله بذكر معتمد، أو الخروج.';
+
+  @override
+  String get adhkarRoutineSkipRetired => 'تخطي الذكر';
+
+  @override
+  String get adhkarRoutineReplaceRetired => 'استبدال الذكر';
+
+  @override
+  String get adhkarRoutineExit => 'الخروج من الورد';
+
+  @override
+  String get adhkarRoutineCompletedDesc =>
+      'أتممت وردك الخاص، تقبل الله طاعتكم وبارك في وقتكم.';
+
+  @override
+  String get adhkarRoutineReorderHelp => 'اسحب لإعادة ترتيب الأذكار';
+
+  @override
+  String get adhkarViewAllRoutines => 'عرض الكل';
 }

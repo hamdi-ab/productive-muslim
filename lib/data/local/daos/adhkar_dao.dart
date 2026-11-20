@@ -3,11 +3,21 @@ import 'package:drift/drift.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_bookmarks.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_completions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_routine_completions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_routines.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_sessions.dart';
 
 part 'adhkar_dao.g.dart';
 
-@DriftAccessor(tables: [AdhkarBookmarks, AdhkarSessions, AdhkarCompletions])
+@DriftAccessor(
+  tables: [
+    AdhkarBookmarks,
+    AdhkarSessions,
+    AdhkarCompletions,
+    AdhkarRoutines,
+    AdhkarRoutineCompletions,
+  ],
+)
 class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
   AdhkarDao(super.db);
 
@@ -161,5 +171,106 @@ class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
           (t) => t.collectionId.equals(collectionId) & t.date.equals(date),
         ))
         .go();
+  }
+
+  // --- Routines ---
+
+  Future<void> saveRoutine({
+    required String id,
+    required String name,
+    required String itemIdsJson,
+    String? preferredTime,
+    String? weekdaysJson,
+    required int createdAt,
+    required int updatedAt,
+    String? retiredItemIdsJson,
+  }) {
+    return into(adhkarRoutines).insertOnConflictUpdate(
+      AdhkarRoutinesCompanion.insert(
+        id: id,
+        name: name,
+        itemIdsJson: itemIdsJson,
+        preferredTime: Value(preferredTime),
+        weekdaysJson: Value(weekdaysJson),
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        retiredItemIdsJson: Value(retiredItemIdsJson),
+      ),
+    );
+  }
+
+  Future<void> deleteRoutine(String routineId) async {
+    await (delete(adhkarRoutines)..where((t) => t.id.equals(routineId))).go();
+    await clearSession('routine_$routineId');
+  }
+
+  Future<AdhkarRoutineEntry?> getRoutine(String routineId) {
+    return (select(
+      adhkarRoutines,
+    )..where((t) => t.id.equals(routineId))).getSingleOrNull();
+  }
+
+  Future<List<AdhkarRoutineEntry>> getAllRoutines() {
+    return (select(
+      adhkarRoutines,
+    )..orderBy([(t) => OrderingTerm.asc(t.createdAt)])).get();
+  }
+
+  Stream<List<AdhkarRoutineEntry>> watchAllRoutines() {
+    return (select(
+      adhkarRoutines,
+    )..orderBy([(t) => OrderingTerm.asc(t.createdAt)])).watch();
+  }
+
+  // --- Routine Completions ---
+
+  Future<void> logRoutineCompletion({
+    required String routineId,
+    required String routineName,
+    required String date,
+    required int completedAt,
+  }) {
+    return into(adhkarRoutineCompletions).insert(
+      AdhkarRoutineCompletionsCompanion.insert(
+        routineId: routineId,
+        routineName: routineName,
+        date: date,
+        completedAt: completedAt,
+      ),
+    );
+  }
+
+  Future<bool> isRoutineCompletedOnDate(String routineId, String date) async {
+    final row =
+        await (select(adhkarRoutineCompletions)..where(
+              (t) => t.routineId.equals(routineId) & t.date.equals(date),
+            ))
+            .getSingleOrNull();
+    return row != null;
+  }
+
+  Stream<bool> watchIsRoutineCompletedOnDate(String routineId, String date) {
+    return (select(adhkarRoutineCompletions)
+          ..where((t) => t.routineId.equals(routineId) & t.date.equals(date)))
+        .watchSingleOrNull()
+        .map((row) => row != null);
+  }
+
+  Future<List<AdhkarRoutineCompletionEntry>> getRoutineCompletionsForDate(
+    String date,
+  ) {
+    return (select(
+      adhkarRoutineCompletions,
+    )..where((t) => t.date.equals(date))).get();
+  }
+
+  Future<List<AdhkarRoutineCompletionEntry>> getAllRoutineCompletions({
+    String? routineId,
+  }) {
+    final query = select(adhkarRoutineCompletions);
+    if (routineId != null) {
+      query.where((t) => t.routineId.equals(routineId));
+    }
+    return (query..orderBy([(t) => OrderingTerm.desc(t.completedAt)])).get();
   }
 }

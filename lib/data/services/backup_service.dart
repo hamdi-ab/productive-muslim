@@ -29,12 +29,16 @@ class BackupService {
     final bookmarksList = await _db.select(_db.adhkarBookmarks).get();
     final sessionsList = await _db.select(_db.adhkarSessions).get();
     final adhkarCompletionsList = await _db.select(_db.adhkarCompletions).get();
+    final routinesList = await _db.select(_db.adhkarRoutines).get();
+    final routineCompletionsList = await _db
+        .select(_db.adhkarRoutineCompletions)
+        .get();
 
     final settingsMap =
         _settingsService?.exportSettings() ?? <String, dynamic>{};
 
     return {
-      'version': 3,
+      'version': 4,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'app': 'Productive Muslim',
       'data': {
@@ -52,6 +56,10 @@ class BackupService {
         'adhkarCompletions': adhkarCompletionsList
             .map((c) => c.toJson())
             .toList(),
+        'adhkarRoutines': routinesList.map((r) => r.toJson()).toList(),
+        'adhkarRoutineCompletions': routineCompletionsList
+            .map((c) => c.toJson())
+            .toList(),
         'settings': settingsMap,
       },
     };
@@ -63,13 +71,13 @@ class BackupService {
     return const JsonEncoder.withIndent('  ').convert(payload);
   }
 
-  /// Validate and import backup payload from JSON string (supports v1, v2, and v3)
+  /// Validate and import backup payload from JSON string (supports v1, v2, v3, and v4)
   Future<bool> importBackupFromJson(String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) return false;
       final version = decoded['version'];
-      if ((version != 1 && version != 2 && version != 3) ||
+      if ((version != 1 && version != 2 && version != 3 && version != 4) ||
           decoded['data'] is! Map<String, dynamic>) {
         return false;
       }
@@ -101,13 +109,26 @@ class BackupService {
         }
       }
 
-      if (version == 3) {
+      if (version >= 3) {
         const v3Tables = [
           'adhkarBookmarks',
           'adhkarSessions',
           'adhkarCompletions',
         ];
         for (final table in v3Tables) {
+          if (data.containsKey(table)) {
+            final list = data[table];
+            if (list is! List) return false;
+            for (final item in list) {
+              if (item is! Map<String, dynamic>) return false;
+            }
+          }
+        }
+      }
+
+      if (version >= 4) {
+        const v4Tables = ['adhkarRoutines', 'adhkarRoutineCompletions'];
+        for (final table in v4Tables) {
           if (data.containsKey(table)) {
             final list = data[table];
             if (list is! List) return false;
@@ -174,7 +195,7 @@ class BackupService {
       final List<AdhkarBookmark> bookmarks;
       final List<AdhkarSession> sessions;
       final List<AdhkarCompletion> adhkarCompletions;
-      if (version == 3) {
+      if (version >= 3) {
         bookmarks = ((data['adhkarBookmarks'] as List?) ?? [])
             .map((i) => AdhkarBookmark.fromJson(i as Map<String, dynamic>))
             .toList();
@@ -188,6 +209,24 @@ class BackupService {
         bookmarks = [];
         sessions = [];
         adhkarCompletions = [];
+      }
+
+      final List<AdhkarRoutineEntry> routines;
+      final List<AdhkarRoutineCompletionEntry> routineCompletions;
+      if (version >= 4) {
+        routines = ((data['adhkarRoutines'] as List?) ?? [])
+            .map((i) => AdhkarRoutineEntry.fromJson(i as Map<String, dynamic>))
+            .toList();
+        routineCompletions = ((data['adhkarRoutineCompletions'] as List?) ?? [])
+            .map(
+              (i) => AdhkarRoutineCompletionEntry.fromJson(
+                i as Map<String, dynamic>,
+              ),
+            )
+            .toList();
+      } else {
+        routines = [];
+        routineCompletions = [];
       }
 
       final settingsMap = data['settings'] as Map<String, dynamic>?;
@@ -220,6 +259,8 @@ class BackupService {
           await _db.delete(_db.adhkarBookmarks).go();
           await _db.delete(_db.adhkarSessions).go();
           await _db.delete(_db.adhkarCompletions).go();
+          await _db.delete(_db.adhkarRoutines).go();
+          await _db.delete(_db.adhkarRoutineCompletions).go();
 
           for (final t in tasks) {
             await _db.into(_db.tasks).insert(t);
@@ -232,6 +273,12 @@ class BackupService {
           }
           for (final i in intentions) {
             await _db.into(_db.intentionEntries).insert(i);
+          }
+          for (final r in routines) {
+            await _db.into(_db.adhkarRoutines).insert(r);
+          }
+          for (final rc in routineCompletions) {
+            await _db.into(_db.adhkarRoutineCompletions).insert(rc);
           }
           for (final m in muhasabah) {
             if (m.id == 0) {

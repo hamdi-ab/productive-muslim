@@ -12,6 +12,7 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 class AdhkarCollectionCompletionCard extends StatelessWidget {
   final DhikrCategory category;
   final List<DhikrItem> items;
+  final String? description;
   final VoidCallback onDone;
   final VoidCallback onReadAgain;
 
@@ -19,6 +20,7 @@ class AdhkarCollectionCompletionCard extends StatelessWidget {
     super.key,
     required this.category,
     required this.items,
+    this.description,
     required this.onDone,
     required this.onReadAgain,
   });
@@ -125,7 +127,7 @@ class AdhkarCollectionCompletionCard extends StatelessWidget {
                         horizontal: AppSpacing.sm,
                       ),
                       child: Text(
-                        l10n.adhkarCollectionCompletedDesc,
+                        description ?? l10n.adhkarCollectionCompletedDesc,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 13.5,

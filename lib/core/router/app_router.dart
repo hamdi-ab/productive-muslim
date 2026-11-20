@@ -21,7 +21,10 @@ import 'package:productive_muslim/features/tasks/presentation/screens/plan_scree
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
+import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_explore_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routines_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routine_edit_screen.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
 import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
@@ -233,9 +236,18 @@ class AppRouter {
                   isReviewMode = true;
                 }
               }
+              String? routineId;
+              if (state.extra is Map &&
+                  (state.extra as Map)['routineId'] is String) {
+                routineId = (state.extra as Map)['routineId'] as String;
+              } else {
+                routineId = state.uri.queryParameters['routineId'];
+              }
+
               return AdhkarScreen(
                 initialCategory: category,
                 initialItemId: itemId,
+                initialRoutineId: routineId,
                 isReviewModeEnabled: isReviewMode,
               );
             },
@@ -374,6 +386,21 @@ class AppRouter {
             isReviewMode = true;
           }
           return AdhkarExploreScreen(isReviewModeEnabled: isReviewMode);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.adhkarRoutines,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const AdhkarRoutinesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adhkarRoutineEdit,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final routine = state.extra is AdhkarRoutine
+              ? state.extra as AdhkarRoutine
+              : null;
+          return AdhkarRoutineEditScreen(routine: routine);
         },
       ),
     ],

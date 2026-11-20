@@ -19,6 +19,8 @@ class AdhkarCategoryTabs extends StatelessWidget {
   final ValueChanged<DhikrCategory> onCategorySelected;
   final bool isBookmarksSelected;
   final VoidCallback? onBookmarksSelected;
+  final bool isRoutinesSelected;
+  final VoidCallback? onRoutinesSelected;
   final VoidCallback? onExploreTap;
   final AppLocalizations l10n;
   final bool isDark;
@@ -30,6 +32,8 @@ class AdhkarCategoryTabs extends StatelessWidget {
     required this.onCategorySelected,
     this.isBookmarksSelected = false,
     this.onBookmarksSelected,
+    this.isRoutinesSelected = false,
+    this.onRoutinesSelected,
     this.onExploreTap,
     required this.l10n,
     required this.isDark,
@@ -195,6 +199,74 @@ class AdhkarCategoryTabs extends StatelessWidget {
                               ? (isDark
                                     ? Colors.white
                                     : AppColors.secondaryDark)
+                              : (isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (onRoutinesSelected != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: AppPressable(
+                key: const Key('adhkar_routines_tab_chip'),
+                onTap: onRoutinesSelected!,
+                pressedScale: 0.95,
+                borderRadius: BorderRadius.circular(20),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isRoutinesSelected
+                        ? (isDark
+                              ? AppColors.primary.withValues(alpha: 0.35)
+                              : AppColors.primary.withValues(alpha: 0.12))
+                        : (isDark
+                              ? Colors.white.withValues(alpha: 0.04)
+                              : Colors.black.withValues(alpha: 0.03)),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isRoutinesSelected
+                          ? (isDark
+                                ? AppColors.secondary.withValues(alpha: 0.6)
+                                : AppColors.primary.withValues(alpha: 0.4))
+                          : (isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.06)),
+                      width: isRoutinesSelected ? 1.2 : 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isRoutinesSelected
+                            ? Icons.playlist_add_check_rounded
+                            : Icons.playlist_add_check_circle_outlined,
+                        size: 15,
+                        color: isRoutinesSelected
+                            ? (isDark ? Colors.white : AppColors.primary)
+                            : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        l10n.adhkarTabRoutines,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: isRoutinesSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isRoutinesSelected
+                              ? (isDark ? Colors.white : AppColors.primary)
                               : (isDark
                                     ? AppColors.darkTextSecondary
                                     : AppColors.textSecondary),

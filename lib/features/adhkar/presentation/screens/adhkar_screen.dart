@@ -14,11 +14,15 @@ import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/home_widget_sync_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routine_edit_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_background_atmosphere.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_category_tabs.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_my_routines_section.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_retired_item_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_session_dock.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
@@ -36,6 +40,7 @@ String _toArabicDigits(String input) {
 class AdhkarScreen extends StatefulWidget {
   final DhikrCategory initialCategory;
   final String? initialItemId;
+  final String? initialRoutineId;
   final bool? isReviewModeEnabled;
   final bool? isInternalReviewAvailable;
 
@@ -43,6 +48,7 @@ class AdhkarScreen extends StatefulWidget {
     super.key,
     this.initialCategory = DhikrCategory.morning,
     this.initialItemId,
+    this.initialRoutineId,
     this.isReviewModeEnabled,
     this.isInternalReviewAvailable,
   });
@@ -54,6 +60,8 @@ class AdhkarScreen extends StatefulWidget {
 class _AdhkarScreenState extends State<AdhkarScreen> {
   late DhikrCategory _selectedCategory;
   bool _isBookmarksView = false;
+  bool _isRoutinesView = false;
+  AdhkarRoutine? _activeRoutine;
   late PageController _pageController;
   int _currentPageIndex = 0;
   final Map<String, int> _counts = {};
@@ -144,6 +152,20 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _loadLegacySavedCounts();
     }
     await _loadBookmarks();
+    if (widget.initialRoutineId != null && _adhkarRepo != null) {
+      final routine = await _adhkarRepo!.getRoutineById(
+        widget.initialRoutineId!,
+      );
+      if (routine != null && mounted) {
+        setState(() {
+          _activeRoutine = routine;
+          _isRoutinesView = false;
+          _isBookmarksView = false;
+        });
+        await _loadSessionForCollection('routine_${routine.id}');
+        return;
+      }
+    }
     await _loadSessionForCollection(_selectedCategory.name);
   }
 
@@ -185,9 +207,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   Future<void> _loadSessionForCollection(String collectionId) async {
     if (_adhkarRepo == null) return;
     try {
-      final isCompleted = await _adhkarRepo!.isCollectionCompletedToday(
-        collectionId,
-      );
+      final isCompleted = _activeRoutine != null
+          ? await _adhkarRepo!.isRoutineCompletedToday(_activeRoutine!.id)
+          : await _adhkarRepo!.isCollectionCompletedToday(collectionId);
       final session = await _adhkarRepo!.getSession(collectionId);
 
       if (mounted) {
@@ -201,12 +223,17 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           if (widget.initialItemId != null) {
             targetIndex = items.indexWhere((i) => i.id == widget.initialItemId);
           }
+          final maxLen = _activeRoutine != null
+              ? _activeRoutine!.itemIds.length
+              : items.length;
           if (targetIndex >= 0) {
             _currentPageIndex = targetIndex;
           } else if (session != null &&
               session.lastPageIndex > 0 &&
-              session.lastPageIndex < items.length) {
+              session.lastPageIndex < maxLen) {
             _currentPageIndex = session.lastPageIndex;
+          } else {
+            _currentPageIndex = 0;
           }
 
           if (_currentPageIndex > 0) {
@@ -228,6 +255,18 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   }
 
   List<DhikrItem> get _currentItems {
+    if (_activeRoutine != null) {
+      final items = <DhikrItem>[];
+      for (final id in _activeRoutine!.itemIds) {
+        final item =
+            _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
+            AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
+        if (item != null && (_isReviewMode || item.isApproved)) {
+          items.add(item);
+        }
+      }
+      return items;
+    }
     if (_isBookmarksView) {
       return _bookmarkedIds
           .map(
@@ -252,10 +291,17 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   }
 
   void _onCategorySelected(DhikrCategory category) {
-    if (!_isBookmarksView && _selectedCategory == category) return;
+    if (!_isBookmarksView &&
+        !_isRoutinesView &&
+        _activeRoutine == null &&
+        _selectedCategory == category) {
+      return;
+    }
     AppHaptics.selectionClick();
     setState(() {
       _isBookmarksView = false;
+      _isRoutinesView = false;
+      _activeRoutine = null;
       _selectedCategory = category;
       _currentPageIndex = 0;
     });
@@ -266,15 +312,101 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   }
 
   void _onBookmarksSelected() {
-    if (_isBookmarksView) return;
+    if (_isBookmarksView && _activeRoutine == null) return;
     AppHaptics.selectionClick();
     setState(() {
       _isBookmarksView = true;
+      _isRoutinesView = false;
+      _activeRoutine = null;
       _currentPageIndex = 0;
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
     }
+  }
+
+  void _onRoutinesSelected() {
+    if (_isRoutinesView && _activeRoutine == null) return;
+    AppHaptics.selectionClick();
+    setState(() {
+      _isRoutinesView = true;
+      _isBookmarksView = false;
+      _activeRoutine = null;
+      _currentPageIndex = 0;
+    });
+  }
+
+  Future<void> _startRoutine(AdhkarRoutine routine) async {
+    AppHaptics.selectionClick();
+    setState(() {
+      _activeRoutine = routine;
+      _isRoutinesView = false;
+      _isBookmarksView = false;
+      _currentPageIndex = 0;
+    });
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    await _loadSessionForCollection('routine_${routine.id}');
+  }
+
+  void _exitActiveRoutine() {
+    AppHaptics.selectionClick();
+    setState(() {
+      _activeRoutine = null;
+      _isRoutinesView = true;
+      _currentPageIndex = 0;
+    });
+  }
+
+  Future<void> _resetRoutine(AdhkarRoutine routine) async {
+    setState(() {
+      for (final id in routine.itemIds) {
+        _counts.remove(id);
+      }
+      _currentPageIndex = 0;
+      _isCompletedToday = false;
+    });
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    if (_adhkarRepo != null) {
+      await _adhkarRepo!.clearSession('routine_${routine.id}');
+    }
+  }
+
+  void _replaceRetiredItem(String oldId) {
+    AppHaptics.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => AdhkarLibraryPickerSheet(
+        alreadySelectedIds: _activeRoutine?.itemIds.toSet() ?? {},
+        onItemSelected: (newItem) async {
+          if (_activeRoutine == null) return;
+          final currentIds = List<String>.from(_activeRoutine!.itemIds);
+          final oldIdx = currentIds.indexOf(oldId);
+          if (oldIdx != -1) {
+            currentIds[oldIdx] = newItem.id;
+          } else {
+            currentIds.add(newItem.id);
+          }
+          final updated = _activeRoutine!.copyWith(
+            itemIds: currentIds,
+            updatedAt: DateTime.now(),
+          );
+          if (_adhkarRepo != null) {
+            await _adhkarRepo!.updateRoutineWithProgressPreservation(updated);
+          }
+          if (mounted) {
+            setState(() {
+              _activeRoutine = updated;
+            });
+          }
+        },
+      ),
+    );
   }
 
   Future<void> _toggleBookmark(DhikrItem item) async {
@@ -314,6 +446,58 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     setState(() {
       _counts[item.id] = next;
     });
+
+    if (_activeRoutine != null) {
+      final routine = _activeRoutine!;
+      final hasRetired = routine.itemIds.any((id) {
+        final d =
+            _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
+            AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
+        return d == null || (!_isReviewMode && !d.isApproved);
+      });
+      final isRoutineCompleted =
+          !hasRetired &&
+          routine.itemIds.isNotEmpty &&
+          routine.itemIds.every((id) {
+            final target =
+                _adhkarRepo
+                    ?.getById(id, includePendingReview: _isReviewMode)
+                    ?.targetCount ??
+                AdhkarCatalog.getById(
+                  id,
+                  includePendingReview: _isReviewMode,
+                )?.targetCount ??
+                1;
+            return (_counts[id] ?? 0) >= target;
+          });
+
+      if (_adhkarRepo != null) {
+        try {
+          if (isRoutineCompleted && !_isCompletedToday) {
+            await _adhkarRepo!.recordRoutineCompletion(
+              routineId: routine.id,
+              routineName: routine.name,
+            );
+            if (mounted) setState(() => _isCompletedToday = true);
+          }
+          await _adhkarRepo!.saveSession(
+            collectionId: 'routine_${routine.id}',
+            lastPageIndex: _currentPageIndex,
+            counts: _counts,
+            isCompleted: isRoutineCompleted,
+          );
+        } catch (_) {}
+      }
+
+      if (next == item.targetCount) {
+        AppHaptics.heavyImpact();
+      } else if (next == 33 || next == 66) {
+        AppHaptics.mediumImpact();
+      } else {
+        AppHaptics.lightImpact();
+      }
+      return;
+    }
 
     final items = _currentItems;
     final isCollectionCompleted =
@@ -368,7 +552,14 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _counts[item.id] = 0;
     });
     try {
-      if (!_isBookmarksView && _adhkarRepo != null) {
+      if (_activeRoutine != null && _adhkarRepo != null) {
+        await _adhkarRepo!.saveSession(
+          collectionId: 'routine_${_activeRoutine!.id}',
+          lastPageIndex: _currentPageIndex,
+          counts: _counts,
+          isCompleted: false,
+        );
+      } else if (!_isBookmarksView && _adhkarRepo != null) {
         await _adhkarRepo!.saveSession(
           collectionId: _selectedCategory.name,
           lastPageIndex: _currentPageIndex,
@@ -441,45 +632,60 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     final items = _currentItems;
     final hasParentScaffold = Scaffold.maybeOf(context) != null;
 
-    final isCollectionCompleted =
-        items.isNotEmpty &&
-        items.every((i) => (_counts[i.id] ?? 0) >= i.targetCount);
-    final hasCompletionCard = isCollectionCompleted && !_isBookmarksView;
-    final totalPageCount = hasCompletionCard ? items.length + 1 : items.length;
+    final isRoutineMode = _activeRoutine != null;
+    final routineLen = _activeRoutine?.itemIds.length ?? 0;
+    final hasRetiredItems =
+        isRoutineMode &&
+        _activeRoutine!.itemIds.any((id) {
+          final d =
+              _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
+              AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
+          return d == null || (!_isReviewMode && !d.isApproved);
+        });
+
+    final isCollectionCompleted = isRoutineMode
+        ? (!hasRetiredItems &&
+              _activeRoutine!.itemIds.isNotEmpty &&
+              _activeRoutine!.itemIds.every((id) {
+                final target =
+                    _adhkarRepo
+                        ?.getById(id, includePendingReview: _isReviewMode)
+                        ?.targetCount ??
+                    AdhkarCatalog.getById(
+                      id,
+                      includePendingReview: _isReviewMode,
+                    )?.targetCount ??
+                    1;
+                return (_counts[id] ?? 0) >= target;
+              }))
+        : (items.isNotEmpty &&
+              items.every((i) => (_counts[i.id] ?? 0) >= i.targetCount));
+
+    final hasCompletionCard =
+        isCollectionCompleted && (!_isBookmarksView || isRoutineMode);
+    final totalPageCount = hasCompletionCard
+        ? (isRoutineMode ? routineLen + 1 : items.length + 1)
+        : (isRoutineMode ? routineLen : items.length);
 
     final String pageLabel;
-    if (_currentPageIndex >= items.length && hasCompletionCard) {
+    final effectiveTotal = isRoutineMode ? routineLen : items.length;
+    if (_currentPageIndex >= effectiveTotal && hasCompletionCard) {
       pageLabel = isAr ? 'اكتمل' : 'Completed';
     } else {
       pageLabel = isAr
-          ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('${items.length}')}'
-          : '${_currentPageIndex + 1} / ${items.length}';
+          ? '${_toArabicDigits('${_currentPageIndex + 1}')} / ${_toArabicDigits('$effectiveTotal')}'
+          : '${_currentPageIndex + 1} / $effectiveTotal';
     }
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-      appBar: hasParentScaffold
-          ? null
-          : ProductiveAppBar(
-              title: l10n.adhkarTitle,
-              subtitle: l10n.adhkarSubtitle,
+      appBar: isRoutineMode
+          ? ProductiveAppBar(
+              title: _activeRoutine!.name,
+              subtitle: l10n.adhkarRoutinePersonalTag,
               showBackButton: true,
+              onBackPressed: _exitActiveRoutine,
               actions: [
-                if (_isInternalReviewAvailable)
-                  ProductiveAppBarAction(
-                    tooltip: _isReviewMode
-                        ? l10n.adhkarDisableReviewMode
-                        : l10n.adhkarEditorialReviewMode,
-                    icon: _isReviewMode
-                        ? Icons.rate_review_rounded
-                        : Icons.rate_review_outlined,
-                    onTap: _toggleReviewMode,
-                  ),
-                ProductiveAppBarAction(
-                  tooltip: l10n.adhkarExploreTitle,
-                  icon: Icons.explore_outlined,
-                  onTap: () => context.push(AppRoutes.adhkarExplore),
-                ),
                 ProductiveAppBarAction(
                   tooltip: l10n.adhkarToggleTransliteration,
                   icon: _showTransliteration
@@ -487,452 +693,630 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                       : Icons.subtitles_off_rounded,
                   onTap: _toggleTransliteration,
                 ),
-                if (items.isNotEmpty) ...[
-                  ProductiveAppBarAction(
-                    tooltip: l10n.typographyTooltip,
-                    icon: Icons.format_size_rounded,
-                    onTap: _showTypographySheet,
+                ProductiveAppBarAction(
+                  tooltip: l10n.typographyTooltip,
+                  icon: Icons.format_size_rounded,
+                  onTap: _showTypographySheet,
+                ),
+                ProductiveAppBarAction(
+                  tooltip: l10n.adhkarReset,
+                  icon: Icons.restart_alt_rounded,
+                  onTap: () => _resetRoutine(_activeRoutine!),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
                   ),
-                  if (!_isBookmarksView)
-                    ProductiveAppBarAction(
-                      tooltip: l10n.adhkarResetCategory,
-                      icon: Icons.restart_alt_rounded,
-                      onTap: () => _resetCategory(_selectedCategory),
-                    ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.primaryLight.withValues(alpha: 0.16)
+                        : AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: isDark
-                          ? AppColors.primaryLight.withValues(alpha: 0.16)
-                          : AppColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.primaryLight.withValues(alpha: 0.3)
-                            : AppColors.primary.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
+                          ? AppColors.primaryLight.withValues(alpha: 0.3)
+                          : AppColors.primary.withValues(alpha: 0.2),
+                      width: 1,
                     ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        pageLabel,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: isDark
-                              ? AppColors.primaryLight
-                              : AppColors.primary,
-                        ),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      pageLabel,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.primaryLight
+                            : AppColors.primary,
                       ),
                     ),
                   ),
-                ],
+                ),
               ],
-            ),
+            )
+          : (hasParentScaffold
+                ? null
+                : ProductiveAppBar(
+                    title: l10n.adhkarTitle,
+                    subtitle: l10n.adhkarSubtitle,
+                    showBackButton: true,
+                    actions: [
+                      if (_isInternalReviewAvailable)
+                        ProductiveAppBarAction(
+                          tooltip: _isReviewMode
+                              ? l10n.adhkarDisableReviewMode
+                              : l10n.adhkarEditorialReviewMode,
+                          icon: _isReviewMode
+                              ? Icons.rate_review_rounded
+                              : Icons.rate_review_outlined,
+                          onTap: _toggleReviewMode,
+                        ),
+                      ProductiveAppBarAction(
+                        tooltip: l10n.adhkarExploreTitle,
+                        icon: Icons.explore_outlined,
+                        onTap: () => context.push(AppRoutes.adhkarExplore),
+                      ),
+                      ProductiveAppBarAction(
+                        tooltip: l10n.adhkarToggleTransliteration,
+                        icon: _showTransliteration
+                            ? Icons.subtitles_rounded
+                            : Icons.subtitles_off_rounded,
+                        onTap: _toggleTransliteration,
+                      ),
+                      if (items.isNotEmpty) ...[
+                        ProductiveAppBarAction(
+                          tooltip: l10n.typographyTooltip,
+                          icon: Icons.format_size_rounded,
+                          onTap: _showTypographySheet,
+                        ),
+                        if (!_isBookmarksView)
+                          ProductiveAppBarAction(
+                            tooltip: l10n.adhkarResetCategory,
+                            icon: Icons.restart_alt_rounded,
+                            onTap: () => _resetCategory(_selectedCategory),
+                          ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.primaryLight.withValues(alpha: 0.16)
+                                : AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.primaryLight.withValues(
+                                      alpha: 0.3,
+                                    )
+                                  : AppColors.primary.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              pageLabel,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: isDark
+                                    ? AppColors.primaryLight
+                                    : AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  )),
       body: Stack(
         children: [
           AdhkarBackgroundAtmosphere(isDark: isDark),
           SafeArea(
             child: Column(
               children: [
-                AdhkarCategoryTabs(
-                  selectedCategory: _isBookmarksView ? null : _selectedCategory,
-                  isBookmarksSelected: _isBookmarksView,
-                  onCategorySelected: _onCategorySelected,
-                  onBookmarksSelected: _onBookmarksSelected,
-                  onExploreTap: () => context.push(AppRoutes.adhkarExplore),
-                  l10n: l10n,
-                  isDark: isDark,
-                ),
-                if (_isReviewMode)
-                  Container(
-                    key: const Key('adhkar_review_mode_banner'),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.xs,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(
-                        alpha: isDark ? 0.2 : 0.12,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.amber.withValues(alpha: 0.5),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.rate_review_rounded,
-                          size: 16,
-                          color: isDark
-                              ? const Color(0xFFFCD34D)
-                              : const Color(0xFFB45309),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            l10n.adhkarReviewModeBanner,
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? const Color(0xFFFCD34D)
-                                  : const Color(0xFFB45309),
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded, size: 16),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          tooltip: l10n.adhkarDisableReviewMode,
-                          onPressed: _toggleReviewMode,
-                        ),
-                      ],
-                    ),
+                if (!isRoutineMode)
+                  AdhkarCategoryTabs(
+                    selectedCategory: (_isBookmarksView || _isRoutinesView)
+                        ? null
+                        : _selectedCategory,
+                    isBookmarksSelected: _isBookmarksView,
+                    isRoutinesSelected: _isRoutinesView,
+                    onCategorySelected: _onCategorySelected,
+                    onBookmarksSelected: _onBookmarksSelected,
+                    onRoutinesSelected: _onRoutinesSelected,
+                    onExploreTap: () => context.push(AppRoutes.adhkarExplore),
+                    l10n: l10n,
+                    isDark: isDark,
                   ),
-                if (hasParentScaffold || _isCompletedToday)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: 2,
+                if (_isRoutinesView && !isRoutineMode)
+                  Expanded(
+                    child: AdhkarMyRoutinesSection(
+                      onStartRoutine: _startRoutine,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              if (items.isNotEmpty)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? AppColors.primaryLight.withValues(
-                                            alpha: 0.16,
-                                          )
-                                        : AppColors.primary.withValues(
-                                            alpha: 0.08,
-                                          ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? AppColors.primaryLight.withValues(
-                                              alpha: 0.3,
-                                            )
-                                          : AppColors.primary.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    pageLabel,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: isDark
-                                          ? AppColors.primaryLight
-                                          : AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                              if (_isCompletedToday && !_isBookmarksView)
-                                GestureDetector(
-                                  onTap: () {
-                                    if (hasCompletionCard &&
-                                        _pageController.hasClients) {
-                                      _pageController.jumpToPage(items.length);
-                                    }
-                                  },
-                                  child: Container(
+                  )
+                else ...[
+                  if (_isReviewMode)
+                    Container(
+                      key: const Key('adhkar_review_mode_banner'),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(
+                          alpha: isDark ? 0.2 : 0.12,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.amber.withValues(alpha: 0.5),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.rate_review_rounded,
+                            size: 16,
+                            color: isDark
+                                ? const Color(0xFFFCD34D)
+                                : const Color(0xFFB45309),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l10n.adhkarReviewModeBanner,
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? const Color(0xFFFCD34D)
+                                    : const Color(0xFFB45309),
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded, size: 16),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            tooltip: l10n.adhkarDisableReviewMode,
+                            onPressed: _toggleReviewMode,
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (hasParentScaffold || _isCompletedToday)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: 2,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (items.isNotEmpty)
+                                  Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
+                                      horizontal: 10,
+                                      vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF10B981,
-                                      ).withValues(alpha: isDark ? 0.2 : 0.12),
-                                      borderRadius: BorderRadius.circular(12),
+                                      color: isDark
+                                          ? AppColors.primaryLight.withValues(
+                                              alpha: 0.16,
+                                            )
+                                          : AppColors.primary.withValues(
+                                              alpha: 0.08,
+                                            ),
+                                      borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: const Color(0xFF10B981)
-                                            .withValues(alpha: 0.4),
-                                        width: 0.8,
+                                        color: isDark
+                                            ? AppColors.primaryLight.withValues(
+                                                alpha: 0.3,
+                                              )
+                                            : AppColors.primary.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                        width: 1,
                                       ),
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.check_circle_rounded,
-                                          size: 13,
-                                          color: Color(0xFF10B981),
+                                    child: Text(
+                                      pageLabel,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: isDark
+                                            ? AppColors.primaryLight
+                                            : AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                if (_isCompletedToday && !_isBookmarksView)
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (hasCompletionCard &&
+                                          _pageController.hasClients) {
+                                        _pageController.jumpToPage(
+                                          items.length,
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981)
+                                            .withValues(
+                                              alpha: isDark ? 0.2 : 0.12,
+                                            ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: const Color(0xFF10B981)
+                                              .withValues(alpha: 0.4),
+                                          width: 0.8,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          l10n.adhkarCompletedToday,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle_rounded,
+                                            size: 13,
                                             color: Color(0xFF10B981),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        if (hasParentScaffold)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (_isInternalReviewAvailable)
-                                IconButton(
-                                  key: const Key(
-                                    'adhkar_review_mode_toggle_shell',
-                                  ),
-                                  tooltip: _isReviewMode
-                                      ? l10n.adhkarDisableReviewMode
-                                      : l10n.adhkarEditorialReviewMode,
-                                  icon: Icon(
-                                    _isReviewMode
-                                        ? Icons.rate_review_rounded
-                                        : Icons.rate_review_outlined,
-                                    size: 20,
-                                    color: _isReviewMode
-                                        ? (isDark
-                                              ? const Color(0xFFFCD34D)
-                                              : const Color(0xFFD97706))
-                                        : null,
-                                  ),
-                                  onPressed: _toggleReviewMode,
-                                ),
-                              IconButton(
-                                tooltip: l10n.adhkarToggleTransliteration,
-                                icon: Icon(
-                                  _showTransliteration
-                                      ? Icons.subtitles_rounded
-                                      : Icons.subtitles_off_rounded,
-                                  size: 20,
-                                  color: _showTransliteration
-                                      ? (isDark
-                                            ? AppColors.primaryLight
-                                            : AppColors.primary)
-                                      : null,
-                                ),
-                                onPressed: _toggleTransliteration,
-                              ),
-                              IconButton(
-                                tooltip: l10n.typographyTooltip,
-                                icon: const Icon(
-                                  Icons.format_size_rounded,
-                                  size: 20,
-                                ),
-                                onPressed: _showTypographySheet,
-                              ),
-                              if (!_isBookmarksView)
-                                IconButton(
-                                  tooltip: l10n.adhkarResetCategory,
-                                  icon: const Icon(
-                                    Icons.restart_alt_rounded,
-                                    size: 20,
-                                  ),
-                                  onPressed: () =>
-                                      _resetCategory(_selectedCategory),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: AppSpacing.xs),
-                Expanded(
-                  child: items.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.xl),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _isBookmarksView
-                                      ? Icons.bookmark_outline_rounded
-                                      : (!_isReviewMode
-                                            ? Icons.hourglass_top_rounded
-                                            : Icons.menu_book_rounded),
-                                  size: 48,
-                                  color: isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.textSecondary,
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  _isBookmarksView
-                                      ? l10n.adhkarBookmarksEmpty
-                                      : (!_isReviewMode
-                                            ? l10n.adhkarContentUnderReview
-                                            : l10n.adhkarEmptyState),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? Colors.white
-                                        : AppColors.primary,
-                                  ),
-                                ),
-                                if (!_isBookmarksView && !_isReviewMode) ...[
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Text(
-                                    l10n.adhkarContentUnderReviewDesc,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      height: 1.4,
-                                      color: isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.textSecondary,
-                                    ),
-                                  ),
-                                  if (_isInternalReviewAvailable) ...[
-                                    const SizedBox(height: AppSpacing.md),
-                                    OutlinedButton.icon(
-                                      key: const Key(
-                                        'adhkar_enable_review_mode_button',
-                                      ),
-                                      onPressed: _toggleReviewMode,
-                                      icon: const Icon(
-                                        Icons.preview_rounded,
-                                        size: 16,
-                                      ),
-                                      label: Text(l10n.adhkarEnableReviewMode),
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: isDark
-                                            ? AppColors.secondary
-                                            : AppColors.secondaryDark,
-                                        side: BorderSide(
-                                          color: AppColors.secondary.withValues(
-                                            alpha: 0.4,
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            l10n.adhkarCompletedToday,
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF10B981),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ],
+                                  ),
                               ],
                             ),
                           ),
-                        )
-                      : PageView.builder(
-                          controller: _pageController,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: totalPageCount,
-                          onPageChanged: (idx) {
-                            setState(() => _currentPageIndex = idx);
-                            if (!_isBookmarksView && _adhkarRepo != null) {
-                              _adhkarRepo!.saveSession(
-                                collectionId: _selectedCategory.name,
-                                lastPageIndex: idx < items.length
-                                    ? idx
-                                    : items.length - 1,
-                                counts: _counts,
-                                isCompleted: isCollectionCompleted,
+                          if (hasParentScaffold)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_isInternalReviewAvailable)
+                                  IconButton(
+                                    key: const Key(
+                                      'adhkar_review_mode_toggle_shell',
+                                    ),
+                                    tooltip: _isReviewMode
+                                        ? l10n.adhkarDisableReviewMode
+                                        : l10n.adhkarEditorialReviewMode,
+                                    icon: Icon(
+                                      _isReviewMode
+                                          ? Icons.rate_review_rounded
+                                          : Icons.rate_review_outlined,
+                                      size: 20,
+                                      color: _isReviewMode
+                                          ? (isDark
+                                                ? const Color(0xFFFCD34D)
+                                                : const Color(0xFFD97706))
+                                          : null,
+                                    ),
+                                    onPressed: _toggleReviewMode,
+                                  ),
+                                IconButton(
+                                  tooltip: l10n.adhkarToggleTransliteration,
+                                  icon: Icon(
+                                    _showTransliteration
+                                        ? Icons.subtitles_rounded
+                                        : Icons.subtitles_off_rounded,
+                                    size: 20,
+                                    color: _showTransliteration
+                                        ? (isDark
+                                              ? AppColors.primaryLight
+                                              : AppColors.primary)
+                                        : null,
+                                  ),
+                                  onPressed: _toggleTransliteration,
+                                ),
+                                IconButton(
+                                  tooltip: l10n.typographyTooltip,
+                                  icon: const Icon(
+                                    Icons.format_size_rounded,
+                                    size: 20,
+                                  ),
+                                  onPressed: _showTypographySheet,
+                                ),
+                                if (!_isBookmarksView)
+                                  IconButton(
+                                    tooltip: l10n.adhkarResetCategory,
+                                    icon: const Icon(
+                                      Icons.restart_alt_rounded,
+                                      size: 20,
+                                    ),
+                                    onPressed: () =>
+                                        _resetCategory(_selectedCategory),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Expanded(
+                    child: (items.isEmpty && !isRoutineMode)
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.xl),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _isBookmarksView
+                                        ? Icons.bookmark_outline_rounded
+                                        : (!_isReviewMode
+                                              ? Icons.hourglass_top_rounded
+                                              : Icons.menu_book_rounded),
+                                    size: 48,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    _isBookmarksView
+                                        ? l10n.adhkarBookmarksEmpty
+                                        : (!_isReviewMode
+                                              ? l10n.adhkarContentUnderReview
+                                              : l10n.adhkarEmptyState),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.white
+                                          : AppColors.primary,
+                                    ),
+                                  ),
+                                  if (!_isBookmarksView && !_isReviewMode) ...[
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      l10n.adhkarContentUnderReviewDesc,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        height: 1.4,
+                                        color: isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                    if (_isInternalReviewAvailable) ...[
+                                      const SizedBox(height: AppSpacing.md),
+                                      OutlinedButton.icon(
+                                        key: const Key(
+                                          'adhkar_enable_review_mode_button',
+                                        ),
+                                        onPressed: _toggleReviewMode,
+                                        icon: const Icon(
+                                          Icons.preview_rounded,
+                                          size: 16,
+                                        ),
+                                        label: Text(
+                                          l10n.adhkarEnableReviewMode,
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: isDark
+                                              ? AppColors.secondary
+                                              : AppColors.secondaryDark,
+                                          side: BorderSide(
+                                            color: AppColors.secondary
+                                                .withValues(alpha: 0.4),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ],
+                              ),
+                            ),
+                          )
+                        : PageView.builder(
+                            controller: _pageController,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: totalPageCount,
+                            onPageChanged: (idx) {
+                              setState(() => _currentPageIndex = idx);
+                              if (isRoutineMode && _adhkarRepo != null) {
+                                _adhkarRepo!.saveSession(
+                                  collectionId: 'routine_${_activeRoutine!.id}',
+                                  lastPageIndex: idx < routineLen
+                                      ? idx
+                                      : routineLen - 1,
+                                  counts: _counts,
+                                  isCompleted: isCollectionCompleted,
+                                );
+                              } else if (!_isBookmarksView &&
+                                  _adhkarRepo != null) {
+                                _adhkarRepo!.saveSession(
+                                  collectionId: _selectedCategory.name,
+                                  lastPageIndex: idx < items.length
+                                      ? idx
+                                      : items.length - 1,
+                                  counts: _counts,
+                                  isCompleted: isCollectionCompleted,
+                                );
+                              }
+                            },
+                            itemBuilder: (context, index) {
+                              if (index ==
+                                      (isRoutineMode
+                                          ? routineLen
+                                          : items.length) &&
+                                  hasCompletionCard) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.xs,
+                                  ),
+                                  child: AdhkarCollectionCompletionCard(
+                                    category: isRoutineMode
+                                        ? DhikrCategory.general
+                                        : _selectedCategory,
+                                    items: items,
+                                    description: isRoutineMode
+                                        ? l10n.adhkarRoutineCompletedDesc
+                                        : null,
+                                    onDone: isRoutineMode
+                                        ? _exitActiveRoutine
+                                        : () {
+                                            if (Navigator.canPop(context)) {
+                                              Navigator.maybePop(context);
+                                            } else {
+                                              _pageController.jumpToPage(0);
+                                            }
+                                          },
+                                    onReadAgain: isRoutineMode
+                                        ? () => _resetRoutine(_activeRoutine!)
+                                        : _readAgain,
+                                  ),
+                                );
+                              }
+
+                              if (isRoutineMode) {
+                                final itemId = _activeRoutine!.itemIds[index];
+                                final item =
+                                    _adhkarRepo?.getById(
+                                      itemId,
+                                      includePendingReview: _isReviewMode,
+                                    ) ??
+                                    AdhkarCatalog.getById(
+                                      itemId,
+                                      includePendingReview: _isReviewMode,
+                                    );
+
+                                if (item == null ||
+                                    (!_isReviewMode && !item.isApproved)) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    child: AdhkarRetiredItemCard(
+                                      itemId: itemId,
+                                      onSkip: () {
+                                        if (_currentPageIndex <
+                                            totalPageCount - 1) {
+                                          _pageController.nextPage(
+                                            duration: const Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        }
+                                      },
+                                      onReplace: () =>
+                                          _replaceRetiredItem(itemId),
+                                      onExit: _exitActiveRoutine,
+                                    ),
+                                  );
+                                }
+
+                                final count = _counts[item.id] ?? 0;
+                                final isBookmarked = _bookmarkedIds.contains(
+                                  item.id,
+                                );
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.xs,
+                                  ),
+                                  child: DhikrCard(
+                                    item: item,
+                                    count: count,
+                                    index: index + 1,
+                                    total: routineLen,
+                                    isBookmarked: isBookmarked,
+                                    onToggleBookmark: () =>
+                                        _toggleBookmark(item),
+                                    showTransliteration: _showTransliteration,
+                                    onTap: () => _incrementCount(item),
+                                    onReset: () => _resetCount(item),
+                                  ),
+                                );
+                              }
+
+                              final item = items[index];
+                              final count = _counts[item.id] ?? 0;
+                              final isBookmarked = _bookmarkedIds.contains(
+                                item.id,
                               );
-                            }
-                          },
-                          itemBuilder: (context, index) {
-                            if (index == items.length && hasCompletionCard) {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: AppSpacing.md,
                                   vertical: AppSpacing.xs,
                                 ),
-                                child: AdhkarCollectionCompletionCard(
-                                  category: _selectedCategory,
-                                  items: items,
-                                  onDone: () {
-                                    if (Navigator.canPop(context)) {
-                                      Navigator.maybePop(context);
-                                    } else {
-                                      _pageController.jumpToPage(0);
-                                    }
-                                  },
-                                  onReadAgain: _readAgain,
+                                child: DhikrCard(
+                                  item: item,
+                                  count: count,
+                                  index: index + 1,
+                                  total: items.length,
+                                  isBookmarked: isBookmarked,
+                                  onToggleBookmark: () => _toggleBookmark(item),
+                                  showTransliteration: _showTransliteration,
+                                  onTap: () => _incrementCount(item),
+                                  onReset: () => _resetCount(item),
                                 ),
                               );
-                            }
-
-                            final item = items[index];
-                            final count = _counts[item.id] ?? 0;
-                            final isBookmarked = _bookmarkedIds.contains(
-                              item.id,
-                            );
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: AppSpacing.xs,
-                              ),
-                              child: DhikrCard(
-                                item: item,
-                                count: count,
-                                index: index + 1,
-                                total: items.length,
-                                isBookmarked: isBookmarked,
-                                onToggleBookmark: () => _toggleBookmark(item),
-                                showTransliteration: _showTransliteration,
-                                onTap: () => _incrementCount(item),
-                                onReset: () => _resetCount(item),
-                              ),
-                            );
-                          },
-                        ),
-                ),
-                if (items.isNotEmpty)
-                  AdhkarSessionDock(
-                    items: items,
-                    counts: _counts,
-                    currentPageIndex: _currentPageIndex,
-                    onPrevious: _currentPageIndex > 0
-                        ? () {
-                            _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : null,
-                    onNext: _currentPageIndex < totalPageCount - 1
-                        ? () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        : null,
-                    l10n: l10n,
-                    isDark: isDark,
+                            },
+                          ),
                   ),
+                  if (items.isNotEmpty || isRoutineMode)
+                    AdhkarSessionDock(
+                      items: items,
+                      counts: _counts,
+                      currentPageIndex: _currentPageIndex,
+                      onPrevious: _currentPageIndex > 0
+                          ? () {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : null,
+                      onNext: _currentPageIndex < totalPageCount - 1
+                          ? () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : null,
+                      l10n: l10n,
+                      isDark: isDark,
+                    ),
+                ],
               ],
             ),
           ),

@@ -63,7 +63,7 @@ void main() {
           );
 
       final payload = await backupService.createBackupPayload();
-      expect(payload['version'], equals(3));
+      expect(payload['version'], equals(4));
       expect(payload['app'], equals('Productive Muslim'));
 
       final data = payload['data'] as Map<String, dynamic>;
@@ -73,6 +73,8 @@ void main() {
       expect((data['adhkarBookmarks'] as List).length, equals(0));
       expect((data['adhkarSessions'] as List).length, equals(0));
       expect((data['adhkarCompletions'] as List).length, equals(0));
+      expect((data['adhkarRoutines'] as List).length, equals(0));
+      expect((data['adhkarRoutineCompletions'] as List).length, equals(0));
       expect(data['settings']['notif_morning_adhkar'], isTrue);
       expect(data['settings']['notif_evening_adhkar'], isFalse);
 
@@ -246,7 +248,7 @@ void main() {
 
       final exported = await backupService.exportBackupToJson();
       expect(exported, contains('ayat_al_kursi'));
-      expect(exported, contains('"version": 3'));
+      expect(exported, contains('"version": 4'));
 
       // Clear the tables
       await db.delete(db.adhkarBookmarks).go();
@@ -274,6 +276,37 @@ void main() {
       expect(completions.first.collectionId, equals('morning'));
       expect(completions.first.date, equals('2026-09-30'));
     });
+
+    test(
+      'importBackupFromJson is backwards compatible with version 3 payload',
+      () async {
+        final v3Json = jsonEncode({
+          'version': 3,
+          'app': 'Productive Muslim',
+          'data': {
+            'tasks': [],
+            'habits': [],
+            'habitCompletions': [],
+            'intentions': [],
+            'muhasabahEntries': [],
+            'barakahEntries': [],
+            'barakahDailyResponses': [],
+            'adhkarBookmarks': [
+              {'dhikrId': 'v3_dhikr', 'createdAt': 12345},
+            ],
+            'adhkarSessions': [],
+            'adhkarCompletions': [],
+            'settings': {'notif_morning_adhkar': true},
+          },
+        });
+
+        final success = await backupService.importBackupFromJson(v3Json);
+        expect(success, isTrue);
+
+        final bookmarks = await db.select(db.adhkarBookmarks).get();
+        expect(bookmarks.any((b) => b.dhikrId == 'v3_dhikr'), isTrue);
+      },
+    );
 
     test('importBackupFromJson safely returns false on invalid payload without corrupting seeded data', () async {
       // Seed existing data
