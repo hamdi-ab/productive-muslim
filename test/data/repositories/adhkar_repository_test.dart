@@ -586,5 +586,110 @@ void main() {
         expect(alphaHistory.first.routineName, equals('Routine Alpha'));
       },
     );
+
+    test('supports completing the same routine twice on the same date without error', () async {
+      const routineId = 'multi_completion_routine';
+      const date = '2026-11-20';
+
+      // Record first completion
+      await repository.recordRoutineCompletion(
+        routineId: routineId,
+        routineName: 'Multi Routine',
+        date: date,
+      );
+
+      // Record second completion on the exact same date
+      await repository.recordRoutineCompletion(
+        routineId: routineId,
+        routineName: 'Multi Routine',
+        date: date,
+      );
+
+      // Verify isRoutineCompletedToday does not throw StateError: Too many elements
+      final isCompleted = await repository.isRoutineCompletedToday(
+        routineId,
+        date: date,
+      );
+      expect(isCompleted, isTrue);
+
+      // Verify watchIsRoutineCompletedToday emits true without error
+      expect(
+        repository.watchIsRoutineCompletedToday(routineId, date: date),
+        emits(true),
+      );
+
+      // Verify getRoutineCompletionHistory contains both completions
+      final history = await repository.getRoutineCompletionHistory(
+        routineId: routineId,
+      );
+      expect(history.length, equals(2));
+      expect(history.every((h) => h.routineId == routineId), isTrue);
+    });
+
+    test('supports completing the same collection twice on the same date without error', () async {
+      const collectionId = 'morning';
+      const date = '2026-11-20';
+
+      await repository.recordCollectionCompletion(collectionId, date: date);
+      await repository.recordCollectionCompletion(collectionId, date: date);
+
+      final isCompleted = await repository.isCollectionCompletedToday(
+        collectionId,
+        date: date,
+      );
+      expect(isCompleted, isTrue);
+
+      expect(
+        repository.watchIsCollectionCompletedToday(collectionId, date: date),
+        emits(true),
+      );
+
+      final completedIds = await repository.getCompletedCollectionIdsForDate(
+        date,
+      );
+      expect(completedIds.where((id) => id == collectionId).length, equals(1));
+    });
+
+    test('persists and restores skippedItemIds in session without schema migration', () async {
+      const collectionId = 'routine_test_skips';
+      final skipped = ['retired_1', 'retired_2'];
+
+      await repository.saveSession(
+        collectionId: collectionId,
+        lastPageIndex: 2,
+        counts: {'valid_1': 3},
+        skippedItemIds: skipped,
+        isCompleted: false,
+      );
+
+      final session = await repository.getSession(collectionId);
+      expect(session, isNotNull);
+      expect(session!.skippedItemIds, equals({'retired_1', 'retired_2'}));
+      expect(session.counts, equals({'valid_1': 3}));
+      expect(session.lastPageIndex, equals(2));
+      expect(session.isCompleted, isFalse);
+
+      // Updating routine preserves skippedItemIds
+      final now = DateTime.now();
+      final routine = AdhkarRoutine(
+        id: 'test_skips',
+        name: 'Skip Preservation Routine',
+        itemIds: ['valid_1', 'retired_1'],
+        createdAt: now,
+        updatedAt: now,
+      );
+      await repository.saveRoutine(routine);
+
+      final updatedRoutine = routine.copyWith(
+        name: 'Renamed Skip Routine',
+        itemIds: ['valid_1', 'retired_1', 'new_item'],
+        updatedAt: now.add(const Duration(minutes: 1)),
+      );
+      await repository.updateRoutineWithProgressPreservation(updatedRoutine);
+
+      final updatedSession = await repository.getSession(collectionId);
+      expect(updatedSession, isNotNull);
+      expect(updatedSession!.skippedItemIds, contains('retired_1'));
+    });
   });
 }

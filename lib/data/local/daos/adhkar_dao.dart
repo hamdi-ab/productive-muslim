@@ -124,23 +124,21 @@ class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
     String collectionId,
     String date,
   ) async {
-    final row =
-        await (select(adhkarCompletions)..where(
-              (t) => t.collectionId.equals(collectionId) & t.date.equals(date),
-            ))
-            .getSingleOrNull();
-    return row != null;
+    final query = select(adhkarCompletions)
+      ..where((t) => t.collectionId.equals(collectionId) & t.date.equals(date))
+      ..limit(1);
+    final rows = await query.get();
+    return rows.isNotEmpty;
   }
 
   Stream<bool> watchIsCollectionCompletedOnDate(
     String collectionId,
     String date,
   ) {
-    return (select(adhkarCompletions)..where(
-          (t) => t.collectionId.equals(collectionId) & t.date.equals(date),
-        ))
-        .watchSingleOrNull()
-        .map((row) => row != null);
+    final query = select(adhkarCompletions)
+      ..where((t) => t.collectionId.equals(collectionId) & t.date.equals(date))
+      ..limit(1);
+    return query.watch().map((rows) => rows.isNotEmpty);
   }
 
   Future<List<AdhkarCompletion>> getCompletionsForDate(String date) {
@@ -241,19 +239,18 @@ class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
   }
 
   Future<bool> isRoutineCompletedOnDate(String routineId, String date) async {
-    final row =
-        await (select(adhkarRoutineCompletions)..where(
-              (t) => t.routineId.equals(routineId) & t.date.equals(date),
-            ))
-            .getSingleOrNull();
-    return row != null;
+    final query = select(adhkarRoutineCompletions)
+      ..where((t) => t.routineId.equals(routineId) & t.date.equals(date))
+      ..limit(1);
+    final rows = await query.get();
+    return rows.isNotEmpty;
   }
 
   Stream<bool> watchIsRoutineCompletedOnDate(String routineId, String date) {
-    return (select(adhkarRoutineCompletions)
-          ..where((t) => t.routineId.equals(routineId) & t.date.equals(date)))
-        .watchSingleOrNull()
-        .map((row) => row != null);
+    final query = select(adhkarRoutineCompletions)
+      ..where((t) => t.routineId.equals(routineId) & t.date.equals(date))
+      ..limit(1);
+    return query.watch().map((rows) => rows.isNotEmpty);
   }
 
   Future<List<AdhkarRoutineCompletionEntry>> getRoutineCompletionsForDate(

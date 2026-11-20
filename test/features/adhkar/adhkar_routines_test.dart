@@ -16,6 +16,7 @@ import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routine_edit_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routines_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_my_routines_section.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_retired_item_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
@@ -334,5 +335,196 @@ void main() {
       expect(find.byType(AdhkarMyRoutinesSection), findsOneWidget);
       expect(find.text('No Personal Routines'), findsOneWidget);
     });
+
+    testWidgets(
+      'skipping a middle retired entry persists skip, advances to next item, and completes only when remaining approved entry is complete',
+      (tester) async {
+        final now = DateTime.now();
+        const routineId = 'routine_skip_middle_test';
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineId,
+            name: 'Middle Skip Routine',
+            itemIds: [
+              'ayat_al_kursi',
+              'retired_middle_id',
+              'sayyid_al_istighfar',
+            ],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            const AdhkarScreen(
+              initialRoutineId: routineId,
+              isReviewModeEnabled: true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 1. We are on Page 0: ayat_al_kursi
+        expect(find.byType(DhikrCard), findsOneWidget);
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+        // Complete ayat_al_kursi (targetCount 1)
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+
+        // Swipe to Page 1: retired_middle_id
+        await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AdhkarRetiredItemCard), findsOneWidget);
+        expect(find.text('ID: retired_middle_id'), findsOneWidget);
+
+        // Tap "Skip Dhikr"
+        await tester.tap(find.text('Skip Dhikr'));
+        await tester.pumpAndSettle();
+
+        // Verify page automatically advanced to sayyid_al_istighfar
+        expect(find.byType(DhikrCard), findsOneWidget);
+        expect(find.textContaining('Sayyid al-Istighfar'), findsOneWidget);
+
+        // Verify routine completion NOT yet recorded because sayyid_al_istighfar is not completed yet
+        expect(await repository.isRoutineCompletedToday(routineId), isFalse);
+
+        // Verify session persisted skippedItemIds
+        final session = await repository.getSession('routine_$routineId');
+        expect(session, isNotNull);
+        expect(session!.skippedItemIds, contains('retired_middle_id'));
+
+        // Complete sayyid_al_istighfar (targetCount 1)
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+
+        // Now all approved items are completed and retired item was skipped -> routine completes!
+        expect(await repository.isRoutineCompletedToday(routineId), isTrue);
+
+        // Advance to completion card
+        await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+        await tester.pumpAndSettle();
+        expect(find.byType(AdhkarCollectionCompletionCard), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'skipping a final retired entry immediately reveals completion card and records completion',
+      (tester) async {
+        final now = DateTime.now();
+        const routineId = 'routine_skip_final_test';
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineId,
+            name: 'Final Skip Routine',
+            itemIds: ['ayat_al_kursi', 'retired_final_id'],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            const AdhkarScreen(
+              initialRoutineId: routineId,
+              isReviewModeEnabled: true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Complete first item (ayat_al_kursi targetCount 1)
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+
+        // Move to final retired item
+        await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AdhkarRetiredItemCard), findsOneWidget);
+        expect(find.text('ID: retired_final_id'), findsOneWidget);
+
+        // Tap Skip on the final item
+        await tester.tap(find.text('Skip Dhikr'));
+        await tester.pumpAndSettle();
+
+        // Routine completion is recorded
+        expect(await repository.isRoutineCompletedToday(routineId), isTrue);
+
+        // Completion card is reached and displayed
+        expect(find.byType(AdhkarCollectionCompletionCard), findsOneWidget);
+        expect(
+          find.text('الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'restarting or resuming routine preserves skipped state and keeps original retired ID in configuration',
+      (tester) async {
+        final now = DateTime.now();
+        const routineId = 'routine_resume_skip_test';
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineId,
+            name: 'Resume Skip Routine',
+            itemIds: ['retired_first_id', 'ayat_al_kursi'],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            const AdhkarScreen(
+              initialRoutineId: routineId,
+              isReviewModeEnabled: true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Starts on retired_first_id
+        expect(find.byType(AdhkarRetiredItemCard), findsOneWidget);
+        await tester.tap(find.text('Skip Dhikr'));
+        await tester.pumpAndSettle();
+
+        // Advances to ayat_al_kursi
+        expect(find.byType(DhikrCard), findsOneWidget);
+
+        // Exit routine to return to routines view via app bar back button
+        await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+        await tester.pumpAndSettle();
+
+        // Verify routine still has the original retired ID in configuration
+        final routineConfig = await repository.getRoutineById(routineId);
+        expect(routineConfig, isNotNull);
+        expect(
+          routineConfig!.itemIds,
+          equals(['retired_first_id', 'ayat_al_kursi']),
+        );
+
+        // Verify My Routines section displays Continue button
+        final continueBtn = find.text('Continue');
+        expect(continueBtn, findsOneWidget);
+
+        // Resume routine via Continue button
+        await tester.tap(continueBtn);
+        await tester.pumpAndSettle();
+
+        // Resumed on ayat_al_kursi
+        expect(find.byType(DhikrCard), findsOneWidget);
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+
+        // Complete the remaining approved item
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+
+        // Routine finishes because the first retired item was remembered as skipped
+        expect(await repository.isRoutineCompletedToday(routineId), isTrue);
+      },
+    );
   });
 }

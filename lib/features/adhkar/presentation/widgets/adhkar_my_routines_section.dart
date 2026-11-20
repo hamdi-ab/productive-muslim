@@ -195,7 +195,9 @@ class AdhkarMyRoutinesSection extends StatelessWidget {
                         final hasActiveSession =
                             session != null &&
                             !session.isCompleted &&
-                            session.counts.values.any((c) => c > 0);
+                            (session.counts.values.any((c) => c > 0) ||
+                                session.skippedItemIds.isNotEmpty ||
+                                session.lastPageIndex > 0);
 
                         return AdhkarRoutineCard(
                           routine: routine,

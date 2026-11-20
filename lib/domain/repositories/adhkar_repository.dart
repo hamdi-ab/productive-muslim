@@ -36,6 +36,7 @@ abstract class AdhkarRepository {
     required String collectionId,
     required int lastPageIndex,
     required Map<String, int> counts,
+    List<String>? skippedItemIds,
     bool isCompleted = false,
   });
   Future<void> clearSession(String collectionId);

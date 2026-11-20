@@ -65,6 +65,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   final Map<String, int> _counts = {};
+  final Set<String> _skippedItemIds = {};
 
   final Set<String> _bookmarkedIds = {};
   bool _showTransliteration = false;
@@ -161,6 +162,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           _activeRoutine = routine;
           _isRoutinesView = false;
           _isBookmarksView = false;
+          _skippedItemIds.clear();
         });
         await _loadSessionForCollection('routine_${routine.id}');
         return;
@@ -217,6 +219,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           _isCompletedToday = isCompleted;
           if (session != null) {
             _counts.addAll(session.counts);
+            _skippedItemIds.addAll(session.skippedItemIds);
           }
           final items = _currentItems;
           int targetIndex = -1;
@@ -304,6 +307,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _activeRoutine = null;
       _selectedCategory = category;
       _currentPageIndex = 0;
+      _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
@@ -319,6 +323,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isRoutinesView = false;
       _activeRoutine = null;
       _currentPageIndex = 0;
+      _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
@@ -333,6 +338,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isBookmarksView = false;
       _activeRoutine = null;
       _currentPageIndex = 0;
+      _skippedItemIds.clear();
     });
   }
 
@@ -343,6 +349,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isRoutinesView = false;
       _isBookmarksView = false;
       _currentPageIndex = 0;
+      _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
@@ -356,6 +363,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _activeRoutine = null;
       _isRoutinesView = true;
       _currentPageIndex = 0;
+      _skippedItemIds.clear();
     });
   }
 
@@ -364,6 +372,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       for (final id in routine.itemIds) {
         _counts.remove(id);
       }
+      _skippedItemIds.clear();
       _currentPageIndex = 0;
       _isCompletedToday = false;
     });
@@ -438,6 +447,72 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     } catch (_) {}
   }
 
+  bool _isRoutineCompleted(AdhkarRoutine routine) {
+    if (routine.itemIds.isEmpty) return false;
+    final approved = <DhikrItem>[];
+    final retiredIds = <String>[];
+    for (final id in routine.itemIds) {
+      final d =
+          _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
+          AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
+      if (d != null && (_isReviewMode || d.isApproved)) {
+        approved.add(d);
+      } else {
+        retiredIds.add(id);
+      }
+    }
+    if (approved.isEmpty) return false;
+    final approvedDone = approved.every(
+      (item) => (_counts[item.id] ?? 0) >= item.targetCount,
+    );
+    if (!approvedDone) return false;
+    return retiredIds.every(
+      (id) =>
+          _skippedItemIds.contains(id) || routine.retiredItemIds.contains(id),
+    );
+  }
+
+  Future<void> _skipRetiredItem(String itemId) async {
+    if (_activeRoutine == null) return;
+    AppHaptics.selectionClick();
+    setState(() {
+      _skippedItemIds.add(itemId);
+    });
+
+    final routine = _activeRoutine!;
+    final isRoutineCompleted = _isRoutineCompleted(routine);
+
+    if (_adhkarRepo != null) {
+      try {
+        if (isRoutineCompleted && !_isCompletedToday) {
+          await _adhkarRepo!.recordRoutineCompletion(
+            routineId: routine.id,
+            routineName: routine.name,
+          );
+          if (mounted) setState(() => _isCompletedToday = true);
+        }
+        await _adhkarRepo!.saveSession(
+          collectionId: 'routine_${routine.id}',
+          lastPageIndex: _currentPageIndex,
+          counts: _counts,
+          skippedItemIds: _skippedItemIds.toList(),
+          isCompleted: isRoutineCompleted,
+        );
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+
+    final routineLen = routine.itemIds.length;
+    final totalPageCount = isRoutineCompleted ? routineLen + 1 : routineLen;
+    if (_currentPageIndex < totalPageCount - 1 && _pageController.hasClients) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   Future<void> _incrementCount(DhikrItem item) async {
     final current = _counts[item.id] ?? 0;
     if (current >= item.targetCount) return;
@@ -449,27 +524,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     if (_activeRoutine != null) {
       final routine = _activeRoutine!;
-      final hasRetired = routine.itemIds.any((id) {
-        final d =
-            _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
-            AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
-        return d == null || (!_isReviewMode && !d.isApproved);
-      });
-      final isRoutineCompleted =
-          !hasRetired &&
-          routine.itemIds.isNotEmpty &&
-          routine.itemIds.every((id) {
-            final target =
-                _adhkarRepo
-                    ?.getById(id, includePendingReview: _isReviewMode)
-                    ?.targetCount ??
-                AdhkarCatalog.getById(
-                  id,
-                  includePendingReview: _isReviewMode,
-                )?.targetCount ??
-                1;
-            return (_counts[id] ?? 0) >= target;
-          });
+      final isRoutineCompleted = _isRoutineCompleted(routine);
 
       if (_adhkarRepo != null) {
         try {
@@ -484,6 +539,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
             collectionId: 'routine_${routine.id}',
             lastPageIndex: _currentPageIndex,
             counts: _counts,
+            skippedItemIds: _skippedItemIds.toList(),
             isCompleted: isRoutineCompleted,
           );
         } catch (_) {}
@@ -557,6 +613,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           collectionId: 'routine_${_activeRoutine!.id}',
           lastPageIndex: _currentPageIndex,
           counts: _counts,
+          skippedItemIds: _skippedItemIds.toList(),
           isCompleted: false,
         );
       } else if (!_isBookmarksView && _adhkarRepo != null) {
@@ -634,30 +691,8 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     final isRoutineMode = _activeRoutine != null;
     final routineLen = _activeRoutine?.itemIds.length ?? 0;
-    final hasRetiredItems =
-        isRoutineMode &&
-        _activeRoutine!.itemIds.any((id) {
-          final d =
-              _adhkarRepo?.getById(id, includePendingReview: _isReviewMode) ??
-              AdhkarCatalog.getById(id, includePendingReview: _isReviewMode);
-          return d == null || (!_isReviewMode && !d.isApproved);
-        });
-
     final isCollectionCompleted = isRoutineMode
-        ? (!hasRetiredItems &&
-              _activeRoutine!.itemIds.isNotEmpty &&
-              _activeRoutine!.itemIds.every((id) {
-                final target =
-                    _adhkarRepo
-                        ?.getById(id, includePendingReview: _isReviewMode)
-                        ?.targetCount ??
-                    AdhkarCatalog.getById(
-                      id,
-                      includePendingReview: _isReviewMode,
-                    )?.targetCount ??
-                    1;
-                return (_counts[id] ?? 0) >= target;
-              }))
+        ? _isRoutineCompleted(_activeRoutine!)
         : (items.isNotEmpty &&
               items.every((i) => (_counts[i.id] ?? 0) >= i.targetCount));
 
@@ -1155,6 +1190,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                       ? idx
                                       : routineLen - 1,
                                   counts: _counts,
+                                  skippedItemIds: _skippedItemIds.toList(),
                                   isCompleted: isCollectionCompleted,
                                 );
                               } else if (!_isBookmarksView &&
@@ -1225,17 +1261,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                     ),
                                     child: AdhkarRetiredItemCard(
                                       itemId: itemId,
-                                      onSkip: () {
-                                        if (_currentPageIndex <
-                                            totalPageCount - 1) {
-                                          _pageController.nextPage(
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            curve: Curves.easeInOut,
-                                          );
-                                        }
-                                      },
+                                      onSkip: () => _skipRetiredItem(itemId),
                                       onReplace: () =>
                                           _replaceRetiredItem(itemId),
                                       onExit: _exitActiveRoutine,

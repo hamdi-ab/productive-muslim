@@ -227,12 +227,17 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     required String collectionId,
     required int lastPageIndex,
     required Map<String, int> counts,
+    List<String>? skippedItemIds,
     bool isCompleted = false,
   }) {
+    final Map<String, dynamic> payload = Map<String, dynamic>.from(counts);
+    if (skippedItemIds != null && skippedItemIds.isNotEmpty) {
+      payload['__skipped__'] = skippedItemIds;
+    }
     return _adhkarDao.saveSession(
       collectionId: _canonicalCollectionId(collectionId),
       lastPageIndex: lastPageIndex,
-      countsJson: jsonEncode(counts),
+      countsJson: jsonEncode(payload),
       lastAccessedAt: DateTime.now().millisecondsSinceEpoch,
       isCompleted: isCompleted,
     );
@@ -421,10 +426,15 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
               return (newCounts[id] ?? 0) >= target;
             });
 
+        final newSkipped = existingSession.skippedItemIds
+            .where((id) => updatedItemIdsSet.contains(id))
+            .toList();
+
         await saveSession(
           collectionId: sessionColId,
           lastPageIndex: newPageIndex,
           counts: newCounts,
+          skippedItemIds: newSkipped,
           isCompleted: isCompleted,
         );
       }
@@ -621,12 +631,21 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   AdhkarSessionRecord _mapSessionRow(AdhkarSession row) {
     Map<String, int> counts = {};
+    Set<String> skippedItemIds = {};
     try {
       final decoded = jsonDecode(row.countsJson);
       if (decoded is Map) {
-        counts = decoded.map(
-          (k, v) => MapEntry(k.toString(), (v as num).toInt()),
-        );
+        if (decoded.containsKey('__skipped__') &&
+            decoded['__skipped__'] is List) {
+          skippedItemIds = (decoded['__skipped__'] as List)
+              .map((e) => e.toString())
+              .toSet();
+        }
+        for (final entry in decoded.entries) {
+          if (entry.key != '__skipped__' && entry.value is num) {
+            counts[entry.key.toString()] = (entry.value as num).toInt();
+          }
+        }
       }
     } catch (_) {}
 
@@ -636,6 +655,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       counts: counts,
       lastAccessedAt: DateTime.fromMillisecondsSinceEpoch(row.lastAccessedAt),
       isCompleted: row.isCompleted,
+      skippedItemIds: skippedItemIds,
     );
   }
 
