@@ -16,6 +16,7 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/models/tasbih_state.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_background_atmosphere.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_category_tabs.dart';
@@ -193,6 +194,18 @@ class _CatalogFallbackRepository implements AdhkarRepository {
   Future<List<AdhkarRoutineCompletion>> getRoutineCompletionHistory({
     String? routineId,
   }) async => [];
+
+  @override
+  Future<TasbihState> getTasbihState() async => TasbihState.initial();
+
+  @override
+  Stream<TasbihState> watchTasbihState() => Stream.value(TasbihState.initial());
+
+  @override
+  Future<void> saveTasbihState(TasbihState state) async {}
+
+  @override
+  Future<void> resetTasbihCount() async {}
 
   @override
   Future<void> migrateFromSharedPreferencesIfNeeded(

@@ -22,6 +22,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
   final bool isRoutinesSelected;
   final VoidCallback? onRoutinesSelected;
   final VoidCallback? onExploreTap;
+  final VoidCallback? onTasbihTap;
   final AppLocalizations l10n;
   final bool isDark;
 
@@ -35,6 +36,7 @@ class AdhkarCategoryTabs extends StatelessWidget {
     this.isRoutinesSelected = false,
     this.onRoutinesSelected,
     this.onExploreTap,
+    this.onTasbihTap,
     required this.l10n,
     required this.isDark,
   });
@@ -321,6 +323,57 @@ class AdhkarCategoryTabs extends StatelessWidget {
                           color: isDark
                               ? AppColors.primaryLight
                               : AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (onTasbihTap != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: AppPressable(
+                key: const Key('adhkar_tasbih_tab_chip'),
+                onTap: onTasbihTap!,
+                pressedScale: 0.95,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.secondary.withValues(alpha: 0.15)
+                        : AppColors.secondary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.secondary.withValues(alpha: 0.35)
+                          : AppColors.secondary.withValues(alpha: 0.25),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.fingerprint_rounded,
+                        size: 15,
+                        color: isDark
+                            ? AppColors.secondaryLight
+                            : AppColors.secondaryDark,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        l10n.adhkarTabTasbih,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColors.secondaryLight
+                              : AppColors.secondaryDark,
                         ),
                       ),
                     ],

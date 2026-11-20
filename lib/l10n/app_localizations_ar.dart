@@ -1910,4 +1910,117 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarViewAllRoutines => 'عرض الكل';
+
+  @override
+  String get adhkarTabTasbih => 'السبحة';
+
+  @override
+  String get tasbihTitle => 'السبحة';
+
+  @override
+  String get tasbihSubtitle => 'عداد شخصي مستقل';
+
+  @override
+  String get tasbihFreeCounter => 'عداد حر';
+
+  @override
+  String get tasbihTapToCount => 'اضغط في أي مكان للعد';
+
+  @override
+  String get tasbihUndo => 'تراجع';
+
+  @override
+  String get tasbihReset => 'إعادة ضبط';
+
+  @override
+  String get tasbihResetConfirmTitle => 'إعادة ضبط العداد؟';
+
+  @override
+  String get tasbihResetConfirmDesc =>
+      'هل أنت متأكد من إعادة ضبط العداد إلى 0؟ سيتم الاحتفاظ بالتسمية والهدف المحددين.';
+
+  @override
+  String get tasbihSetRemembrance => 'تحديد الذكر';
+
+  @override
+  String get tasbihChangeRemembrance => 'تغيير الذكر';
+
+  @override
+  String get tasbihApprovedLibrary => 'من الأذكار المعتمدة';
+
+  @override
+  String get tasbihPersonalLabel => 'تسمية شخصية';
+
+  @override
+  String get tasbihPersonalLabelNotice =>
+      'تسمية شخصية خاصة بك — ليست نصًا مأثورًا';
+
+  @override
+  String get tasbihEnterPersonalLabel => 'إدخال تسمية شخصية';
+
+  @override
+  String get tasbihPersonalLabelHint => 'مثال: استغفار، صلوات، دعاء شخصي';
+
+  @override
+  String get tasbihSelectFromLibrary => 'اختيار من المكتبة المعتمدة';
+
+  @override
+  String get tasbihClearSelection => 'إلغاء التحديد (عداد حر)';
+
+  @override
+  String get tasbihPersonalTarget => 'هدف شخصي (اختياري)';
+
+  @override
+  String get tasbihPersonalTargetDesc =>
+      'هدف تنظيمي شخصي تختاره بنفسك، وليس توصية شرعية محددة';
+
+  @override
+  String get tasbihNoTarget => 'بدون هدف';
+
+  @override
+  String tasbihTargetLabel(int target) {
+    return 'الهدف: $target';
+  }
+
+  @override
+  String tasbihTargetReached(int target) {
+    return 'تم الوصول للهدف الشخصي ($target)';
+  }
+
+  @override
+  String get tasbihCustomTarget => 'هدف مخصص';
+
+  @override
+  String get tasbihEnterTargetNumber => 'أدخل العدد المستهدف';
+
+  @override
+  String get tasbihSaveTarget => 'حفظ الهدف';
+
+  @override
+  String get tasbihClearTarget => 'إلغاء الهدف';
+
+  @override
+  String get tasbihRetiredWarning => 'الذكر غير معتمد حاليًا';
+
+  @override
+  String get tasbihRetiredDesc =>
+      'هذا الذكر لم يعد متاحًا في المكتبة المعتمدة. يمكنك اختيار ذكر آخر، أو استخدامه كتسمية شخصية، أو إلغاء التحديد.';
+
+  @override
+  String get tasbihUseAsCustomLabel => 'استخدام كتسمية شخصية';
+
+  @override
+  String get tasbihHapticsEnabled => 'الاهتزاز مفعّل';
+
+  @override
+  String get tasbihHapticsDisabled => 'الاهتزاز معطّل';
+
+  @override
+  String get tasbihToggleHaptics => 'تبديل الاهتزاز';
+
+  @override
+  String get tasbihSelectRemembranceModalTitle => 'ماذا تريد أن تعد؟';
+
+  @override
+  String get tasbihPersonalTargetModalTitle => 'تحديد هدف شخصي';
 }

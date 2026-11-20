@@ -18,6 +18,7 @@ abstract final class AppRoutes {
   static const adhkarExplore = '/adhkar/explore';
   static const adhkarRoutines = '/adhkar/routines';
   static const adhkarRoutineEdit = '/adhkar/routines/edit';
+  static const adhkarTasbih = '/adhkar/tasbih';
 
   // My Day sub-destinations / nested paths
   static const myDayTasks = '/my-day/tasks';
@@ -37,4 +38,5 @@ abstract final class AppRoutes {
   static const intentions = '/intentions';
   static const prayerTimesUnderscore = '/prayer_times';
   static const streak = '/streak';
+  static const tasbih = '/tasbih';
 }

@@ -746,5 +746,54 @@
   "adhkarRoutineExit": "Exit Routine",
   "adhkarRoutineCompletedDesc": "You have completed your personal routine. May Allah accept your remembrance.",
   "adhkarRoutineReorderHelp": "Drag to reorder remembrances",
-  "adhkarViewAllRoutines": "View all"
+  "adhkarViewAllRoutines": "View all",
+  "adhkarTabTasbih": "Tasbih",
+  "tasbihTitle": "Tasbih",
+  "tasbihSubtitle": "Independent offline counter",
+  "tasbihFreeCounter": "Free Counter",
+  "tasbihTapToCount": "Tap anywhere to count",
+  "tasbihUndo": "Undo",
+  "tasbihReset": "Reset",
+  "tasbihResetConfirmTitle": "Reset Counter?",
+  "tasbihResetConfirmDesc": "Are you sure you want to reset the count to 0? Your chosen label and target will be preserved.",
+  "tasbihSetRemembrance": "Set Remembrance",
+  "tasbihChangeRemembrance": "Change Remembrance",
+  "tasbihApprovedLibrary": "Approved Library",
+  "tasbihPersonalLabel": "Personal Label",
+  "tasbihPersonalLabelNotice": "Your personal label — not religiously sourced text",
+  "tasbihEnterPersonalLabel": "Enter Personal Label",
+  "tasbihPersonalLabelHint": "e.g., Istighfar, Salawat, Personal Dua",
+  "tasbihSelectFromLibrary": "Select from Reviewed Library",
+  "tasbihClearSelection": "Clear (Free Counter)",
+  "tasbihPersonalTarget": "Personal Target (Optional)",
+  "tasbihPersonalTargetDesc": "Organizational only — not a prescribed repetition or spiritual score",
+  "tasbihNoTarget": "No target",
+  "tasbihTargetLabel": "Target: {target}",
+  "@tasbihTargetLabel": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "tasbihTargetReached": "Personal target reached ({target})",
+  "@tasbihTargetReached": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "tasbihCustomTarget": "Custom target",
+  "tasbihEnterTargetNumber": "Enter target count",
+  "tasbihSaveTarget": "Set Target",
+  "tasbihClearTarget": "Clear Target",
+  "tasbihRetiredWarning": "Remembrance retired or unapproved",
+  "tasbihRetiredDesc": "This remembrance is no longer available in the approved library. You can select another remembrance, use it as a custom label, or clear it.",
+  "tasbihUseAsCustomLabel": "Use as Custom Label",
+  "tasbihHapticsEnabled": "Haptics enabled",
+  "tasbihHapticsDisabled": "Haptics disabled",
+  "tasbihToggleHaptics": "Toggle vibration",
+  "tasbihSelectRemembranceModalTitle": "What are you counting?",
+  "tasbihPersonalTargetModalTitle": "Set Personal Target"
 }

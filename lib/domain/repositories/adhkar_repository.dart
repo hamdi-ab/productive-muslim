@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/models/tasbih_state.dart';
 
 abstract class AdhkarRepository {
   List<DhikrItem> getAll({bool? includePendingReview});
@@ -79,6 +80,12 @@ abstract class AdhkarRepository {
   Future<List<AdhkarRoutineCompletion>> getRoutineCompletionHistory({
     String? routineId,
   });
+
+  // Tasbih
+  Future<TasbihState> getTasbihState();
+  Stream<TasbihState> watchTasbihState();
+  Future<void> saveTasbihState(TasbihState state);
+  Future<void> resetTasbihCount();
 
   // Migration
   Future<void> migrateFromSharedPreferencesIfNeeded(SharedPreferences prefs);

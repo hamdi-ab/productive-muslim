@@ -17,10 +17,10 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
-import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routine_edit_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_background_atmosphere.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_category_tabs.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_library_picker_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_my_routines_section.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_retired_item_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_session_dock.dart';
@@ -800,6 +800,12 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                         onTap: () => context.push(AppRoutes.adhkarExplore),
                       ),
                       ProductiveAppBarAction(
+                        key: const Key('adhkar_tasbih_app_bar_action'),
+                        tooltip: l10n.tasbihTitle,
+                        icon: Icons.fingerprint_rounded,
+                        onTap: () => context.push(AppRoutes.adhkarTasbih),
+                      ),
+                      ProductiveAppBarAction(
                         tooltip: l10n.adhkarToggleTransliteration,
                         icon: _showTransliteration
                             ? Icons.subtitles_rounded
@@ -872,6 +878,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     onBookmarksSelected: _onBookmarksSelected,
                     onRoutinesSelected: _onRoutinesSelected,
                     onExploreTap: () => context.push(AppRoutes.adhkarExplore),
+                    onTasbihTap: () => context.push(AppRoutes.adhkarTasbih),
                     l10n: l10n,
                     isDark: isDark,
                   ),

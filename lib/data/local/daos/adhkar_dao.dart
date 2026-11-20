@@ -6,6 +6,7 @@ import 'package:productive_muslim/data/local/database/tables/adhkar_completions.
 import 'package:productive_muslim/data/local/database/tables/adhkar_routine_completions.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_routines.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_sessions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_tasbih.dart';
 
 part 'adhkar_dao.g.dart';
 
@@ -16,6 +17,7 @@ part 'adhkar_dao.g.dart';
     AdhkarCompletions,
     AdhkarRoutines,
     AdhkarRoutineCompletions,
+    AdhkarTasbih,
   ],
 )
 class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
@@ -269,5 +271,64 @@ class AdhkarDao extends DatabaseAccessor<AppDatabase> with _$AdhkarDaoMixin {
       query.where((t) => t.routineId.equals(routineId));
     }
     return (query..orderBy([(t) => OrderingTerm.desc(t.completedAt)])).get();
+  }
+
+  // --- Tasbih ---
+
+  Future<AdhkarTasbihEntry?> getTasbihState({String id = 'default'}) {
+    return (select(
+      adhkarTasbih,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  Stream<AdhkarTasbihEntry?> watchTasbihState({String id = 'default'}) {
+    return (select(
+      adhkarTasbih,
+    )..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
+  Future<void> saveTasbihState({
+    String id = 'default',
+    required int currentCount,
+    int? targetCount,
+    String? dhikrId,
+    String? customLabel,
+    int? lastCount,
+    required int updatedAt,
+  }) {
+    return into(adhkarTasbih).insertOnConflictUpdate(
+      AdhkarTasbihCompanion.insert(
+        id: id,
+        currentCount: Value(currentCount),
+        targetCount: Value(targetCount),
+        dhikrId: Value(dhikrId),
+        customLabel: Value(customLabel),
+        lastCount: Value(lastCount),
+        updatedAt: updatedAt,
+      ),
+    );
+  }
+
+  Future<void> resetTasbihCount({String id = 'default'}) async {
+    final existing = await getTasbihState(id: id);
+    if (existing == null) {
+      await saveTasbihState(
+        id: id,
+        currentCount: 0,
+        updatedAt: DateTime.now().millisecondsSinceEpoch,
+      );
+      return;
+    }
+    await (update(adhkarTasbih)..where((t) => t.id.equals(id))).write(
+      AdhkarTasbihCompanion(
+        currentCount: const Value(0),
+        lastCount: const Value(null),
+        updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+      ),
+    );
+  }
+
+  Future<List<AdhkarTasbihEntry>> getAllTasbihEntries() {
+    return select(adhkarTasbih).get();
   }
 }

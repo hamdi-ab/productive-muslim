@@ -1917,4 +1917,118 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarViewAllRoutines => 'View all';
+
+  @override
+  String get adhkarTabTasbih => 'Tasbih';
+
+  @override
+  String get tasbihTitle => 'Tasbih';
+
+  @override
+  String get tasbihSubtitle => 'Independent offline counter';
+
+  @override
+  String get tasbihFreeCounter => 'Free Counter';
+
+  @override
+  String get tasbihTapToCount => 'Tap anywhere to count';
+
+  @override
+  String get tasbihUndo => 'Undo';
+
+  @override
+  String get tasbihReset => 'Reset';
+
+  @override
+  String get tasbihResetConfirmTitle => 'Reset Counter?';
+
+  @override
+  String get tasbihResetConfirmDesc =>
+      'Are you sure you want to reset the count to 0? Your chosen label and target will be preserved.';
+
+  @override
+  String get tasbihSetRemembrance => 'Set Remembrance';
+
+  @override
+  String get tasbihChangeRemembrance => 'Change Remembrance';
+
+  @override
+  String get tasbihApprovedLibrary => 'Approved Library';
+
+  @override
+  String get tasbihPersonalLabel => 'Personal Label';
+
+  @override
+  String get tasbihPersonalLabelNotice =>
+      'Your personal label — not religiously sourced text';
+
+  @override
+  String get tasbihEnterPersonalLabel => 'Enter Personal Label';
+
+  @override
+  String get tasbihPersonalLabelHint =>
+      'e.g., Istighfar, Salawat, Personal Dua';
+
+  @override
+  String get tasbihSelectFromLibrary => 'Select from Reviewed Library';
+
+  @override
+  String get tasbihClearSelection => 'Clear (Free Counter)';
+
+  @override
+  String get tasbihPersonalTarget => 'Personal Target (Optional)';
+
+  @override
+  String get tasbihPersonalTargetDesc =>
+      'Organizational only — not a prescribed repetition or spiritual score';
+
+  @override
+  String get tasbihNoTarget => 'No target';
+
+  @override
+  String tasbihTargetLabel(int target) {
+    return 'Target: $target';
+  }
+
+  @override
+  String tasbihTargetReached(int target) {
+    return 'Personal target reached ($target)';
+  }
+
+  @override
+  String get tasbihCustomTarget => 'Custom target';
+
+  @override
+  String get tasbihEnterTargetNumber => 'Enter target count';
+
+  @override
+  String get tasbihSaveTarget => 'Set Target';
+
+  @override
+  String get tasbihClearTarget => 'Clear Target';
+
+  @override
+  String get tasbihRetiredWarning => 'Remembrance retired or unapproved';
+
+  @override
+  String get tasbihRetiredDesc =>
+      'This remembrance is no longer available in the approved library. You can select another remembrance, use it as a custom label, or clear it.';
+
+  @override
+  String get tasbihUseAsCustomLabel => 'Use as Custom Label';
+
+  @override
+  String get tasbihHapticsEnabled => 'Haptics enabled';
+
+  @override
+  String get tasbihHapticsDisabled => 'Haptics disabled';
+
+  @override
+  String get tasbihToggleHaptics => 'Toggle vibration';
+
+  @override
+  String get tasbihSelectRemembranceModalTitle => 'What are you counting?';
+
+  @override
+  String get tasbihPersonalTargetModalTitle => 'Set Personal Target';
 }

@@ -25,6 +25,7 @@ import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_explore_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routines_screen.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_routine_edit_screen.dart';
+import 'package:productive_muslim/features/adhkar/presentation/screens/tasbih_screen.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_review_screen.dart';
 import 'package:productive_muslim/features/reflect/presentation/screens/reflect_screen.dart';
@@ -402,6 +403,16 @@ class AppRouter {
               : null;
           return AdhkarRoutineEditScreen(routine: routine);
         },
+      ),
+      GoRoute(
+        path: AppRoutes.adhkarTasbih,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const TasbihScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.tasbih,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const TasbihScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

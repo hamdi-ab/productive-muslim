@@ -5,6 +5,7 @@ import 'package:productive_muslim/data/local/database/tables/adhkar_completions.
 import 'package:productive_muslim/data/local/database/tables/adhkar_routine_completions.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_routines.dart';
 import 'package:productive_muslim/data/local/database/tables/adhkar_sessions.dart';
+import 'package:productive_muslim/data/local/database/tables/adhkar_tasbih.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_daily_responses.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_entries.dart';
 import 'package:productive_muslim/data/local/database/tables/barakah_prompts.dart';
@@ -42,6 +43,7 @@ part 'app_database.g.dart';
     AdhkarCompletions,
     AdhkarRoutines,
     AdhkarRoutineCompletions,
+    AdhkarTasbih,
   ],
   daos: [
     BarakahDao,
@@ -59,7 +61,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -104,6 +106,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         await m.createTable(adhkarRoutines);
         await m.createTable(adhkarRoutineCompletions);
+      }
+      if (from < 7) {
+        await m.createTable(adhkarTasbih);
       }
     },
   );
