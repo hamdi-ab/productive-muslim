@@ -19,6 +19,7 @@ import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_sc
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_my_routines_section.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_retired_item_card.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_routine_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -524,6 +525,220 @@ void main() {
 
         // Routine finishes because the first retired item was remembered as skipped
         expect(await repository.isRoutineCompletedToday(routineId), isTrue);
+      },
+    );
+
+    testWidgets(
+      'routine progress does not leak between routines sharing the same dhikr item',
+      (tester) async {
+        final now = DateTime.now();
+        const routineAId = 'routine_a_leak_test';
+        const routineBId = 'routine_b_leak_test';
+
+        // Routine A has ayat_al_kursi (targetCount 1)
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineAId,
+            name: 'Routine Alpha',
+            itemIds: ['ayat_al_kursi'],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        // Routine B has ayat_al_kursi (targetCount 1) AND sayyid_al_istighfar (targetCount 1)
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineBId,
+            name: 'Routine Beta',
+            itemIds: ['ayat_al_kursi', 'sayyid_al_istighfar'],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            const AdhkarScreen(
+              initialRoutineId: routineAId,
+              isReviewModeEnabled: true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // 1. In Routine A: complete ayat_al_kursi (targetCount 1)
+        expect(find.text('Routine Alpha'), findsOneWidget);
+        expect(find.byType(DhikrCard), findsOneWidget);
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+        expect(find.text('0 / 1'), findsOneWidget);
+
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+
+        // Routine A reaches completion
+        expect(
+          find.descendant(
+            of: find.byType(DhikrCard),
+            matching: find.text('1 / 1'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+        expect(await repository.isRoutineCompletedToday(routineAId), isTrue);
+
+        // 2. Exit Routine A back to My Routines view
+        await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AdhkarMyRoutinesSection), findsOneWidget);
+        expect(find.text('Routine Beta'), findsOneWidget);
+
+        // 3. Start Routine B (which has no saved session)
+        final routineBCard = find.ancestor(
+          of: find.text('Routine Beta'),
+          matching: find.byType(AdhkarRoutineCard),
+        );
+        final startRoutineB = find.descendant(
+          of: routineBCard,
+          matching: find.text('Start'),
+        );
+        expect(startRoutineB, findsOneWidget);
+        await tester.tap(startRoutineB);
+        await tester.pumpAndSettle();
+
+        // Verify Routine B is active
+        expect(find.text('Routine Beta'), findsOneWidget);
+
+        // Crucial isolation check: ayat_al_kursi in Routine B must start at ZERO!
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+        expect(find.text('0 / 1'), findsOneWidget);
+
+        // Verify Routine B cannot be completed from Routine A's progress
+        expect(await repository.isRoutineCompletedToday(routineBId), isFalse);
+
+        // 4. Exit Routine B and return to Routine A
+        await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AdhkarMyRoutinesSection), findsOneWidget);
+
+        final routineACard = find.ancestor(
+          of: find.text('Routine Alpha'),
+          matching: find.byType(AdhkarRoutineCard),
+        );
+        final startRoutineA = find.descendant(
+          of: routineACard,
+          matching: find.text('Start'),
+        );
+        expect(startRoutineA, findsOneWidget);
+        await tester.tap(startRoutineA);
+        await tester.pumpAndSettle();
+
+        // 5. Verifies switching back to A restores A's own saved count
+        expect(find.text('Routine Alpha'), findsOneWidget);
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(DhikrCard),
+            matching: find.text('1 / 1'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+        expect(await repository.isRoutineCompletedToday(routineAId), isTrue);
+      },
+    );
+
+    testWidgets(
+      'progress does not leak between official collections and personal routines sharing the same dhikr item',
+      (tester) async {
+        final now = DateTime.now();
+        const routineId = 'routine_col_isolation_test';
+
+        // Routine has ayat_al_kursi
+        await repository.saveRoutine(
+          AdhkarRoutine(
+            id: routineId,
+            name: 'Isolation Routine',
+            itemIds: ['ayat_al_kursi'],
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+        // Save session for official Morning collection where ayat_al_kursi is completed
+        await repository.saveSession(
+          collectionId: DhikrCategory.morning.name,
+          lastPageIndex: 0,
+          counts: {'ayat_al_kursi': 1},
+          isCompleted: false,
+        );
+
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            const AdhkarScreen(
+              initialCategory: DhikrCategory.morning,
+              isReviewModeEnabled: true,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to My Routines tab
+        final routinesTab = find.byKey(const Key('adhkar_routines_tab_chip'));
+        await tester.ensureVisible(routinesTab);
+        await tester.tap(routinesTab);
+        await tester.pumpAndSettle();
+
+        // Start Isolation Routine (which has no saved session)
+        final routineCard = find.ancestor(
+          of: find.text('Isolation Routine'),
+          matching: find.byType(AdhkarRoutineCard),
+        );
+        final startRoutine = find.descendant(
+          of: routineCard,
+          matching: find.text('Start'),
+        );
+        expect(startRoutine, findsOneWidget);
+        await tester.tap(startRoutine);
+        await tester.pumpAndSettle();
+
+        // Routine should be at count 0 despite Morning collection having count 1
+        expect(find.text('Isolation Routine'), findsOneWidget);
+        expect(find.textContaining('Ayat al-Kursi'), findsOneWidget);
+        expect(find.text('0 / 1'), findsOneWidget);
+        expect(await repository.isRoutineCompletedToday(routineId), isFalse);
+
+        // Complete ayat_al_kursi in the routine
+        await tester.tap(find.byType(DhikrCard));
+        await tester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: find.byType(DhikrCard),
+            matching: find.text('1 / 1'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Completed! Alhamdulillah'), findsOneWidget);
+        expect(await repository.isRoutineCompletedToday(routineId), isTrue);
+
+        // Exit routine to routines tab
+        await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+        await tester.pumpAndSettle();
+
+        // Switch back to Morning tab
+        final morningTab = find.text('Morning');
+        await tester.ensureVisible(morningTab);
+        await tester.tap(morningTab);
+        await tester.pumpAndSettle();
+
+        // Morning collection retains its own session and is not broken by the routine
+        final morningSession = await repository.getSession(
+          DhikrCategory.morning.name,
+        );
+        expect(morningSession, isNotNull);
+        expect(morningSession!.counts['ayat_al_kursi'], equals(1));
       },
     );
   });

@@ -145,7 +145,10 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       await _settingsService?.setAdhkarReviewModeEnabled(next);
     } catch (_) {}
     await _loadBookmarks();
-    _loadSessionForCollection(_selectedCategory.name);
+    final targetColId = _activeRoutine != null
+        ? 'routine_${_activeRoutine!.id}'
+        : _selectedCategory.name;
+    _loadSessionForCollection(targetColId);
   }
 
   Future<void> _initData() async {
@@ -162,6 +165,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
           _activeRoutine = routine;
           _isRoutinesView = false;
           _isBookmarksView = false;
+          _counts.clear();
           _skippedItemIds.clear();
         });
         await _loadSessionForCollection('routine_${routine.id}');
@@ -217,6 +221,8 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       if (mounted) {
         setState(() {
           _isCompletedToday = isCompleted;
+          _counts.clear();
+          _skippedItemIds.clear();
           if (session != null) {
             _counts.addAll(session.counts);
             _skippedItemIds.addAll(session.skippedItemIds);
@@ -307,6 +313,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _activeRoutine = null;
       _selectedCategory = category;
       _currentPageIndex = 0;
+      _counts.clear();
       _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
@@ -323,6 +330,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isRoutinesView = false;
       _activeRoutine = null;
       _currentPageIndex = 0;
+      _counts.clear();
       _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
@@ -338,6 +346,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isBookmarksView = false;
       _activeRoutine = null;
       _currentPageIndex = 0;
+      _counts.clear();
       _skippedItemIds.clear();
     });
   }
@@ -349,6 +358,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _isRoutinesView = false;
       _isBookmarksView = false;
       _currentPageIndex = 0;
+      _counts.clear();
       _skippedItemIds.clear();
     });
     if (_pageController.hasClients) {
@@ -363,15 +373,14 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       _activeRoutine = null;
       _isRoutinesView = true;
       _currentPageIndex = 0;
+      _counts.clear();
       _skippedItemIds.clear();
     });
   }
 
   Future<void> _resetRoutine(AdhkarRoutine routine) async {
     setState(() {
-      for (final id in routine.itemIds) {
-        _counts.remove(id);
-      }
+      _counts.clear();
       _skippedItemIds.clear();
       _currentPageIndex = 0;
       _isCompletedToday = false;
@@ -629,11 +638,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
   Future<void> _resetCategory(DhikrCategory category) async {
     AppHaptics.mediumImpact();
-    final items = _currentItems;
     setState(() {
-      for (final item in items) {
-        _counts[item.id] = 0;
-      }
+      _counts.clear();
+      _skippedItemIds.clear();
       _currentPageIndex = 0;
     });
     if (_pageController.hasClients) {
@@ -653,11 +660,9 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
   Future<void> _readAgain() async {
     AppHaptics.mediumImpact();
-    final items = _currentItems;
     setState(() {
-      for (final item in items) {
-        _counts[item.id] = 0;
-      }
+      _counts.clear();
+      _skippedItemIds.clear();
       _currentPageIndex = 0;
     });
     if (_pageController.hasClients) {
