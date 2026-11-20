@@ -1791,4 +1791,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarFilterCategories => 'Categories';
+
+  @override
+  String get adhkarTabRoutines => 'My Routines';
+
+  @override
+  String get adhkarMyRoutinesTitle => 'My Routines';
+
+  @override
+  String get adhkarMyRoutinesSubtitle =>
+      'Personal arrangements of reviewed Adhkar';
+
+  @override
+  String get adhkarMyRoutinesEmptyTitle => 'No Personal Routines';
+
+  @override
+  String get adhkarMyRoutinesEmptyDesc =>
+      'Create personal routines from reviewed Adhkar to recite in your own preferred order.';
+
+  @override
+  String get adhkarCreateRoutineButton => 'Create a routine';
+
+  @override
+  String get adhkarNewRoutineTitle => 'New Routine';
+
+  @override
+  String get adhkarEditRoutineTitle => 'Edit Routine';
+
+  @override
+  String get adhkarRoutineNameLabel => 'Routine Name';
+
+  @override
+  String get adhkarRoutineNameHint => 'e.g., Morning Focus, Calm Night';
+
+  @override
+  String get adhkarRoutineNameRequired => 'Please enter a routine name';
+
+  @override
+  String get adhkarRoutineItemsTitle => 'Selected Remembrances';
+
+  @override
+  String get adhkarRoutineAddItems => 'Add Remembrances';
+
+  @override
+  String get adhkarRoutineNoItemsError =>
+      'Add at least one remembrance to your routine';
+
+  @override
+  String get adhkarRoutineDuplicateItemError =>
+      'This remembrance is already in this routine';
+
+  @override
+  String get adhkarRoutineScheduleOptional => 'Schedule (Optional)';
+
+  @override
+  String get adhkarRoutineScheduleDesc =>
+      'Organizational only — helps plan your day without notifications';
+
+  @override
+  String get adhkarRoutinePreferredTime => 'Preferred Time';
+
+  @override
+  String get adhkarRoutinePreferredDays => 'Preferred Days';
+
+  @override
+  String get adhkarRoutineNoTime => 'No time set';
+
+  @override
+  String get adhkarRoutineClearTime => 'Clear time';
+
+  @override
+  String get adhkarRoutineSelectAdhkar => 'Select Adhkar';
+
+  @override
+  String get adhkarRoutineSearchAdhkar => 'Search reviewed adhkar...';
+
+  @override
+  String get adhkarRoutineAlreadyAdded => 'Already added';
+
+  @override
+  String get adhkarRoutineDeleteConfirmTitle => 'Delete Routine?';
+
+  @override
+  String get adhkarRoutineDeleteConfirmDesc =>
+      'This routine and its unfinished reading session will be removed. Your completed history and bookmarks will be preserved.';
+
+  @override
+  String get adhkarRoutineSave => 'Save Routine';
+
+  @override
+  String get adhkarRoutineDelete => 'Delete';
+
+  @override
+  String get adhkarRoutineStart => 'Start';
+
+  @override
+  String get adhkarRoutineContinue => 'Continue';
+
+  @override
+  String get adhkarRoutinePersonalTag => 'Personal';
+
+  @override
+  String get adhkarRoutineRetiredNotice =>
+      'This remembrance was retired or modified in the library.';
+
+  @override
+  String get adhkarRoutineRetiredExplanation =>
+      'To preserve accuracy, please review this step. You can skip it, replace it with another reviewed dhikr, or exit.';
+
+  @override
+  String get adhkarRoutineSkipRetired => 'Skip Dhikr';
+
+  @override
+  String get adhkarRoutineReplaceRetired => 'Replace Dhikr';
+
+  @override
+  String get adhkarRoutineExit => 'Exit Routine';
+
+  @override
+  String get adhkarRoutineCompletedDesc =>
+      'You have completed your personal routine. May Allah accept your remembrance.';
+
+  @override
+  String get adhkarRoutineReorderHelp => 'Drag to reorder remembrances';
+
+  @override
+  String get adhkarViewAllRoutines => 'View all';
 }

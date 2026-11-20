@@ -3205,6 +3205,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Categories'**
   String get adhkarFilterCategories;
+
+  /// No description provided for @adhkarTabRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'My Routines'**
+  String get adhkarTabRoutines;
+
+  /// No description provided for @adhkarMyRoutinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Routines'**
+  String get adhkarMyRoutinesTitle;
+
+  /// No description provided for @adhkarMyRoutinesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal arrangements of reviewed Adhkar'**
+  String get adhkarMyRoutinesSubtitle;
+
+  /// No description provided for @adhkarMyRoutinesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Personal Routines'**
+  String get adhkarMyRoutinesEmptyTitle;
+
+  /// No description provided for @adhkarMyRoutinesEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create personal routines from reviewed Adhkar to recite in your own preferred order.'**
+  String get adhkarMyRoutinesEmptyDesc;
+
+  /// No description provided for @adhkarCreateRoutineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a routine'**
+  String get adhkarCreateRoutineButton;
+
+  /// No description provided for @adhkarNewRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Routine'**
+  String get adhkarNewRoutineTitle;
+
+  /// No description provided for @adhkarEditRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Routine'**
+  String get adhkarEditRoutineTitle;
+
+  /// No description provided for @adhkarRoutineNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine Name'**
+  String get adhkarRoutineNameLabel;
+
+  /// No description provided for @adhkarRoutineNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Morning Focus, Calm Night'**
+  String get adhkarRoutineNameHint;
+
+  /// No description provided for @adhkarRoutineNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a routine name'**
+  String get adhkarRoutineNameRequired;
+
+  /// No description provided for @adhkarRoutineItemsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Remembrances'**
+  String get adhkarRoutineItemsTitle;
+
+  /// No description provided for @adhkarRoutineAddItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Remembrances'**
+  String get adhkarRoutineAddItems;
+
+  /// No description provided for @adhkarRoutineNoItemsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one remembrance to your routine'**
+  String get adhkarRoutineNoItemsError;
+
+  /// No description provided for @adhkarRoutineDuplicateItemError.
+  ///
+  /// In en, this message translates to:
+  /// **'This remembrance is already in this routine'**
+  String get adhkarRoutineDuplicateItemError;
+
+  /// No description provided for @adhkarRoutineScheduleOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule (Optional)'**
+  String get adhkarRoutineScheduleOptional;
+
+  /// No description provided for @adhkarRoutineScheduleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizational only — helps plan your day without notifications'**
+  String get adhkarRoutineScheduleDesc;
+
+  /// No description provided for @adhkarRoutinePreferredTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Time'**
+  String get adhkarRoutinePreferredTime;
+
+  /// No description provided for @adhkarRoutinePreferredDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Days'**
+  String get adhkarRoutinePreferredDays;
+
+  /// No description provided for @adhkarRoutineNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'No time set'**
+  String get adhkarRoutineNoTime;
+
+  /// No description provided for @adhkarRoutineClearTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear time'**
+  String get adhkarRoutineClearTime;
+
+  /// No description provided for @adhkarRoutineSelectAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Adhkar'**
+  String get adhkarRoutineSelectAdhkar;
+
+  /// No description provided for @adhkarRoutineSearchAdhkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Search reviewed adhkar...'**
+  String get adhkarRoutineSearchAdhkar;
+
+  /// No description provided for @adhkarRoutineAlreadyAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Already added'**
+  String get adhkarRoutineAlreadyAdded;
+
+  /// No description provided for @adhkarRoutineDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Routine?'**
+  String get adhkarRoutineDeleteConfirmTitle;
+
+  /// No description provided for @adhkarRoutineDeleteConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This routine and its unfinished reading session will be removed. Your completed history and bookmarks will be preserved.'**
+  String get adhkarRoutineDeleteConfirmDesc;
+
+  /// No description provided for @adhkarRoutineSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Routine'**
+  String get adhkarRoutineSave;
+
+  /// No description provided for @adhkarRoutineDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get adhkarRoutineDelete;
+
+  /// No description provided for @adhkarRoutineStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get adhkarRoutineStart;
+
+  /// No description provided for @adhkarRoutineContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get adhkarRoutineContinue;
+
+  /// No description provided for @adhkarRoutinePersonalTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get adhkarRoutinePersonalTag;
+
+  /// No description provided for @adhkarRoutineRetiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This remembrance was retired or modified in the library.'**
+  String get adhkarRoutineRetiredNotice;
+
+  /// No description provided for @adhkarRoutineRetiredExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'To preserve accuracy, please review this step. You can skip it, replace it with another reviewed dhikr, or exit.'**
+  String get adhkarRoutineRetiredExplanation;
+
+  /// No description provided for @adhkarRoutineSkipRetired.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Dhikr'**
+  String get adhkarRoutineSkipRetired;
+
+  /// No description provided for @adhkarRoutineReplaceRetired.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace Dhikr'**
+  String get adhkarRoutineReplaceRetired;
+
+  /// No description provided for @adhkarRoutineExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Routine'**
+  String get adhkarRoutineExit;
+
+  /// No description provided for @adhkarRoutineCompletedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have completed your personal routine. May Allah accept your remembrance.'**
+  String get adhkarRoutineCompletedDesc;
+
+  /// No description provided for @adhkarRoutineReorderHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder remembrances'**
+  String get adhkarRoutineReorderHelp;
+
+  /// No description provided for @adhkarViewAllRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get adhkarViewAllRoutines;
 }
 
 class _AppLocalizationsDelegate

@@ -4,6 +4,7 @@ class AdhkarSessionRecord {
   final Map<String, int> counts;
   final DateTime lastAccessedAt;
   final bool isCompleted;
+  final Set<String> skippedItemIds;
 
   const AdhkarSessionRecord({
     required this.collectionId,
@@ -11,6 +12,7 @@ class AdhkarSessionRecord {
     required this.counts,
     required this.lastAccessedAt,
     this.isCompleted = false,
+    this.skippedItemIds = const {},
   });
 
   AdhkarSessionRecord copyWith({
@@ -19,6 +21,7 @@ class AdhkarSessionRecord {
     Map<String, int>? counts,
     DateTime? lastAccessedAt,
     bool? isCompleted,
+    Set<String>? skippedItemIds,
   }) {
     return AdhkarSessionRecord(
       collectionId: collectionId ?? this.collectionId,
@@ -26,6 +29,7 @@ class AdhkarSessionRecord {
       counts: counts ?? this.counts,
       lastAccessedAt: lastAccessedAt ?? this.lastAccessedAt,
       isCompleted: isCompleted ?? this.isCompleted,
+      skippedItemIds: skippedItemIds ?? this.skippedItemIds,
     );
   }
 }

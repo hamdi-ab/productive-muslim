@@ -7,6 +7,7 @@ import 'package:productive_muslim/data/catalogs/adhkar_catalog.dart';
 import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
@@ -226,12 +227,17 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
     required String collectionId,
     required int lastPageIndex,
     required Map<String, int> counts,
+    List<String>? skippedItemIds,
     bool isCompleted = false,
   }) {
+    final Map<String, dynamic> payload = Map<String, dynamic>.from(counts);
+    if (skippedItemIds != null && skippedItemIds.isNotEmpty) {
+      payload['__skipped__'] = skippedItemIds;
+    }
     return _adhkarDao.saveSession(
       collectionId: _canonicalCollectionId(collectionId),
       lastPageIndex: lastPageIndex,
-      countsJson: jsonEncode(counts),
+      countsJson: jsonEncode(payload),
       lastAccessedAt: DateTime.now().millisecondsSinceEpoch,
       isCompleted: isCompleted,
     );
@@ -317,6 +323,179 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       _canonicalCollectionId(collectionId),
       targetDate,
     );
+  }
+
+  // --- Personal Routines ---
+
+  @override
+  Future<List<AdhkarRoutine>> getRoutines() async {
+    final rows = await _adhkarDao.getAllRoutines();
+    return rows.map(_mapRoutineRow).toList();
+  }
+
+  @override
+  Stream<List<AdhkarRoutine>> watchRoutines() {
+    return _adhkarDao.watchAllRoutines().map(
+      (rows) => rows.map(_mapRoutineRow).toList(),
+    );
+  }
+
+  @override
+  Future<AdhkarRoutine?> getRoutineById(String id) async {
+    final row = await _adhkarDao.getRoutine(id);
+    return row != null ? _mapRoutineRow(row) : null;
+  }
+
+  @override
+  Future<void> saveRoutine(AdhkarRoutine routine) async {
+    await _adhkarDao.saveRoutine(
+      id: routine.id,
+      name: routine.name,
+      itemIdsJson: jsonEncode(routine.itemIds),
+      preferredTime: routine.preferredTime,
+      weekdaysJson: routine.weekdays.isNotEmpty
+          ? jsonEncode(routine.weekdays)
+          : null,
+      createdAt: routine.createdAt.millisecondsSinceEpoch,
+      updatedAt: routine.updatedAt.millisecondsSinceEpoch,
+      retiredItemIdsJson: routine.retiredItemIds.isNotEmpty
+          ? jsonEncode(routine.retiredItemIds)
+          : null,
+    );
+  }
+
+  @override
+  Future<void> updateRoutineWithProgressPreservation(
+    AdhkarRoutine updatedRoutine,
+  ) async {
+    final existingRoutine = await getRoutineById(updatedRoutine.id);
+    if (existingRoutine != null) {
+      final sessionColId = 'routine_${updatedRoutine.id}';
+      final existingSession = await getSession(sessionColId);
+
+      if (existingSession != null) {
+        final updatedItemIdsSet = updatedRoutine.itemIds.toSet();
+        final newCounts = Map<String, int>.from(existingSession.counts);
+
+        // Remove counts for items that are no longer in the routine
+        newCounts.removeWhere((id, _) => !updatedItemIdsSet.contains(id));
+
+        // Determine new lastPageIndex
+        int newPageIndex = 0;
+        if (updatedRoutine.itemIds.isNotEmpty) {
+          final oldItemIds = existingRoutine.itemIds;
+          final oldIndex = existingSession.lastPageIndex;
+
+          if (oldIndex >= 0 && oldIndex < oldItemIds.length) {
+            final oldCurrentItemId = oldItemIds[oldIndex];
+            if (updatedItemIdsSet.contains(oldCurrentItemId)) {
+              // Current item still exists in the routine at a possibly new position
+              newPageIndex = updatedRoutine.itemIds.indexOf(oldCurrentItemId);
+            } else {
+              // Current item was removed: move safely to next valid entry in the routine
+              int foundIndex = -1;
+              for (int i = oldIndex + 1; i < oldItemIds.length; i++) {
+                if (updatedItemIdsSet.contains(oldItemIds[i])) {
+                  foundIndex = updatedRoutine.itemIds.indexOf(oldItemIds[i]);
+                  break;
+                }
+              }
+              if (foundIndex == -1) {
+                for (int i = oldIndex - 1; i >= 0; i--) {
+                  if (updatedItemIdsSet.contains(oldItemIds[i])) {
+                    foundIndex = updatedRoutine.itemIds.indexOf(oldItemIds[i]);
+                    break;
+                  }
+                }
+              }
+              newPageIndex = foundIndex != -1 ? foundIndex : 0;
+            }
+          }
+          newPageIndex = newPageIndex.clamp(
+            0,
+            updatedRoutine.itemIds.length - 1,
+          );
+        }
+
+        // Check if all items in updatedRoutine are now completed with preserved counts
+        final isCompleted =
+            updatedRoutine.itemIds.isNotEmpty &&
+            updatedRoutine.itemIds.every((id) {
+              final target =
+                  getById(id, includePendingReview: true)?.targetCount ?? 1;
+              return (newCounts[id] ?? 0) >= target;
+            });
+
+        final newSkipped = existingSession.skippedItemIds
+            .where((id) => updatedItemIdsSet.contains(id))
+            .toList();
+
+        await saveSession(
+          collectionId: sessionColId,
+          lastPageIndex: newPageIndex,
+          counts: newCounts,
+          skippedItemIds: newSkipped,
+          isCompleted: isCompleted,
+        );
+      }
+    }
+
+    await saveRoutine(updatedRoutine);
+  }
+
+  @override
+  Future<void> deleteRoutine(String id) async {
+    await _adhkarDao.deleteRoutine(id);
+  }
+
+  // --- Routine Completions ---
+
+  @override
+  Future<void> recordRoutineCompletion({
+    required String routineId,
+    required String routineName,
+    String? date,
+  }) {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    return _adhkarDao.logRoutineCompletion(
+      routineId: routineId,
+      routineName: routineName,
+      date: targetDate,
+      completedAt: DateTime.now().millisecondsSinceEpoch,
+    );
+  }
+
+  @override
+  Future<bool> isRoutineCompletedToday(String routineId, {String? date}) {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    return _adhkarDao.isRoutineCompletedOnDate(routineId, targetDate);
+  }
+
+  @override
+  Stream<bool> watchIsRoutineCompletedToday(String routineId, {String? date}) {
+    final targetDate =
+        date ?? DateTime.now().toIso8601String().substring(0, 10);
+    return _adhkarDao.watchIsRoutineCompletedOnDate(routineId, targetDate);
+  }
+
+  @override
+  Future<List<AdhkarRoutineCompletion>> getRoutineCompletionsForDate(
+    String date,
+  ) async {
+    final rows = await _adhkarDao.getRoutineCompletionsForDate(date);
+    return rows.map(_mapRoutineCompletionRow).toList();
+  }
+
+  @override
+  Future<List<AdhkarRoutineCompletion>> getRoutineCompletionHistory({
+    String? routineId,
+  }) async {
+    final rows = await _adhkarDao.getAllRoutineCompletions(
+      routineId: routineId,
+    );
+    return rows.map(_mapRoutineCompletionRow).toList();
   }
 
   // --- Migration ---
@@ -452,12 +631,21 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
 
   AdhkarSessionRecord _mapSessionRow(AdhkarSession row) {
     Map<String, int> counts = {};
+    Set<String> skippedItemIds = {};
     try {
       final decoded = jsonDecode(row.countsJson);
       if (decoded is Map) {
-        counts = decoded.map(
-          (k, v) => MapEntry(k.toString(), (v as num).toInt()),
-        );
+        if (decoded.containsKey('__skipped__') &&
+            decoded['__skipped__'] is List) {
+          skippedItemIds = (decoded['__skipped__'] as List)
+              .map((e) => e.toString())
+              .toSet();
+        }
+        for (final entry in decoded.entries) {
+          if (entry.key != '__skipped__' && entry.value is num) {
+            counts[entry.key.toString()] = (entry.value as num).toInt();
+          }
+        }
       }
     } catch (_) {}
 
@@ -467,6 +655,7 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       counts: counts,
       lastAccessedAt: DateTime.fromMillisecondsSinceEpoch(row.lastAccessedAt),
       isCompleted: row.isCompleted,
+      skippedItemIds: skippedItemIds,
     );
   }
 
@@ -478,5 +667,58 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       if (cat.name == name) return cat;
     }
     return null;
+  }
+
+  AdhkarRoutine _mapRoutineRow(AdhkarRoutineEntry row) {
+    List<String> itemIds = [];
+    try {
+      final decoded = jsonDecode(row.itemIdsJson);
+      if (decoded is List) {
+        itemIds = decoded.map((e) => e.toString()).toList();
+      }
+    } catch (_) {}
+
+    List<int> weekdays = [];
+    if (row.weekdaysJson != null) {
+      try {
+        final decoded = jsonDecode(row.weekdaysJson!);
+        if (decoded is List) {
+          weekdays = decoded.map((e) => (e as num).toInt()).toList();
+        }
+      } catch (_) {}
+    }
+
+    List<String> retiredItemIds = [];
+    if (row.retiredItemIdsJson != null) {
+      try {
+        final decoded = jsonDecode(row.retiredItemIdsJson!);
+        if (decoded is List) {
+          retiredItemIds = decoded.map((e) => e.toString()).toList();
+        }
+      } catch (_) {}
+    }
+
+    return AdhkarRoutine(
+      id: row.id,
+      name: row.name,
+      itemIds: itemIds,
+      preferredTime: row.preferredTime,
+      weekdays: weekdays,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
+      retiredItemIds: retiredItemIds,
+    );
+  }
+
+  AdhkarRoutineCompletion _mapRoutineCompletionRow(
+    AdhkarRoutineCompletionEntry row,
+  ) {
+    return AdhkarRoutineCompletion(
+      id: row.id,
+      routineId: row.routineId,
+      routineName: row.routineName,
+      date: row.date,
+      completedAt: DateTime.fromMillisecondsSinceEpoch(row.completedAt),
+    );
   }
 }

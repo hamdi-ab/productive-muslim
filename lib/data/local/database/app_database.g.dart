@@ -4889,6 +4889,919 @@ class AdhkarCompletionsCompanion extends UpdateCompanion<AdhkarCompletion> {
   }
 }
 
+class $AdhkarRoutinesTable extends AdhkarRoutines
+    with TableInfo<$AdhkarRoutinesTable, AdhkarRoutineEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarRoutinesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _itemIdsJsonMeta = const VerificationMeta(
+    'itemIdsJson',
+  );
+  @override
+  late final GeneratedColumn<String> itemIdsJson = GeneratedColumn<String>(
+    'item_ids_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _preferredTimeMeta = const VerificationMeta(
+    'preferredTime',
+  );
+  @override
+  late final GeneratedColumn<String> preferredTime = GeneratedColumn<String>(
+    'preferred_time',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _weekdaysJsonMeta = const VerificationMeta(
+    'weekdaysJson',
+  );
+  @override
+  late final GeneratedColumn<String> weekdaysJson = GeneratedColumn<String>(
+    'weekdays_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _retiredItemIdsJsonMeta =
+      const VerificationMeta('retiredItemIdsJson');
+  @override
+  late final GeneratedColumn<String> retiredItemIdsJson =
+      GeneratedColumn<String>(
+        'retired_item_ids_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    itemIdsJson,
+    preferredTime,
+    weekdaysJson,
+    createdAt,
+    updatedAt,
+    retiredItemIdsJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_routines';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarRoutineEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('item_ids_json')) {
+      context.handle(
+        _itemIdsJsonMeta,
+        itemIdsJson.isAcceptableOrUnknown(
+          data['item_ids_json']!,
+          _itemIdsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_itemIdsJsonMeta);
+    }
+    if (data.containsKey('preferred_time')) {
+      context.handle(
+        _preferredTimeMeta,
+        preferredTime.isAcceptableOrUnknown(
+          data['preferred_time']!,
+          _preferredTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('weekdays_json')) {
+      context.handle(
+        _weekdaysJsonMeta,
+        weekdaysJson.isAcceptableOrUnknown(
+          data['weekdays_json']!,
+          _weekdaysJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('retired_item_ids_json')) {
+      context.handle(
+        _retiredItemIdsJsonMeta,
+        retiredItemIdsJson.isAcceptableOrUnknown(
+          data['retired_item_ids_json']!,
+          _retiredItemIdsJsonMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AdhkarRoutineEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarRoutineEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      itemIdsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}item_ids_json'],
+      )!,
+      preferredTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}preferred_time'],
+      ),
+      weekdaysJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}weekdays_json'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      retiredItemIdsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}retired_item_ids_json'],
+      ),
+    );
+  }
+
+  @override
+  $AdhkarRoutinesTable createAlias(String alias) {
+    return $AdhkarRoutinesTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarRoutineEntry extends DataClass
+    implements Insertable<AdhkarRoutineEntry> {
+  final String id;
+  final String name;
+  final String itemIdsJson;
+  final String? preferredTime;
+  final String? weekdaysJson;
+  final int createdAt;
+  final int updatedAt;
+  final String? retiredItemIdsJson;
+  const AdhkarRoutineEntry({
+    required this.id,
+    required this.name,
+    required this.itemIdsJson,
+    this.preferredTime,
+    this.weekdaysJson,
+    required this.createdAt,
+    required this.updatedAt,
+    this.retiredItemIdsJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['item_ids_json'] = Variable<String>(itemIdsJson);
+    if (!nullToAbsent || preferredTime != null) {
+      map['preferred_time'] = Variable<String>(preferredTime);
+    }
+    if (!nullToAbsent || weekdaysJson != null) {
+      map['weekdays_json'] = Variable<String>(weekdaysJson);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || retiredItemIdsJson != null) {
+      map['retired_item_ids_json'] = Variable<String>(retiredItemIdsJson);
+    }
+    return map;
+  }
+
+  AdhkarRoutinesCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarRoutinesCompanion(
+      id: Value(id),
+      name: Value(name),
+      itemIdsJson: Value(itemIdsJson),
+      preferredTime: preferredTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(preferredTime),
+      weekdaysJson: weekdaysJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weekdaysJson),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      retiredItemIdsJson: retiredItemIdsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(retiredItemIdsJson),
+    );
+  }
+
+  factory AdhkarRoutineEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarRoutineEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      itemIdsJson: serializer.fromJson<String>(json['itemIdsJson']),
+      preferredTime: serializer.fromJson<String?>(json['preferredTime']),
+      weekdaysJson: serializer.fromJson<String?>(json['weekdaysJson']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      retiredItemIdsJson: serializer.fromJson<String?>(
+        json['retiredItemIdsJson'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'itemIdsJson': serializer.toJson<String>(itemIdsJson),
+      'preferredTime': serializer.toJson<String?>(preferredTime),
+      'weekdaysJson': serializer.toJson<String?>(weekdaysJson),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+      'retiredItemIdsJson': serializer.toJson<String?>(retiredItemIdsJson),
+    };
+  }
+
+  AdhkarRoutineEntry copyWith({
+    String? id,
+    String? name,
+    String? itemIdsJson,
+    Value<String?> preferredTime = const Value.absent(),
+    Value<String?> weekdaysJson = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+    Value<String?> retiredItemIdsJson = const Value.absent(),
+  }) => AdhkarRoutineEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    itemIdsJson: itemIdsJson ?? this.itemIdsJson,
+    preferredTime: preferredTime.present
+        ? preferredTime.value
+        : this.preferredTime,
+    weekdaysJson: weekdaysJson.present ? weekdaysJson.value : this.weekdaysJson,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    retiredItemIdsJson: retiredItemIdsJson.present
+        ? retiredItemIdsJson.value
+        : this.retiredItemIdsJson,
+  );
+  AdhkarRoutineEntry copyWithCompanion(AdhkarRoutinesCompanion data) {
+    return AdhkarRoutineEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      itemIdsJson: data.itemIdsJson.present
+          ? data.itemIdsJson.value
+          : this.itemIdsJson,
+      preferredTime: data.preferredTime.present
+          ? data.preferredTime.value
+          : this.preferredTime,
+      weekdaysJson: data.weekdaysJson.present
+          ? data.weekdaysJson.value
+          : this.weekdaysJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      retiredItemIdsJson: data.retiredItemIdsJson.present
+          ? data.retiredItemIdsJson.value
+          : this.retiredItemIdsJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarRoutineEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('itemIdsJson: $itemIdsJson, ')
+          ..write('preferredTime: $preferredTime, ')
+          ..write('weekdaysJson: $weekdaysJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('retiredItemIdsJson: $retiredItemIdsJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    itemIdsJson,
+    preferredTime,
+    weekdaysJson,
+    createdAt,
+    updatedAt,
+    retiredItemIdsJson,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarRoutineEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.itemIdsJson == this.itemIdsJson &&
+          other.preferredTime == this.preferredTime &&
+          other.weekdaysJson == this.weekdaysJson &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.retiredItemIdsJson == this.retiredItemIdsJson);
+}
+
+class AdhkarRoutinesCompanion extends UpdateCompanion<AdhkarRoutineEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> itemIdsJson;
+  final Value<String?> preferredTime;
+  final Value<String?> weekdaysJson;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<String?> retiredItemIdsJson;
+  final Value<int> rowid;
+  const AdhkarRoutinesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.itemIdsJson = const Value.absent(),
+    this.preferredTime = const Value.absent(),
+    this.weekdaysJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.retiredItemIdsJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AdhkarRoutinesCompanion.insert({
+    required String id,
+    required String name,
+    required String itemIdsJson,
+    this.preferredTime = const Value.absent(),
+    this.weekdaysJson = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.retiredItemIdsJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       itemIdsJson = Value(itemIdsJson),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<AdhkarRoutineEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? itemIdsJson,
+    Expression<String>? preferredTime,
+    Expression<String>? weekdaysJson,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<String>? retiredItemIdsJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (itemIdsJson != null) 'item_ids_json': itemIdsJson,
+      if (preferredTime != null) 'preferred_time': preferredTime,
+      if (weekdaysJson != null) 'weekdays_json': weekdaysJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (retiredItemIdsJson != null)
+        'retired_item_ids_json': retiredItemIdsJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AdhkarRoutinesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? itemIdsJson,
+    Value<String?>? preferredTime,
+    Value<String?>? weekdaysJson,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<String?>? retiredItemIdsJson,
+    Value<int>? rowid,
+  }) {
+    return AdhkarRoutinesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      itemIdsJson: itemIdsJson ?? this.itemIdsJson,
+      preferredTime: preferredTime ?? this.preferredTime,
+      weekdaysJson: weekdaysJson ?? this.weekdaysJson,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      retiredItemIdsJson: retiredItemIdsJson ?? this.retiredItemIdsJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (itemIdsJson.present) {
+      map['item_ids_json'] = Variable<String>(itemIdsJson.value);
+    }
+    if (preferredTime.present) {
+      map['preferred_time'] = Variable<String>(preferredTime.value);
+    }
+    if (weekdaysJson.present) {
+      map['weekdays_json'] = Variable<String>(weekdaysJson.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (retiredItemIdsJson.present) {
+      map['retired_item_ids_json'] = Variable<String>(retiredItemIdsJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarRoutinesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('itemIdsJson: $itemIdsJson, ')
+          ..write('preferredTime: $preferredTime, ')
+          ..write('weekdaysJson: $weekdaysJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('retiredItemIdsJson: $retiredItemIdsJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AdhkarRoutineCompletionsTable extends AdhkarRoutineCompletions
+    with
+        TableInfo<
+          $AdhkarRoutineCompletionsTable,
+          AdhkarRoutineCompletionEntry
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarRoutineCompletionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _routineIdMeta = const VerificationMeta(
+    'routineId',
+  );
+  @override
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
+    'routine_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _routineNameMeta = const VerificationMeta(
+    'routineName',
+  );
+  @override
+  late final GeneratedColumn<String> routineName = GeneratedColumn<String>(
+    'routine_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<int> completedAt = GeneratedColumn<int>(
+    'completed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    routineId,
+    routineName,
+    date,
+    completedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_routine_completions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarRoutineCompletionEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('routine_id')) {
+      context.handle(
+        _routineIdMeta,
+        routineId.isAcceptableOrUnknown(data['routine_id']!, _routineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_routineIdMeta);
+    }
+    if (data.containsKey('routine_name')) {
+      context.handle(
+        _routineNameMeta,
+        routineName.isAcceptableOrUnknown(
+          data['routine_name']!,
+          _routineNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_routineNameMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_completedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AdhkarRoutineCompletionEntry map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarRoutineCompletionEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      routineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_id'],
+      )!,
+      routineName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}routine_name'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AdhkarRoutineCompletionsTable createAlias(String alias) {
+    return $AdhkarRoutineCompletionsTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarRoutineCompletionEntry extends DataClass
+    implements Insertable<AdhkarRoutineCompletionEntry> {
+  final int id;
+  final String routineId;
+  final String routineName;
+  final String date;
+  final int completedAt;
+  const AdhkarRoutineCompletionEntry({
+    required this.id,
+    required this.routineId,
+    required this.routineName,
+    required this.date,
+    required this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['routine_id'] = Variable<String>(routineId);
+    map['routine_name'] = Variable<String>(routineName);
+    map['date'] = Variable<String>(date);
+    map['completed_at'] = Variable<int>(completedAt);
+    return map;
+  }
+
+  AdhkarRoutineCompletionsCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarRoutineCompletionsCompanion(
+      id: Value(id),
+      routineId: Value(routineId),
+      routineName: Value(routineName),
+      date: Value(date),
+      completedAt: Value(completedAt),
+    );
+  }
+
+  factory AdhkarRoutineCompletionEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarRoutineCompletionEntry(
+      id: serializer.fromJson<int>(json['id']),
+      routineId: serializer.fromJson<String>(json['routineId']),
+      routineName: serializer.fromJson<String>(json['routineName']),
+      date: serializer.fromJson<String>(json['date']),
+      completedAt: serializer.fromJson<int>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'routineId': serializer.toJson<String>(routineId),
+      'routineName': serializer.toJson<String>(routineName),
+      'date': serializer.toJson<String>(date),
+      'completedAt': serializer.toJson<int>(completedAt),
+    };
+  }
+
+  AdhkarRoutineCompletionEntry copyWith({
+    int? id,
+    String? routineId,
+    String? routineName,
+    String? date,
+    int? completedAt,
+  }) => AdhkarRoutineCompletionEntry(
+    id: id ?? this.id,
+    routineId: routineId ?? this.routineId,
+    routineName: routineName ?? this.routineName,
+    date: date ?? this.date,
+    completedAt: completedAt ?? this.completedAt,
+  );
+  AdhkarRoutineCompletionEntry copyWithCompanion(
+    AdhkarRoutineCompletionsCompanion data,
+  ) {
+    return AdhkarRoutineCompletionEntry(
+      id: data.id.present ? data.id.value : this.id,
+      routineId: data.routineId.present ? data.routineId.value : this.routineId,
+      routineName: data.routineName.present
+          ? data.routineName.value
+          : this.routineName,
+      date: data.date.present ? data.date.value : this.date,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarRoutineCompletionEntry(')
+          ..write('id: $id, ')
+          ..write('routineId: $routineId, ')
+          ..write('routineName: $routineName, ')
+          ..write('date: $date, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, routineId, routineName, date, completedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarRoutineCompletionEntry &&
+          other.id == this.id &&
+          other.routineId == this.routineId &&
+          other.routineName == this.routineName &&
+          other.date == this.date &&
+          other.completedAt == this.completedAt);
+}
+
+class AdhkarRoutineCompletionsCompanion
+    extends UpdateCompanion<AdhkarRoutineCompletionEntry> {
+  final Value<int> id;
+  final Value<String> routineId;
+  final Value<String> routineName;
+  final Value<String> date;
+  final Value<int> completedAt;
+  const AdhkarRoutineCompletionsCompanion({
+    this.id = const Value.absent(),
+    this.routineId = const Value.absent(),
+    this.routineName = const Value.absent(),
+    this.date = const Value.absent(),
+    this.completedAt = const Value.absent(),
+  });
+  AdhkarRoutineCompletionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String routineId,
+    required String routineName,
+    required String date,
+    required int completedAt,
+  }) : routineId = Value(routineId),
+       routineName = Value(routineName),
+       date = Value(date),
+       completedAt = Value(completedAt);
+  static Insertable<AdhkarRoutineCompletionEntry> custom({
+    Expression<int>? id,
+    Expression<String>? routineId,
+    Expression<String>? routineName,
+    Expression<String>? date,
+    Expression<int>? completedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (routineId != null) 'routine_id': routineId,
+      if (routineName != null) 'routine_name': routineName,
+      if (date != null) 'date': date,
+      if (completedAt != null) 'completed_at': completedAt,
+    });
+  }
+
+  AdhkarRoutineCompletionsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? routineId,
+    Value<String>? routineName,
+    Value<String>? date,
+    Value<int>? completedAt,
+  }) {
+    return AdhkarRoutineCompletionsCompanion(
+      id: id ?? this.id,
+      routineId: routineId ?? this.routineId,
+      routineName: routineName ?? this.routineName,
+      date: date ?? this.date,
+      completedAt: completedAt ?? this.completedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (routineId.present) {
+      map['routine_id'] = Variable<String>(routineId.value);
+    }
+    if (routineName.present) {
+      map['routine_name'] = Variable<String>(routineName.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(completedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarRoutineCompletionsCompanion(')
+          ..write('id: $id, ')
+          ..write('routineId: $routineId, ')
+          ..write('routineName: $routineName, ')
+          ..write('date: $date, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4913,6 +5826,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AdhkarSessionsTable adhkarSessions = $AdhkarSessionsTable(this);
   late final $AdhkarCompletionsTable adhkarCompletions =
       $AdhkarCompletionsTable(this);
+  late final $AdhkarRoutinesTable adhkarRoutines = $AdhkarRoutinesTable(this);
+  late final $AdhkarRoutineCompletionsTable adhkarRoutineCompletions =
+      $AdhkarRoutineCompletionsTable(this);
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitCompletionsDao habitCompletionsDao = HabitCompletionsDao(
@@ -4938,6 +5854,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     adhkarBookmarks,
     adhkarSessions,
     adhkarCompletions,
+    adhkarRoutines,
+    adhkarRoutineCompletions,
   ];
 }
 
@@ -7643,6 +8561,515 @@ typedef $$AdhkarCompletionsTableProcessedTableManager =
       AdhkarCompletion,
       PrefetchHooks Function()
     >;
+typedef $$AdhkarRoutinesTableCreateCompanionBuilder =
+    AdhkarRoutinesCompanion Function({
+      required String id,
+      required String name,
+      required String itemIdsJson,
+      Value<String?> preferredTime,
+      Value<String?> weekdaysJson,
+      required int createdAt,
+      required int updatedAt,
+      Value<String?> retiredItemIdsJson,
+      Value<int> rowid,
+    });
+typedef $$AdhkarRoutinesTableUpdateCompanionBuilder =
+    AdhkarRoutinesCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> itemIdsJson,
+      Value<String?> preferredTime,
+      Value<String?> weekdaysJson,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<String?> retiredItemIdsJson,
+      Value<int> rowid,
+    });
+
+class $$AdhkarRoutinesTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutinesTable> {
+  $$AdhkarRoutinesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get itemIdsJson => $composableBuilder(
+    column: $table.itemIdsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get preferredTime => $composableBuilder(
+    column: $table.preferredTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get weekdaysJson => $composableBuilder(
+    column: $table.weekdaysJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get retiredItemIdsJson => $composableBuilder(
+    column: $table.retiredItemIdsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarRoutinesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutinesTable> {
+  $$AdhkarRoutinesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get itemIdsJson => $composableBuilder(
+    column: $table.itemIdsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get preferredTime => $composableBuilder(
+    column: $table.preferredTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get weekdaysJson => $composableBuilder(
+    column: $table.weekdaysJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get retiredItemIdsJson => $composableBuilder(
+    column: $table.retiredItemIdsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarRoutinesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutinesTable> {
+  $$AdhkarRoutinesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get itemIdsJson => $composableBuilder(
+    column: $table.itemIdsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get preferredTime => $composableBuilder(
+    column: $table.preferredTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get weekdaysJson => $composableBuilder(
+    column: $table.weekdaysJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get retiredItemIdsJson => $composableBuilder(
+    column: $table.retiredItemIdsJson,
+    builder: (column) => column,
+  );
+}
+
+class $$AdhkarRoutinesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarRoutinesTable,
+          AdhkarRoutineEntry,
+          $$AdhkarRoutinesTableFilterComposer,
+          $$AdhkarRoutinesTableOrderingComposer,
+          $$AdhkarRoutinesTableAnnotationComposer,
+          $$AdhkarRoutinesTableCreateCompanionBuilder,
+          $$AdhkarRoutinesTableUpdateCompanionBuilder,
+          (
+            AdhkarRoutineEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $AdhkarRoutinesTable,
+              AdhkarRoutineEntry
+            >,
+          ),
+          AdhkarRoutineEntry,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarRoutinesTableTableManager(
+    _$AppDatabase db,
+    $AdhkarRoutinesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarRoutinesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AdhkarRoutinesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AdhkarRoutinesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> itemIdsJson = const Value.absent(),
+                Value<String?> preferredTime = const Value.absent(),
+                Value<String?> weekdaysJson = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<String?> retiredItemIdsJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarRoutinesCompanion(
+                id: id,
+                name: name,
+                itemIdsJson: itemIdsJson,
+                preferredTime: preferredTime,
+                weekdaysJson: weekdaysJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                retiredItemIdsJson: retiredItemIdsJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String itemIdsJson,
+                Value<String?> preferredTime = const Value.absent(),
+                Value<String?> weekdaysJson = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<String?> retiredItemIdsJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarRoutinesCompanion.insert(
+                id: id,
+                name: name,
+                itemIdsJson: itemIdsJson,
+                preferredTime: preferredTime,
+                weekdaysJson: weekdaysJson,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                retiredItemIdsJson: retiredItemIdsJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AdhkarRoutinesTable, AdhkarRoutineEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarRoutinesTable,
+                    AdhkarRoutineEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarRoutinesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarRoutinesTable,
+      AdhkarRoutineEntry,
+      $$AdhkarRoutinesTableFilterComposer,
+      $$AdhkarRoutinesTableOrderingComposer,
+      $$AdhkarRoutinesTableAnnotationComposer,
+      $$AdhkarRoutinesTableCreateCompanionBuilder,
+      $$AdhkarRoutinesTableUpdateCompanionBuilder,
+      (
+        AdhkarRoutineEntry,
+        BaseReferences<_$AppDatabase, $AdhkarRoutinesTable, AdhkarRoutineEntry>,
+      ),
+      AdhkarRoutineEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$AdhkarRoutineCompletionsTableCreateCompanionBuilder =
+    AdhkarRoutineCompletionsCompanion Function({
+      Value<int> id,
+      required String routineId,
+      required String routineName,
+      required String date,
+      required int completedAt,
+    });
+typedef $$AdhkarRoutineCompletionsTableUpdateCompanionBuilder =
+    AdhkarRoutineCompletionsCompanion Function({
+      Value<int> id,
+      Value<String> routineId,
+      Value<String> routineName,
+      Value<String> date,
+      Value<int> completedAt,
+    });
+
+class $$AdhkarRoutineCompletionsTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutineCompletionsTable> {
+  $$AdhkarRoutineCompletionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get routineName => $composableBuilder(
+    column: $table.routineName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarRoutineCompletionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutineCompletionsTable> {
+  $$AdhkarRoutineCompletionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineId => $composableBuilder(
+    column: $table.routineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routineName => $composableBuilder(
+    column: $table.routineName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarRoutineCompletionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarRoutineCompletionsTable> {
+  $$AdhkarRoutineCompletionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get routineId =>
+      $composableBuilder(column: $table.routineId, builder: (column) => column);
+
+  GeneratedColumn<String> get routineName => $composableBuilder(
+    column: $table.routineName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$AdhkarRoutineCompletionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarRoutineCompletionsTable,
+          AdhkarRoutineCompletionEntry,
+          $$AdhkarRoutineCompletionsTableFilterComposer,
+          $$AdhkarRoutineCompletionsTableOrderingComposer,
+          $$AdhkarRoutineCompletionsTableAnnotationComposer,
+          $$AdhkarRoutineCompletionsTableCreateCompanionBuilder,
+          $$AdhkarRoutineCompletionsTableUpdateCompanionBuilder,
+          (
+            AdhkarRoutineCompletionEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $AdhkarRoutineCompletionsTable,
+              AdhkarRoutineCompletionEntry
+            >,
+          ),
+          AdhkarRoutineCompletionEntry,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarRoutineCompletionsTableTableManager(
+    _$AppDatabase db,
+    $AdhkarRoutineCompletionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarRoutineCompletionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AdhkarRoutineCompletionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AdhkarRoutineCompletionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> routineId = const Value.absent(),
+                Value<String> routineName = const Value.absent(),
+                Value<String> date = const Value.absent(),
+                Value<int> completedAt = const Value.absent(),
+              }) => AdhkarRoutineCompletionsCompanion(
+                id: id,
+                routineId: routineId,
+                routineName: routineName,
+                date: date,
+                completedAt: completedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String routineId,
+                required String routineName,
+                required String date,
+                required int completedAt,
+              }) => AdhkarRoutineCompletionsCompanion.insert(
+                id: id,
+                routineId: routineId,
+                routineName: routineName,
+                date: date,
+                completedAt: completedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $AdhkarRoutineCompletionsTable,
+                    AdhkarRoutineCompletionEntry
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarRoutineCompletionsTable,
+                    AdhkarRoutineCompletionEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarRoutineCompletionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarRoutineCompletionsTable,
+      AdhkarRoutineCompletionEntry,
+      $$AdhkarRoutineCompletionsTableFilterComposer,
+      $$AdhkarRoutineCompletionsTableOrderingComposer,
+      $$AdhkarRoutineCompletionsTableAnnotationComposer,
+      $$AdhkarRoutineCompletionsTableCreateCompanionBuilder,
+      $$AdhkarRoutineCompletionsTableUpdateCompanionBuilder,
+      (
+        AdhkarRoutineCompletionEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $AdhkarRoutineCompletionsTable,
+          AdhkarRoutineCompletionEntry
+        >,
+      ),
+      AdhkarRoutineCompletionEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7669,4 +9096,11 @@ class $AppDatabaseManager {
       $$AdhkarSessionsTableTableManager(_db, _db.adhkarSessions);
   $$AdhkarCompletionsTableTableManager get adhkarCompletions =>
       $$AdhkarCompletionsTableTableManager(_db, _db.adhkarCompletions);
+  $$AdhkarRoutinesTableTableManager get adhkarRoutines =>
+      $$AdhkarRoutinesTableTableManager(_db, _db.adhkarRoutines);
+  $$AdhkarRoutineCompletionsTableTableManager get adhkarRoutineCompletions =>
+      $$AdhkarRoutineCompletionsTableTableManager(
+        _db,
+        _db.adhkarRoutineCompletions,
+      );
 }
