@@ -391,10 +391,16 @@ class PrayerNotificationScheduler {
     }
   }
 
-  Future<void> rescheduleAll({
+  /// Reschedules all reminders that do not depend on solar calculation or GPS location:
+  /// - Morning Adhkar
+  /// - Evening Adhkar
+  /// - Bedtime Adhkar
+  /// - Sunnah Fasting
+  ///
+  /// This can be called safely during app resume or timezone adjustments when
+  /// location or prayer times are unavailable, without triggering location permission prompts.
+  Future<void> rescheduleLocationIndependentReminders({
     DateTime? now,
-    PrayerTimes? prayerTimes,
-    PrayerTimes? tomorrowPrayerTimes,
     String? locale,
     tz.Location? location,
   }) async {
@@ -407,7 +413,7 @@ class PrayerNotificationScheduler {
     final currentTime = now ?? DateTime.now();
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
-    // Morning and Evening Adhkar Reminders
+    // 1 & 2. Morning and Evening Adhkar Reminders
     await rescheduleAdhkarReminders(
       now: currentTime,
       locale: locale,
@@ -462,6 +468,23 @@ class PrayerNotificationScheduler {
     } else {
       await _plugin.cancel(idSunnahFasting);
     }
+  }
+
+  Future<void> rescheduleAll({
+    DateTime? now,
+    PrayerTimes? prayerTimes,
+    PrayerTimes? tomorrowPrayerTimes,
+    String? locale,
+    tz.Location? location,
+  }) async {
+    await rescheduleLocationIndependentReminders(
+      now: now,
+      locale: locale,
+      location: location,
+    );
+
+    final currentTime = now ?? DateTime.now();
+    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
     // 5. Sunnah Qaylulah (Dhuhr - 30 min)
     if (_settingsService.qaylulahNotificationEnabled) {

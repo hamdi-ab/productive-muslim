@@ -361,5 +361,81 @@ void main() {
       expect(adapter.localTimezoneName, equals('Asia/Riyadh'));
       expect(tz.local.name, equals('Asia/Riyadh'));
     });
+
+    test('rescheduleLocationIndependentReminders schedules morning, evening, bedtime, and fasting without location', () async {
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setEveningAdhkarNotificationEnabled(true);
+      await settingsService.setSleepingAdhkarNotificationEnabled(true);
+      await settingsService.setSunnahFastingNotificationEnabled(true);
+      await settingsService.setQaylulahNotificationEnabled(true);
+
+      final now = DateTime(2026, 9, 29, 5, 0); // Tuesday 5 AM
+      await scheduler.rescheduleLocationIndependentReminders(now: now);
+
+      // Morning, evening, bedtime, fasting are scheduled
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=morning',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idEveningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=evening',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSleepingAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=sleeping',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSunnahFasting,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/energy',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+        ),
+      ).called(1);
+
+      // Qaylulah is NEVER scheduled by rescheduleLocationIndependentReminders
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idQaylulah,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+        ),
+      );
+    });
   });
 }
