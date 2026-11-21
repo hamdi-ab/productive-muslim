@@ -182,17 +182,46 @@ class _TasbihScreenState extends State<TasbihScreen> {
 
     if (confirmed == true) {
       AppHaptics.heavyImpact();
-      if (_adhkarRepo != null) {
+      await _executeReset();
+    }
+  }
+
+  void _showPersistenceError({required VoidCallback onRetry}) {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        key: const Key('tasbih_save_error_snackbar'),
+        content: Text(l10n.tasbihSaveError),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          key: const Key('tasbih_retry_save_button'),
+          label: l10n.retry,
+          onPressed: onRetry,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _executeReset() async {
+    if (_adhkarRepo != null) {
+      try {
         await _adhkarRepo!.resetTasbihCount();
+      } catch (_) {
+        _showPersistenceError(onRetry: _executeReset);
+        return;
       }
-      final updated = _state.copyWith(
-        currentCount: 0,
-        clearLastCount: true,
-        updatedAt: DateTime.now(),
-      );
-      if (mounted) {
-        setState(() => _state = updated);
-      }
+    }
+    final updated = _state.copyWith(
+      currentCount: 0,
+      clearLastCount: true,
+      updatedAt: DateTime.now(),
+    );
+    if (mounted) {
+      setState(() => _state = updated);
     }
   }
 
@@ -201,23 +230,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
       try {
         await _adhkarRepo!.saveTasbihState(state);
       } catch (_) {
-        if (!mounted) return;
-        final l10n = AppLocalizations.of(context);
-        if (l10n == null) return;
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            key: const Key('tasbih_save_error_snackbar'),
-            content: Text(l10n.tasbihSaveError),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-            action: SnackBarAction(
-              key: const Key('tasbih_retry_save_button'),
-              label: l10n.retry,
-              onPressed: () => _saveState(_state),
-            ),
-          ),
-        );
+        _showPersistenceError(onRetry: () => _saveState(_state));
       }
     }
   }
@@ -526,7 +539,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
     );
   }
 
-  void _openCustomLabelDialog({bool isConvertingRetired = false}) {
+  void _openCustomLabelDialog() {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Only prefill if a genuine prior user custom label exists.
@@ -617,24 +630,13 @@ class _TasbihScreenState extends State<TasbihScreen> {
             onPressed: () async {
               final text = controller.text.trim();
               Navigator.pop(ctx);
-              if (isConvertingRetired) {
-                final updated = _state.copyWith(
-                  customLabel: text.isNotEmpty ? text : null,
-                  clearCustomLabel: text.isEmpty,
-                  clearDhikr: true,
-                  updatedAt: DateTime.now(),
-                );
-                setState(() => _state = updated);
-                await _saveState(updated);
-              } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    _promptRemembranceChange(
-                      newCustomLabel: text.isNotEmpty ? text : null,
-                    );
-                  }
-                });
-              }
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _promptRemembranceChange(
+                    newCustomLabel: text.isNotEmpty ? text : null,
+                  );
+                }
+              });
             },
             child: Text(l10n.adhkarRoutineSave),
           ),
@@ -1017,8 +1019,7 @@ class _TasbihScreenState extends State<TasbihScreen> {
                 ),
                 OutlinedButton(
                   key: const Key('tasbih_convert_to_custom_button'),
-                  onPressed: () =>
-                      _openCustomLabelDialog(isConvertingRetired: true),
+                  onPressed: _openCustomLabelDialog,
                   child: Text(l10n.tasbihUseAsCustomLabel),
                 ),
               ],
