@@ -63,7 +63,7 @@ void main() {
           );
 
       final payload = await backupService.createBackupPayload();
-      expect(payload['version'], equals(4));
+      expect(payload['version'], equals(5));
       expect(payload['app'], equals('Productive Muslim'));
 
       final data = payload['data'] as Map<String, dynamic>;
@@ -75,6 +75,7 @@ void main() {
       expect((data['adhkarCompletions'] as List).length, equals(0));
       expect((data['adhkarRoutines'] as List).length, equals(0));
       expect((data['adhkarRoutineCompletions'] as List).length, equals(0));
+      expect((data['adhkarTasbih'] as List).length, equals(0));
       expect(data['settings']['notif_morning_adhkar'], isTrue);
       expect(data['settings']['notif_evening_adhkar'], isFalse);
 
@@ -248,7 +249,7 @@ void main() {
 
       final exported = await backupService.exportBackupToJson();
       expect(exported, contains('ayat_al_kursi'));
-      expect(exported, contains('"version": 4'));
+      expect(exported, contains('"version": 5'));
 
       // Clear the tables
       await db.delete(db.adhkarBookmarks).go();
@@ -276,6 +277,75 @@ void main() {
       expect(completions.first.collectionId, equals('morning'));
       expect(completions.first.date, equals('2026-09-30'));
     });
+
+    test('importBackupFromJson correctly exports and restores version 5 tasbih records', () async {
+      await db.adhkarDao.saveTasbihState(
+        currentCount: 33,
+        targetCount: 100,
+        dhikrId: 'subhanallah',
+        customLabel: 'My Dhikr',
+        lastCount: 32,
+        updatedAt: 5000,
+      );
+
+      final exported = await backupService.exportBackupToJson();
+      expect(exported, contains('subhanallah'));
+      expect(exported, contains('My Dhikr'));
+      expect(exported, contains('"currentCount": 33'));
+
+      // Clear tasbih table
+      await db.delete(db.adhkarTasbih).go();
+      expect((await db.select(db.adhkarTasbih).get()).length, equals(0));
+
+      final success = await backupService.importBackupFromJson(exported);
+      expect(success, isTrue);
+
+      final tasbihList = await db.select(db.adhkarTasbih).get();
+      expect(tasbihList.length, equals(1));
+      expect(tasbihList.first.currentCount, equals(33));
+      expect(tasbihList.first.targetCount, equals(100));
+      expect(tasbihList.first.dhikrId, equals('subhanallah'));
+      expect(tasbihList.first.customLabel, equals('My Dhikr'));
+    });
+
+    test(
+      'importBackupFromJson is backwards compatible with version 4 payload',
+      () async {
+        final v4Json = jsonEncode({
+          'version': 4,
+          'app': 'Productive Muslim',
+          'data': {
+            'tasks': [],
+            'habits': [],
+            'habitCompletions': [],
+            'intentions': [],
+            'muhasabahEntries': [],
+            'barakahEntries': [],
+            'barakahDailyResponses': [],
+            'adhkarBookmarks': [],
+            'adhkarSessions': [],
+            'adhkarCompletions': [],
+            'adhkarRoutines': [
+              {
+                'id': 'routine_v4',
+                'name': 'Routine V4',
+                'itemIdsJson': '["item1"]',
+                'createdAt': 1000,
+                'updatedAt': 1000,
+              },
+            ],
+            'adhkarRoutineCompletions': [],
+            'settings': {'notif_morning_adhkar': true},
+          },
+        });
+
+        final success = await backupService.importBackupFromJson(v4Json);
+        expect(success, isTrue);
+
+        final routines = await db.select(db.adhkarRoutines).get();
+        expect(routines.any((r) => r.id == 'routine_v4'), isTrue);
+      },
+    );
 
     test(
       'importBackupFromJson is backwards compatible with version 3 payload',

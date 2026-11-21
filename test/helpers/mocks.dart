@@ -7,11 +7,14 @@ import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/intention_entry.dart';
 import 'package:productive_muslim/domain/models/muhasabah_entry.dart';
 import 'package:productive_muslim/domain/models/task.dart';
+import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
 import 'package:productive_muslim/domain/repositories/intention_repository.dart';
 import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart';
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
+
+class MockAdhkarRepository extends Mock implements AdhkarRepository {}
 
 class MockBarakahRepository extends Mock implements BarakahRepository {}
 

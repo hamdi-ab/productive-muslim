@@ -11,6 +11,7 @@ mixin _$AdhkarDaoMixin on DatabaseAccessor<AppDatabase> {
   $AdhkarRoutinesTable get adhkarRoutines => attachedDatabase.adhkarRoutines;
   $AdhkarRoutineCompletionsTable get adhkarRoutineCompletions =>
       attachedDatabase.adhkarRoutineCompletions;
+  $AdhkarTasbihTable get adhkarTasbih => attachedDatabase.adhkarTasbih;
   AdhkarDaoManager get managers => AdhkarDaoManager(this);
 }
 
@@ -42,4 +43,6 @@ class AdhkarDaoManager {
         _db.attachedDatabase,
         _db.adhkarRoutineCompletions,
       );
+  $$AdhkarTasbihTableTableManager get adhkarTasbih =>
+      $$AdhkarTasbihTableTableManager(_db.attachedDatabase, _db.adhkarTasbih);
 }

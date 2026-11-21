@@ -3439,6 +3439,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View all'**
   String get adhkarViewAllRoutines;
+
+  /// No description provided for @adhkarTabTasbih.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasbih'**
+  String get adhkarTabTasbih;
+
+  /// No description provided for @tasbihTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasbih'**
+  String get tasbihTitle;
+
+  /// No description provided for @tasbihSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Independent offline counter'**
+  String get tasbihSubtitle;
+
+  /// No description provided for @tasbihFreeCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Counter'**
+  String get tasbihFreeCounter;
+
+  /// No description provided for @tasbihTapToCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap anywhere to count'**
+  String get tasbihTapToCount;
+
+  /// No description provided for @tasbihUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get tasbihUndo;
+
+  /// No description provided for @tasbihReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get tasbihReset;
+
+  /// No description provided for @tasbihResetConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Counter?'**
+  String get tasbihResetConfirmTitle;
+
+  /// No description provided for @tasbihResetConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reset the count to 0? Your chosen label and target will be preserved.'**
+  String get tasbihResetConfirmDesc;
+
+  /// No description provided for @tasbihSetRemembrance.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Remembrance'**
+  String get tasbihSetRemembrance;
+
+  /// No description provided for @tasbihChangeRemembrance.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Remembrance'**
+  String get tasbihChangeRemembrance;
+
+  /// No description provided for @tasbihApprovedLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved Library'**
+  String get tasbihApprovedLibrary;
+
+  /// No description provided for @tasbihPersonalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Label'**
+  String get tasbihPersonalLabel;
+
+  /// No description provided for @tasbihPersonalLabelNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your personal label — not religiously sourced text'**
+  String get tasbihPersonalLabelNotice;
+
+  /// No description provided for @tasbihEnterPersonalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Personal Label'**
+  String get tasbihEnterPersonalLabel;
+
+  /// No description provided for @tasbihPersonalLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Istighfar, Salawat, Personal Dua'**
+  String get tasbihPersonalLabelHint;
+
+  /// No description provided for @tasbihSelectFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from Reviewed Library'**
+  String get tasbihSelectFromLibrary;
+
+  /// No description provided for @tasbihClearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear (Free Counter)'**
+  String get tasbihClearSelection;
+
+  /// No description provided for @tasbihPersonalTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Target (Optional)'**
+  String get tasbihPersonalTarget;
+
+  /// No description provided for @tasbihPersonalTargetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizational only — not a prescribed repetition or spiritual score'**
+  String get tasbihPersonalTargetDesc;
+
+  /// No description provided for @tasbihNoTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'No target'**
+  String get tasbihNoTarget;
+
+  /// No description provided for @tasbihTargetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {target}'**
+  String tasbihTargetLabel(int target);
+
+  /// No description provided for @tasbihTargetReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal target reached ({target})'**
+  String tasbihTargetReached(int target);
+
+  /// No description provided for @tasbihCustomTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom target'**
+  String get tasbihCustomTarget;
+
+  /// No description provided for @tasbihEnterTargetNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter target count'**
+  String get tasbihEnterTargetNumber;
+
+  /// No description provided for @tasbihSaveTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Target'**
+  String get tasbihSaveTarget;
+
+  /// No description provided for @tasbihClearTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Target'**
+  String get tasbihClearTarget;
+
+  /// No description provided for @tasbihRetiredWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Remembrance retired or unapproved'**
+  String get tasbihRetiredWarning;
+
+  /// No description provided for @tasbihRetiredDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This remembrance is no longer available in the approved library. You can select another remembrance, use it as a custom label, or clear it.'**
+  String get tasbihRetiredDesc;
+
+  /// No description provided for @tasbihUseAsCustomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use as Custom Label'**
+  String get tasbihUseAsCustomLabel;
+
+  /// No description provided for @tasbihHapticsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptics enabled'**
+  String get tasbihHapticsEnabled;
+
+  /// No description provided for @tasbihHapticsDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptics disabled'**
+  String get tasbihHapticsDisabled;
+
+  /// No description provided for @tasbihToggleHaptics.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle vibration'**
+  String get tasbihToggleHaptics;
+
+  /// No description provided for @tasbihSelectRemembranceModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you counting?'**
+  String get tasbihSelectRemembranceModalTitle;
+
+  /// No description provided for @tasbihPersonalTargetModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Personal Target'**
+  String get tasbihPersonalTargetModalTitle;
+
+  /// No description provided for @tasbihSwitchConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Remembrance?'**
+  String get tasbihSwitchConfirmTitle;
+
+  /// No description provided for @tasbihSwitchConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an active count of {count}. Reset count for the new remembrance or keep count as an unlabelled counter?'**
+  String tasbihSwitchConfirmDesc(int count);
+
+  /// No description provided for @tasbihSwitchResetToZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to 0'**
+  String get tasbihSwitchResetToZero;
+
+  /// No description provided for @tasbihSwitchKeepAsGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep as General Counter'**
+  String get tasbihSwitchKeepAsGeneral;
+
+  /// No description provided for @tasbihSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save counter progress locally'**
+  String get tasbihSaveError;
 }
 
 class _AppLocalizationsDelegate

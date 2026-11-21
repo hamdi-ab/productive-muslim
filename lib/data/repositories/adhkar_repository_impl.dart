@@ -10,6 +10,7 @@ import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/models/adhkar_routine.dart';
 import 'package:productive_muslim/domain/models/adhkar_session_record.dart';
 import 'package:productive_muslim/domain/models/dhikr.dart';
+import 'package:productive_muslim/domain/models/tasbih_state.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 
 class AdhkarRepositoryImpl implements AdhkarRepository {
@@ -719,6 +720,55 @@ class AdhkarRepositoryImpl implements AdhkarRepository {
       routineName: row.routineName,
       date: row.date,
       completedAt: DateTime.fromMillisecondsSinceEpoch(row.completedAt),
+    );
+  }
+
+  // --- Tasbih ---
+
+  @override
+  Future<TasbihState> getTasbihState() async {
+    final row = await _adhkarDao.getTasbihState();
+    if (row == null) {
+      return TasbihState.initial();
+    }
+    return _mapTasbihRow(row);
+  }
+
+  @override
+  Stream<TasbihState> watchTasbihState() {
+    return _adhkarDao.watchTasbihState().map((row) {
+      if (row == null) {
+        return TasbihState.initial();
+      }
+      return _mapTasbihRow(row);
+    });
+  }
+
+  @override
+  Future<void> saveTasbihState(TasbihState state) async {
+    await _adhkarDao.saveTasbihState(
+      currentCount: state.currentCount,
+      targetCount: state.targetCount,
+      dhikrId: state.dhikrId,
+      customLabel: state.customLabel,
+      lastCount: state.lastCount,
+      updatedAt: state.updatedAt.millisecondsSinceEpoch,
+    );
+  }
+
+  @override
+  Future<void> resetTasbihCount() async {
+    await _adhkarDao.resetTasbihCount();
+  }
+
+  TasbihState _mapTasbihRow(AdhkarTasbihEntry row) {
+    return TasbihState(
+      currentCount: row.currentCount,
+      targetCount: row.targetCount,
+      dhikrId: row.dhikrId,
+      customLabel: row.customLabel,
+      lastCount: row.lastCount,
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
   }
 }

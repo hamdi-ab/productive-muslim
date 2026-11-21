@@ -5802,6 +5802,488 @@ class AdhkarRoutineCompletionsCompanion
   }
 }
 
+class $AdhkarTasbihTable extends AdhkarTasbih
+    with TableInfo<$AdhkarTasbihTable, AdhkarTasbihEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AdhkarTasbihTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentCountMeta = const VerificationMeta(
+    'currentCount',
+  );
+  @override
+  late final GeneratedColumn<int> currentCount = GeneratedColumn<int>(
+    'current_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _targetCountMeta = const VerificationMeta(
+    'targetCount',
+  );
+  @override
+  late final GeneratedColumn<int> targetCount = GeneratedColumn<int>(
+    'target_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _dhikrIdMeta = const VerificationMeta(
+    'dhikrId',
+  );
+  @override
+  late final GeneratedColumn<String> dhikrId = GeneratedColumn<String>(
+    'dhikr_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customLabelMeta = const VerificationMeta(
+    'customLabel',
+  );
+  @override
+  late final GeneratedColumn<String> customLabel = GeneratedColumn<String>(
+    'custom_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastCountMeta = const VerificationMeta(
+    'lastCount',
+  );
+  @override
+  late final GeneratedColumn<int> lastCount = GeneratedColumn<int>(
+    'last_count',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    currentCount,
+    targetCount,
+    dhikrId,
+    customLabel,
+    lastCount,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'adhkar_tasbih';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AdhkarTasbihEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('current_count')) {
+      context.handle(
+        _currentCountMeta,
+        currentCount.isAcceptableOrUnknown(
+          data['current_count']!,
+          _currentCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_count')) {
+      context.handle(
+        _targetCountMeta,
+        targetCount.isAcceptableOrUnknown(
+          data['target_count']!,
+          _targetCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('dhikr_id')) {
+      context.handle(
+        _dhikrIdMeta,
+        dhikrId.isAcceptableOrUnknown(data['dhikr_id']!, _dhikrIdMeta),
+      );
+    }
+    if (data.containsKey('custom_label')) {
+      context.handle(
+        _customLabelMeta,
+        customLabel.isAcceptableOrUnknown(
+          data['custom_label']!,
+          _customLabelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_count')) {
+      context.handle(
+        _lastCountMeta,
+        lastCount.isAcceptableOrUnknown(data['last_count']!, _lastCountMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AdhkarTasbihEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AdhkarTasbihEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      currentCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_count'],
+      )!,
+      targetCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_count'],
+      ),
+      dhikrId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dhikr_id'],
+      ),
+      customLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}custom_label'],
+      ),
+      lastCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_count'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AdhkarTasbihTable createAlias(String alias) {
+    return $AdhkarTasbihTable(attachedDatabase, alias);
+  }
+}
+
+class AdhkarTasbihEntry extends DataClass
+    implements Insertable<AdhkarTasbihEntry> {
+  final String id;
+  final int currentCount;
+  final int? targetCount;
+  final String? dhikrId;
+  final String? customLabel;
+  final int? lastCount;
+  final int updatedAt;
+  const AdhkarTasbihEntry({
+    required this.id,
+    required this.currentCount,
+    this.targetCount,
+    this.dhikrId,
+    this.customLabel,
+    this.lastCount,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['current_count'] = Variable<int>(currentCount);
+    if (!nullToAbsent || targetCount != null) {
+      map['target_count'] = Variable<int>(targetCount);
+    }
+    if (!nullToAbsent || dhikrId != null) {
+      map['dhikr_id'] = Variable<String>(dhikrId);
+    }
+    if (!nullToAbsent || customLabel != null) {
+      map['custom_label'] = Variable<String>(customLabel);
+    }
+    if (!nullToAbsent || lastCount != null) {
+      map['last_count'] = Variable<int>(lastCount);
+    }
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  AdhkarTasbihCompanion toCompanion(bool nullToAbsent) {
+    return AdhkarTasbihCompanion(
+      id: Value(id),
+      currentCount: Value(currentCount),
+      targetCount: targetCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(targetCount),
+      dhikrId: dhikrId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dhikrId),
+      customLabel: customLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customLabel),
+      lastCount: lastCount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastCount),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AdhkarTasbihEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AdhkarTasbihEntry(
+      id: serializer.fromJson<String>(json['id']),
+      currentCount: serializer.fromJson<int>(json['currentCount']),
+      targetCount: serializer.fromJson<int?>(json['targetCount']),
+      dhikrId: serializer.fromJson<String?>(json['dhikrId']),
+      customLabel: serializer.fromJson<String?>(json['customLabel']),
+      lastCount: serializer.fromJson<int?>(json['lastCount']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'currentCount': serializer.toJson<int>(currentCount),
+      'targetCount': serializer.toJson<int?>(targetCount),
+      'dhikrId': serializer.toJson<String?>(dhikrId),
+      'customLabel': serializer.toJson<String?>(customLabel),
+      'lastCount': serializer.toJson<int?>(lastCount),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  AdhkarTasbihEntry copyWith({
+    String? id,
+    int? currentCount,
+    Value<int?> targetCount = const Value.absent(),
+    Value<String?> dhikrId = const Value.absent(),
+    Value<String?> customLabel = const Value.absent(),
+    Value<int?> lastCount = const Value.absent(),
+    int? updatedAt,
+  }) => AdhkarTasbihEntry(
+    id: id ?? this.id,
+    currentCount: currentCount ?? this.currentCount,
+    targetCount: targetCount.present ? targetCount.value : this.targetCount,
+    dhikrId: dhikrId.present ? dhikrId.value : this.dhikrId,
+    customLabel: customLabel.present ? customLabel.value : this.customLabel,
+    lastCount: lastCount.present ? lastCount.value : this.lastCount,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AdhkarTasbihEntry copyWithCompanion(AdhkarTasbihCompanion data) {
+    return AdhkarTasbihEntry(
+      id: data.id.present ? data.id.value : this.id,
+      currentCount: data.currentCount.present
+          ? data.currentCount.value
+          : this.currentCount,
+      targetCount: data.targetCount.present
+          ? data.targetCount.value
+          : this.targetCount,
+      dhikrId: data.dhikrId.present ? data.dhikrId.value : this.dhikrId,
+      customLabel: data.customLabel.present
+          ? data.customLabel.value
+          : this.customLabel,
+      lastCount: data.lastCount.present ? data.lastCount.value : this.lastCount,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarTasbihEntry(')
+          ..write('id: $id, ')
+          ..write('currentCount: $currentCount, ')
+          ..write('targetCount: $targetCount, ')
+          ..write('dhikrId: $dhikrId, ')
+          ..write('customLabel: $customLabel, ')
+          ..write('lastCount: $lastCount, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    currentCount,
+    targetCount,
+    dhikrId,
+    customLabel,
+    lastCount,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AdhkarTasbihEntry &&
+          other.id == this.id &&
+          other.currentCount == this.currentCount &&
+          other.targetCount == this.targetCount &&
+          other.dhikrId == this.dhikrId &&
+          other.customLabel == this.customLabel &&
+          other.lastCount == this.lastCount &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AdhkarTasbihCompanion extends UpdateCompanion<AdhkarTasbihEntry> {
+  final Value<String> id;
+  final Value<int> currentCount;
+  final Value<int?> targetCount;
+  final Value<String?> dhikrId;
+  final Value<String?> customLabel;
+  final Value<int?> lastCount;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const AdhkarTasbihCompanion({
+    this.id = const Value.absent(),
+    this.currentCount = const Value.absent(),
+    this.targetCount = const Value.absent(),
+    this.dhikrId = const Value.absent(),
+    this.customLabel = const Value.absent(),
+    this.lastCount = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AdhkarTasbihCompanion.insert({
+    required String id,
+    this.currentCount = const Value.absent(),
+    this.targetCount = const Value.absent(),
+    this.dhikrId = const Value.absent(),
+    this.customLabel = const Value.absent(),
+    this.lastCount = const Value.absent(),
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       updatedAt = Value(updatedAt);
+  static Insertable<AdhkarTasbihEntry> custom({
+    Expression<String>? id,
+    Expression<int>? currentCount,
+    Expression<int>? targetCount,
+    Expression<String>? dhikrId,
+    Expression<String>? customLabel,
+    Expression<int>? lastCount,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (currentCount != null) 'current_count': currentCount,
+      if (targetCount != null) 'target_count': targetCount,
+      if (dhikrId != null) 'dhikr_id': dhikrId,
+      if (customLabel != null) 'custom_label': customLabel,
+      if (lastCount != null) 'last_count': lastCount,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AdhkarTasbihCompanion copyWith({
+    Value<String>? id,
+    Value<int>? currentCount,
+    Value<int?>? targetCount,
+    Value<String?>? dhikrId,
+    Value<String?>? customLabel,
+    Value<int?>? lastCount,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AdhkarTasbihCompanion(
+      id: id ?? this.id,
+      currentCount: currentCount ?? this.currentCount,
+      targetCount: targetCount ?? this.targetCount,
+      dhikrId: dhikrId ?? this.dhikrId,
+      customLabel: customLabel ?? this.customLabel,
+      lastCount: lastCount ?? this.lastCount,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (currentCount.present) {
+      map['current_count'] = Variable<int>(currentCount.value);
+    }
+    if (targetCount.present) {
+      map['target_count'] = Variable<int>(targetCount.value);
+    }
+    if (dhikrId.present) {
+      map['dhikr_id'] = Variable<String>(dhikrId.value);
+    }
+    if (customLabel.present) {
+      map['custom_label'] = Variable<String>(customLabel.value);
+    }
+    if (lastCount.present) {
+      map['last_count'] = Variable<int>(lastCount.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AdhkarTasbihCompanion(')
+          ..write('id: $id, ')
+          ..write('currentCount: $currentCount, ')
+          ..write('targetCount: $targetCount, ')
+          ..write('dhikrId: $dhikrId, ')
+          ..write('customLabel: $customLabel, ')
+          ..write('lastCount: $lastCount, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5829,6 +6311,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AdhkarRoutinesTable adhkarRoutines = $AdhkarRoutinesTable(this);
   late final $AdhkarRoutineCompletionsTable adhkarRoutineCompletions =
       $AdhkarRoutineCompletionsTable(this);
+  late final $AdhkarTasbihTable adhkarTasbih = $AdhkarTasbihTable(this);
   late final BarakahDao barakahDao = BarakahDao(this as AppDatabase);
   late final HabitDao habitDao = HabitDao(this as AppDatabase);
   late final HabitCompletionsDao habitCompletionsDao = HabitCompletionsDao(
@@ -5856,6 +6339,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     adhkarCompletions,
     adhkarRoutines,
     adhkarRoutineCompletions,
+    adhkarTasbih,
   ];
 }
 
@@ -9070,6 +9554,263 @@ typedef $$AdhkarRoutineCompletionsTableProcessedTableManager =
       AdhkarRoutineCompletionEntry,
       PrefetchHooks Function()
     >;
+typedef $$AdhkarTasbihTableCreateCompanionBuilder =
+    AdhkarTasbihCompanion Function({
+      required String id,
+      Value<int> currentCount,
+      Value<int?> targetCount,
+      Value<String?> dhikrId,
+      Value<String?> customLabel,
+      Value<int?> lastCount,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AdhkarTasbihTableUpdateCompanionBuilder =
+    AdhkarTasbihCompanion Function({
+      Value<String> id,
+      Value<int> currentCount,
+      Value<int?> targetCount,
+      Value<String?> dhikrId,
+      Value<String?> customLabel,
+      Value<int?> lastCount,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AdhkarTasbihTableFilterComposer
+    extends Composer<_$AppDatabase, $AdhkarTasbihTable> {
+  $$AdhkarTasbihTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentCount => $composableBuilder(
+    column: $table.currentCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetCount => $composableBuilder(
+    column: $table.targetCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dhikrId => $composableBuilder(
+    column: $table.dhikrId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get customLabel => $composableBuilder(
+    column: $table.customLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastCount => $composableBuilder(
+    column: $table.lastCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AdhkarTasbihTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdhkarTasbihTable> {
+  $$AdhkarTasbihTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentCount => $composableBuilder(
+    column: $table.currentCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetCount => $composableBuilder(
+    column: $table.targetCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dhikrId => $composableBuilder(
+    column: $table.dhikrId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get customLabel => $composableBuilder(
+    column: $table.customLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastCount => $composableBuilder(
+    column: $table.lastCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AdhkarTasbihTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdhkarTasbihTable> {
+  $$AdhkarTasbihTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get currentCount => $composableBuilder(
+    column: $table.currentCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetCount => $composableBuilder(
+    column: $table.targetCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dhikrId =>
+      $composableBuilder(column: $table.dhikrId, builder: (column) => column);
+
+  GeneratedColumn<String> get customLabel => $composableBuilder(
+    column: $table.customLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastCount =>
+      $composableBuilder(column: $table.lastCount, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AdhkarTasbihTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AdhkarTasbihTable,
+          AdhkarTasbihEntry,
+          $$AdhkarTasbihTableFilterComposer,
+          $$AdhkarTasbihTableOrderingComposer,
+          $$AdhkarTasbihTableAnnotationComposer,
+          $$AdhkarTasbihTableCreateCompanionBuilder,
+          $$AdhkarTasbihTableUpdateCompanionBuilder,
+          (
+            AdhkarTasbihEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $AdhkarTasbihTable,
+              AdhkarTasbihEntry
+            >,
+          ),
+          AdhkarTasbihEntry,
+          PrefetchHooks Function()
+        > {
+  $$AdhkarTasbihTableTableManager(_$AppDatabase db, $AdhkarTasbihTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AdhkarTasbihTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AdhkarTasbihTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AdhkarTasbihTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> currentCount = const Value.absent(),
+                Value<int?> targetCount = const Value.absent(),
+                Value<String?> dhikrId = const Value.absent(),
+                Value<String?> customLabel = const Value.absent(),
+                Value<int?> lastCount = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarTasbihCompanion(
+                id: id,
+                currentCount: currentCount,
+                targetCount: targetCount,
+                dhikrId: dhikrId,
+                customLabel: customLabel,
+                lastCount: lastCount,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<int> currentCount = const Value.absent(),
+                Value<int?> targetCount = const Value.absent(),
+                Value<String?> dhikrId = const Value.absent(),
+                Value<String?> customLabel = const Value.absent(),
+                Value<int?> lastCount = const Value.absent(),
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AdhkarTasbihCompanion.insert(
+                id: id,
+                currentCount: currentCount,
+                targetCount: targetCount,
+                dhikrId: dhikrId,
+                customLabel: customLabel,
+                lastCount: lastCount,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AdhkarTasbihTable, AdhkarTasbihEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AdhkarTasbihTable,
+                    AdhkarTasbihEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AdhkarTasbihTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AdhkarTasbihTable,
+      AdhkarTasbihEntry,
+      $$AdhkarTasbihTableFilterComposer,
+      $$AdhkarTasbihTableOrderingComposer,
+      $$AdhkarTasbihTableAnnotationComposer,
+      $$AdhkarTasbihTableCreateCompanionBuilder,
+      $$AdhkarTasbihTableUpdateCompanionBuilder,
+      (
+        AdhkarTasbihEntry,
+        BaseReferences<_$AppDatabase, $AdhkarTasbihTable, AdhkarTasbihEntry>,
+      ),
+      AdhkarTasbihEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9103,4 +9844,6 @@ class $AppDatabaseManager {
         _db,
         _db.adhkarRoutineCompletions,
       );
+  $$AdhkarTasbihTableTableManager get adhkarTasbih =>
+      $$AdhkarTasbihTableTableManager(_db, _db.adhkarTasbih);
 }

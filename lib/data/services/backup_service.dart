@@ -33,12 +33,13 @@ class BackupService {
     final routineCompletionsList = await _db
         .select(_db.adhkarRoutineCompletions)
         .get();
+    final tasbihList = await _db.select(_db.adhkarTasbih).get();
 
     final settingsMap =
         _settingsService?.exportSettings() ?? <String, dynamic>{};
 
     return {
-      'version': 4,
+      'version': 5,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'app': 'Productive Muslim',
       'data': {
@@ -60,6 +61,7 @@ class BackupService {
         'adhkarRoutineCompletions': routineCompletionsList
             .map((c) => c.toJson())
             .toList(),
+        'adhkarTasbih': tasbihList.map((t) => t.toJson()).toList(),
         'settings': settingsMap,
       },
     };
@@ -71,13 +73,17 @@ class BackupService {
     return const JsonEncoder.withIndent('  ').convert(payload);
   }
 
-  /// Validate and import backup payload from JSON string (supports v1, v2, v3, and v4)
+  /// Validate and import backup payload from JSON string (supports v1, v2, v3, v4, and v5)
   Future<bool> importBackupFromJson(String jsonString) async {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is! Map<String, dynamic>) return false;
       final version = decoded['version'];
-      if ((version != 1 && version != 2 && version != 3 && version != 4) ||
+      if ((version != 1 &&
+              version != 2 &&
+              version != 3 &&
+              version != 4 &&
+              version != 5) ||
           decoded['data'] is! Map<String, dynamic>) {
         return false;
       }
@@ -129,6 +135,19 @@ class BackupService {
       if (version >= 4) {
         const v4Tables = ['adhkarRoutines', 'adhkarRoutineCompletions'];
         for (final table in v4Tables) {
+          if (data.containsKey(table)) {
+            final list = data[table];
+            if (list is! List) return false;
+            for (final item in list) {
+              if (item is! Map<String, dynamic>) return false;
+            }
+          }
+        }
+      }
+
+      if (version >= 5) {
+        const v5Tables = ['adhkarTasbih'];
+        for (final table in v5Tables) {
           if (data.containsKey(table)) {
             final list = data[table];
             if (list is! List) return false;
@@ -229,6 +248,15 @@ class BackupService {
         routineCompletions = [];
       }
 
+      final List<AdhkarTasbihEntry> tasbih;
+      if (version >= 5 || data.containsKey('adhkarTasbih')) {
+        tasbih = ((data['adhkarTasbih'] as List?) ?? [])
+            .map((i) => AdhkarTasbihEntry.fromJson(i as Map<String, dynamic>))
+            .toList();
+      } else {
+        tasbih = [];
+      }
+
       final settingsMap = data['settings'] as Map<String, dynamic>?;
 
       // Validate bedtime hour/minute in settings if present
@@ -261,6 +289,7 @@ class BackupService {
           await _db.delete(_db.adhkarCompletions).go();
           await _db.delete(_db.adhkarRoutines).go();
           await _db.delete(_db.adhkarRoutineCompletions).go();
+          await _db.delete(_db.adhkarTasbih).go();
 
           for (final t in tasks) {
             await _db.into(_db.tasks).insert(t);
@@ -313,6 +342,9 @@ class BackupService {
           }
           for (final c in adhkarCompletions) {
             await _db.into(_db.adhkarCompletions).insert(c);
+          }
+          for (final t in tasbih) {
+            await _db.into(_db.adhkarTasbih).insert(t);
           }
 
           // Import settings inside the transaction so any failure rolls back
