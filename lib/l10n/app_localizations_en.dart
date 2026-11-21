@@ -2048,4 +2048,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tasbihSaveError => 'Unable to save counter progress locally';
+
+  @override
+  String get adhkarRemindersTitle => 'Adhkar Reminders';
+
+  @override
+  String get adhkarRemindersSubtitle =>
+      'Opt-in, peaceful reminders at your chosen times';
+
+  @override
+  String get adhkarRemindersGlobalLabel => 'Allow Adhkar Reminders';
+
+  @override
+  String get adhkarRemindersGlobalDesc =>
+      'Master control for all morning and evening reminders';
+
+  @override
+  String get adhkarRemindersPermissionRequired =>
+      'Notification Permission Required';
+
+  @override
+  String get adhkarRemindersPermissionDesc =>
+      'Reminders cannot be delivered until notification permission is granted in your device settings.';
+
+  @override
+  String get adhkarRemindersGrantPermission => 'Enable Notifications';
+
+  @override
+  String get adhkarMorningReminderDesc =>
+      'Gentle reminder to begin your day peacefully';
+
+  @override
+  String get adhkarEveningReminderDesc =>
+      'Gentle reminder before your day winds down';
+
+  @override
+  String get adhkarRemindersPeacefulNotice =>
+      'Reminders are local, peaceful, and completely optional. They never imply religious obligation, score progress, or send follow-up nudges.';
+
+  @override
+  String get adhkarReminderScheduleError =>
+      'Unable to schedule reminder. Please check notification permissions.';
+
+  @override
+  String get adhkarReminderSetTime => 'Set Time';
 }

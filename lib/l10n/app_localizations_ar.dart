@@ -2040,4 +2040,47 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tasbihSaveError => 'تعذر حفظ تقدم العداد محليًا';
+
+  @override
+  String get adhkarRemindersTitle => 'تذكيرات الأذكار';
+
+  @override
+  String get adhkarRemindersSubtitle =>
+      'تذكيرات اختيارية هادئة في الأوقات التي تختارها';
+
+  @override
+  String get adhkarRemindersGlobalLabel => 'تفعيل تذكيرات الأذكار';
+
+  @override
+  String get adhkarRemindersGlobalDesc =>
+      'التحكم الشامل في جميع تذكيرات الصباح والمساء';
+
+  @override
+  String get adhkarRemindersPermissionRequired => 'إذن الإشعارات مطلوب';
+
+  @override
+  String get adhkarRemindersPermissionDesc =>
+      'لا يمكن إرسال التذكيرات حتى يتم منح إذن الإشعارات من إعدادات جهازك.';
+
+  @override
+  String get adhkarRemindersGrantPermission => 'تفعيل الإشعارات';
+
+  @override
+  String get adhkarMorningReminderDesc =>
+      'تذكير هادئ لبدء يومك بذكر الله والسكينة';
+
+  @override
+  String get adhkarEveningReminderDesc =>
+      'تذكير هادئ لختام يومك بالذكر والسكينة';
+
+  @override
+  String get adhkarRemindersPeacefulNotice =>
+      'التذكيرات محلية وهادئة واختيارية تماماً. لا تلزمك دينياً، ولا تحتسب نقاطاً، ولا ترسل تنبيهات متكررة.';
+
+  @override
+  String get adhkarReminderScheduleError =>
+      'تعذر جدولة التذكير. يرجى التحقق من أذونات الإشعارات.';
+
+  @override
+  String get adhkarReminderSetTime => 'تحديد الوقت';
 }
