@@ -71,7 +71,7 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
     }
   }
 
-  Future<void> _requestPermission() async {
+  Future<bool> _requestPermission() async {
     AppHaptics.selectionClick();
     if (_scheduler != null) {
       final granted = await _scheduler!.requestPermission();
@@ -81,7 +81,9 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
       if (granted) {
         await _reschedule();
       }
+      return granted;
     }
+    return false;
   }
 
   Future<void> _reschedule() async {
@@ -104,14 +106,33 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
     );
   }
 
+  void _showPermissionDeniedSnackBar() {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        key: const Key('adhkar_reminders_permission_snackbar'),
+        content: Text(l10n.adhkarRemindersPermissionDesc),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _toggleGlobal(bool value) async {
     AppHaptics.selectionClick();
     final prev = _globalEnabled;
-    setState(() => _globalEnabled = value);
 
-    if (value && !_hasPermission) {
-      await _requestPermission();
+    if (value && !_hasPermission && (_morningEnabled || _eveningEnabled)) {
+      final granted = await _requestPermission();
+      if (!granted) {
+        _showPermissionDeniedSnackBar();
+        return;
+      }
     }
+
+    setState(() => _globalEnabled = value);
 
     try {
       if (_settingsService != null) {
@@ -130,11 +151,16 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
   Future<void> _toggleMorning(bool value) async {
     AppHaptics.selectionClick();
     final prev = _morningEnabled;
-    setState(() => _morningEnabled = value);
 
     if (value && !_hasPermission) {
-      await _requestPermission();
+      final granted = await _requestPermission();
+      if (!granted) {
+        _showPermissionDeniedSnackBar();
+        return;
+      }
     }
+
+    setState(() => _morningEnabled = value);
 
     try {
       if (_settingsService != null) {
@@ -194,11 +220,16 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
   Future<void> _toggleEvening(bool value) async {
     AppHaptics.selectionClick();
     final prev = _eveningEnabled;
-    setState(() => _eveningEnabled = value);
 
     if (value && !_hasPermission) {
-      await _requestPermission();
+      final granted = await _requestPermission();
+      if (!granted) {
+        _showPermissionDeniedSnackBar();
+        return;
+      }
     }
+
+    setState(() => _eveningEnabled = value);
 
     try {
       if (_settingsService != null) {
@@ -363,7 +394,7 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
                 cardKey: const Key('adhkar_morning_reminder_card'),
                 toggleKey: const Key('adhkar_morning_reminder_toggle'),
                 timePickerKey: const Key('adhkar_morning_time_picker_button'),
-                enabled: _morningEnabled,
+                enabled: _morningEnabled && _hasPermission,
                 globalEnabled: _globalEnabled,
                 hour: _morningHour,
                 minute: _morningMinute,
@@ -383,7 +414,7 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
                 cardKey: const Key('adhkar_evening_reminder_card'),
                 toggleKey: const Key('adhkar_evening_reminder_toggle'),
                 timePickerKey: const Key('adhkar_evening_time_picker_button'),
-                enabled: _eveningEnabled,
+                enabled: _eveningEnabled && _hasPermission,
                 globalEnabled: _globalEnabled,
                 hour: _eveningHour,
                 minute: _eveningMinute,

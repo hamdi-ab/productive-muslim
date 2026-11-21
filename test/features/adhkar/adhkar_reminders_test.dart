@@ -15,12 +15,17 @@ import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_sc
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_reminders_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
 
 class MockNotificationPlugin extends Mock
     implements NotificationPluginAdapter {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    tz_data.initializeTimeZones();
+  });
 
   late AppDatabase db;
   late AdhkarDao dao;
@@ -51,6 +56,8 @@ void main() {
 
     mockPlugin = MockNotificationPlugin();
     when(() => mockPlugin.supported).thenReturn(true);
+    when(() => mockPlugin.localTimezoneName).thenReturn('UTC');
+    when(() => mockPlugin.updateLocalTimezone(any())).thenAnswer((_) async {});
     when(
       () => mockPlugin.initialize(
         onNotificationTapped: any(named: 'onNotificationTapped'),
@@ -314,6 +321,50 @@ void main() {
         await tester.pumpAndSettle();
 
         verify(() => mockPlugin.requestPermission()).called(1);
+      },
+    );
+
+    testWidgets(
+      'toggling morning reminder when permission denied keeps toggle false, preserves preference, and shows snackbar',
+      (tester) async {
+        when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+        when(() => mockPlugin.requestPermission())
+            .thenAnswer((_) async => false);
+
+        await tester.pumpWidget(buildSubject());
+        await tester.pumpAndSettle();
+
+        final morningSwitch = find.byKey(
+          const Key('adhkar_morning_reminder_toggle'),
+        );
+        await tester.tap(morningSwitch);
+        await tester.pumpAndSettle();
+
+        expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+        final morningWidget = tester.widget<Switch>(morningSwitch);
+        expect(morningWidget.value, isFalse);
+        expect(
+          find.byKey(const Key('adhkar_reminders_permission_snackbar')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'when permission is denied, toggle displays false in UI while preserving saved true preference',
+      (tester) async {
+        await settingsService.setMorningAdhkarNotificationEnabled(true);
+        when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+
+        await tester.pumpWidget(buildSubject());
+        await tester.pumpAndSettle();
+
+        final morningSwitch = find.byKey(
+          const Key('adhkar_morning_reminder_toggle'),
+        );
+        final morningWidget = tester.widget<Switch>(morningSwitch);
+        expect(morningWidget.value, isFalse);
+        expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
       },
     );
 

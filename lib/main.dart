@@ -10,6 +10,8 @@ import 'core/di/di.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'data/services/home_widget_sync_service.dart';
+import 'data/services/prayer_notification_scheduler.dart';
+import 'data/services/prayer_time_service.dart';
 import 'data/services/settings_service.dart';
 import 'domain/repositories/barakah_repository.dart';
 import 'domain/repositories/habit_repository.dart';
@@ -35,13 +37,43 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   StreamSubscription<Uri?>? _widgetClickSub;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initHomeWidgetDeepLinking();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (getIt.isRegistered<PrayerNotificationScheduler>()) {
+        final scheduler = getIt<PrayerNotificationScheduler>();
+        final prayerService = getIt.isRegistered<PrayerTimeService>()
+            ? getIt<PrayerTimeService>()
+            : null;
+        unawaited(() async {
+          final position = await prayerService?.getCurrentPosition();
+          final now = DateTime.now();
+          final times = position != null
+              ? prayerService?.getPrayerTimes(position, date: now)
+              : null;
+          final tomorrowTimes = position != null
+              ? prayerService?.getPrayerTimes(
+                  position,
+                  date: now.add(const Duration(days: 1)),
+                )
+              : null;
+          await scheduler.rescheduleAll(
+            prayerTimes: times,
+            tomorrowPrayerTimes: tomorrowTimes,
+          );
+        }());
+      }
+    }
   }
 
   void _initHomeWidgetDeepLinking() {
@@ -64,6 +96,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _widgetClickSub?.cancel();
     super.dispose();
   }
