@@ -22,6 +22,7 @@ import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_ca
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_collection_completion_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_library_picker_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_my_routines_section.dart';
+import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_reminders_sheet.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_retired_item_card.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_session_dock.dart';
 import 'package:productive_muslim/features/adhkar/presentation/widgets/arabic_typography_sheet.dart';
@@ -445,6 +446,18 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     } catch (_) {}
   }
 
+  void _showRemindersSheet() {
+    AppHaptics.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => const AdhkarRemindersSheet(),
+    ).then((_) {
+      if (mounted) setState(() {});
+    });
+  }
+
   Future<void> _toggleTransliteration() async {
     AppHaptics.lightImpact();
     final next = !_showTransliteration;
@@ -806,6 +819,15 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                         onTap: () => context.push(AppRoutes.adhkarTasbih),
                       ),
                       ProductiveAppBarAction(
+                        key: const Key('adhkar_reminders_app_bar_action'),
+                        tooltip: l10n.adhkarRemindersTitle,
+                        icon:
+                            _settingsService?.hasAnyAdhkarReminderActive == true
+                            ? Icons.notifications_active_rounded
+                            : Icons.notifications_none_rounded,
+                        onTap: _showRemindersSheet,
+                      ),
+                      ProductiveAppBarAction(
                         tooltip: l10n.adhkarToggleTransliteration,
                         icon: _showTransliteration
                             ? Icons.subtitles_rounded
@@ -1072,6 +1094,29 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                                     ),
                                     onPressed: _toggleReviewMode,
                                   ),
+                                IconButton(
+                                  key: const Key(
+                                    'adhkar_reminders_shell_action',
+                                  ),
+                                  tooltip: l10n.adhkarRemindersTitle,
+                                  icon: Icon(
+                                    _settingsService
+                                                ?.hasAnyAdhkarReminderActive ==
+                                            true
+                                        ? Icons.notifications_active_rounded
+                                        : Icons.notifications_none_rounded,
+                                    size: 20,
+                                    color:
+                                        _settingsService
+                                                ?.hasAnyAdhkarReminderActive ==
+                                            true
+                                        ? (isDark
+                                              ? AppColors.primaryLight
+                                              : AppColors.primary)
+                                        : null,
+                                  ),
+                                  onPressed: _showRemindersSheet,
+                                ),
                                 IconButton(
                                   tooltip: l10n.adhkarToggleTransliteration,
                                   icon: Icon(

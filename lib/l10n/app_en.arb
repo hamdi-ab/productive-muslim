@@ -807,5 +807,17 @@
   },
   "tasbihSwitchResetToZero": "Reset to 0",
   "tasbihSwitchKeepAsGeneral": "Keep as General Counter",
-  "tasbihSaveError": "Unable to save counter progress locally"
+  "tasbihSaveError": "Unable to save counter progress locally",
+  "adhkarRemindersTitle": "Adhkar Reminders",
+  "adhkarRemindersSubtitle": "Opt-in, peaceful reminders at your chosen times",
+  "adhkarRemindersGlobalLabel": "Allow Adhkar Reminders",
+  "adhkarRemindersGlobalDesc": "Master control for all morning and evening reminders",
+  "adhkarRemindersPermissionRequired": "Notification Permission Required",
+  "adhkarRemindersPermissionDesc": "Reminders cannot be delivered until notification permission is granted in your device settings.",
+  "adhkarRemindersGrantPermission": "Enable Notifications",
+  "adhkarMorningReminderDesc": "Gentle reminder to begin your day peacefully",
+  "adhkarEveningReminderDesc": "Gentle reminder before your day winds down",
+  "adhkarRemindersPeacefulNotice": "Reminders are local, peaceful, and completely optional. They never imply religious obligation, score progress, or send follow-up nudges.",
+  "adhkarReminderScheduleError": "Unable to schedule reminder. Please check notification permissions.",
+  "adhkarReminderSetTime": "Set Time"
 }

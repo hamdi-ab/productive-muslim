@@ -25,6 +25,10 @@ class _SmartRemindersSettingsCardState
   late bool _qaylulah;
   late int _bedtimeHour;
   late int _bedtimeMinute;
+  late int _morningHour;
+  late int _morningMinute;
+  late int _eveningHour;
+  late int _eveningMinute;
 
   @override
   void initState() {
@@ -42,14 +46,22 @@ class _SmartRemindersSettingsCardState
       _qaylulah = s.qaylulahNotificationEnabled;
       _bedtimeHour = s.bedtimeReminderHour;
       _bedtimeMinute = s.bedtimeReminderMinute;
+      _morningHour = s.morningAdhkarReminderHour;
+      _morningMinute = s.morningAdhkarReminderMinute;
+      _eveningHour = s.eveningAdhkarReminderHour;
+      _eveningMinute = s.eveningAdhkarReminderMinute;
     } else {
-      _morning = true;
-      _evening = true;
+      _morning = false;
+      _evening = false;
       _sleeping = true;
       _fasting = true;
       _qaylulah = false;
       _bedtimeHour = 22;
       _bedtimeMinute = 30;
+      _morningHour = 7;
+      _morningMinute = 0;
+      _eveningHour = 18;
+      _eveningMinute = 0;
     }
   }
 
@@ -157,6 +169,52 @@ class _SmartRemindersSettingsCardState
     }
   }
 
+  Future<void> _pickMorningTime(BuildContext context) async {
+    AppHaptics.selectionClick();
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _morningHour, minute: _morningMinute),
+    );
+    if (!mounted) return;
+    if (selected != null) {
+      if (getIt.isRegistered<SettingsService>()) {
+        await getIt<SettingsService>().setMorningAdhkarReminderTime(
+          hour: selected.hour,
+          minute: selected.minute,
+        );
+      }
+      if (!mounted) return;
+      setState(() {
+        _morningHour = selected.hour;
+        _morningMinute = selected.minute;
+      });
+      await _reschedule();
+    }
+  }
+
+  Future<void> _pickEveningTime(BuildContext context) async {
+    AppHaptics.selectionClick();
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _eveningHour, minute: _eveningMinute),
+    );
+    if (!mounted) return;
+    if (selected != null) {
+      if (getIt.isRegistered<SettingsService>()) {
+        await getIt<SettingsService>().setEveningAdhkarReminderTime(
+          hour: selected.hour,
+          minute: selected.minute,
+        );
+      }
+      if (!mounted) return;
+      setState(() {
+        _eveningHour = selected.hour;
+        _eveningMinute = selected.minute;
+      });
+      await _reschedule();
+    }
+  }
+
   Widget _buildIconContainer(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(8),
@@ -172,6 +230,8 @@ class _SmartRemindersSettingsCardState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final morningTime = TimeOfDay(hour: _morningHour, minute: _morningMinute);
+    final eveningTime = TimeOfDay(hour: _eveningHour, minute: _eveningMinute);
     final bedtime = TimeOfDay(hour: _bedtimeHour, minute: _bedtimeMinute);
     final dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
@@ -203,6 +263,59 @@ class _SmartRemindersSettingsCardState
           value: _morning,
           onChanged: _toggleMorning,
         ),
+        if (_morning) ...[
+          Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
+          ListTile(
+            key: const Key('setting_morning_time_picker'),
+            contentPadding: const EdgeInsets.only(left: 56, right: 16),
+            title: Text(
+              l10n.adhkarReminderSetTime,
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        morningTime.format(context),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            onTap: () => _pickMorningTime(context),
+          ),
+        ],
         Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_qaylulah_toggle'),
@@ -253,6 +366,59 @@ class _SmartRemindersSettingsCardState
           value: _evening,
           onChanged: _toggleEvening,
         ),
+        if (_evening) ...[
+          Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
+          ListTile(
+            key: const Key('setting_evening_time_picker'),
+            contentPadding: const EdgeInsets.only(left: 56, right: 16),
+            title: Text(
+              l10n.adhkarReminderSetTime,
+              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        eveningTime.format(context),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            onTap: () => _pickEveningTime(context),
+          ),
+        ],
         Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_sleeping_adhkar_toggle'),

@@ -12,9 +12,14 @@ void main() {
   });
 
   group('SettingsService Smart Notification Preferences', () {
-    test('defaults are enabled for adhkar and sunnah fasting', () {
-      expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
-      expect(settingsService.eveningAdhkarNotificationEnabled, isTrue);
+    test('defaults are opt-in (disabled) for morning/evening adhkar and enabled for others', () {
+      expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      expect(settingsService.eveningAdhkarNotificationEnabled, isFalse);
+      expect(settingsService.adhkarRemindersGlobalEnabled, isTrue);
+      expect(settingsService.morningAdhkarReminderHour, equals(7));
+      expect(settingsService.morningAdhkarReminderMinute, equals(0));
+      expect(settingsService.eveningAdhkarReminderHour, equals(18));
+      expect(settingsService.eveningAdhkarReminderMinute, equals(0));
       expect(settingsService.sleepingAdhkarNotificationEnabled, isTrue);
       expect(settingsService.sunnahFastingNotificationEnabled, isTrue);
       expect(settingsService.qaylulahNotificationEnabled, isFalse);
@@ -23,11 +28,22 @@ void main() {
     });
 
     test('can toggle preferences and persist', () async {
-      await settingsService.setMorningAdhkarNotificationEnabled(false);
-      expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
 
-      await settingsService.setEveningAdhkarNotificationEnabled(false);
-      expect(settingsService.eveningAdhkarNotificationEnabled, isFalse);
+      await settingsService.setEveningAdhkarNotificationEnabled(true);
+      expect(settingsService.eveningAdhkarNotificationEnabled, isTrue);
+
+      await settingsService.setAdhkarRemindersGlobalEnabled(false);
+      expect(settingsService.adhkarRemindersGlobalEnabled, isFalse);
+
+      await settingsService.setMorningAdhkarReminderTime(hour: 6, minute: 30);
+      expect(settingsService.morningAdhkarReminderHour, equals(6));
+      expect(settingsService.morningAdhkarReminderMinute, equals(30));
+
+      await settingsService.setEveningAdhkarReminderTime(hour: 17, minute: 45);
+      expect(settingsService.eveningAdhkarReminderHour, equals(17));
+      expect(settingsService.eveningAdhkarReminderMinute, equals(45));
 
       await settingsService.setSleepingAdhkarNotificationEnabled(false);
       expect(settingsService.sleepingAdhkarNotificationEnabled, isFalse);

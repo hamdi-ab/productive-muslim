@@ -64,27 +64,45 @@ void main() {
     );
   });
 
-  testWidgets('toggling morning adhkar updates settings service', (
-    tester,
-  ) async {
-    await tester.pumpWidget(buildSubject());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'toggling morning adhkar updates settings service and reveals time picker',
+    (tester) async {
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
 
-    final toggleFinder = find.byKey(const Key('setting_morning_adhkar_toggle'));
-    expect(toggleFinder, findsOneWidget);
+      final toggleFinder = find.byKey(
+        const Key('setting_morning_adhkar_toggle'),
+      );
+      expect(toggleFinder, findsOneWidget);
 
-    // Tap toggle off
-    await tester.tap(toggleFinder);
-    await tester.pumpAndSettle();
+      // Initial default is false (opt-in)
+      expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      expect(
+        find.byKey(const Key('setting_morning_time_picker')),
+        findsNothing,
+      );
 
-    expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      // Tap toggle on
+      await tester.tap(toggleFinder);
+      await tester.pumpAndSettle();
 
-    // Tap toggle on
-    await tester.tap(toggleFinder);
-    await tester.pumpAndSettle();
+      expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
+      expect(
+        find.byKey(const Key('setting_morning_time_picker')),
+        findsOneWidget,
+      );
 
-    expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
-  });
+      // Tap toggle off
+      await tester.tap(toggleFinder);
+      await tester.pumpAndSettle();
+
+      expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      expect(
+        find.byKey(const Key('setting_morning_time_picker')),
+        findsNothing,
+      );
+    },
+  );
 
   testWidgets('toggling sunnah fasting updates settings service', (
     tester,

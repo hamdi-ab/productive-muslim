@@ -233,6 +233,80 @@ class PrayerNotificationScheduler {
     return current.add(const Duration(days: 1));
   }
 
+  Future<void> rescheduleAdhkarReminders({
+    DateTime? now,
+    String? locale,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    }
+    final currentTime = now ?? DateTime.now();
+    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+    final globalEnabled = _settingsService.adhkarRemindersGlobalEnabled;
+
+    // 1. Morning Adhkar Reminder (user-selected time, opt-in, gentle wording)
+    if (globalEnabled && _settingsService.morningAdhkarNotificationEnabled) {
+      final hour = _settingsService.morningAdhkarReminderHour;
+      final minute = _settingsService.morningAdhkarReminderMinute;
+      var morningTarget = DateTime(
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+        hour,
+        minute,
+      );
+      if (morningTarget.isBefore(currentTime)) {
+        morningTarget = morningTarget.add(const Duration(days: 1));
+      }
+
+      await _plugin.zonedSchedule(
+        id: idMorningAdhkar,
+        title: isAr ? 'أذكار الصباح' : 'Morning Adhkar',
+        body: isAr
+            ? 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.'
+            : 'Start your day with peaceful remembrance.',
+        scheduledDate: morningTarget,
+        payload: '/adhkar?category=morning',
+        channelId: channelAdhkar,
+        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
+        matchTimeOnly: true,
+      );
+    } else {
+      await _plugin.cancel(idMorningAdhkar);
+    }
+
+    // 2. Evening Adhkar Reminder (user-selected time, opt-in, gentle wording)
+    if (globalEnabled && _settingsService.eveningAdhkarNotificationEnabled) {
+      final hour = _settingsService.eveningAdhkarReminderHour;
+      final minute = _settingsService.eveningAdhkarReminderMinute;
+      var eveningTarget = DateTime(
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+        hour,
+        minute,
+      );
+      if (eveningTarget.isBefore(currentTime)) {
+        eveningTarget = eveningTarget.add(const Duration(days: 1));
+      }
+
+      await _plugin.zonedSchedule(
+        id: idEveningAdhkar,
+        title: isAr ? 'أذكار المساء' : 'Evening Adhkar',
+        body: isAr
+            ? 'اختم يومك بذكر الله والسكينة.'
+            : 'Wind down your day with peaceful remembrance.',
+        scheduledDate: eveningTarget,
+        payload: '/adhkar?category=evening',
+        channelId: channelAdhkar,
+        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
+        matchTimeOnly: true,
+      );
+    } else {
+      await _plugin.cancel(idEveningAdhkar);
+    }
+  }
+
   Future<void> rescheduleAll({
     DateTime? now,
     PrayerTimes? prayerTimes,
@@ -246,87 +320,8 @@ class PrayerNotificationScheduler {
     final currentTime = now ?? DateTime.now();
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
-    // 1. Morning Adhkar (Fajr + 15 min or 6:00 AM fallback)
-    if (_settingsService.morningAdhkarNotificationEnabled) {
-      DateTime morningTarget;
-      if (prayerTimes != null) {
-        morningTarget = prayerTimes.fajr.add(const Duration(minutes: 15));
-      } else {
-        morningTarget = DateTime(
-          currentTime.year,
-          currentTime.month,
-          currentTime.day,
-          6,
-          0,
-        );
-      }
-      if (morningTarget.isBefore(currentTime)) {
-        if (tomorrowPrayerTimes != null) {
-          morningTarget = tomorrowPrayerTimes.fajr.add(
-            const Duration(minutes: 15),
-          );
-        } else {
-          morningTarget = morningTarget.add(const Duration(days: 1));
-        }
-      }
-
-      await _plugin.zonedSchedule(
-        id: idMorningAdhkar,
-        title: isAr
-            ? '🌅 أذكار الصباح • نور وحفظ'
-            : '🌅 Morning Adhkar • Light & Protection',
-        body: isAr
-            ? 'ابدأ يومك بذكر الله وحصن نفسك بالبركة.'
-            : 'Start your day with divine remembrance and barakah.',
-        scheduledDate: morningTarget,
-        payload: '/adhkar?category=morning',
-        channelId: channelAdhkar,
-        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
-      );
-    } else {
-      await _plugin.cancel(idMorningAdhkar);
-    }
-
-    // 2. Evening Adhkar (Asr + 10 min or 5:00 PM fallback)
-    if (_settingsService.eveningAdhkarNotificationEnabled) {
-      DateTime eveningTarget;
-      if (prayerTimes != null) {
-        eveningTarget = prayerTimes.asr.add(const Duration(minutes: 10));
-      } else {
-        eveningTarget = DateTime(
-          currentTime.year,
-          currentTime.month,
-          currentTime.day,
-          17,
-          0,
-        );
-      }
-      if (eveningTarget.isBefore(currentTime)) {
-        if (tomorrowPrayerTimes != null) {
-          eveningTarget = tomorrowPrayerTimes.asr.add(
-            const Duration(minutes: 10),
-          );
-        } else {
-          eveningTarget = eveningTarget.add(const Duration(days: 1));
-        }
-      }
-
-      await _plugin.zonedSchedule(
-        id: idEveningAdhkar,
-        title: isAr
-            ? '🌆 أذكار المساء • حصن المسلم'
-            : '🌆 Evening Adhkar • Evening Shield',
-        body: isAr
-            ? 'حصّن مسائك بالأذكار المأثورة قبل غروب الشمس.'
-            : 'Fortify your evening with authentic remembrance before sunset.',
-        scheduledDate: eveningTarget,
-        payload: '/adhkar?category=evening',
-        channelId: channelAdhkar,
-        channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
-      );
-    } else {
-      await _plugin.cancel(idEveningAdhkar);
-    }
+    // Morning and Evening Adhkar Reminders
+    await rescheduleAdhkarReminders(now: currentTime, locale: locale);
 
     // 3. Bedtime Adhkar (configured hour/minute)
     if (_settingsService.sleepingAdhkarNotificationEnabled) {

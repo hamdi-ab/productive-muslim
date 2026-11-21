@@ -48,67 +48,75 @@ void main() {
   });
 
   group('PrayerNotificationScheduler', () {
-    test('schedules morning, evening, bedtime, and fasting when enabled (English)', () async {
-      final now = DateTime(2026, 9, 29, 5, 0); // 5:00 AM on a Tuesday
-      final coordinates = Coordinates(21.4225, 39.8262);
-      final params = CalculationMethodParameters.muslimWorldLeague();
-      final prayerTimes = PrayerTimes(
-        date: now,
-        coordinates: coordinates,
-        calculationParameters: params,
-      );
+    test(
+      'schedules morning, evening, bedtime, and fasting when enabled (English)',
+      () async {
+        await settingsService.setMorningAdhkarNotificationEnabled(true);
+        await settingsService.setEveningAdhkarNotificationEnabled(true);
 
-      await scheduler.rescheduleAll(
-        now: now,
-        prayerTimes: prayerTimes,
-        locale: 'en',
-      );
+        final now = DateTime(2026, 9, 29, 5, 0); // 5:00 AM on a Tuesday
+        final coordinates = Coordinates(21.4225, 39.8262);
+        final params = CalculationMethodParameters.muslimWorldLeague();
+        final prayerTimes = PrayerTimes(
+          date: now,
+          coordinates: coordinates,
+          calculationParameters: params,
+        );
 
-      // Verify Morning Adhkar scheduled with English copy
-      verify(
-        () => mockPlugin.zonedSchedule(
-          id: PrayerNotificationScheduler.idMorningAdhkar,
-          title: '🌅 Morning Adhkar • Light & Protection',
-          body: 'Start your day with divine remembrance and barakah.',
-          scheduledDate: any(named: 'scheduledDate'),
-          payload: '/adhkar?category=morning',
-          channelId: any(named: 'channelId'),
-          channelName: any(named: 'channelName'),
-          matchTimeOnly: any(named: 'matchTimeOnly'),
-        ),
-      ).called(1);
+        await scheduler.rescheduleAll(
+          now: now,
+          prayerTimes: prayerTimes,
+          locale: 'en',
+        );
 
-      // Verify Evening Adhkar scheduled with English copy
-      verify(
-        () => mockPlugin.zonedSchedule(
-          id: PrayerNotificationScheduler.idEveningAdhkar,
-          title: '🌆 Evening Adhkar • Evening Shield',
-          body:
-              'Fortify your evening with authentic remembrance before sunset.',
-          scheduledDate: any(named: 'scheduledDate'),
-          payload: '/adhkar?category=evening',
-          channelId: any(named: 'channelId'),
-          channelName: any(named: 'channelName'),
-          matchTimeOnly: any(named: 'matchTimeOnly'),
-        ),
-      ).called(1);
+        // Verify Morning Adhkar scheduled with gentle English copy
+        verify(
+          () => mockPlugin.zonedSchedule(
+            id: PrayerNotificationScheduler.idMorningAdhkar,
+            title: 'Morning Adhkar',
+            body: 'Start your day with peaceful remembrance.',
+            scheduledDate: DateTime(2026, 9, 29, 7, 0),
+            payload: '/adhkar?category=morning',
+            channelId: any(named: 'channelId'),
+            channelName: any(named: 'channelName'),
+            matchTimeOnly: true,
+          ),
+        ).called(1);
 
-      // Verify Bedtime Adhkar scheduled with English copy
-      verify(
-        () => mockPlugin.zonedSchedule(
-          id: PrayerNotificationScheduler.idSleepingAdhkar,
-          title: '🌙 Bedtime Adhkar & Sunnah',
-          body: 'Wind down with Ayat al-Kursi, Surat Al-Ikhlas, and bedtime supplication.',
-          scheduledDate: any(named: 'scheduledDate'),
-          payload: '/adhkar?category=sleeping',
-          channelId: any(named: 'channelId'),
-          channelName: any(named: 'channelName'),
-          matchTimeOnly: true,
-        ),
-      ).called(1);
-    });
+        // Verify Evening Adhkar scheduled with gentle English copy
+        verify(
+          () => mockPlugin.zonedSchedule(
+            id: PrayerNotificationScheduler.idEveningAdhkar,
+            title: 'Evening Adhkar',
+            body: 'Wind down your day with peaceful remembrance.',
+            scheduledDate: DateTime(2026, 9, 29, 18, 0),
+            payload: '/adhkar?category=evening',
+            channelId: any(named: 'channelId'),
+            channelName: any(named: 'channelName'),
+            matchTimeOnly: true,
+          ),
+        ).called(1);
+
+        // Verify Bedtime Adhkar scheduled with English copy
+        verify(
+          () => mockPlugin.zonedSchedule(
+            id: PrayerNotificationScheduler.idSleepingAdhkar,
+            title: '🌙 Bedtime Adhkar & Sunnah',
+            body: 'Wind down with Ayat al-Kursi, Surat Al-Ikhlas, and bedtime supplication.',
+            scheduledDate: any(named: 'scheduledDate'),
+            payload: '/adhkar?category=sleeping',
+            channelId: any(named: 'channelId'),
+            channelName: any(named: 'channelName'),
+            matchTimeOnly: true,
+          ),
+        ).called(1);
+      },
+    );
 
     test('schedules notifications in Arabic when locale is ar', () async {
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setEveningAdhkarNotificationEnabled(true);
+
       final now = DateTime(2026, 9, 29, 5, 0);
       final coordinates = Coordinates(21.4225, 39.8262);
       final params = CalculationMethodParameters.muslimWorldLeague();
@@ -127,34 +135,41 @@ void main() {
       verify(
         () => mockPlugin.zonedSchedule(
           id: PrayerNotificationScheduler.idMorningAdhkar,
-          title: '🌅 أذكار الصباح • نور وحفظ',
-          body: 'ابدأ يومك بذكر الله وحصن نفسك بالبركة.',
+          title: 'أذكار الصباح',
+          body: 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.',
           scheduledDate: any(named: 'scheduledDate'),
           payload: '/adhkar?category=morning',
           channelId: any(named: 'channelId'),
           channelName: 'أذكار اليوم',
-          matchTimeOnly: any(named: 'matchTimeOnly'),
+          matchTimeOnly: true,
         ),
       ).called(1);
 
       verify(
         () => mockPlugin.zonedSchedule(
           id: PrayerNotificationScheduler.idEveningAdhkar,
-          title: '🌆 أذكار المساء • حصن المسلم',
-          body: 'حصّن مسائك بالأذكار المأثورة قبل غروب الشمس.',
+          title: 'أذكار المساء',
+          body: 'اختم يومك بذكر الله والسكينة.',
           scheduledDate: any(named: 'scheduledDate'),
           payload: '/adhkar?category=evening',
           channelId: any(named: 'channelId'),
           channelName: 'أذكار اليوم',
-          matchTimeOnly: any(named: 'matchTimeOnly'),
+          matchTimeOnly: true,
         ),
       ).called(1);
     });
 
     test(
-      'recalculates tomorrow prayer times when today prayer has passed',
+      'recalculates tomorrow morning reminder when today time has passed',
       () async {
-        final now = DateTime(2026, 9, 29, 14, 0); // 2:00 PM (Fajr has passed)
+        await settingsService.setMorningAdhkarNotificationEnabled(true);
+        final now = DateTime(
+          2026,
+          9,
+          29,
+          14,
+          0,
+        ); // 2:00 PM (7:00 AM has passed)
         final tomorrow = now.add(const Duration(days: 1));
         final coordinates = Coordinates(21.4225, 39.8262);
         final params = CalculationMethodParameters.muslimWorldLeague();
@@ -175,20 +190,18 @@ void main() {
           tomorrowPrayerTimes: prayerTimesTomorrow,
         );
 
-        final expectedTomorrowFajr = prayerTimesTomorrow.fajr.add(
-          const Duration(minutes: 15),
-        );
+        final expectedTomorrowMorning = DateTime(2026, 9, 30, 7, 0);
 
         verify(
           () => mockPlugin.zonedSchedule(
             id: PrayerNotificationScheduler.idMorningAdhkar,
             title: any(named: 'title'),
             body: any(named: 'body'),
-            scheduledDate: expectedTomorrowFajr,
+            scheduledDate: expectedTomorrowMorning,
             payload: '/adhkar?category=morning',
             channelId: any(named: 'channelId'),
             channelName: any(named: 'channelName'),
-            matchTimeOnly: any(named: 'matchTimeOnly'),
+            matchTimeOnly: true,
           ),
         ).called(1);
       },
