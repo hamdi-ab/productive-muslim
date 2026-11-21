@@ -10,10 +10,42 @@ import 'package:productive_muslim/data/local/daos/adhkar_dao.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
 import 'package:productive_muslim/data/repositories/adhkar_repository_impl.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/domain/models/dhikr.dart';
 import 'package:productive_muslim/domain/models/tasbih_state.dart';
 import 'package:productive_muslim/domain/repositories/adhkar_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/tasbih_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
+
+class FailingAdhkarRepository extends Fake implements AdhkarRepository {
+  final AdhkarRepository inner;
+  bool shouldFail = true;
+
+  FailingAdhkarRepository(this.inner);
+
+  @override
+  Future<TasbihState> getTasbihState() => inner.getTasbihState();
+
+  @override
+  Stream<TasbihState> watchTasbihState() => inner.watchTasbihState();
+
+  @override
+  bool get isReviewModeEnabled => inner.isReviewModeEnabled;
+
+  @override
+  DhikrItem? getById(String id, {bool? includePendingReview}) =>
+      inner.getById(id, includePendingReview: includePendingReview);
+
+  @override
+  Future<void> saveTasbihState(TasbihState state) async {
+    if (shouldFail) {
+      throw Exception('Database write failed');
+    }
+    await inner.saveTasbihState(state);
+  }
+
+  @override
+  Future<void> resetTasbihCount() => inner.resetTasbihCount();
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -350,7 +382,7 @@ void main() {
     );
 
     testWidgets(
-      'handles retired or unapproved library entries safely with prominent warning',
+      'handles retired or unapproved library entries safely with prominent warning and custom conversion without exposing raw id',
       (tester) async {
         // Seed state with an unapproved/retired dhikrId
         final unapprovedItem = AdhkarCatalog.all.first;
@@ -375,9 +407,25 @@ void main() {
         expect(find.text('Remembrance retired or unapproved'), findsOneWidget);
         expect(find.text('Approved Library'), findsNothing);
 
-        // Converting to custom label clears dhikrId and converts safely
+        // Converting to custom label opens dialog; text field is NOT pre-filled with unapproved raw ID
         await tester.tap(
           find.byKey(const Key('tasbih_convert_to_custom_button')),
+        );
+        await tester.pumpAndSettle();
+
+        final textField = tester.widget<TextField>(
+          find.byKey(const Key('tasbih_custom_label_input')),
+        );
+        expect(textField.controller?.text, isNot(unapprovedItem.id));
+        expect(textField.controller?.text.isEmpty, isTrue);
+
+        // User enters their own personal label
+        await tester.enterText(
+          find.byKey(const Key('tasbih_custom_label_input')),
+          'My Morning Remembrance',
+        );
+        await tester.tap(
+          find.byKey(const Key('tasbih_custom_label_save_button')),
         );
         await tester.pumpAndSettle();
 
@@ -386,10 +434,363 @@ void main() {
           find.byKey(const Key('tasbih_personal_label_badge')),
           findsOneWidget,
         );
+        expect(find.text('My Morning Remembrance'), findsOneWidget);
+        // Raw internal ID is never displayed
+        expect(find.text(unapprovedItem.id), findsNothing);
 
         final state = await repository.getTasbihState();
         expect(state.dhikrId, isNull);
-        expect(state.customLabel, unapprovedItem.id);
+        expect(state.customLabel, 'My Morning Remembrance');
+        expect(state.currentCount, 10);
+      },
+    );
+  });
+
+  group('TasbihScreen Remembrance Switching & Count Isolation (Finding 1)', () {
+    testWidgets(
+      'changing library item when count > 0 prompts confirmation, reset to 0 sets count 0 with new dhikr',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final items = AdhkarCatalog.all;
+        final firstItem = items[0];
+        final secondItem = items[1];
+
+        // Seed with firstItem and count = 15
+        await repository.saveTasbihState(
+          TasbihState(
+            currentCount: 15,
+            dhikrId: firstItem.id,
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('15'), findsOneWidget);
+
+        // Open change remembrance modal -> select from library
+        await tester.tap(
+          find.byKey(const Key('tasbih_change_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_choose_library_option')));
+        await tester.pumpAndSettle();
+
+        // Select second item
+        await tester.tap(find.text(secondItem.arabic));
+        await tester.pumpAndSettle();
+
+        // Confirmation dialog is displayed
+        expect(find.text('Change Remembrance?'), findsOneWidget);
+        expect(
+          find.text(
+            'You have an active count of 15. Reset count for the new remembrance or keep count as an unlabelled counter?',
+          ),
+          findsOneWidget,
+        );
+
+        // Tap "Reset to 0"
+        await tester.tap(find.byKey(const Key('tasbih_switch_reset_button')));
+        await tester.pumpAndSettle();
+
+        // Count is reset to 0 and new dhikr is active
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text(secondItem.arabic), findsOneWidget);
+
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 0);
+        expect(state.dhikrId, secondItem.id);
+        expect(state.customLabel, isNull);
+      },
+    );
+
+    testWidgets(
+      'changing library item when count > 0 prompts confirmation, keep count preserves count and clears dhikr',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final items = AdhkarCatalog.all;
+        final firstItem = items[0];
+        final secondItem = items[1];
+
+        await repository.saveTasbihState(
+          TasbihState(
+            currentCount: 15,
+            dhikrId: firstItem.id,
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('tasbih_change_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_choose_library_option')));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text(secondItem.arabic));
+        await tester.pumpAndSettle();
+
+        // Tap "Keep as General Counter"
+        await tester.tap(find.byKey(const Key('tasbih_switch_keep_button')));
+        await tester.pumpAndSettle();
+
+        // Count is preserved (15), dhikr is cleared to free counter
+        expect(find.text('15'), findsOneWidget);
+        expect(find.text('Free Counter'), findsOneWidget);
+        expect(find.text(secondItem.arabic), findsNothing);
+
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 15);
+        expect(state.dhikrId, isNull);
+        expect(state.customLabel, isNull);
+      },
+    );
+
+    testWidgets(
+      'changing remembrance when count > 0 prompts confirmation, cancel preserves count and previous dhikr',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final items = AdhkarCatalog.all;
+        final firstItem = items[0];
+        final secondItem = items[1];
+
+        await repository.saveTasbihState(
+          TasbihState(
+            currentCount: 15,
+            dhikrId: firstItem.id,
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('tasbih_change_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_choose_library_option')));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text(secondItem.arabic));
+        await tester.pumpAndSettle();
+
+        // Tap "Cancel"
+        await tester.tap(find.byKey(const Key('tasbih_switch_cancel_button')));
+        await tester.pumpAndSettle();
+
+        // Count is preserved (15) and previous dhikr remains
+        expect(find.text('15'), findsOneWidget);
+        expect(find.text(firstItem.arabic), findsOneWidget);
+
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 15);
+        expect(state.dhikrId, firstItem.id);
+      },
+    );
+
+    testWidgets(
+      'switching to custom label when count > 0 prompts confirmation and reset to 0 applies label with count 0',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final firstItem = AdhkarCatalog.all.first;
+
+        await repository.saveTasbihState(
+          TasbihState(
+            currentCount: 20,
+            dhikrId: firstItem.id,
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to custom label
+        await tester.tap(
+          find.byKey(const Key('tasbih_change_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_custom_label_option')));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byKey(const Key('tasbih_custom_label_input')),
+          'Personal Istighfar',
+        );
+        await tester.tap(
+          find.byKey(const Key('tasbih_custom_label_save_button')),
+        );
+        await tester.pumpAndSettle();
+
+        // Confirmation dialog is shown
+        expect(find.text('Change Remembrance?'), findsOneWidget);
+
+        // Tap "Reset to 0"
+        await tester.tap(find.byKey(const Key('tasbih_switch_reset_button')));
+        await tester.pumpAndSettle();
+
+        // Count is 0 and custom label is shown
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text('Personal Istighfar'), findsOneWidget);
+        expect(
+          find.byKey(const Key('tasbih_personal_label_badge')),
+          findsOneWidget,
+        );
+
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 0);
+        expect(state.customLabel, 'Personal Istighfar');
+        expect(state.dhikrId, isNull);
+      },
+    );
+
+    testWidgets(
+      'switching to custom label when count > 0 prompts confirmation and keep count clears dhikr and label',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final firstItem = AdhkarCatalog.all.first;
+
+        await repository.saveTasbihState(
+          TasbihState(
+            currentCount: 20,
+            dhikrId: firstItem.id,
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const Key('tasbih_change_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_custom_label_option')));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byKey(const Key('tasbih_custom_label_input')),
+          'Personal Istighfar',
+        );
+        await tester.tap(
+          find.byKey(const Key('tasbih_custom_label_save_button')),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap "Keep as General Counter"
+        await tester.tap(find.byKey(const Key('tasbih_switch_keep_button')));
+        await tester.pumpAndSettle();
+
+        // Count preserved, unlabelled free counter
+        expect(find.text('20'), findsOneWidget);
+        expect(find.text('Free Counter'), findsOneWidget);
+        expect(find.text('Personal Istighfar'), findsNothing);
+
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 20);
+        expect(state.customLabel, isNull);
+        expect(state.dhikrId, isNull);
+      },
+    );
+
+    testWidgets(
+      'switching remembrance when count == 0 switches immediately without confirmation',
+      (tester) async {
+        await repository.setReviewModeEnabled(true);
+        final firstItem = AdhkarCatalog.all.first;
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            screen: const TasbihScreen(isReviewModeEnabled: true),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('0'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const Key('tasbih_set_remembrance_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('tasbih_choose_library_option')));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text(firstItem.arabic));
+        await tester.pumpAndSettle();
+
+        // Switches immediately without showing dialog
+        expect(find.text('Change Remembrance?'), findsNothing);
+        expect(find.text(firstItem.arabic), findsOneWidget);
+        expect(find.text('0'), findsOneWidget);
+
+        final state = await repository.getTasbihState();
+        expect(state.dhikrId, firstItem.id);
+        expect(state.currentCount, 0);
+      },
+    );
+  });
+
+  group('TasbihScreen Persistence Safety & Error Recovery (Finding 3)', () {
+    testWidgets(
+      'persistence failure surfaces visible non-disruptive snackbar with working retry',
+      (tester) async {
+        final failingRepo = FailingAdhkarRepository(repository);
+        await getIt.unregister<AdhkarRepository>();
+        getIt.registerSingleton<AdhkarRepository>(failingRepo);
+
+        await tester.pumpWidget(buildTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap counter -> saving will fail
+        await tester.tap(find.byKey(const Key('tasbih_counter_button')));
+        await tester.pumpAndSettle();
+
+        // Visible SnackBar is displayed
+        expect(
+          find.byKey(const Key('tasbih_save_error_snackbar')),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Unable to save counter progress locally'),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('tasbih_retry_save_button')),
+          findsOneWidget,
+        );
+
+        // Fix failure condition and tap retry
+        failingRepo.shouldFail = false;
+        await tester.tap(find.byKey(const Key('tasbih_retry_save_button')));
+        await tester.pumpAndSettle();
+
+        // State is now persisted
+        final state = await repository.getTasbihState();
+        expect(state.currentCount, 1);
       },
     );
   });

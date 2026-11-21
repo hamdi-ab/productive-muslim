@@ -2023,4 +2023,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tasbihPersonalTargetModalTitle => 'تحديد هدف شخصي';
+
+  @override
+  String get tasbihSwitchConfirmTitle => 'تغيير الذكر؟';
+
+  @override
+  String tasbihSwitchConfirmDesc(int count) {
+    return 'لديك عداد حالي قدره $count. هل تريد تصفير العداد للذكر الجديد أم الاحتفاظ به كعداد عام؟';
+  }
+
+  @override
+  String get tasbihSwitchResetToZero => 'تصفير إلى 0';
+
+  @override
+  String get tasbihSwitchKeepAsGeneral => 'احتفاظ كعداد عام';
+
+  @override
+  String get tasbihSaveError => 'تعذر حفظ تقدم العداد محليًا';
 }

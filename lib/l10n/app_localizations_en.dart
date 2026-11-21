@@ -2031,4 +2031,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tasbihPersonalTargetModalTitle => 'Set Personal Target';
+
+  @override
+  String get tasbihSwitchConfirmTitle => 'Change Remembrance?';
+
+  @override
+  String tasbihSwitchConfirmDesc(int count) {
+    return 'You have an active count of $count. Reset count for the new remembrance or keep count as an unlabelled counter?';
+  }
+
+  @override
+  String get tasbihSwitchResetToZero => 'Reset to 0';
+
+  @override
+  String get tasbihSwitchKeepAsGeneral => 'Keep as General Counter';
+
+  @override
+  String get tasbihSaveError => 'Unable to save counter progress locally';
 }

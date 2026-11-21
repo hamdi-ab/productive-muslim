@@ -691,5 +691,17 @@
   "tasbihHapticsDisabled": "الاهتزاز معطّل",
   "tasbihToggleHaptics": "تبديل الاهتزاز",
   "tasbihSelectRemembranceModalTitle": "ماذا تريد أن تعد؟",
-  "tasbihPersonalTargetModalTitle": "تحديد هدف شخصي"
+  "tasbihPersonalTargetModalTitle": "تحديد هدف شخصي",
+  "tasbihSwitchConfirmTitle": "تغيير الذكر؟",
+  "tasbihSwitchConfirmDesc": "لديك عداد حالي قدره {count}. هل تريد تصفير العداد للذكر الجديد أم الاحتفاظ به كعداد عام؟",
+  "@tasbihSwitchConfirmDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tasbihSwitchResetToZero": "تصفير إلى 0",
+  "tasbihSwitchKeepAsGeneral": "احتفاظ كعداد عام",
+  "tasbihSaveError": "تعذر حفظ تقدم العداد محليًا"
 }

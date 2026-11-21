@@ -16,6 +16,8 @@ import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_ba
 import 'package:productive_muslim/features/adhkar/presentation/widgets/adhkar_library_picker_sheet.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
+enum _RemembranceSwitchAction { resetToZero, keepAsGeneral, cancel }
+
 class TasbihScreen extends StatefulWidget {
   final bool? isReviewModeEnabled;
 
@@ -198,7 +200,165 @@ class _TasbihScreenState extends State<TasbihScreen> {
     if (_adhkarRepo != null) {
       try {
         await _adhkarRepo!.saveTasbihState(state);
-      } catch (_) {}
+      } catch (_) {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context);
+        if (l10n == null) return;
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            key: const Key('tasbih_save_error_snackbar'),
+            content: Text(l10n.tasbihSaveError),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              key: const Key('tasbih_retry_save_button'),
+              label: l10n.retry,
+              onPressed: () => _saveState(_state),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _applyRemembranceChange({
+    String? newDhikrId,
+    String? newCustomLabel,
+    required bool resetCount,
+  }) async {
+    final updated = _state.copyWith(
+      currentCount: resetCount ? 0 : _state.currentCount,
+      clearLastCount: resetCount,
+      dhikrId: newDhikrId,
+      clearDhikr: newDhikrId == null,
+      customLabel: newCustomLabel,
+      clearCustomLabel: newCustomLabel == null,
+      updatedAt: DateTime.now(),
+    );
+    if (mounted) {
+      setState(() => _state = updated);
+    }
+    await _saveState(updated);
+  }
+
+  Future<void> _promptRemembranceChange({
+    String? newDhikrId,
+    String? newCustomLabel,
+  }) async {
+    // If setting empty/null, clear remembrance and keep count as free counter
+    if (newDhikrId == null && newCustomLabel == null) {
+      final updated = _state.copyWith(
+        clearDhikr: true,
+        clearCustomLabel: true,
+        updatedAt: DateTime.now(),
+      );
+      if (mounted) {
+        setState(() => _state = updated);
+      }
+      await _saveState(updated);
+      return;
+    }
+
+    // If selecting the exact same remembrance, do nothing
+    if (newDhikrId != null && newDhikrId == _state.dhikrId) return;
+    if (newCustomLabel != null &&
+        newCustomLabel == _state.customLabel &&
+        _state.dhikrId == null) {
+      return;
+    }
+
+    // If count is 0, switch immediately without prompting
+    if (_state.currentCount <= 0) {
+      await _applyRemembranceChange(
+        newDhikrId: newDhikrId,
+        newCustomLabel: newCustomLabel,
+        resetCount: false,
+      );
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final action = await showDialog<_RemembranceSwitchAction>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          l10n.tasbihSwitchConfirmTitle,
+          style: TextStyle(
+            color: isDark ? Colors.white : AppColors.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          l10n.tasbihSwitchConfirmDesc(_state.currentCount),
+          style: TextStyle(
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            key: const Key('tasbih_switch_cancel_button'),
+            onPressed: () =>
+                Navigator.pop(ctx, _RemembranceSwitchAction.cancel),
+            child: Text(
+              MaterialLocalizations.of(context).cancelButtonLabel,
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          OutlinedButton(
+            key: const Key('tasbih_switch_keep_button'),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () =>
+                Navigator.pop(ctx, _RemembranceSwitchAction.keepAsGeneral),
+            child: Text(l10n.tasbihSwitchKeepAsGeneral),
+          ),
+          ElevatedButton(
+            key: const Key('tasbih_switch_reset_button'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () =>
+                Navigator.pop(ctx, _RemembranceSwitchAction.resetToZero),
+            child: Text(l10n.tasbihSwitchResetToZero),
+          ),
+        ],
+      ),
+    );
+
+    if (action == _RemembranceSwitchAction.resetToZero) {
+      await _applyRemembranceChange(
+        newDhikrId: newDhikrId,
+        newCustomLabel: newCustomLabel,
+        resetCount: true,
+      );
+    } else if (action == _RemembranceSwitchAction.keepAsGeneral) {
+      final updated = _state.copyWith(
+        clearDhikr: true,
+        clearCustomLabel: true,
+        updatedAt: DateTime.now(),
+      );
+      if (mounted) {
+        setState(() => _state = updated);
+      }
+      await _saveState(updated);
     }
   }
 
@@ -355,22 +515,22 @@ class _TasbihScreenState extends State<TasbihScreen> {
       builder: (ctx) => AdhkarLibraryPickerSheet(
         includePendingReview: _isReviewMode,
         alreadySelectedIds: _state.dhikrId != null ? {_state.dhikrId!} : {},
-        onItemSelected: (item) async {
-          final updated = _state.copyWith(
-            dhikrId: item.id,
-            clearCustomLabel: true,
-            updatedAt: DateTime.now(),
-          );
-          setState(() => _state = updated);
-          await _saveState(updated);
+        onItemSelected: (item) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              _promptRemembranceChange(newDhikrId: item.id);
+            }
+          });
         },
       ),
     );
   }
 
-  void _openCustomLabelDialog() {
+  void _openCustomLabelDialog({bool isConvertingRetired = false}) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Only prefill if a genuine prior user custom label exists.
+    // Never prefill with rawId / dhikrId.
     final controller = TextEditingController(text: _state.customLabel ?? '');
 
     showDialog(
@@ -457,14 +617,24 @@ class _TasbihScreenState extends State<TasbihScreen> {
             onPressed: () async {
               final text = controller.text.trim();
               Navigator.pop(ctx);
-              final updated = _state.copyWith(
-                customLabel: text.isNotEmpty ? text : null,
-                clearCustomLabel: text.isEmpty,
-                clearDhikr: true,
-                updatedAt: DateTime.now(),
-              );
-              setState(() => _state = updated);
-              await _saveState(updated);
+              if (isConvertingRetired) {
+                final updated = _state.copyWith(
+                  customLabel: text.isNotEmpty ? text : null,
+                  clearCustomLabel: text.isEmpty,
+                  clearDhikr: true,
+                  updatedAt: DateTime.now(),
+                );
+                setState(() => _state = updated);
+                await _saveState(updated);
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    _promptRemembranceChange(
+                      newCustomLabel: text.isNotEmpty ? text : null,
+                    );
+                  }
+                });
+              }
             },
             child: Text(l10n.adhkarRoutineSave),
           ),
@@ -847,16 +1017,8 @@ class _TasbihScreenState extends State<TasbihScreen> {
                 ),
                 OutlinedButton(
                   key: const Key('tasbih_convert_to_custom_button'),
-                  onPressed: () async {
-                    final rawId = _state.dhikrId ?? '';
-                    final updated = _state.copyWith(
-                      customLabel: rawId,
-                      clearDhikr: true,
-                      updatedAt: DateTime.now(),
-                    );
-                    setState(() => _state = updated);
-                    await _saveState(updated);
-                  },
+                  onPressed: () =>
+                      _openCustomLabelDialog(isConvertingRetired: true),
                   child: Text(l10n.tasbihUseAsCustomLabel),
                 ),
               ],

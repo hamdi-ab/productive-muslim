@@ -3649,6 +3649,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set Personal Target'**
   String get tasbihPersonalTargetModalTitle;
+
+  /// No description provided for @tasbihSwitchConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Remembrance?'**
+  String get tasbihSwitchConfirmTitle;
+
+  /// No description provided for @tasbihSwitchConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an active count of {count}. Reset count for the new remembrance or keep count as an unlabelled counter?'**
+  String tasbihSwitchConfirmDesc(int count);
+
+  /// No description provided for @tasbihSwitchResetToZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to 0'**
+  String get tasbihSwitchResetToZero;
+
+  /// No description provided for @tasbihSwitchKeepAsGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep as General Counter'**
+  String get tasbihSwitchKeepAsGeneral;
+
+  /// No description provided for @tasbihSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save counter progress locally'**
+  String get tasbihSaveError;
 }
 
 class _AppLocalizationsDelegate

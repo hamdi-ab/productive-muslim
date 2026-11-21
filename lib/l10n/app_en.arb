@@ -795,5 +795,17 @@
   "tasbihHapticsDisabled": "Haptics disabled",
   "tasbihToggleHaptics": "Toggle vibration",
   "tasbihSelectRemembranceModalTitle": "What are you counting?",
-  "tasbihPersonalTargetModalTitle": "Set Personal Target"
+  "tasbihPersonalTargetModalTitle": "Set Personal Target",
+  "tasbihSwitchConfirmTitle": "Change Remembrance?",
+  "tasbihSwitchConfirmDesc": "You have an active count of {count}. Reset count for the new remembrance or keep count as an unlabelled counter?",
+  "@tasbihSwitchConfirmDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tasbihSwitchResetToZero": "Reset to 0",
+  "tasbihSwitchKeepAsGeneral": "Keep as General Counter",
+  "tasbihSaveError": "Unable to save counter progress locally"
 }
