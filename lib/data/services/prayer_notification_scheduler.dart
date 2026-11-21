@@ -1,16 +1,32 @@
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+tz.Location _safeLocalLocation() {
+  try {
+    return tz.local;
+  } catch (_) {
+    try {
+      tz_data.initializeTimeZones();
+      return tz.local;
+    } catch (_) {
+      return tz.UTC;
+    }
+  }
+}
+
 /// Adapter interface to decouple FlutterLocalNotificationsPlugin for testing.
 abstract class NotificationPluginAdapter {
   bool get supported;
+  String get localTimezoneName;
   Future<void> initialize({
     void Function(String payload)? onNotificationTapped,
   });
+  Future<void> updateLocalTimezone([String? timeZoneName]);
   Future<bool> requestPermission();
   Future<bool> hasPermission();
   Future<void> cancel(int id);
@@ -28,20 +44,45 @@ abstract class NotificationPluginAdapter {
 
 class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
   final FlutterLocalNotificationsPlugin _plugin;
+  final MethodChannel _timezoneChannel;
   final void Function(String payload)? onNotificationTapped;
   bool _initialized = false;
   bool _launchChecked = false;
 
   LocalNotificationPluginAdapter({
     FlutterLocalNotificationsPlugin? plugin,
+    MethodChannel timezoneChannel = const MethodChannel(
+      'productive_muslim/timezone',
+    ),
     this.onNotificationTapped,
-  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
+       _timezoneChannel = timezoneChannel;
 
   @override
   bool get supported =>
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS);
+
+  @override
+  String get localTimezoneName => _safeLocalLocation().name;
+
+  @override
+  Future<void> updateLocalTimezone([String? timeZoneName]) async {
+    try {
+      tz_data.initializeTimeZones();
+    } catch (_) {}
+    try {
+      final zone =
+          timeZoneName ??
+          (supported
+              ? await _timezoneChannel.invokeMethod<String>('getLocalTimezone')
+              : null);
+      if (zone != null) {
+        tz.setLocalLocation(tz.getLocation(zone));
+      }
+    } catch (_) {}
+  }
 
   @override
   Future<void> initialize({
@@ -69,6 +110,7 @@ class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
       );
 
       tz_data.initializeTimeZones();
+      await updateLocalTimezone();
       _initialized = true;
     }
 
@@ -143,7 +185,10 @@ class LocalNotificationPluginAdapter implements NotificationPluginAdapter {
   }) async {
     if (!supported) return;
 
-    final tzDate = tz.TZDateTime.from(scheduledDate, tz.local);
+    final loc = _safeLocalLocation();
+    final tz.TZDateTime tzDate = scheduledDate is tz.TZDateTime
+        ? scheduledDate
+        : tz.TZDateTime.from(scheduledDate, loc);
     await _plugin.zonedSchedule(
       id: id,
       title: title,
@@ -196,6 +241,9 @@ class PrayerNotificationScheduler {
   Future<void> initialize({
     void Function(String payload)? onNotificationTapped,
   }) async {
+    try {
+      tz_data.initializeTimeZones();
+    } catch (_) {}
     await _plugin.initialize(onNotificationTapped: onNotificationTapped);
     _initialized = true;
   }
@@ -233,115 +281,155 @@ class PrayerNotificationScheduler {
     return current.add(const Duration(days: 1));
   }
 
-  Future<void> rescheduleAll({
-    DateTime? now,
-    PrayerTimes? prayerTimes,
-    PrayerTimes? tomorrowPrayerTimes,
-    String? locale,
-  }) async {
+  Future<void> updateTimezone([String? timeZoneName]) async {
     if (!_initialized) {
       await initialize();
     }
+    await _plugin.updateLocalTimezone(timeZoneName);
+  }
 
-    final currentTime = now ?? DateTime.now();
+  tz.Location _resolveLocation(DateTime? referenceTime, tz.Location? location) {
+    if (location != null) return location;
+    if (referenceTime is tz.TZDateTime) return referenceTime.location;
+    return _safeLocalLocation();
+  }
+
+  tz.TZDateTime calculateNextAdhkarOccurrence({
+    required int hour,
+    required int minute,
+    DateTime? referenceTime,
+    tz.Location? location,
+  }) {
+    final loc = _resolveLocation(referenceTime, location);
+    final ref = referenceTime != null
+        ? (referenceTime is tz.TZDateTime
+              ? referenceTime
+              : tz.TZDateTime.from(referenceTime, loc))
+        : tz.TZDateTime.now(loc);
+
+    var target = tz.TZDateTime(loc, ref.year, ref.month, ref.day, hour, minute);
+
+    if (!target.isAfter(ref)) {
+      final nextDay = ref.add(const Duration(days: 1));
+      target = tz.TZDateTime(
+        loc,
+        nextDay.year,
+        nextDay.month,
+        nextDay.day,
+        hour,
+        minute,
+      );
+    }
+    return target;
+  }
+
+  Future<void> rescheduleAdhkarReminders({
+    DateTime? now,
+    String? locale,
+    tz.Location? location,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    } else {
+      await _plugin.updateLocalTimezone();
+    }
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+    final globalEnabled = _settingsService.adhkarRemindersGlobalEnabled;
 
-    // 1. Morning Adhkar (Fajr + 15 min or 6:00 AM fallback)
-    if (_settingsService.morningAdhkarNotificationEnabled) {
-      DateTime morningTarget;
-      if (prayerTimes != null) {
-        morningTarget = prayerTimes.fajr.add(const Duration(minutes: 15));
-      } else {
-        morningTarget = DateTime(
-          currentTime.year,
-          currentTime.month,
-          currentTime.day,
-          6,
-          0,
-        );
-      }
-      if (morningTarget.isBefore(currentTime)) {
-        if (tomorrowPrayerTimes != null) {
-          morningTarget = tomorrowPrayerTimes.fajr.add(
-            const Duration(minutes: 15),
-          );
-        } else {
-          morningTarget = morningTarget.add(const Duration(days: 1));
-        }
-      }
+    // 1. Morning Adhkar Reminder (user-selected time, opt-in, gentle wording)
+    if (globalEnabled && _settingsService.morningAdhkarNotificationEnabled) {
+      final hour = _settingsService.morningAdhkarReminderHour;
+      final minute = _settingsService.morningAdhkarReminderMinute;
+      final morningTarget = calculateNextAdhkarOccurrence(
+        hour: hour,
+        minute: minute,
+        referenceTime: now,
+        location: location,
+      );
 
       await _plugin.zonedSchedule(
         id: idMorningAdhkar,
-        title: isAr
-            ? '🌅 أذكار الصباح • نور وحفظ'
-            : '🌅 Morning Adhkar • Light & Protection',
+        title: isAr ? 'أذكار الصباح' : 'Morning Adhkar',
         body: isAr
-            ? 'ابدأ يومك بذكر الله وحصن نفسك بالبركة.'
-            : 'Start your day with divine remembrance and barakah.',
+            ? 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.'
+            : 'Start your day with peaceful remembrance.',
         scheduledDate: morningTarget,
         payload: '/adhkar?category=morning',
         channelId: channelAdhkar,
         channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
+        matchTimeOnly: true,
       );
     } else {
       await _plugin.cancel(idMorningAdhkar);
     }
 
-    // 2. Evening Adhkar (Asr + 10 min or 5:00 PM fallback)
-    if (_settingsService.eveningAdhkarNotificationEnabled) {
-      DateTime eveningTarget;
-      if (prayerTimes != null) {
-        eveningTarget = prayerTimes.asr.add(const Duration(minutes: 10));
-      } else {
-        eveningTarget = DateTime(
-          currentTime.year,
-          currentTime.month,
-          currentTime.day,
-          17,
-          0,
-        );
-      }
-      if (eveningTarget.isBefore(currentTime)) {
-        if (tomorrowPrayerTimes != null) {
-          eveningTarget = tomorrowPrayerTimes.asr.add(
-            const Duration(minutes: 10),
-          );
-        } else {
-          eveningTarget = eveningTarget.add(const Duration(days: 1));
-        }
-      }
+    // 2. Evening Adhkar Reminder (user-selected time, opt-in, gentle wording)
+    if (globalEnabled && _settingsService.eveningAdhkarNotificationEnabled) {
+      final hour = _settingsService.eveningAdhkarReminderHour;
+      final minute = _settingsService.eveningAdhkarReminderMinute;
+      final eveningTarget = calculateNextAdhkarOccurrence(
+        hour: hour,
+        minute: minute,
+        referenceTime: now,
+        location: location,
+      );
 
       await _plugin.zonedSchedule(
         id: idEveningAdhkar,
-        title: isAr
-            ? '🌆 أذكار المساء • حصن المسلم'
-            : '🌆 Evening Adhkar • Evening Shield',
+        title: isAr ? 'أذكار المساء' : 'Evening Adhkar',
         body: isAr
-            ? 'حصّن مسائك بالأذكار المأثورة قبل غروب الشمس.'
-            : 'Fortify your evening with authentic remembrance before sunset.',
+            ? 'اختم يومك بذكر الله والسكينة.'
+            : 'Wind down your day with peaceful remembrance.',
         scheduledDate: eveningTarget,
         payload: '/adhkar?category=evening',
         channelId: channelAdhkar,
         channelName: isAr ? 'أذكار اليوم' : 'Daily Adhkar Reminders',
+        matchTimeOnly: true,
       );
     } else {
       await _plugin.cancel(idEveningAdhkar);
     }
+  }
+
+  /// Reschedules all reminders that do not depend on solar calculation or GPS location:
+  /// - Morning Adhkar
+  /// - Evening Adhkar
+  /// - Bedtime Adhkar
+  /// - Sunnah Fasting
+  ///
+  /// This can be called safely during app resume or timezone adjustments when
+  /// location or prayer times are unavailable, without triggering location permission prompts.
+  Future<void> rescheduleLocationIndependentReminders({
+    DateTime? now,
+    String? locale,
+    tz.Location? location,
+  }) async {
+    if (!_initialized) {
+      await initialize();
+    } else {
+      await _plugin.updateLocalTimezone();
+    }
+
+    final currentTime = now ?? DateTime.now();
+    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+
+    // 1 & 2. Morning and Evening Adhkar Reminders
+    await rescheduleAdhkarReminders(
+      now: currentTime,
+      locale: locale,
+      location: location,
+    );
 
     // 3. Bedtime Adhkar (configured hour/minute)
     if (_settingsService.sleepingAdhkarNotificationEnabled) {
       final hour = _settingsService.bedtimeReminderHour;
       final minute = _settingsService.bedtimeReminderMinute;
-      var bedtimeTarget = DateTime(
-        currentTime.year,
-        currentTime.month,
-        currentTime.day,
-        hour,
-        minute,
+      final bedtimeTarget = calculateNextAdhkarOccurrence(
+        hour: hour,
+        minute: minute,
+        referenceTime: currentTime,
+        location: location,
       );
-      if (bedtimeTarget.isBefore(currentTime)) {
-        bedtimeTarget = bedtimeTarget.add(const Duration(days: 1));
-      }
 
       await _plugin.zonedSchedule(
         id: idSleepingAdhkar,
@@ -380,6 +468,23 @@ class PrayerNotificationScheduler {
     } else {
       await _plugin.cancel(idSunnahFasting);
     }
+  }
+
+  Future<void> rescheduleAll({
+    DateTime? now,
+    PrayerTimes? prayerTimes,
+    PrayerTimes? tomorrowPrayerTimes,
+    String? locale,
+    tz.Location? location,
+  }) async {
+    await rescheduleLocationIndependentReminders(
+      now: now,
+      locale: locale,
+      location: location,
+    );
+
+    final currentTime = now ?? DateTime.now();
+    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
     // 5. Sunnah Qaylulah (Dhuhr - 30 min)
     if (_settingsService.qaylulahNotificationEnabled) {

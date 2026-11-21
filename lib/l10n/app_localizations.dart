@@ -3679,6 +3679,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to save counter progress locally'**
   String get tasbihSaveError;
+
+  /// No description provided for @adhkarRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adhkar Reminders'**
+  String get adhkarRemindersTitle;
+
+  /// No description provided for @adhkarRemindersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Opt-in, peaceful reminders at your chosen times'**
+  String get adhkarRemindersSubtitle;
+
+  /// No description provided for @adhkarRemindersGlobalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Adhkar Reminders'**
+  String get adhkarRemindersGlobalLabel;
+
+  /// No description provided for @adhkarRemindersGlobalDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Master control for all morning and evening reminders'**
+  String get adhkarRemindersGlobalDesc;
+
+  /// No description provided for @adhkarRemindersPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Permission Required'**
+  String get adhkarRemindersPermissionRequired;
+
+  /// No description provided for @adhkarRemindersPermissionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders cannot be delivered until notification permission is granted in your device settings.'**
+  String get adhkarRemindersPermissionDesc;
+
+  /// No description provided for @adhkarRemindersGrantPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get adhkarRemindersGrantPermission;
+
+  /// No description provided for @adhkarMorningReminderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle reminder to begin your day peacefully'**
+  String get adhkarMorningReminderDesc;
+
+  /// No description provided for @adhkarEveningReminderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle reminder before your day winds down'**
+  String get adhkarEveningReminderDesc;
+
+  /// No description provided for @adhkarRemindersPeacefulNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders are local, peaceful, and completely optional. They never imply religious obligation, score progress, or send follow-up nudges.'**
+  String get adhkarRemindersPeacefulNotice;
+
+  /// No description provided for @adhkarReminderScheduleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to schedule reminder. Please check notification permissions.'**
+  String get adhkarReminderScheduleError;
+
+  /// No description provided for @adhkarReminderSetTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Time'**
+  String get adhkarReminderSetTime;
 }
 
 class _AppLocalizationsDelegate

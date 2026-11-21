@@ -703,5 +703,17 @@
   },
   "tasbihSwitchResetToZero": "تصفير إلى 0",
   "tasbihSwitchKeepAsGeneral": "احتفاظ كعداد عام",
-  "tasbihSaveError": "تعذر حفظ تقدم العداد محليًا"
+  "tasbihSaveError": "تعذر حفظ تقدم العداد محليًا",
+  "adhkarRemindersTitle": "تذكيرات الأذكار",
+  "adhkarRemindersSubtitle": "تذكيرات اختيارية هادئة في الأوقات التي تختارها",
+  "adhkarRemindersGlobalLabel": "تفعيل تذكيرات الأذكار",
+  "adhkarRemindersGlobalDesc": "التحكم الشامل في جميع تذكيرات الصباح والمساء",
+  "adhkarRemindersPermissionRequired": "إذن الإشعارات مطلوب",
+  "adhkarRemindersPermissionDesc": "لا يمكن إرسال التذكيرات حتى يتم منح إذن الإشعارات من إعدادات جهازك.",
+  "adhkarRemindersGrantPermission": "تفعيل الإشعارات",
+  "adhkarMorningReminderDesc": "تذكير هادئ لبدء يومك بذكر الله والسكينة",
+  "adhkarEveningReminderDesc": "تذكير هادئ لختام يومك بالذكر والسكينة",
+  "adhkarRemindersPeacefulNotice": "التذكيرات محلية وهادئة واختيارية تماماً. لا تلزمك دينياً، ولا تحتسب نقاطاً، ولا ترسل تنبيهات متكررة.",
+  "adhkarReminderScheduleError": "تعذر جدولة التذكير. يرجى التحقق من أذونات الإشعارات.",
+  "adhkarReminderSetTime": "تحديد الوقت"
 }

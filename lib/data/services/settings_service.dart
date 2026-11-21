@@ -391,18 +391,76 @@ class SettingsService {
     await _prefs?.setBool(_adhkarReviewModeKey, enabled);
   }
 
+  static const _adhkarRemindersGlobalKey = 'adhkar_reminders_global_enabled';
+  static const _morningAdhkarReminderHourKey = 'morning_adhkar_reminder_hour';
+  static const _morningAdhkarReminderMinuteKey =
+      'morning_adhkar_reminder_minute';
+  static const _eveningAdhkarReminderHourKey = 'evening_adhkar_reminder_hour';
+  static const _eveningAdhkarReminderMinuteKey =
+      'evening_adhkar_reminder_minute';
+
+  /// Master switch for all Adhkar reminders. Defaults to true.
+  bool get adhkarRemindersGlobalEnabled =>
+      _prefs?.getBool(_adhkarRemindersGlobalKey) ?? true;
+
+  Future<void> setAdhkarRemindersGlobalEnabled(bool enabled) async =>
+      _prefs?.setBool(_adhkarRemindersGlobalKey, enabled);
+
   // Smart Reminders & Notifications
+  /// Morning Adhkar reminder toggle. Disabled by default (opt-in).
   bool get morningAdhkarNotificationEnabled =>
-      _prefs?.getBool('notif_morning_adhkar') ?? true;
+      _prefs?.getBool('notif_morning_adhkar') ?? false;
 
   Future<void> setMorningAdhkarNotificationEnabled(bool enabled) async =>
       _prefs?.setBool('notif_morning_adhkar', enabled);
 
+  int get morningAdhkarReminderHour =>
+      _prefs?.getInt(_morningAdhkarReminderHourKey) ?? 7;
+
+  int get morningAdhkarReminderMinute =>
+      _prefs?.getInt(_morningAdhkarReminderMinuteKey) ?? 0;
+
+  Future<void> setMorningAdhkarReminderTime({
+    required int hour,
+    required int minute,
+  }) async {
+    RangeError.checkValueInInterval(hour, 0, 23, 'hour');
+    RangeError.checkValueInInterval(minute, 0, 59, 'minute');
+    await _prefs?.setInt(_morningAdhkarReminderHourKey, hour);
+    await _prefs?.setInt(_morningAdhkarReminderMinuteKey, minute);
+  }
+
+  /// Evening Adhkar reminder toggle. Disabled by default (opt-in).
   bool get eveningAdhkarNotificationEnabled =>
-      _prefs?.getBool('notif_evening_adhkar') ?? true;
+      _prefs?.getBool('notif_evening_adhkar') ?? false;
 
   Future<void> setEveningAdhkarNotificationEnabled(bool enabled) async =>
       _prefs?.setBool('notif_evening_adhkar', enabled);
+
+  int get eveningAdhkarReminderHour =>
+      _prefs?.getInt(_eveningAdhkarReminderHourKey) ?? 18;
+
+  int get eveningAdhkarReminderMinute =>
+      _prefs?.getInt(_eveningAdhkarReminderMinuteKey) ?? 0;
+
+  Future<void> setEveningAdhkarReminderTime({
+    required int hour,
+    required int minute,
+  }) async {
+    RangeError.checkValueInInterval(hour, 0, 23, 'hour');
+    RangeError.checkValueInInterval(minute, 0, 59, 'minute');
+    await _prefs?.setInt(_eveningAdhkarReminderHourKey, hour);
+    await _prefs?.setInt(_eveningAdhkarReminderMinuteKey, minute);
+  }
+
+  bool get isMorningAdhkarReminderActive =>
+      adhkarRemindersGlobalEnabled && morningAdhkarNotificationEnabled;
+
+  bool get isEveningAdhkarReminderActive =>
+      adhkarRemindersGlobalEnabled && eveningAdhkarNotificationEnabled;
+
+  bool get hasAnyAdhkarReminderActive =>
+      isMorningAdhkarReminderActive || isEveningAdhkarReminderActive;
 
   bool get sleepingAdhkarNotificationEnabled =>
       _prefs?.getBool('notif_sleeping_adhkar') ?? true;

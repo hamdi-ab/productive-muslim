@@ -34,6 +34,42 @@ class PrayerTimeService {
 
   String? get cachedLocationName => _cachedLocationName;
 
+  /// Returns the in-memory cached position or constructs a position from
+  /// previously saved coordinates in [SettingsService] without requesting
+  /// location permission or interacting with GPS.
+  ///
+  /// Returns null if neither in-memory cache nor saved coordinates are available.
+  Position? getCachedOrSavedPosition() {
+    if (_cachedPosition != null) return _cachedPosition;
+
+    if (getIt.isRegistered<SettingsService>()) {
+      final settings = getIt<SettingsService>();
+      final coords = settings.lastCoordinates;
+      if (coords != null) {
+        final pos = Position(
+          longitude: coords.longitude,
+          latitude: coords.latitude,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          altitudeAccuracy: 0,
+          heading: 0,
+          headingAccuracy: 0,
+          speed: 0,
+          speedAccuracy: 0,
+        );
+        _cachedPosition = pos;
+        return pos;
+      }
+    }
+    return null;
+  }
+
+  @visibleForTesting
+  void setCachedPositionForTesting(Position? position) {
+    _cachedPosition = position;
+  }
+
   Future<Position?> getCurrentPosition() async {
     if (_ongoingFetch != null) {
       return await _ongoingFetch;
