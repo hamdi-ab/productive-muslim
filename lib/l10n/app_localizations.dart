@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingWelcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Prayer, tasks, habits, and intentions — together in one space'**
+  /// **'Strengthen your remembrance of Allah, organize around Salah, and live with intention'**
   String get onboardingWelcomeSubtitle;
 
   /// No description provided for @onboardingNameTitle.
@@ -313,6 +313,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Allow location access for accurate prayer times?'**
   String get allowLocation;
+
+  /// No description provided for @onboardingPillarsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Five Daily Pillars'**
+  String get onboardingPillarsTitle;
+
+  /// No description provided for @onboardingPillarsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose up to 3 pillars you want to focus on first'**
+  String get onboardingPillarsSubtitle;
+
+  /// No description provided for @pillarRemember.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember'**
+  String get pillarRemember;
+
+  /// No description provided for @pillarRememberDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentic morning & evening adhkar and daily dhikr'**
+  String get pillarRememberDesc;
+
+  /// No description provided for @pillarPray.
+  ///
+  /// In en, this message translates to:
+  /// **'Pray'**
+  String get pillarPray;
+
+  /// No description provided for @pillarPrayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer times, adhan countdowns, and Qibla direction'**
+  String get pillarPrayDesc;
+
+  /// No description provided for @pillarAct.
+  ///
+  /// In en, this message translates to:
+  /// **'Intend & Act'**
+  String get pillarAct;
+
+  /// No description provided for @pillarActDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily intentions, priority tasks, and focused sessions'**
+  String get pillarActDesc;
+
+  /// No description provided for @pillarReflect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflect'**
+  String get pillarReflect;
+
+  /// No description provided for @pillarReflectDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle evening review, gratitude, and muhasabah'**
+  String get pillarReflectDesc;
+
+  /// No description provided for @pillarGrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow'**
+  String get pillarGrow;
+
+  /// No description provided for @pillarGrowDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistent habits and holistic personal character'**
+  String get pillarGrowDesc;
 
   /// No description provided for @onboardingQualitiesTitle.
   ///
@@ -1979,25 +2051,25 @@ abstract class AppLocalizations {
   /// No description provided for @barakahAnalyticsEnergyTriad.
   ///
   /// In en, this message translates to:
-  /// **'Holistic Energy Triad'**
+  /// **'Personal Energy & Wellbeing'**
   String get barakahAnalyticsEnergyTriad;
 
   /// No description provided for @barakahAnalyticsSpiritual.
   ///
   /// In en, this message translates to:
-  /// **'Spiritual'**
+  /// **'Inner Stillness & Presence'**
   String get barakahAnalyticsSpiritual;
 
   /// No description provided for @barakahAnalyticsPhysical.
   ///
   /// In en, this message translates to:
-  /// **'Physical'**
+  /// **'Physical Vitality & Rest'**
   String get barakahAnalyticsPhysical;
 
   /// No description provided for @barakahAnalyticsMental.
   ///
   /// In en, this message translates to:
-  /// **'Mental'**
+  /// **'Mental Clarity & Focus'**
   String get barakahAnalyticsMental;
 
   /// No description provided for @barakahAnalyticsActiveDays.

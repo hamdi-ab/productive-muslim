@@ -79,7 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingWelcomeSubtitle =>
-      'Prayer, tasks, habits, and intentions — together in one space';
+      'Strengthen your remembrance of Allah, organize around Salah, and live with intention';
 
   @override
   String get onboardingNameTitle => 'What is your name?';
@@ -135,6 +135,48 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get allowLocation =>
       'Allow location access for accurate prayer times?';
+
+  @override
+  String get onboardingPillarsTitle => 'Your Five Daily Pillars';
+
+  @override
+  String get onboardingPillarsSubtitle =>
+      'Choose up to 3 pillars you want to focus on first';
+
+  @override
+  String get pillarRemember => 'Remember';
+
+  @override
+  String get pillarRememberDesc =>
+      'Authentic morning & evening adhkar and daily dhikr';
+
+  @override
+  String get pillarPray => 'Pray';
+
+  @override
+  String get pillarPrayDesc =>
+      'Prayer times, adhan countdowns, and Qibla direction';
+
+  @override
+  String get pillarAct => 'Intend & Act';
+
+  @override
+  String get pillarActDesc =>
+      'Daily intentions, priority tasks, and focused sessions';
+
+  @override
+  String get pillarReflect => 'Reflect';
+
+  @override
+  String get pillarReflectDesc =>
+      'Gentle evening review, gratitude, and muhasabah';
+
+  @override
+  String get pillarGrow => 'Grow';
+
+  @override
+  String get pillarGrowDesc =>
+      'Consistent habits and holistic personal character';
 
   @override
   String get onboardingQualitiesTitle => 'What qualities do you want to build?';
@@ -1070,16 +1112,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barakahAnalyticsConsistency => '7-Day Barakah Matrix';
 
   @override
-  String get barakahAnalyticsEnergyTriad => 'Holistic Energy Triad';
+  String get barakahAnalyticsEnergyTriad => 'Personal Energy & Wellbeing';
 
   @override
-  String get barakahAnalyticsSpiritual => 'Spiritual';
+  String get barakahAnalyticsSpiritual => 'Inner Stillness & Presence';
 
   @override
-  String get barakahAnalyticsPhysical => 'Physical';
+  String get barakahAnalyticsPhysical => 'Physical Vitality & Rest';
 
   @override
-  String get barakahAnalyticsMental => 'Mental';
+  String get barakahAnalyticsMental => 'Mental Clarity & Focus';
 
   @override
   String barakahAnalyticsActiveDays(int count) {

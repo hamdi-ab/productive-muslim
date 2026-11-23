@@ -143,8 +143,18 @@ void main() {
         expect(find.byType(EnergyTriadBreakdownCard), findsOneWidget);
         expect(find.byType(BarakahCoachingInsightsCard), findsOneWidget);
         expect(find.text('7-Day Barakah Matrix'), findsOneWidget);
-        expect(find.text('Holistic Energy Triad'), findsOneWidget);
+        expect(find.text('Personal Energy & Wellbeing'), findsOneWidget);
         expect(find.text('Spiritual Growth Insights'), findsOneWidget);
+        expect(find.text('Inner Stillness & Presence'), findsOneWidget);
+        expect(find.text('Mental Clarity & Focus'), findsOneWidget);
+        expect(find.text('Physical Vitality & Rest'), findsOneWidget);
+        // Explicitly assert absence of any numerical scores, progress gauges, or ranked tier labels
+        expect(find.textContaining('/ 5.0'), findsNothing);
+        expect(find.text('Vibrant'), findsNothing);
+        expect(find.text('Steady'), findsNothing);
+        expect(find.text('Moderate'), findsNothing);
+        expect(find.text('Low'), findsNothing);
+        expect(find.byType(FractionallySizedBox), findsNothing);
       },
     );
   });

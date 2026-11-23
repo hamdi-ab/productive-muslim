@@ -72,14 +72,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mindfulProductivity => 'كفاءة واعية';
 
   @override
-  String get writeYourOwn => 'أو اكتب半个تك';
+  String get writeYourOwn => 'أو اكتب نيتك';
 
   @override
   String get onboardingWelcomeTitle => 'ابنِ يومك حول ما يهم';
 
   @override
   String get onboardingWelcomeSubtitle =>
-      'الصلاة، المهام، العادات، والنيات — كلها في مكان واحد';
+      'عزز ذكر الله، نظّم مسؤولياتك حول الصلاة، وعش حياة متوازنة وهادفة';
 
   @override
   String get onboardingNameTitle => 'ما اسمك؟';
@@ -88,7 +88,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingNameSubtitle => 'نستخدمه لتخصيص تجربتك';
 
   @override
-  String get onboardingIntentionTitle => 'ما الذي ي bringsك اليوم؟';
+  String get onboardingIntentionTitle => 'ما الذي ترجوه اليوم؟';
 
   @override
   String get onboardingIntentionSubtitle => 'اختر نيتك أو اكتبها بنفسك';
@@ -133,6 +133,45 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get allowLocation =>
       'سمح بالوصول للموقع للحصول على مواقيت صلاة دقيقة؟';
+
+  @override
+  String get onboardingPillarsTitle => 'ركائزك الخمس اليومية';
+
+  @override
+  String get onboardingPillarsSubtitle =>
+      'اختر حتى 3 ركائز تود التركيز عليها أولاً';
+
+  @override
+  String get pillarRemember => 'الذِّكْر';
+
+  @override
+  String get pillarRememberDesc =>
+      'أذكار الصباح والمساء المأثورة والذكر اليومي';
+
+  @override
+  String get pillarPray => 'الصَّلَاة';
+
+  @override
+  String get pillarPrayDesc =>
+      'مواقيت الصلاة، العد التنازلي للأذان واتجاه القبلة';
+
+  @override
+  String get pillarAct => 'النِّيَّة والعَمَل';
+
+  @override
+  String get pillarActDesc => 'تجديد النية، ترتيب المهام الأساسية والتركيز';
+
+  @override
+  String get pillarReflect => 'التَّأَمُّل';
+
+  @override
+  String get pillarReflectDesc => 'محاسبة النفس الهادئة، الشكر، وتقدير البركة';
+
+  @override
+  String get pillarGrow => 'النَّمَاء';
+
+  @override
+  String get pillarGrowDesc => 'بناء العادات المستمرة وحسن الخلق';
 
   @override
   String get onboardingQualitiesTitle => 'ما هي الصفات التي تريد أن تبنيها؟';
@@ -249,7 +288,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get done => 'تم';
 
   @override
-  String get skip => ' Amber';
+  String get skip => 'تخطي';
 
   @override
   String get remindMeLater => 'ذكرني لاحقاً';
@@ -1060,16 +1099,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get barakahAnalyticsConsistency => 'مصفوفة البركة للأسبوع';
 
   @override
-  String get barakahAnalyticsEnergyTriad => 'ثلاثية الطاقة المتكاملة';
+  String get barakahAnalyticsEnergyTriad => 'تأملات التوازن والنشاط';
 
   @override
-  String get barakahAnalyticsSpiritual => 'الروحية';
+  String get barakahAnalyticsSpiritual => 'السكينة وحضور القلب';
 
   @override
-  String get barakahAnalyticsPhysical => 'البدنية';
+  String get barakahAnalyticsPhysical => 'الحيوية والراحة البدنية';
 
   @override
-  String get barakahAnalyticsMental => 'الذهنية';
+  String get barakahAnalyticsMental => 'صفاء الذهن والتركيز';
 
   @override
   String barakahAnalyticsActiveDays(int count) {

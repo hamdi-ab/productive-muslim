@@ -7,6 +7,7 @@ class OnboardingStep {
   final IconData icon;
   final bool hasInput;
   final bool hasChips;
+  final bool hasPillars;
   final bool hasQualities;
   final bool hasPermission;
 
@@ -16,6 +17,7 @@ class OnboardingStep {
     required this.icon,
     this.hasInput = false,
     this.hasChips = false,
+    this.hasPillars = false,
     this.hasQualities = false,
     this.hasPermission = false,
   });
@@ -28,6 +30,8 @@ class OnboardingStep {
         return l10n.onboardingNameTitle;
       case 'onboardingIntentionTitle':
         return l10n.onboardingIntentionTitle;
+      case 'onboardingPillarsTitle':
+        return l10n.onboardingPillarsTitle;
       case 'onboardingQualitiesTitle':
         return l10n.onboardingQualitiesTitle;
       case 'onboardingPermissionTitle':
@@ -46,6 +50,8 @@ class OnboardingStep {
         return l10n.onboardingNameSubtitle;
       case 'onboardingIntentionSubtitle':
         return l10n.onboardingIntentionSubtitle;
+      case 'onboardingPillarsSubtitle':
+        return l10n.onboardingPillarsSubtitle;
       case 'onboardingQualitiesSubtitle':
         return l10n.onboardingQualitiesSubtitle;
       case 'onboardingPermissionSubtitle':

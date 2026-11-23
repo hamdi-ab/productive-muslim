@@ -1,6 +1,6 @@
 # Productive Muslim
 
-A Flutter mobile app for university students and young professionals that helps them become Productive Muslims through the 9 essential qualities framework — a coach-like guided experience combining Islamic intention-setting with modern productivity science.
+A daily companion that helps Muslims strengthen their remembrance of Allah, organize their responsibilities around Salah, and develop a more intentional and balanced life — built on the Five Pillars framework (*Remember, Pray, Intend & Act, Reflect, Grow*).
 
 ## Technical Stack
 
