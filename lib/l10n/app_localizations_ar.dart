@@ -2083,4 +2083,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhkarReminderSetTime => 'تحديد الوقت';
+
+  @override
+  String get adhkarRemindersDeliveryPending => 'تم الحفظ • الإذن مطلوب للإرسال';
 }

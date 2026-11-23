@@ -16,8 +16,8 @@ class SmartRemindersSettingsCard extends StatefulWidget {
       _SmartRemindersSettingsCardState();
 }
 
-class _SmartRemindersSettingsCardState
-    extends State<SmartRemindersSettingsCard> {
+class _SmartRemindersSettingsCardState extends State<SmartRemindersSettingsCard>
+    with WidgetsBindingObserver {
   late bool _morning;
   late bool _evening;
   late bool _sleeping;
@@ -34,8 +34,22 @@ class _SmartRemindersSettingsCardState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadValues();
     _checkPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkPermission();
+    }
   }
 
   void _loadValues() {
@@ -72,7 +86,11 @@ class _SmartRemindersSettingsCardState
       final permitted = await getIt<PrayerNotificationScheduler>()
           .hasPermission();
       if (mounted) {
+        final wasNotPermitted = !_hasPermission;
         setState(() => _hasPermission = permitted);
+        if (permitted && wasNotPermitted) {
+          await _reschedule();
+        }
       }
     }
   }
@@ -128,26 +146,25 @@ class _SmartRemindersSettingsCardState
         ? getIt<PrayerTimeService>()
         : null;
 
-    final position = await prayerService?.getCurrentPosition();
+    final position = prayerService?.getCachedOrSavedPosition();
     if (!mounted) return;
 
-    final now = DateTime.now();
-    final times = position != null
-        ? prayerService?.getPrayerTimes(position, date: now)
-        : null;
-    final tomorrowTimes = position != null
-        ? prayerService?.getPrayerTimes(
-            position,
-            date: now.add(const Duration(days: 1)),
-          )
-        : null;
-
     final locale = Localizations.localeOf(context).languageCode;
-    await scheduler.rescheduleAll(
-      prayerTimes: times,
-      tomorrowPrayerTimes: tomorrowTimes,
-      locale: locale,
-    );
+    if (position != null) {
+      final now = DateTime.now();
+      final times = prayerService?.getPrayerTimes(position, date: now);
+      final tomorrowTimes = prayerService?.getPrayerTimes(
+        position,
+        date: now.add(const Duration(days: 1)),
+      );
+      await scheduler.rescheduleAll(
+        prayerTimes: times,
+        tomorrowPrayerTimes: tomorrowTimes,
+        locale: locale,
+      );
+    } else {
+      await scheduler.rescheduleLocationIndependentReminders(locale: locale);
+    }
   }
 
   Future<void> _toggleMorning(bool value) async {
@@ -158,7 +175,6 @@ class _SmartRemindersSettingsCardState
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -192,7 +208,6 @@ class _SmartRemindersSettingsCardState
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -226,7 +241,6 @@ class _SmartRemindersSettingsCardState
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -260,7 +274,6 @@ class _SmartRemindersSettingsCardState
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -294,7 +307,6 @@ class _SmartRemindersSettingsCardState
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -338,7 +350,7 @@ class _SmartRemindersSettingsCardState
           minute: selected.minute,
         );
       }
-      if (_sleeping && _hasPermission) {
+      if (_sleeping) {
         await _reschedule();
       }
     } catch (_) {
@@ -380,7 +392,7 @@ class _SmartRemindersSettingsCardState
           minute: selected.minute,
         );
       }
-      if (_morning && _hasPermission) {
+      if (_morning) {
         await _reschedule();
       }
     } catch (_) {
@@ -422,7 +434,7 @@ class _SmartRemindersSettingsCardState
           minute: selected.minute,
         );
       }
-      if (_evening && _hasPermission) {
+      if (_evening) {
         await _reschedule();
       }
     } catch (_) {
@@ -519,6 +531,34 @@ class _SmartRemindersSettingsCardState
     );
   }
 
+  Widget _buildDeliveryPendingBadge(AppLocalizations l10n, {required Key key}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 56, right: 16, bottom: 8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.notifications_off_outlined,
+            size: 14,
+            color: Color(0xFFB45309),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              l10n.adhkarRemindersDeliveryPending,
+              key: key,
+              style: const TextStyle(
+                fontSize: 11.5,
+                color: Color(0xFFB45309),
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -529,12 +569,6 @@ class _SmartRemindersSettingsCardState
     final dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : Colors.black.withValues(alpha: 0.05);
-
-    final effectiveMorning = _hasPermission && _morning;
-    final effectiveEvening = _hasPermission && _evening;
-    final effectiveSleeping = _hasPermission && _sleeping;
-    final effectiveFasting = _hasPermission && _fasting;
-    final effectiveQaylulah = _hasPermission && _qaylulah;
 
     return Column(
       children: [
@@ -565,10 +599,16 @@ class _SmartRemindersSettingsCardState
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          value: effectiveMorning,
+          value: _morning,
           onChanged: _toggleMorning,
         ),
-        if (effectiveMorning) ...[
+        if (_morning && !_hasPermission) ...[
+          _buildDeliveryPendingBadge(
+            l10n,
+            key: const Key('setting_morning_delivery_pending_badge'),
+          ),
+        ],
+        if (_morning) ...[
           Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
           ListTile(
             key: const Key('setting_morning_time_picker'),
@@ -643,9 +683,15 @@ class _SmartRemindersSettingsCardState
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          value: effectiveQaylulah,
+          value: _qaylulah,
           onChanged: _toggleQaylulah,
         ),
+        if (_qaylulah && !_hasPermission) ...[
+          _buildDeliveryPendingBadge(
+            l10n,
+            key: const Key('setting_qaylulah_delivery_pending_badge'),
+          ),
+        ],
         Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
         SwitchListTile(
           key: const Key('setting_evening_adhkar_toggle'),
@@ -668,10 +714,16 @@ class _SmartRemindersSettingsCardState
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          value: effectiveEvening,
+          value: _evening,
           onChanged: _toggleEvening,
         ),
-        if (effectiveEvening) ...[
+        if (_evening && !_hasPermission) ...[
+          _buildDeliveryPendingBadge(
+            l10n,
+            key: const Key('setting_evening_delivery_pending_badge'),
+          ),
+        ],
+        if (_evening) ...[
           Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
           ListTile(
             key: const Key('setting_evening_time_picker'),
@@ -746,10 +798,16 @@ class _SmartRemindersSettingsCardState
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          value: effectiveSleeping,
+          value: _sleeping,
           onChanged: _toggleSleeping,
         ),
-        if (effectiveSleeping) ...[
+        if (_sleeping && !_hasPermission) ...[
+          _buildDeliveryPendingBadge(
+            l10n,
+            key: const Key('setting_sleeping_delivery_pending_badge'),
+          ),
+        ],
+        if (_sleeping) ...[
           Divider(height: 1, indent: 56, endIndent: 16, color: dividerColor),
           ListTile(
             key: const Key('setting_bedtime_time_picker'),
@@ -824,9 +882,15 @@ class _SmartRemindersSettingsCardState
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          value: effectiveFasting,
+          value: _fasting,
           onChanged: _toggleFasting,
         ),
+        if (_fasting && !_hasPermission) ...[
+          _buildDeliveryPendingBadge(
+            l10n,
+            key: const Key('setting_fasting_delivery_pending_badge'),
+          ),
+        ],
       ],
     );
   }

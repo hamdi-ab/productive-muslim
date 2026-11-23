@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/smart_reminders_settings_card.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -11,6 +12,8 @@ import 'package:timezone/data/latest.dart' as tz_data;
 
 class MockNotificationPlugin extends Mock
     implements NotificationPluginAdapter {}
+
+class MockPrayerTimeService extends Mock implements PrayerTimeService {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -180,7 +183,7 @@ void main() {
   );
 
   testWidgets(
-    'toggling morning reminder when permission denied keeps toggle false, preserves preference, and shows snackbar',
+    'toggling morning reminder when permission denied saves preference, displays toggle as true, shows snackbar and delivery pending badge',
     (tester) async {
       when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
       when(() => mockPlugin.requestPermission()).thenAnswer((_) async => false);
@@ -194,18 +197,22 @@ void main() {
       await tester.tap(toggleFinder);
       await tester.pumpAndSettle();
 
-      expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+      expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
       final switchTile = tester.widget<SwitchListTile>(toggleFinder);
-      expect(switchTile.value, isFalse);
+      expect(switchTile.value, isTrue);
       expect(
         find.byKey(const Key('smart_reminders_permission_snackbar')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
         findsOneWidget,
       );
     },
   );
 
   testWidgets(
-    'when permission is denied, toggle displays false in UI while preserving saved true preference',
+    'when permission is denied, toggle displays true saved preference with delivery pending badge',
     (tester) async {
       await settingsService.setMorningAdhkarNotificationEnabled(true);
       when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
@@ -217,8 +224,95 @@ void main() {
         const Key('setting_morning_adhkar_toggle'),
       );
       final switchTile = tester.widget<SwitchListTile>(toggleFinder);
-      expect(switchTile.value, isFalse);
+      expect(switchTile.value, isTrue);
       expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'when permission is later granted via button, saved preferences are rescheduled without re-entering',
+    (tester) async {
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+      when(() => mockPlugin.requestPermission()).thenAnswer((_) async => true);
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
+        findsOneWidget,
+      );
+
+      // Grant permission via the button
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      final grantBtn = find.byKey(
+        const Key('smart_reminders_grant_permission_button'),
+      );
+      await tester.tap(grantBtn);
+      await tester.pumpAndSettle();
+
+      // Morning adhkar scheduled
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=morning',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      // Delivery pending badge is removed
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'changing reminder settings with no saved coordinates reschedules location-independent reminders without requesting location',
+    (tester) async {
+      final mockPrayerService = MockPrayerTimeService();
+      when(() => mockPrayerService.getCachedOrSavedPosition()).thenReturn(null);
+      GetIt.instance.registerSingleton<PrayerTimeService>(mockPrayerService);
+      addTearDown(() {
+        if (GetIt.instance.isRegistered<PrayerTimeService>()) {
+          GetIt.instance.unregister<PrayerTimeService>();
+        }
+      });
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      final toggleFinder = find.byKey(
+        const Key('setting_morning_adhkar_toggle'),
+      );
+      await tester.tap(toggleFinder);
+      await tester.pumpAndSettle();
+
+      verify(() => mockPrayerService.getCachedOrSavedPosition()).called(1);
+      verifyNever(() => mockPrayerService.getCurrentPosition());
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=morning',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
     },
   );
 

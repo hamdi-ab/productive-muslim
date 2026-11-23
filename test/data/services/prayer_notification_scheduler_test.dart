@@ -437,5 +437,128 @@ void main() {
         ),
       );
     });
+
+    test('does not schedule any notifications and cancels existing when notification permission is denied', () async {
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setEveningAdhkarNotificationEnabled(true);
+
+      final now = DateTime(2026, 9, 29, 5, 0);
+      await scheduler.rescheduleAdhkarReminders();
+
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idMorningAdhkar),
+      ).called(1);
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idEveningAdhkar),
+      ).called(1);
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      );
+
+      // Also test rescheduleLocationIndependentReminders
+      await scheduler.rescheduleLocationIndependentReminders(now: now);
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idMorningAdhkar),
+      ).called(1);
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idEveningAdhkar),
+      ).called(1);
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idSleepingAdhkar),
+      ).called(1);
+      verify(
+        () => mockPlugin.cancel(PrayerNotificationScheduler.idSunnahFasting),
+      ).called(1);
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      );
+
+      // Also test rescheduleAll
+      await scheduler.rescheduleAll(now: now);
+      verify(() => mockPlugin.cancel(PrayerNotificationScheduler.idQaylulah))
+          .called(1);
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      );
+    });
+
+    test('reschedules previously saved preferences when permission is later granted', () async {
+      // Initially no permission, preferences are saved
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setEveningAdhkarNotificationEnabled(true);
+
+      await scheduler.rescheduleAdhkarReminders();
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      );
+
+      // Later permission is granted
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      await scheduler.rescheduleAdhkarReminders();
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=morning',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idEveningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=evening',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+    });
   });
 }

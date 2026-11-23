@@ -2092,4 +2092,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarReminderSetTime => 'Set Time';
+
+  @override
+  String get adhkarRemindersDeliveryPending =>
+      'Saved • Permission needed for delivery';
 }

@@ -62,22 +62,24 @@ class _BarakahReminderLifecycleState extends State<BarakahReminderLifecycle>
           ? getIt<PrayerTimeService>()
           : null;
       unawaited(() async {
-        final position = await prayerService?.getCurrentPosition();
-        final now = DateTime.now();
-        final times = position != null
-            ? prayerService?.getPrayerTimes(position, date: now)
-            : null;
-        final tomorrowTimes = position != null
-            ? prayerService?.getPrayerTimes(
-                position,
-                date: now.add(const Duration(days: 1)),
-              )
-            : null;
-        await scheduler.rescheduleAll(
-          prayerTimes: times,
-          tomorrowPrayerTimes: tomorrowTimes,
-          locale: _locale?.languageCode,
-        );
+        final position = prayerService?.getCachedOrSavedPosition();
+        if (position != null) {
+          final now = DateTime.now();
+          final times = prayerService?.getPrayerTimes(position, date: now);
+          final tomorrowTimes = prayerService?.getPrayerTimes(
+            position,
+            date: now.add(const Duration(days: 1)),
+          );
+          await scheduler.rescheduleAll(
+            prayerTimes: times,
+            tomorrowPrayerTimes: tomorrowTimes,
+            locale: _locale?.languageCode,
+          );
+        } else {
+          await scheduler.rescheduleLocationIndependentReminders(
+            locale: _locale?.languageCode,
+          );
+        }
       }());
     }
   }

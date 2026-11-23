@@ -325,7 +325,7 @@ void main() {
     );
 
     testWidgets(
-      'toggling morning reminder when permission denied keeps toggle false, preserves preference, and shows snackbar',
+      'toggling morning reminder when permission denied saves preference, displays toggle as true, shows snackbar and delivery pending badge',
       (tester) async {
         when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
         when(() => mockPlugin.requestPermission())
@@ -340,18 +340,24 @@ void main() {
         await tester.tap(morningSwitch);
         await tester.pumpAndSettle();
 
-        expect(settingsService.morningAdhkarNotificationEnabled, isFalse);
+        expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
         final morningWidget = tester.widget<Switch>(morningSwitch);
-        expect(morningWidget.value, isFalse);
+        expect(morningWidget.value, isTrue);
         expect(
           find.byKey(const Key('adhkar_reminders_permission_snackbar')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(
+            const Key('adhkar_morning_reminder_card_delivery_pending'),
+          ),
           findsOneWidget,
         );
       },
     );
 
     testWidgets(
-      'when permission is denied, toggle displays false in UI while preserving saved true preference',
+      'when permission is denied, toggle displays true saved preference with delivery pending badge',
       (tester) async {
         await settingsService.setMorningAdhkarNotificationEnabled(true);
         when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
@@ -363,8 +369,63 @@ void main() {
           const Key('adhkar_morning_reminder_toggle'),
         );
         final morningWidget = tester.widget<Switch>(morningSwitch);
-        expect(morningWidget.value, isFalse);
+        expect(morningWidget.value, isTrue);
         expect(settingsService.morningAdhkarNotificationEnabled, isTrue);
+        expect(
+          find.byKey(
+            const Key('adhkar_morning_reminder_card_delivery_pending'),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'when permission is later granted via button, saved preferences are rescheduled without re-entering',
+      (tester) async {
+        await settingsService.setMorningAdhkarNotificationEnabled(true);
+        when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+        when(() => mockPlugin.requestPermission())
+            .thenAnswer((_) async => true);
+
+        await tester.pumpWidget(buildSubject());
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(
+            const Key('adhkar_morning_reminder_card_delivery_pending'),
+          ),
+          findsOneWidget,
+        );
+
+        // Tap grant permission button in warning card
+        when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+        await tester.tap(
+          find.byKey(const Key('adhkar_reminders_grant_permission_button')),
+        );
+        await tester.pumpAndSettle();
+
+        // Notification scheduled for morning adhkar
+        verify(
+          () => mockPlugin.zonedSchedule(
+            id: PrayerNotificationScheduler.idMorningAdhkar,
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            payload: '/adhkar?category=morning',
+            channelId: any(named: 'channelId'),
+            channelName: any(named: 'channelName'),
+            matchTimeOnly: true,
+          ),
+        ).called(1);
+
+        // Delivery pending badge is removed
+        expect(
+          find.byKey(
+            const Key('adhkar_morning_reminder_card_delivery_pending'),
+          ),
+          findsNothing,
+        );
       },
     );
 
