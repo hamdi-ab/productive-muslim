@@ -3751,6 +3751,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set Time'**
   String get adhkarReminderSetTime;
+
+  /// No description provided for @adhkarRemindersDeliveryPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved • Permission needed for delivery'**
+  String get adhkarRemindersDeliveryPending;
 }
 
 class _AppLocalizationsDelegate

@@ -715,5 +715,6 @@
   "adhkarEveningReminderDesc": "تذكير هادئ لختام يومك بالذكر والسكينة",
   "adhkarRemindersPeacefulNotice": "التذكيرات محلية وهادئة واختيارية تماماً. لا تلزمك دينياً، ولا تحتسب نقاطاً، ولا ترسل تنبيهات متكررة.",
   "adhkarReminderScheduleError": "تعذر جدولة التذكير. يرجى التحقق من أذونات الإشعارات.",
-  "adhkarReminderSetTime": "تحديد الوقت"
+  "adhkarReminderSetTime": "تحديد الوقت",
+  "adhkarRemindersDeliveryPending": "تم الحفظ • الإذن مطلوب للإرسال"
 }

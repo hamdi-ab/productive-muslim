@@ -16,7 +16,8 @@ class AdhkarRemindersSheet extends StatefulWidget {
   State<AdhkarRemindersSheet> createState() => _AdhkarRemindersSheetState();
 }
 
-class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
+class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet>
+    with WidgetsBindingObserver {
   SettingsService? get _settingsService =>
       getIt.isRegistered<SettingsService>() ? getIt<SettingsService>() : null;
 
@@ -37,8 +38,22 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadState();
     _checkPermission();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkPermission();
+    }
   }
 
   void _loadState() {
@@ -66,7 +81,11 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
     if (_scheduler != null) {
       final permitted = await _scheduler!.hasPermission();
       if (mounted) {
+        final wasNotPermitted = !_hasPermission;
         setState(() => _hasPermission = permitted);
+        if (permitted && wasNotPermitted) {
+          await _reschedule();
+        }
       }
     }
   }
@@ -128,7 +147,6 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -156,7 +174,6 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -225,7 +242,6 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
       final granted = await _requestPermission();
       if (!granted) {
         _showPermissionDeniedSnackBar();
-        return;
       }
     }
 
@@ -394,8 +410,9 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
                 cardKey: const Key('adhkar_morning_reminder_card'),
                 toggleKey: const Key('adhkar_morning_reminder_toggle'),
                 timePickerKey: const Key('adhkar_morning_time_picker_button'),
-                enabled: _morningEnabled && _hasPermission,
+                enabled: _morningEnabled,
                 globalEnabled: _globalEnabled,
+                hasPermission: _hasPermission,
                 hour: _morningHour,
                 minute: _morningMinute,
                 onToggle: _toggleMorning,
@@ -414,8 +431,9 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
                 cardKey: const Key('adhkar_evening_reminder_card'),
                 toggleKey: const Key('adhkar_evening_reminder_toggle'),
                 timePickerKey: const Key('adhkar_evening_time_picker_button'),
-                enabled: _eveningEnabled && _hasPermission,
+                enabled: _eveningEnabled,
                 globalEnabled: _globalEnabled,
+                hasPermission: _hasPermission,
                 hour: _eveningHour,
                 minute: _eveningMinute,
                 onToggle: _toggleEvening,
@@ -605,6 +623,7 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
     required Key timePickerKey,
     required bool enabled,
     required bool globalEnabled,
+    bool hasPermission = true,
     required int hour,
     required int minute,
     required ValueChanged<bool> onToggle,
@@ -612,7 +631,11 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
     required AppLocalizations l10n,
     required bool isDark,
   }) {
-    final isEffectivelyActive = globalEnabled && enabled;
+    final isEffectivelyActive = globalEnabled && enabled && hasPermission;
+    final isDeliveryPending = globalEnabled && enabled && !hasPermission;
+    final cardKeyValue = cardKey is ValueKey
+        ? cardKey.value.toString()
+        : 'adhkar_reminder';
 
     return Container(
       key: cardKey,
@@ -676,6 +699,31 @@ class _AdhkarRemindersSheetState extends State<AdhkarRemindersSheet> {
               ),
             ],
           ),
+          if (isDeliveryPending) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(
+                  Icons.notifications_off_outlined,
+                  size: 14,
+                  color: Color(0xFFB45309),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    l10n.adhkarRemindersDeliveryPending,
+                    key: Key('${cardKeyValue}_delivery_pending'),
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: Color(0xFFB45309),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
           const Divider(height: 1),
           const SizedBox(height: 10),

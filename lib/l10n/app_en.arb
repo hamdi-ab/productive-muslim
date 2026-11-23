@@ -819,5 +819,6 @@
   "adhkarEveningReminderDesc": "Gentle reminder before your day winds down",
   "adhkarRemindersPeacefulNotice": "Reminders are local, peaceful, and completely optional. They never imply religious obligation, score progress, or send follow-up nudges.",
   "adhkarReminderScheduleError": "Unable to schedule reminder. Please check notification permissions.",
-  "adhkarReminderSetTime": "Set Time"
+  "adhkarReminderSetTime": "Set Time",
+  "adhkarRemindersDeliveryPending": "Saved • Permission needed for delivery"
 }

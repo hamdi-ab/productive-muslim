@@ -333,6 +333,14 @@ class PrayerNotificationScheduler {
     } else {
       await _plugin.updateLocalTimezone();
     }
+
+    final permitted = await hasPermission();
+    if (!permitted) {
+      await _plugin.cancel(idMorningAdhkar);
+      await _plugin.cancel(idEveningAdhkar);
+      return;
+    }
+
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
     final globalEnabled = _settingsService.adhkarRemindersGlobalEnabled;
 
@@ -410,6 +418,15 @@ class PrayerNotificationScheduler {
       await _plugin.updateLocalTimezone();
     }
 
+    final permitted = await hasPermission();
+    if (!permitted) {
+      await _plugin.cancel(idMorningAdhkar);
+      await _plugin.cancel(idEveningAdhkar);
+      await _plugin.cancel(idSleepingAdhkar);
+      await _plugin.cancel(idSunnahFasting);
+      return;
+    }
+
     final currentTime = now ?? DateTime.now();
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
 
@@ -477,6 +494,16 @@ class PrayerNotificationScheduler {
     String? locale,
     tz.Location? location,
   }) async {
+    final permitted = await hasPermission();
+    if (!permitted) {
+      await _plugin.cancel(idMorningAdhkar);
+      await _plugin.cancel(idEveningAdhkar);
+      await _plugin.cancel(idSleepingAdhkar);
+      await _plugin.cancel(idSunnahFasting);
+      await _plugin.cancel(idQaylulah);
+      return;
+    }
+
     await rescheduleLocationIndependentReminders(
       now: now,
       locale: locale,

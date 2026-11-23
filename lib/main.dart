@@ -55,6 +55,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         final prayerService = getIt.isRegistered<PrayerTimeService>()
             ? getIt<PrayerTimeService>()
             : null;
+        final settings = getIt.isRegistered<SettingsService>()
+            ? getIt<SettingsService>()
+            : null;
+        final locale = settings?.localeNotifier.value?.languageCode;
         unawaited(() async {
           final position = prayerService?.getCachedOrSavedPosition();
           if (position != null) {
@@ -67,9 +71,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             await scheduler.rescheduleAll(
               prayerTimes: times,
               tomorrowPrayerTimes: tomorrowTimes,
+              locale: locale,
             );
           } else {
-            await scheduler.rescheduleLocationIndependentReminders();
+            await scheduler.rescheduleLocationIndependentReminders(
+              locale: locale,
+            );
           }
         }());
       }
