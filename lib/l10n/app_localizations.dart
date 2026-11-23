@@ -2051,25 +2051,25 @@ abstract class AppLocalizations {
   /// No description provided for @barakahAnalyticsEnergyTriad.
   ///
   /// In en, this message translates to:
-  /// **'Holistic Energy Triad'**
+  /// **'Personal Energy & Wellbeing'**
   String get barakahAnalyticsEnergyTriad;
 
   /// No description provided for @barakahAnalyticsSpiritual.
   ///
   /// In en, this message translates to:
-  /// **'Spiritual'**
+  /// **'Inner Stillness & Presence'**
   String get barakahAnalyticsSpiritual;
 
   /// No description provided for @barakahAnalyticsPhysical.
   ///
   /// In en, this message translates to:
-  /// **'Physical'**
+  /// **'Physical Vitality & Rest'**
   String get barakahAnalyticsPhysical;
 
   /// No description provided for @barakahAnalyticsMental.
   ///
   /// In en, this message translates to:
-  /// **'Mental'**
+  /// **'Mental Clarity & Focus'**
   String get barakahAnalyticsMental;
 
   /// No description provided for @barakahAnalyticsActiveDays.

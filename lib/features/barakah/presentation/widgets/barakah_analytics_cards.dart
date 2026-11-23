@@ -187,7 +187,7 @@ class BarakahConsistencyMatrixCard extends StatelessWidget {
   }
 }
 
-/// Visual progress breakdown of Spiritual, Mental, and Physical energy
+/// Personal wellbeing reflection on Inner Stillness, Mental Clarity, and Physical Rest
 class EnergyTriadBreakdownCard extends StatelessWidget {
   const EnergyTriadBreakdownCard({super.key, required this.analytics});
 
@@ -197,6 +197,7 @@ class EnergyTriadBreakdownCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -221,11 +222,7 @@ class EnergyTriadBreakdownCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.bolt_rounded,
-                size: 18,
-                color: Color(0xFFF59E0B),
-              ),
+              const Icon(Icons.spa_rounded, size: 18, color: Color(0xFF10B981)),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
@@ -238,40 +235,44 @@ class EnergyTriadBreakdownCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 4),
+          Text(
+            isAr ? 'مراجعة ذاتية لحضورك الذهني والبدني، ليست مقياساً إيمانياً' : 'Self-reported reflection on daily presence and balance — not a spiritual measure.',
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark ? Colors.white60 : Colors.black54,
+              height: 1.3,
+            ),
+          ),
           const SizedBox(height: AppSpacing.md),
-          _EnergyBar(
+          _WellbeingTile(
             title: l10n.barakahAnalyticsSpiritual,
-            value: analytics.avgSpiritual,
+            desc: isAr
+                ? 'حضور الذهن والخشوع في الروتين والذكر اليومي'
+                : 'Mindful presence, sincere intention, and inner peace',
             color: const Color(0xFF10B981),
-            icon: Icons.mosque_rounded,
+            icon: Icons.spa_rounded,
+            isDark: isDark,
           ),
           const SizedBox(height: AppSpacing.sm),
-          _EnergyBar(
+          _WellbeingTile(
             title: l10n.barakahAnalyticsMental,
-            value: analytics.avgMental,
+            desc: isAr
+                ? 'الوضوح المعرفي وإدارة الانتباه في الأعمال اليومية'
+                : 'Cognitive focus, clarity, and intentional attention',
             color: const Color(0xFF6366F1),
             icon: Icons.psychology_rounded,
+            isDark: isDark,
           ),
           const SizedBox(height: AppSpacing.sm),
-          _EnergyBar(
+          _WellbeingTile(
             title: l10n.barakahAnalyticsPhysical,
-            value: analytics.avgPhysical,
+            desc: isAr
+                ? 'العناية بالبدن، النوم الكافي والتغذية السليمة'
+                : 'Bodily energy, restorative rest, and healthy habits',
             color: const Color(0xFFF59E0B),
             icon: Icons.directions_run_rounded,
-          ),
-          const SizedBox(height: AppSpacing.sm + 2),
-          Text(
-            isDark
-                ? (Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'مستويات الطاقة تعبير ذاتي للمتابعة الشخصية وليست مقياساً إيمانياً.'
-                      : 'Self-reported energy levels for personal mindfulness, not a spiritual measure.')
-                : (Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'مستويات الطاقة تعبير ذاتي للمتابعة الشخصية وليست مقياساً إيمانياً.'
-                      : 'Self-reported energy levels for personal mindfulness, not a spiritual measure.'),
-            style: TextStyle(
-              fontSize: 10.5,
-              color: isDark ? Colors.white38 : Colors.black38,
-            ),
+            isDark: isDark,
           ),
         ],
       ),
@@ -279,97 +280,78 @@ class EnergyTriadBreakdownCard extends StatelessWidget {
   }
 }
 
-String _getEnergyLevelLabel(double value, bool isAr) {
-  if (value >= 4.5) return isAr ? 'مفعمة' : 'Vibrant';
-  if (value >= 3.5) return isAr ? 'مستقرة' : 'Steady';
-  if (value >= 2.5) return isAr ? 'معتدلة' : 'Moderate';
-  if (value >= 1.5) return isAr ? 'منخفضة' : 'Low';
-  if (value > 0) return isAr ? 'بحاجة لراحة' : 'Resting';
-  return isAr ? 'غير مسجل' : 'Not recorded';
-}
-
-class _EnergyBar extends StatelessWidget {
-  const _EnergyBar({
+class _WellbeingTile extends StatelessWidget {
+  const _WellbeingTile({
     required this.title,
-    required this.value,
+    required this.desc,
     required this.color,
     required this.icon,
+    required this.isDark,
   });
 
   final String title;
-  final double value;
+  final String desc;
   final Color color;
   final IconData icon;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final normalized = (value / 5.0).clamp(0.0, 1.0);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Icon(icon, size: 14, color: color),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : AppColors.surfaceSubtle,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: isDark ? 0.2 : 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: isDark ? 0.2 : 0.12),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _getEnergyLevelLabel(value, isAr),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Container(
-          height: 8,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: FractionallySizedBox(
-            alignment: AlignmentDirectional.centerStart,
-            widthFactor: normalized,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(4),
-              ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isDark ? Colors.white60 : Colors.black54,
+                    height: 1.25,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

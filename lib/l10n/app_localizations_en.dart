@@ -1112,16 +1112,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get barakahAnalyticsConsistency => '7-Day Barakah Matrix';
 
   @override
-  String get barakahAnalyticsEnergyTriad => 'Holistic Energy Triad';
+  String get barakahAnalyticsEnergyTriad => 'Personal Energy & Wellbeing';
 
   @override
-  String get barakahAnalyticsSpiritual => 'Spiritual';
+  String get barakahAnalyticsSpiritual => 'Inner Stillness & Presence';
 
   @override
-  String get barakahAnalyticsPhysical => 'Physical';
+  String get barakahAnalyticsPhysical => 'Physical Vitality & Rest';
 
   @override
-  String get barakahAnalyticsMental => 'Mental';
+  String get barakahAnalyticsMental => 'Mental Clarity & Focus';
 
   @override
   String barakahAnalyticsActiveDays(int count) {

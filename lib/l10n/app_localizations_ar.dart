@@ -1099,16 +1099,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get barakahAnalyticsConsistency => 'مصفوفة البركة للأسبوع';
 
   @override
-  String get barakahAnalyticsEnergyTriad => 'ثلاثية الطاقة المتكاملة';
+  String get barakahAnalyticsEnergyTriad => 'تأملات التوازن والنشاط';
 
   @override
-  String get barakahAnalyticsSpiritual => 'الروحية';
+  String get barakahAnalyticsSpiritual => 'السكينة وحضور القلب';
 
   @override
-  String get barakahAnalyticsPhysical => 'البدنية';
+  String get barakahAnalyticsPhysical => 'الحيوية والراحة البدنية';
 
   @override
-  String get barakahAnalyticsMental => 'الذهنية';
+  String get barakahAnalyticsMental => 'صفاء الذهن والتركيز';
 
   @override
   String barakahAnalyticsActiveDays(int count) {

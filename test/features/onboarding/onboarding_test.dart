@@ -178,4 +178,42 @@ void main() {
     expect(settings.localeCode, 'ar');
     expect(settings.localeNotifier.value, const Locale('ar'));
   });
+
+  testWidgets('persists selected pillars to settings and preference alias', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Fatima');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Seeking barakah in my time'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Remember'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pray'));
+    await tester.pumpAndSettle();
+
+    final continueBtn = find.text('Continue').last;
+    await tester.ensureVisible(continueBtn);
+    await tester.pumpAndSettle();
+    await tester.tap(continueBtn);
+    await tester.pumpAndSettle();
+
+    expect(settings.selectedPillars, containsAll(['remember', 'pray']));
+    expect(settings.selectedQualities, containsAll(['remember', 'pray']));
+    expect(
+      settings.prefs?.getStringList('selected_qualities'),
+      containsAll(['remember', 'pray']),
+    );
+  });
 }

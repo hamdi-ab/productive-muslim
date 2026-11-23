@@ -380,10 +380,10 @@
   "settingQaylulahDesc": "Gentle reminder 30 min before Dhuhr for a 20-min recharge.",
   "barakahAnalyticsTitle": "Weekly Growth & Analytics",
   "barakahAnalyticsConsistency": "7-Day Barakah Matrix",
-  "barakahAnalyticsEnergyTriad": "Holistic Energy Triad",
-  "barakahAnalyticsSpiritual": "Spiritual",
-  "barakahAnalyticsPhysical": "Physical",
-  "barakahAnalyticsMental": "Mental",
+  "barakahAnalyticsEnergyTriad": "Personal Energy & Wellbeing",
+  "barakahAnalyticsSpiritual": "Inner Stillness & Presence",
+  "barakahAnalyticsPhysical": "Physical Vitality & Rest",
+  "barakahAnalyticsMental": "Mental Clarity & Focus",
   "barakahAnalyticsActiveDays": "{count} / 7 Active Days",
   "@barakahAnalyticsActiveDays": {
     "placeholders": {
