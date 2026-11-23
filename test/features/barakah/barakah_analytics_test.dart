@@ -145,6 +145,9 @@ void main() {
         expect(find.text('7-Day Barakah Matrix'), findsOneWidget);
         expect(find.text('Holistic Energy Triad'), findsOneWidget);
         expect(find.text('Spiritual Growth Insights'), findsOneWidget);
+        expect(find.text('Vibrant'), findsOneWidget);
+        expect(find.text('Steady'), findsNWidgets(2));
+        expect(find.textContaining('/ 5.0'), findsNothing);
       },
     );
   });

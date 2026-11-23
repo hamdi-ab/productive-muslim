@@ -255,22 +255,20 @@ class _ReviewContent extends StatelessWidget {
                     .getCompletedDhikrIds(key)
                     .length;
                 final isFasting = settingsService.isSunnahFastingTarget(key);
-                final energy = settingsService.getDailyEnergy(key);
-                // Only add the energy point when a real saved record exists.
-                final energyPoint = energy.physical > 0 ? 1 : 0;
-                final score = dhikrCount + (isFasting ? 3 : 0) + energyPoint;
-                if (score > 0) {
-                  activityMap[key] = score;
+                final hasEnergy = settingsService.hasDailyEnergy(key);
+                final dayActivityCount =
+                    dhikrCount + (isFasting ? 1 : 0) + (hasEnergy ? 1 : 0);
+                if (dayActivityCount > 0) {
+                  activityMap[key] = dayActivityCount;
                 }
               }
             }
             for (final d in analytics.dailySnapshots) {
               final key = BarakahReviewWeek.dateKey(d.date);
-              // Dhikr and fasting are already counted via SettingsService above;
-              // add only the daily-review bonus so we don't double-count.
-              final reviewBonus = d.barakahAnswer != null ? 2 : 0;
-              if (reviewBonus > 0) {
-                activityMap[key] = (activityMap[key] ?? 0) + reviewBonus;
+              // Count the daily reflection factually without arbitrary point scoring
+              final hasReview = d.barakahAnswer != null;
+              if (hasReview) {
+                activityMap[key] = (activityMap[key] ?? 0) + 1;
               }
             }
             return BarakahHeatmapCard(

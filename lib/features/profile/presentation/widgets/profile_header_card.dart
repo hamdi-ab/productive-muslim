@@ -10,8 +10,8 @@ import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
-/// Hero identity card for the user's spiritual profile, showcasing avatar,
-/// spiritual persona level, and quick access to system settings.
+/// Identity card for the user's profile, showcasing avatar,
+/// user name, daily intention/motto, and quick access to settings.
 class ProfileHeaderCard extends StatefulWidget {
   final bool isDark;
   final bool isAr;
@@ -346,7 +346,7 @@ class _ProfileHeaderCardState extends State<ProfileHeaderCard> {
               ),
               const SizedBox(width: 14),
 
-              // Name and Spiritual Rank
+              // Name and Motto
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

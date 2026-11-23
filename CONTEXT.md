@@ -1,14 +1,20 @@
 # Context
 
-Productive Muslim — a Flutter mobile app for university students and young professionals that helps them become Productive Muslims through the 9 essential qualities framework.
+Productive Muslim — a daily companion that helps Muslims strengthen their remembrance of Allah, organize their responsibilities around Salah, and develop a more intentional and balanced life.
 
 ## Core concepts
 
-- **Barakah**: divine blessing and spiritual nourishment; daily prompt-card responses and a read-only weekly review that browses saved reflections with descriptive answer/source counts (no scoring or productivity correlations)
-- **Habits**: daily routines that build the 9 essential qualities
-- **Tasks**: specific actions within a habit
-- **Intentions**: journaling daily intentions and reflections
-- **Onboarding**: guided setup of user profile, preferences, and goals
+- **Five Pillars**:
+  - **Remember**: Dhikr and authentic morning & evening adhkar
+  - **Pray**: Salah timetable, accurate adhan countdowns, and Qibla direction
+  - **Intend & Act**: Daily intentions, priority tasks, habits, and focus sessions (My Day)
+  - **Reflect**: Gentle evening review, muhasabah, and gratitude without numerical spiritual scores
+  - **Grow**: Consistent, humble personal growth and character development
+- **Barakah**: divine blessing and spiritual nourishment; daily prompt-card reflections and a qualitative weekly review with factual reflection counts (strictly free from spiritual scoring or gamified points)
+- **Habits**: daily routines anchored to prayers and intentional living
+- **Tasks**: purposeful daily actions organized around Salah
+- **Intentions**: daily intention setting and evening reflection
+- **Onboarding**: guided setup of user profile, daily pillars focus, and prayer times
 
 ## Architecture notes
 

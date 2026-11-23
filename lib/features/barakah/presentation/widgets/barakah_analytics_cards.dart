@@ -259,10 +259,33 @@ class EnergyTriadBreakdownCard extends StatelessWidget {
             color: const Color(0xFFF59E0B),
             icon: Icons.directions_run_rounded,
           ),
+          const SizedBox(height: AppSpacing.sm + 2),
+          Text(
+            isDark
+                ? (Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'مستويات الطاقة تعبير ذاتي للمتابعة الشخصية وليست مقياساً إيمانياً.'
+                      : 'Self-reported energy levels for personal mindfulness, not a spiritual measure.')
+                : (Localizations.localeOf(context).languageCode == 'ar'
+                      ? 'مستويات الطاقة تعبير ذاتي للمتابعة الشخصية وليست مقياساً إيمانياً.'
+                      : 'Self-reported energy levels for personal mindfulness, not a spiritual measure.'),
+            style: TextStyle(
+              fontSize: 10.5,
+              color: isDark ? Colors.white38 : Colors.black38,
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+String _getEnergyLevelLabel(double value, bool isAr) {
+  if (value >= 4.5) return isAr ? 'مفعمة' : 'Vibrant';
+  if (value >= 3.5) return isAr ? 'مستقرة' : 'Steady';
+  if (value >= 2.5) return isAr ? 'معتدلة' : 'Moderate';
+  if (value >= 1.5) return isAr ? 'منخفضة' : 'Low';
+  if (value > 0) return isAr ? 'بحاجة لراحة' : 'Resting';
+  return isAr ? 'غير مسجل' : 'Not recorded';
 }
 
 class _EnergyBar extends StatelessWidget {
@@ -281,6 +304,7 @@ class _EnergyBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final normalized = (value / 5.0).clamp(0.0, 1.0);
 
     return Column(
@@ -307,12 +331,19 @@ class _EnergyBar extends StatelessWidget {
                 ],
               ),
             ),
-            Text(
-              _locDigits(context, '${value.toStringAsFixed(1)} / 5.0'),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: color,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: isDark ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _getEnergyLevelLabel(value, isAr),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
               ),
             ),
           ],

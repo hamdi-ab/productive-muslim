@@ -10,6 +10,7 @@ import 'package:productive_muslim/features/onboarding/presentation/widgets/onboa
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_intention_chips.dart';
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_name_input.dart';
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_permission_card.dart';
+import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_pillars_selector.dart';
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_qualities_selector.dart';
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_step_header.dart';
 import 'package:productive_muslim/features/onboarding/presentation/widgets/onboarding_step_indicator.dart';
@@ -29,14 +30,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final PageController _pageController;
   int _currentStep = 0;
   String _selectedIntention = '';
-  final List<String> _selectedQualities = [];
+  final List<String> _selectedPillars = [];
   final _nameController = TextEditingController();
   OnboardingPermissionState _permissionState =
       OnboardingPermissionState.initial;
 
   SettingsService get _settings => widget.settings ?? SettingsService.empty();
 
-  static const _maxQualities = 3;
+  static const _maxPillars = 3;
 
   static const List<OnboardingStep> _steps = [
     OnboardingStep(
@@ -57,10 +58,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       hasChips: true,
     ),
     OnboardingStep(
-      titleKey: 'onboardingQualitiesTitle',
-      subtitleKey: 'onboardingQualitiesSubtitle',
-      icon: Icons.star_rounded,
-      hasQualities: true,
+      titleKey: 'onboardingPillarsTitle',
+      subtitleKey: 'onboardingPillarsSubtitle',
+      icon: Icons.view_quilt_rounded,
+      hasPillars: true,
     ),
     OnboardingStep(
       titleKey: 'onboardingPermissionTitle',
@@ -94,8 +95,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       await _settings.setUserIntention(_selectedIntention);
     }
 
-    if (_currentStep == 3 && _selectedQualities.isNotEmpty) {
-      await _settings.setSelectedQualities(_selectedQualities);
+    if (_currentStep == 3 && _selectedPillars.isNotEmpty) {
+      await _settings.setSelectedPillars(_selectedPillars);
     }
 
     if (_currentStep < _steps.length - 1) {
@@ -165,17 +166,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool get _canProceed {
     if (_currentStep == 1) return _nameController.text.trim().isNotEmpty;
     if (_currentStep == 2) return _selectedIntention.isNotEmpty;
-    if (_currentStep == 3) return _selectedQualities.isNotEmpty;
+    if (_currentStep == 3) return _selectedPillars.isNotEmpty;
     return true;
   }
 
-  void _toggleQuality(String quality) {
+  void _togglePillar(String pillar) {
     AppHaptics.selectionClick();
     setState(() {
-      if (_selectedQualities.contains(quality)) {
-        _selectedQualities.remove(quality);
-      } else if (_selectedQualities.length < _maxQualities) {
-        _selectedQualities.add(quality);
+      if (_selectedPillars.contains(pillar)) {
+        _selectedPillars.remove(pillar);
+      } else if (_selectedPillars.length < _maxPillars) {
+        _selectedPillars.add(pillar);
       }
     });
   }
@@ -307,10 +308,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 l10n: l10n,
                                 isDark: isDark,
                               ),
+                            if (step.hasPillars)
+                              OnboardingPillarsSelector(
+                                selectedPillars: _selectedPillars,
+                                onToggle: _togglePillar,
+                                isDark: isDark,
+                              ),
                             if (step.hasQualities)
                               OnboardingQualitiesSelector(
-                                selectedQualities: _selectedQualities,
-                                onToggle: _toggleQuality,
+                                selectedQualities: _selectedPillars,
+                                onToggle: _togglePillar,
                                 isDark: isDark,
                               ),
                             if (step.hasPermission)

@@ -30,7 +30,7 @@ void main() {
     expect(find.text('Build your day around what matters'), findsOneWidget);
     expect(
       find.text(
-        'Prayer, tasks, habits, and intentions — together in one space',
+        'Strengthen your remembrance of Allah, organize around Salah, and live with intention',
       ),
       findsOneWidget,
     );
@@ -63,7 +63,7 @@ void main() {
     expect(find.text('Seeking barakah in my time'), findsOneWidget);
   });
 
-  testWidgets('advances to qualities step', (tester) async {
+  testWidgets('advances to pillars step', (tester) async {
     await tester.pumpWidget(buildTestWidget());
     await tester.pumpAndSettle();
 
@@ -80,9 +80,12 @@ void main() {
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('What qualities do you want to build?'), findsOneWidget);
-    expect(find.text('God-Consciousness'), findsOneWidget);
-    expect(find.text('Patience'), findsOneWidget);
+    expect(find.text('Your Five Daily Pillars'), findsOneWidget);
+    expect(find.text('Remember'), findsOneWidget);
+    expect(find.text('Pray'), findsOneWidget);
+    expect(find.text('Intend & Act'), findsOneWidget);
+    expect(find.text('Reflect'), findsOneWidget);
+    expect(find.text('Grow'), findsOneWidget);
   });
 
   testWidgets('advances to permission step', (tester) async {
@@ -101,7 +104,7 @@ void main() {
 
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('God-Consciousness'));
+    await tester.tap(find.text('Remember'));
     await tester.pumpAndSettle();
 
     final continueBtn3 = find.text('Continue').last;
@@ -129,7 +132,7 @@ void main() {
 
     await tester.tap(find.text('Continue').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('God-Consciousness'));
+    await tester.tap(find.text('Remember'));
     await tester.pumpAndSettle();
 
     final continueBtn4 = find.text('Continue').last;

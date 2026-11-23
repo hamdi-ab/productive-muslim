@@ -205,6 +205,12 @@ class SettingsService {
   Future<void> setSelectedQualities(List<String> qualities) async =>
       _prefs?.setStringList(_selectedQualitiesKey, qualities);
 
+  /// Alias for the Five Pillars framework alignment
+  List<String> get selectedPillars => selectedQualities;
+
+  Future<void> setSelectedPillars(List<String> pillars) =>
+      setSelectedQualities(pillars);
+
   /// Location permission state: 'granted', 'denied', 'denied_forever', or null (not yet requested)
   String? get locationPermission => _prefs?.getString(_locationPermissionKey);
 
@@ -239,6 +245,10 @@ class SettingsService {
       list.add(date);
     }
     await _prefs?.setStringList(_sunnahFastingTargetKey, list);
+  }
+
+  bool hasDailyEnergy(String date) {
+    return _prefs?.containsKey('energy_p_$date') ?? false;
   }
 
   ({int physical, int spiritual, int mental}) getDailyEnergy(String date) {
