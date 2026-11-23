@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
@@ -218,6 +219,44 @@ void main() {
         equals(['morning_1', 'morning_2']),
       );
     });
+
+    test(
+      'backup and restore preserves prayer calculation method and Asr madhab',
+      () async {
+        await settingsService.setPrayerCalculationMethod(
+          CalculationMethod.egyptian,
+        );
+        await settingsService.setPrayerMadhab(Madhab.hanafi);
+
+        final payload = await backupService.createBackupPayload();
+        final data = payload['data'] as Map<String, dynamic>;
+        final exportedSettings = data['settings'] as Map<String, dynamic>;
+        expect(
+          exportedSettings['prayer_calculation_method'],
+          equals('egyptian'),
+        );
+        expect(exportedSettings['prayer_madhab'], equals('hanafi'));
+
+        // Mutate local state back to MWL / Shafi
+        await settingsService.setPrayerCalculationMethod(
+          CalculationMethod.muslimWorldLeague,
+        );
+        await settingsService.setPrayerMadhab(Madhab.shafi);
+
+        // Restore payload with Karachi and Hanafi
+        exportedSettings['prayer_calculation_method'] = 'karachi';
+        exportedSettings['prayer_madhab'] = 'hanafi';
+        final jsonStr = jsonEncode(payload);
+
+        final success = await backupService.importBackupFromJson(jsonStr);
+        expect(success, isTrue);
+        expect(
+          settingsService.prayerCalculationMethod,
+          equals(CalculationMethod.karachi),
+        );
+        expect(settingsService.prayerMadhab, equals(Madhab.hanafi));
+      },
+    );
 
     test('importBackupFromJson correctly exports and restores version 3 adhkar records', () async {
       await db

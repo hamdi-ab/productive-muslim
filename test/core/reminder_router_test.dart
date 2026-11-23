@@ -73,6 +73,11 @@ void main() {
       AppRouter.router.go('/settings');
       await pumpRouter(tester);
       expect(find.byType(SettingsScreen), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('barakah_reminder_toggle')),
+        50,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.byKey(const Key('barakah_reminder_toggle')), findsOneWidget);
       AppRouter.openBarakahReminder();
       await pumpFrames(tester);

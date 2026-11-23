@@ -453,6 +453,33 @@ class AppLocalizationsAr extends AppLocalizations {
       'احصل على إشعارات في أوقات الصلاة';
 
   @override
+  String get prayerCalculationMethod => 'طريقة الحساب';
+
+  @override
+  String get prayerCalculationMethodDesc =>
+      'المعيار الفلكي المعتمد لحساب مواقيت الصلاة';
+
+  @override
+  String get prayerMadhab => 'حساب العصر (المذهب الفقهي)';
+
+  @override
+  String get prayerMadhabDesc => 'طول الظل المعتمد لتحديد بداية وقت صلاة العصر';
+
+  @override
+  String get prayerMadhabShafi => 'الجمهور (الشافعي، المالكي، الحنبلي)';
+
+  @override
+  String get prayerMadhabShafiDesc =>
+      'يبدأ وقت العصر عندما يصير ظل كل شيء مثله (طول الظل 1)';
+
+  @override
+  String get prayerMadhabHanafi => 'الحنفي';
+
+  @override
+  String get prayerMadhabHanafiDesc =>
+      'يبدأ وقت العصر عندما يصير ظل كل شيء مثليه (طول الظل 2)';
+
+  @override
   String get islam => 'إسلام';
 
   @override

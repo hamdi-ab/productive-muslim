@@ -3,9 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
+import 'package:productive_muslim/features/prayer_times/models/prayer_calculation_options.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/screens/prayer_times_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
@@ -68,8 +71,33 @@ void main() {
     );
   }
 
-  PrayerTimes createPrayerTimes({DateTime? date}) {
-    final params = CalculationMethodParameters.muslimWorldLeague();
+  Widget buildScreenWithRouter({String language = 'en'}) {
+    final router = GoRouter(
+      initialLocation: '/prayer',
+      routes: [
+        GoRoute(path: '/prayer', builder: (_, _) => const PrayerTimesScreen()),
+        GoRoute(
+          path: AppRoutes.settings,
+          builder: (_, _) => const Scaffold(body: Text('Settings Screen')),
+        ),
+      ],
+    );
+
+    return MaterialApp.router(
+      locale: Locale(language),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    );
+  }
+
+  PrayerTimes createPrayerTimes({
+    DateTime? date,
+    CalculationParameters? calculationParameters,
+  }) {
+    final params =
+        calculationParameters ??
+        CalculationMethodParameters.muslimWorldLeague();
     return PrayerTimes(
       date: date ?? DateTime.now(),
       coordinates: Coordinates(40.7128, -74.0060),
@@ -268,5 +296,126 @@ void main() {
 
     expect(find.text('الفجر (غداً)'), findsOneWidget);
     expect(find.text('غداً'), findsOneWidget);
+  });
+
+  testWidgets('displays MWL calculation method badge by default', (
+    tester,
+  ) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(createPrayerTimes());
+
+    await tester.pumpWidget(buildScreen());
+    await tester.pumpAndSettle();
+
+    final badgeFinder = find.byKey(
+      const Key('prayer_calculation_method_badge'),
+    );
+    expect(badgeFinder, findsOneWidget);
+    expect(find.text('Muslim World League'), findsOneWidget);
+  });
+
+  testWidgets(
+    'displays method badge with Hanafi suffix when Asr madhab is Hanafi',
+    (tester) async {
+      final position = Position(
+        latitude: 40.7128,
+        longitude: -74.0060,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        heading: 0,
+        speed: 0,
+        speedAccuracy: 0,
+        altitudeAccuracy: 0,
+        headingAccuracy: 0,
+      );
+      mockService.setPosition(position);
+      final params = PrayerCalculationOptions.buildParameters(
+        method: CalculationMethod.egyptian,
+        madhab: Madhab.hanafi,
+      );
+      mockService.setPrayerTimes(
+        createPrayerTimes(calculationParameters: params),
+      );
+
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Egyptian Authority • Hanafi'), findsOneWidget);
+    },
+  );
+
+  testWidgets('displays localized calculation method badge in Arabic', (
+    tester,
+  ) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    final params = PrayerCalculationOptions.buildParameters(
+      method: CalculationMethod.egyptian,
+      madhab: Madhab.hanafi,
+    );
+    mockService.setPrayerTimes(
+      createPrayerTimes(calculationParameters: params),
+    );
+
+    await tester.pumpWidget(buildScreen(language: 'ar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('الهيئة المصرية • حنفي'), findsOneWidget);
+  });
+
+  testWidgets('tapping calculation method badge navigates to settings', (
+    tester,
+  ) async {
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(createPrayerTimes());
+
+    await tester.pumpWidget(buildScreenWithRouter());
+    await tester.pumpAndSettle();
+
+    final badgeFinder = find.byKey(
+      const Key('prayer_calculation_method_badge'),
+    );
+    expect(badgeFinder, findsOneWidget);
+
+    await tester.tap(badgeFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings Screen'), findsOneWidget);
   });
 }

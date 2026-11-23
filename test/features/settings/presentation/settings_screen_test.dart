@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/settings/logic/settings_bloc.dart';
 import 'package:productive_muslim/features/settings/presentation/barakah_reminder_lifecycle.dart';
@@ -13,6 +16,8 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../helpers/fake_reminder_scheduler.dart';
+
+class _MockPrayerTimeService extends Mock implements PrayerTimeService {}
 
 void main() {
   late FakeReminderScheduler scheduler;
@@ -361,4 +366,126 @@ void main() {
     expect(settings.localeCode, 'en');
     expect(settings.localeNotifier.value, const Locale('en'));
   });
+
+  testWidgets(
+    'prayer calculation method tile shows current method and selecting new method updates settings service',
+    (tester) async {
+      final mockPrayerService = _MockPrayerTimeService();
+      when(() => mockPrayerService.onPrayerCalculationSettingsChanged())
+          .thenAnswer((_) async {});
+      getIt.registerSingleton<PrayerTimeService>(mockPrayerService);
+
+      try {
+        await pumpScreen(tester);
+
+        final tileFinder = find.byKey(
+          const Key('settings_calculation_method_tile'),
+        );
+        await ensureVisible(tester, tileFinder);
+
+        expect(tileFinder, findsOneWidget);
+        expect(find.text('Muslim World League (MWL)'), findsOneWidget);
+
+        await tester.tap(tileFinder);
+        await tester.pumpAndSettle();
+
+        final egyptianOption = find.byKey(const Key('calc_method_egyptian'));
+        expect(egyptianOption, findsOneWidget);
+
+        await tester.tap(egyptianOption);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('calc_method_egyptian')), findsNothing);
+        expect(settings.prayerCalculationMethod, CalculationMethod.egyptian);
+        expect(
+          settings.calculationMethodNotifier.value,
+          CalculationMethod.egyptian,
+        );
+        expect(
+          find.text('Egyptian General Authority of Survey'),
+          findsOneWidget,
+        );
+        verify(() => mockPrayerService.onPrayerCalculationSettingsChanged())
+            .called(1);
+      } finally {
+        if (getIt.isRegistered<PrayerTimeService>()) {
+          getIt.unregister<PrayerTimeService>();
+        }
+      }
+    },
+  );
+
+  testWidgets(
+    'prayer Asr madhab tile shows current madhab and selecting Hanafi updates settings service',
+    (tester) async {
+      final mockPrayerService = _MockPrayerTimeService();
+      when(() => mockPrayerService.onPrayerCalculationSettingsChanged())
+          .thenAnswer((_) async {});
+      getIt.registerSingleton<PrayerTimeService>(mockPrayerService);
+
+      try {
+        await pumpScreen(tester);
+
+        final tileFinder = find.byKey(const Key('settings_asr_madhab_tile'));
+        await ensureVisible(tester, tileFinder);
+
+        expect(tileFinder, findsOneWidget);
+        expect(
+          find.text("Standard (Shafi'i, Maliki, Hanbali)"),
+          findsOneWidget,
+        );
+
+        await tester.tap(tileFinder);
+        await tester.pumpAndSettle();
+
+        final hanafiOption = find.byKey(const Key('madhab_hanafi'));
+        expect(hanafiOption, findsOneWidget);
+
+        await tester.tap(hanafiOption);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('madhab_hanafi')), findsNothing);
+        expect(settings.prayerMadhab, Madhab.hanafi);
+        expect(settings.madhabNotifier.value, Madhab.hanafi);
+        expect(find.text('Hanafi'), findsOneWidget);
+        verify(() => mockPrayerService.onPrayerCalculationSettingsChanged())
+            .called(1);
+      } finally {
+        if (getIt.isRegistered<PrayerTimeService>()) {
+          getIt.unregister<PrayerTimeService>();
+        }
+      }
+    },
+  );
+
+  testWidgets(
+    'prayer calculation and madhab tiles render localized in Arabic',
+    (tester) async {
+      await pumpScreen(tester, language: 'ar');
+
+      final methodTile = find.byKey(
+        const Key('settings_calculation_method_tile'),
+      );
+      await ensureVisible(tester, methodTile);
+      expect(find.text('طريقة الحساب'), findsOneWidget);
+      expect(find.text('رابطة العالم الإسلامي (MWL)'), findsOneWidget);
+
+      final madhabTile = find.byKey(const Key('settings_asr_madhab_tile'));
+      await ensureVisible(tester, madhabTile);
+      expect(find.text('حساب العصر (المذهب الفقهي)'), findsOneWidget);
+      expect(find.text('الجمهور (الشافعي، المالكي، الحنبلي)'), findsOneWidget);
+
+      await tester.tap(madhabTile);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('madhab_hanafi')), findsOneWidget);
+      expect(find.text('الحنفي (ظل مثلين)'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('madhab_hanafi')));
+      await tester.pumpAndSettle();
+
+      expect(settings.prayerMadhab, Madhab.hanafi);
+      expect(find.text('الحنفي (ظل مثلين)'), findsOneWidget);
+    },
+  );
 }

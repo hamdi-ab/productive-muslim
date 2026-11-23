@@ -926,6 +926,54 @@ abstract class AppLocalizations {
   /// **'Get notified at prayer times'**
   String get adhanNotificationsDescription;
 
+  /// No description provided for @prayerCalculationMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation Method'**
+  String get prayerCalculationMethod;
+
+  /// No description provided for @prayerCalculationMethodDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Astronomical convention used to calculate prayer times'**
+  String get prayerCalculationMethodDesc;
+
+  /// No description provided for @prayerMadhab.
+  ///
+  /// In en, this message translates to:
+  /// **'Asr Calculation (Madhab)'**
+  String get prayerMadhab;
+
+  /// No description provided for @prayerMadhabDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow factor used to determine Asr prayer time'**
+  String get prayerMadhabDesc;
+
+  /// No description provided for @prayerMadhabShafi.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard (Shafi\'i, Maliki, Hanbali)'**
+  String get prayerMadhabShafi;
+
+  /// No description provided for @prayerMadhabShafiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Asr begins when an object\'s shadow equals its height (factor 1)'**
+  String get prayerMadhabShafiDesc;
+
+  /// No description provided for @prayerMadhabHanafi.
+  ///
+  /// In en, this message translates to:
+  /// **'Hanafi'**
+  String get prayerMadhabHanafi;
+
+  /// No description provided for @prayerMadhabHanafiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Asr begins when an object\'s shadow equals twice its height (factor 2)'**
+  String get prayerMadhabHanafiDesc;
+
   /// No description provided for @islam.
   ///
   /// In en, this message translates to:

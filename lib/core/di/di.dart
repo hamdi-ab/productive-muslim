@@ -111,7 +111,9 @@ Future<void> setupDi() async {
   getIt.registerLazySingleton<HomeWidgetSyncService>(
     () => HomeWidgetSyncService(),
   );
-  getIt.registerLazySingleton<PrayerTimeService>(() => PrayerTimeService());
+  getIt.registerLazySingleton<PrayerTimeService>(
+    () => PrayerTimeService(settingsService: getIt<SettingsService>()),
+  );
   getIt.registerLazySingleton<AdhanNotificationService>(
     () => AdhanNotificationService(
       onNotificationTapped: AppRouter.handleNotificationPayload,

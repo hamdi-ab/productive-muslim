@@ -7,14 +7,20 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/utils/platform_timezone.dart';
+import 'package:productive_muslim/data/services/adhan_notification_service.dart';
+import 'package:productive_muslim/data/services/prayer_notification_scheduler.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/features/prayer_times/models/prayer_calculation_options.dart';
 
 class PrayerTimeService {
-  PrayerTimeService() {
+  PrayerTimeService({SettingsService? settingsService})
+    : _settingsService = settingsService {
     try {
       tz_data.initializeTimeZones();
     } catch (_) {}
   }
+
+  final SettingsService? _settingsService;
 
   Position? _cachedPosition;
   PrayerTimes? _cachedPrayerTimes;
@@ -438,15 +444,86 @@ class PrayerTimeService {
     return _cachedLocationName;
   }
 
+  SettingsService? get _effectiveSettings =>
+      _settingsService ??
+      (getIt.isRegistered<SettingsService>() ? getIt<SettingsService>() : null);
+
   PrayerTimes? getPrayerTimes(Position position, {DateTime? date}) {
     final coordinates = Coordinates(position.latitude, position.longitude);
-    final params = CalculationMethodParameters.muslimWorldLeague();
+    final settings = _effectiveSettings;
+    final method =
+        settings?.prayerCalculationMethod ??
+        CalculationMethod.muslimWorldLeague;
+    final madhab = settings?.prayerMadhab ?? Madhab.shafi;
+    final params = PrayerCalculationOptions.buildParameters(
+      method: method,
+      madhab: madhab,
+    );
 
     return PrayerTimes(
       date: date ?? DateTime.now(),
       coordinates: coordinates,
       calculationParameters: params,
     );
+  }
+
+  /// Recomputes in-memory prayer times cache using the current position and
+  /// active calculation preferences.
+  void refreshPrayerTimesCache() {
+    final pos = getCachedOrSavedPosition();
+    if (pos != null) {
+      _cachedPrayerTimes = getPrayerTimes(pos);
+    } else {
+      _cachedPrayerTimes = null;
+    }
+  }
+
+  /// Refreshes in-memory caches and reschedules all active prayer notifications
+  /// and solar-anchored reminders to reflect updated calculation or madhab settings.
+  Future<void> onPrayerCalculationSettingsChanged() async {
+    refreshPrayerTimesCache();
+
+    // 1. Reschedule Adhan notifications if active
+    final settings = _effectiveSettings;
+    if (settings != null &&
+        settings.adhanNotificationsEnabled &&
+        getIt.isRegistered<AdhanNotificationService>()) {
+      final adhanService = getIt<AdhanNotificationService>();
+      final pos = getCachedOrSavedPosition();
+      if (pos != null) {
+        final times = getPrayerTimes(pos);
+        if (times != null) {
+          await adhanService.cancelAll();
+          await adhanService.schedulePrayerNotifications(
+            fajr: times.fajr,
+            dhuhr: times.dhuhr,
+            asr: times.asr,
+            maghrib: times.maghrib,
+            isha: times.isha,
+          );
+        }
+      }
+    }
+
+    // 2. Reschedule Smart Reminders / Sunnah (Qaylulah depends on Dhuhr)
+    if (getIt.isRegistered<PrayerNotificationScheduler>()) {
+      final scheduler = getIt<PrayerNotificationScheduler>();
+      final pos = getCachedOrSavedPosition();
+      if (pos != null) {
+        final now = DateTime.now();
+        final times = getPrayerTimes(pos, date: now);
+        final tomorrowTimes = getPrayerTimes(
+          pos,
+          date: now.add(const Duration(days: 1)),
+        );
+        await scheduler.rescheduleAll(
+          prayerTimes: times,
+          tomorrowPrayerTimes: tomorrowTimes,
+        );
+      } else {
+        await scheduler.rescheduleLocationIndependentReminders();
+      }
+    }
   }
 
   String? getNextPrayerName(PrayerTimes prayerTimes) {
