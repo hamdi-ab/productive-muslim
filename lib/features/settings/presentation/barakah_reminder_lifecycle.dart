@@ -46,7 +46,9 @@ class _BarakahReminderLifecycleState extends State<BarakahReminderLifecycle>
   }
 
   void _reconcile() {
-    final l10n = AppLocalizations.of(context)!;
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return;
     unawaited(
       widget.service.reconcile(
         ReminderContent(

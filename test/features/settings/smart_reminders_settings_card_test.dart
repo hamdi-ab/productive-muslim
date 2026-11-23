@@ -279,6 +279,45 @@ void main() {
   );
 
   testWidgets(
+    'when permission is later granted in system settings and app resumed, saved preferences are rescheduled and delivery pending badge is cleared',
+    (tester) async {
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
+        findsOneWidget,
+      );
+
+      // User grants permission in system settings and returns to app
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pumpAndSettle();
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=morning',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      expect(
+        find.byKey(const Key('setting_morning_delivery_pending_badge')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
     'changing reminder settings with no saved coordinates reschedules location-independent reminders without requesting location',
     (tester) async {
       final mockPrayerService = MockPrayerTimeService();
