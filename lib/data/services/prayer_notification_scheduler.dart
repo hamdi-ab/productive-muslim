@@ -494,17 +494,21 @@ class PrayerNotificationScheduler {
     String? locale,
     tz.Location? location,
   }) async {
+    final permitted = await hasPermission();
+    if (!permitted) {
+      await _plugin.cancel(idMorningAdhkar);
+      await _plugin.cancel(idEveningAdhkar);
+      await _plugin.cancel(idSleepingAdhkar);
+      await _plugin.cancel(idSunnahFasting);
+      await _plugin.cancel(idQaylulah);
+      return;
+    }
+
     await rescheduleLocationIndependentReminders(
       now: now,
       locale: locale,
       location: location,
     );
-
-    final permitted = await hasPermission();
-    if (!permitted) {
-      await _plugin.cancel(idQaylulah);
-      return;
-    }
 
     final currentTime = now ?? DateTime.now();
     final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');

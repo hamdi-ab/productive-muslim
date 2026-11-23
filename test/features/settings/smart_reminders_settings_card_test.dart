@@ -356,6 +356,120 @@ void main() {
   );
 
   testWidgets(
+    'no-coordinates and permission-denied path with bedtime and fasting preferences enabled does not schedule notifications, preserves preferences, and schedules after permission is granted',
+    (tester) async {
+      final mockPrayerService = MockPrayerTimeService();
+      when(() => mockPrayerService.getCachedOrSavedPosition()).thenReturn(null);
+      GetIt.instance.registerSingleton<PrayerTimeService>(mockPrayerService);
+      addTearDown(() {
+        if (GetIt.instance.isRegistered<PrayerTimeService>()) {
+          GetIt.instance.unregister<PrayerTimeService>();
+        }
+      });
+
+      // Explicitly enable bedtime and fasting preferences
+      await settingsService.setSleepingAdhkarNotificationEnabled(true);
+      await settingsService.setSunnahFastingNotificationEnabled(true);
+
+      // Permission denied
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
+      when(() => mockPlugin.requestPermission()).thenAnswer((_) async => false);
+
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      // Preferences preserved in settings
+      expect(settingsService.sleepingAdhkarNotificationEnabled, isTrue);
+      expect(settingsService.sunnahFastingNotificationEnabled, isTrue);
+
+      // Delivery pending badges shown because preferences are enabled while permission is denied
+      expect(
+        find.byKey(const Key('setting_sleeping_delivery_pending_badge')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('setting_fasting_delivery_pending_badge')),
+        findsOneWidget,
+      );
+
+      // Trigger a settings change to exercise _reschedule() with no coordinates and denied permission
+      final morningToggle = find.byKey(
+        const Key('setting_morning_adhkar_toggle'),
+      );
+      await tester.tap(morningToggle);
+      await tester.pumpAndSettle();
+
+      // Non-interactive check was used, no location requested
+      verify(() => mockPrayerService.getCachedOrSavedPosition())
+          .called(greaterThanOrEqualTo(1));
+      verifyNever(() => mockPrayerService.getCurrentPosition());
+
+      // Preferences still preserved
+      expect(settingsService.sleepingAdhkarNotificationEnabled, isTrue);
+      expect(settingsService.sunnahFastingNotificationEnabled, isTrue);
+
+      // NO notifications scheduled while permission is denied
+      verifyNever(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      );
+
+      // Now permission is granted via button
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      when(() => mockPlugin.requestPermission()).thenAnswer((_) async => true);
+      final grantBtn = find.byKey(
+        const Key('smart_reminders_grant_permission_button'),
+      );
+      await tester.tap(grantBtn);
+      await tester.pumpAndSettle();
+
+      // Both bedtime and fasting notifications are now scheduled
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSleepingAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=sleeping',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSunnahFasting,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/energy',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+        ),
+      ).called(1);
+
+      // Badges cleared
+      expect(
+        find.byKey(const Key('setting_sleeping_delivery_pending_badge')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('setting_fasting_delivery_pending_badge')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
     'scheduling error reverts toggle state and displays error snackbar',
     (tester) async {
       when(

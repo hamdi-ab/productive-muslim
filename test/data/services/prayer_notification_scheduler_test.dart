@@ -442,6 +442,9 @@ void main() {
       when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
       await settingsService.setMorningAdhkarNotificationEnabled(true);
       await settingsService.setEveningAdhkarNotificationEnabled(true);
+      await settingsService.setSleepingAdhkarNotificationEnabled(true);
+      await settingsService.setSunnahFastingNotificationEnabled(true);
+      await settingsService.setQaylulahNotificationEnabled(true);
 
       final now = DateTime(2026, 9, 29, 5, 0);
       await scheduler.rescheduleAdhkarReminders();
@@ -515,8 +518,10 @@ void main() {
       when(() => mockPlugin.hasPermission()).thenAnswer((_) async => false);
       await settingsService.setMorningAdhkarNotificationEnabled(true);
       await settingsService.setEveningAdhkarNotificationEnabled(true);
+      await settingsService.setSleepingAdhkarNotificationEnabled(true);
+      await settingsService.setSunnahFastingNotificationEnabled(true);
 
-      await scheduler.rescheduleAdhkarReminders();
+      await scheduler.rescheduleLocationIndependentReminders();
       verifyNever(
         () => mockPlugin.zonedSchedule(
           id: any(named: 'id'),
@@ -532,7 +537,7 @@ void main() {
 
       // Later permission is granted
       when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
-      await scheduler.rescheduleAdhkarReminders();
+      await scheduler.rescheduleLocationIndependentReminders();
 
       verify(
         () => mockPlugin.zonedSchedule(
@@ -557,6 +562,31 @@ void main() {
           channelId: any(named: 'channelId'),
           channelName: any(named: 'channelName'),
           matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSleepingAdhkar,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/adhkar?category=sleeping',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idSunnahFasting,
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: '/energy',
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
         ),
       ).called(1);
     });
