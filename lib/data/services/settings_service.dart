@@ -115,6 +115,39 @@ class SettingsService {
 
   String get localeCode => _prefs?.getString(_localeKey) ?? 'system';
 
+  /// Returns the explicit locale if set ('en' or 'ar'), or resolves the
+  /// platform/device locale when the preference is 'system' (or unset).
+  Locale get effectiveLocale {
+    final explicit = localeNotifier.value;
+    if (explicit != null) {
+      return explicit;
+    }
+    final code = _prefs?.getString(_localeKey);
+    final parsed = _parseLocale(code);
+    if (parsed != null) {
+      return parsed;
+    }
+    return _resolvePlatformLocale();
+  }
+
+  /// Returns the 2-letter language code of [effectiveLocale] ('ar' or 'en').
+  String get effectiveLanguageCode {
+    final lang = effectiveLocale.languageCode.toLowerCase();
+    return lang.startsWith('ar') ? 'ar' : 'en';
+  }
+
+  static Locale _resolvePlatformLocale() {
+    try {
+      return WidgetsBinding.instance.platformDispatcher.locale;
+    } catch (_) {
+      try {
+        return PlatformDispatcher.instance.locale;
+      } catch (_) {
+        return const Locale('en');
+      }
+    }
+  }
+
   Future<void> setLocaleCode(String code) async {
     await _prefs?.setString(_localeKey, code);
     localeNotifier.value = _parseLocale(code);

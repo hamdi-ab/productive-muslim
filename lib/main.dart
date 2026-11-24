@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         final settings = getIt.isRegistered<SettingsService>()
             ? getIt<SettingsService>()
             : null;
-        final locale = settings?.localeNotifier.value?.languageCode;
+        final locale = settings?.effectiveLanguageCode;
         unawaited(() async {
           final position = prayerService?.getCachedOrSavedPosition();
           if (position != null) {

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,4 +78,30 @@ void main() {
       throwsStateError,
     );
   });
+
+  test(
+    'effectiveLocale resolves explicit and system platform locales',
+    () async {
+      final prefs = await SharedPreferences.getInstance();
+      final settings = SettingsService(prefs: prefs);
+
+      await settings.setLocaleCode('ar');
+      expect(settings.effectiveLocale, const Locale('ar'));
+      expect(settings.effectiveLanguageCode, 'ar');
+
+      await settings.setLocaleCode('en');
+      expect(settings.effectiveLocale, const Locale('en'));
+      expect(settings.effectiveLanguageCode, 'en');
+
+      await settings.setLocaleCode('system');
+      TestWidgetsFlutterBinding.instance.platformDispatcher.localeTestValue =
+          const Locale('ar', 'EG');
+      addTearDown(() {
+        TestWidgetsFlutterBinding.instance.platformDispatcher
+            .clearLocaleTestValue();
+      });
+
+      expect(settings.effectiveLanguageCode, 'ar');
+    },
+  );
 }

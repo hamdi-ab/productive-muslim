@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -595,6 +597,33 @@ void main() {
       await scheduler.cancelQaylulah();
       verify(() => mockPlugin.cancel(PrayerNotificationScheduler.idQaylulah))
           .called(1);
+    });
+
+    test('rescheduleAll resolves platform Arabic locale when locale argument is null and setting is system', () async {
+      TestWidgetsFlutterBinding.instance.platformDispatcher.localeTestValue =
+          const Locale('ar', 'SA');
+      addTearDown(() {
+        TestWidgetsFlutterBinding.instance.platformDispatcher
+            .clearLocaleTestValue();
+      });
+
+      await settingsService.setLocaleCode('system');
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+
+      await scheduler.rescheduleAll();
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: 'أذكار الصباح',
+          body: 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.',
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
     });
   });
 }

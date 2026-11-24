@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
@@ -429,6 +431,109 @@ void main() {
 
       service.setCachedPositionForTesting(makkahPos);
       await settingsService.setLocaleCode('ar');
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setPrayerCalculationMethod(
+        CalculationMethod.karachi,
+      );
+
+      await service.onPrayerCalculationSettingsChanged();
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: 'أذكار الصباح',
+          body: 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.',
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+    });
+
+    test('onPrayerCalculationSettingsChanged resolves system Arabic locale when app language preference is system', () async {
+      final mockAdhan = MockAdhanNotificationService();
+      final mockScheduler = MockPrayerNotificationScheduler();
+
+      when(() => mockAdhan.cancelAll()).thenAnswer((_) async {});
+      when(
+        () => mockScheduler.rescheduleAll(
+          prayerTimes: any(named: 'prayerTimes'),
+          tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+          locale: any(named: 'locale'),
+          location: any(named: 'location'),
+        ),
+      ).thenAnswer((_) async {});
+
+      GetIt.I.registerSingleton<AdhanNotificationService>(mockAdhan);
+      GetIt.I.registerSingleton<PrayerNotificationScheduler>(mockScheduler);
+
+      TestWidgetsFlutterBinding.instance.platformDispatcher.localeTestValue =
+          const Locale('ar', 'SA');
+      addTearDown(() {
+        TestWidgetsFlutterBinding.instance.platformDispatcher
+            .clearLocaleTestValue();
+      });
+
+      service.setCachedPositionForTesting(makkahPos);
+      await settingsService.setLocaleCode('system');
+      await settingsService.setPrayerCalculationMethod(
+        CalculationMethod.ummAlQura,
+      );
+
+      await service.onPrayerCalculationSettingsChanged();
+
+      verify(
+        () => mockScheduler.rescheduleAll(
+          prayerTimes: any(named: 'prayerTimes'),
+          tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+          locale: 'ar',
+        ),
+      ).called(1);
+    });
+
+    test('onPrayerCalculationSettingsChanged schedules Arabic reminders when app language is system on Arabic device with real scheduler', () async {
+      final mockPlugin = MockNotificationPluginAdapter();
+      when(() => mockPlugin.supported).thenReturn(true);
+      when(() => mockPlugin.localTimezoneName).thenReturn('UTC');
+      when(() => mockPlugin.updateLocalTimezone(any()))
+          .thenAnswer((_) async {});
+      when(
+        () => mockPlugin.initialize(
+          onNotificationTapped: any(named: 'onNotificationTapped'),
+        ),
+      ).thenAnswer((_) async {});
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      when(() => mockPlugin.cancel(any())).thenAnswer((_) async {});
+      when(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      ).thenAnswer((_) async {});
+
+      final realScheduler = PrayerNotificationScheduler(
+        settingsService: settingsService,
+        plugin: mockPlugin,
+      );
+      GetIt.I.registerSingleton<PrayerNotificationScheduler>(realScheduler);
+
+      TestWidgetsFlutterBinding.instance.platformDispatcher.localeTestValue =
+          const Locale('ar');
+      addTearDown(() {
+        TestWidgetsFlutterBinding.instance.platformDispatcher
+            .clearLocaleTestValue();
+      });
+
+      service.setCachedPositionForTesting(makkahPos);
+      await settingsService.setLocaleCode('system');
       await settingsService.setMorningAdhkarNotificationEnabled(true);
       await settingsService.setPrayerCalculationMethod(
         CalculationMethod.karachi,

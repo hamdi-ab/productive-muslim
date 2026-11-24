@@ -512,10 +512,7 @@ class PrayerTimeService {
     if (getIt.isRegistered<PrayerNotificationScheduler>()) {
       final scheduler = getIt<PrayerNotificationScheduler>();
       final effectiveLocale =
-          settings?.localeNotifier.value?.languageCode ??
-          (settings?.localeCode != null && settings!.localeCode != 'system'
-              ? settings.localeCode
-              : null);
+          settings?.effectiveLanguageCode ?? _resolveFallbackLanguageCode();
       if (pos != null) {
         final now = DateTime.now();
         final times = getPrayerTimes(pos, date: now);
@@ -533,6 +530,26 @@ class PrayerTimeService {
           locale: effectiveLocale,
         );
         await scheduler.cancelQaylulah();
+      }
+    }
+  }
+
+  static String _resolveFallbackLanguageCode() {
+    try {
+      final code = WidgetsBinding
+          .instance
+          .platformDispatcher
+          .locale
+          .languageCode
+          .toLowerCase();
+      return code.startsWith('ar') ? 'ar' : 'en';
+    } catch (_) {
+      try {
+        final code = PlatformDispatcher.instance.locale.languageCode
+            .toLowerCase();
+        return code.startsWith('ar') ? 'ar' : 'en';
+      } catch (_) {
+        return 'en';
       }
     }
   }

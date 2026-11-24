@@ -331,6 +331,13 @@ class PrayerNotificationScheduler {
     return target;
   }
 
+  String _resolveLanguage(String? locale) {
+    if (locale != null && locale.isNotEmpty) {
+      return locale.toLowerCase().startsWith('ar') ? 'ar' : 'en';
+    }
+    return _settingsService.effectiveLanguageCode;
+  }
+
   Future<void> rescheduleAdhkarReminders({
     DateTime? now,
     String? locale,
@@ -349,7 +356,7 @@ class PrayerNotificationScheduler {
       return;
     }
 
-    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+    final isAr = _resolveLanguage(locale) == 'ar';
     final globalEnabled = _settingsService.adhkarRemindersGlobalEnabled;
 
     // 1. Morning Adhkar Reminder (user-selected time, opt-in, gentle wording)
@@ -436,7 +443,7 @@ class PrayerNotificationScheduler {
     }
 
     final currentTime = now ?? DateTime.now();
-    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+    final isAr = _resolveLanguage(locale) == 'ar';
 
     // 1 & 2. Morning and Evening Adhkar Reminders
     await rescheduleAdhkarReminders(
@@ -519,7 +526,7 @@ class PrayerNotificationScheduler {
     );
 
     final currentTime = now ?? DateTime.now();
-    final isAr = (locale ?? 'en').toLowerCase().startsWith('ar');
+    final isAr = _resolveLanguage(locale) == 'ar';
 
     // 5. Sunnah Qaylulah (Dhuhr - 30 min)
     if (_settingsService.qaylulahNotificationEnabled) {
