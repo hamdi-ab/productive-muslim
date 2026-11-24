@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
@@ -391,5 +393,57 @@ void main() {
 
       verify(() => mockRepo.deleteEntry(99)).called(1);
     });
+
+    testWidgets(
+      'renders daily vitality & wellbeing shortcut card and navigates to EnergyScreen',
+      (tester) async {
+        final router = GoRouter(
+          initialLocation: '/reflect',
+          routes: [
+            GoRoute(
+              path: '/reflect',
+              builder: (_, _) => Scaffold(
+                body: RepositoryProvider<MuhasabahRepository>.value(
+                  value: mockRepo,
+                  child: const MuhasabahView(),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: AppRoutes.energy,
+              builder: (_, _) => const Scaffold(body: Text('Energy Screen')),
+            ),
+          ],
+        );
+
+        when(() => mockRepo.watchEntriesForDate(any()))
+            .thenAnswer((_) => Stream.value([]));
+        when(() => mockRepo.getEntriesForDate(any()))
+            .thenAnswer((_) async => []);
+
+        await tester.binding.setSurfaceSize(const Size(800, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          MaterialApp.router(
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final energyCard = find.byKey(
+          const Key('muhasabah_energy_shortcut_card'),
+        );
+        expect(energyCard, findsOneWidget);
+
+        await tester.ensureVisible(energyCard);
+        await tester.tap(energyCard);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Energy Screen'), findsOneWidget);
+      },
+    );
   });
 }

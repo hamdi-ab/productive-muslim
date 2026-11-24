@@ -898,7 +898,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get energyMental => 'Mental Focus';
 
   @override
-  String get energySaved => 'Energy check-in updated';
+  String get energySaved => 'Energy reflection saved';
 
   @override
   String get qualityDetailsAction => 'Practical Action';

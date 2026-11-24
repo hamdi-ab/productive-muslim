@@ -1649,7 +1649,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySaved.
   ///
   /// In en, this message translates to:
-  /// **'Energy check-in updated'**
+  /// **'Energy reflection saved'**
   String get energySaved;
 
   /// No description provided for @qualityDetailsAction.

@@ -435,6 +435,47 @@ void main() {
     );
 
     testWidgets(
+      'navigating to Reflect tab displays vitality shortcut and pushes to EnergyScreen',
+      (tester) async {
+        await pumpRouter(tester);
+
+        // Switch to Reflect tab (index 4)
+        final reflectTab = find.descendant(
+          of: find.byType(FloatingGlassNavBar),
+          matching: find.text('Reflect'),
+        );
+        expect(reflectTab, findsOneWidget);
+
+        await tester.tap(reflectTab);
+        await pumpFrames(tester);
+
+        expect(find.byType(ReflectScreen), findsOneWidget);
+
+        final energyEntry = find.byKey(
+          const Key('muhasabah_energy_shortcut_card'),
+        );
+        expect(energyEntry, findsOneWidget);
+
+        await tester.ensureVisible(energyEntry);
+        await tester.tap(energyEntry);
+        await pumpFrames(tester);
+
+        expect(find.byType(EnergyScreen), findsOneWidget);
+
+        // Pop back to Reflect
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(find.byType(ReflectScreen), findsOneWidget);
+        expect(find.byType(EnergyScreen), findsNothing);
+      },
+    );
+
+    testWidgets(
       'Legacy routes (/plan, /tasks, /habits, /focus, /journal, /barakah) resolve compatibly',
       (tester) async {
         // 1. /plan

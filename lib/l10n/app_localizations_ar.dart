@@ -884,7 +884,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get energyMental => 'التركيز الذهني';
 
   @override
-  String get energySaved => 'تم تحديث تقييم الطاقة';
+  String get energySaved => 'تم حفظ تأمل الطاقة';
 
   @override
   String get qualityDetailsAction => 'التطبيق العملي';
