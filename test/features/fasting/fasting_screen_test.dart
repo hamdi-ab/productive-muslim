@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
@@ -69,5 +71,38 @@ void main() {
 
     expect(find.text('التقويم الهجري وصيام السنة'), findsOneWidget);
     expect(find.text('الأيام البيض'), findsOneWidget);
+  });
+
+  testWidgets('renders Energy shortcut card and navigates to EnergyScreen', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/fasting',
+      routes: [
+        GoRoute(path: '/fasting', builder: (_, _) => const FastingScreen()),
+        GoRoute(
+          path: AppRoutes.energy,
+          builder: (_, _) => const Scaffold(body: Text('Energy Screen')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final energyCard = find.byKey(const Key('fasting_energy_shortcut_card'));
+    expect(energyCard, findsOneWidget);
+
+    await tester.ensureVisible(energyCard);
+    await tester.tap(energyCard);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Energy Screen'), findsOneWidget);
   });
 }

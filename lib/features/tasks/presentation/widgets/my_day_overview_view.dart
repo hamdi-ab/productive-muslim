@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -83,6 +85,10 @@ class MyDayOverviewView extends StatelessWidget {
 
               // 4. Focus Session Shortcut Card
               _buildFocusShortcutCard(context, l10n, isAr),
+              const SizedBox(height: AppSpacing.md),
+
+              // 5. Energy Management & Sunnah Anchors Shortcut Card
+              _buildEnergyShortcutCard(context, l10n, isAr),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -691,6 +697,114 @@ class MyDayOverviewView extends StatelessWidget {
                       const SizedBox(width: 4),
                       Icon(
                         Icons.play_arrow_rounded,
+                        size: 14,
+                        color: isDark
+                            ? const Color(0xFF4EDEA3)
+                            : const Color(0xFF0F4C3A),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnergyShortcutCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isAr,
+  ) {
+    return AppPressable(
+      key: const Key('my_day_energy_shortcut_card'),
+      onTap: () {
+        AppHaptics.lightImpact();
+        context.push(AppRoutes.energy);
+      },
+      pressedScale: 0.98,
+      borderRadius: BorderRadius.circular(20),
+      child: GlassContainer(
+        borderRadius: 20,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.battery_charging_full_rounded,
+                color: Color(0xFF10B981),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    isAr
+                        ? 'طاقة اليوم وروتين السنة'
+                        : 'Energy & Sunnah Anchors',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isAr
+                        ? 'سنة القيلولة، التوازن البدني، وتجديد الحيوية'
+                        : 'Sunnah Qaylulah, physical anchors & vitality.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white70 : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F4C3A)
+                        .withValues(alpha: isDark ? 0.4 : 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isAr ? 'استكشف' : 'Explore',
+                        style: TextStyle(
+                          color: isDark
+                              ? const Color(0xFF4EDEA3)
+                              : const Color(0xFF0F4C3A),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
                         size: 14,
                         color: isDark
                             ? const Color(0xFF4EDEA3)

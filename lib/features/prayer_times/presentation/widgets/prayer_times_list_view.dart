@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/features/prayer_times/presentation/widgets/prayer_fasting_entry_card.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/widgets/prayer_location_header.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/widgets/prayer_tile.dart';
 import 'package:productive_muslim/features/prayer_times/presentation/widgets/solar_prayer_dial.dart';
@@ -201,6 +202,11 @@ class PrayerTimesListView extends StatelessWidget {
                 tag: isAr ? 'غداً' : 'Tomorrow',
               ),
             ],
+
+            const SizedBox(height: AppSpacing.sm),
+
+            // 5. Sunnah Fasting & Hijri Calendar Discovery Card
+            const PrayerFastingEntryCard(),
 
             const SizedBox(height: AppSpacing.lg),
           ],

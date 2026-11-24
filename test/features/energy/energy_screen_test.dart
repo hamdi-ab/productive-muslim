@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
@@ -47,5 +49,38 @@ void main() {
     await tester.pump();
 
     expect(find.text('Pause'), findsOneWidget);
+  });
+
+  testWidgets('tapping Fasting button navigates to FastingScreen', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/energy',
+      routes: [
+        GoRoute(path: '/energy', builder: (_, _) => const EnergyScreen()),
+        GoRoute(
+          path: AppRoutes.fasting,
+          builder: (_, _) => const Scaffold(body: Text('Fasting Screen')),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final hijriBtn = find.text('Hijri Calendar & Fasting');
+    expect(hijriBtn, findsOneWidget);
+
+    await tester.ensureVisible(hijriBtn);
+    await tester.tap(hijriBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fasting Screen'), findsOneWidget);
   });
 }
