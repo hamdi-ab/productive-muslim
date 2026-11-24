@@ -590,5 +590,11 @@ void main() {
         ),
       ).called(1);
     });
+
+    test('cancelQaylulah explicitly cancels idQaylulah notification', () async {
+      await scheduler.cancelQaylulah();
+      verify(() => mockPlugin.cancel(PrayerNotificationScheduler.idQaylulah))
+          .called(1);
+    });
   });
 }

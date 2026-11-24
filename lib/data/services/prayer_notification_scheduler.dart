@@ -256,6 +256,14 @@ class PrayerNotificationScheduler {
     return await _plugin.hasPermission();
   }
 
+  /// Explicitly cancels the solar-dependent Qaylulah reminder.
+  ///
+  /// Useful when location is cleared, unavailable, or when recalculating
+  /// reminders without known coordinates.
+  Future<void> cancelQaylulah() async {
+    await _plugin.cancel(idQaylulah);
+  }
+
   DateTime calculateNextFastingReminder({DateTime? now}) {
     final current = now ?? DateTime.now();
     // Reminder at 8:30 PM (20:30) on Sunday or Wednesday

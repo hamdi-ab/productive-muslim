@@ -15,6 +15,9 @@ class MockAdhanNotificationService extends Mock
 class MockPrayerNotificationScheduler extends Mock
     implements PrayerNotificationScheduler {}
 
+class MockNotificationPluginAdapter extends Mock
+    implements NotificationPluginAdapter {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -312,9 +315,139 @@ void main() {
           () => mockScheduler.rescheduleAll(
             prayerTimes: any(named: 'prayerTimes'),
             tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+            locale: any(named: 'locale'),
           ),
         ).called(1);
       },
     );
+
+    test('onPrayerCalculationSettingsChanged preserves Arabic locale when rescheduling reminders', () async {
+      final mockAdhan = MockAdhanNotificationService();
+      final mockScheduler = MockPrayerNotificationScheduler();
+
+      when(() => mockAdhan.cancelAll()).thenAnswer((_) async {});
+      when(
+        () => mockScheduler.rescheduleAll(
+          prayerTimes: any(named: 'prayerTimes'),
+          tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+          locale: any(named: 'locale'),
+          location: any(named: 'location'),
+        ),
+      ).thenAnswer((_) async {});
+
+      GetIt.I.registerSingleton<AdhanNotificationService>(mockAdhan);
+      GetIt.I.registerSingleton<PrayerNotificationScheduler>(mockScheduler);
+
+      service.setCachedPositionForTesting(makkahPos);
+      await settingsService.setLocaleCode('ar');
+      await settingsService.setPrayerCalculationMethod(
+        CalculationMethod.ummAlQura,
+      );
+
+      await service.onPrayerCalculationSettingsChanged();
+
+      verify(
+        () => mockScheduler.rescheduleAll(
+          prayerTimes: any(named: 'prayerTimes'),
+          tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+          locale: 'ar',
+        ),
+      ).called(1);
+    });
+
+    test('onPrayerCalculationSettingsChanged cancels Qaylulah and Adhans when no position is available', () async {
+      final mockAdhan = MockAdhanNotificationService();
+      final mockScheduler = MockPrayerNotificationScheduler();
+
+      when(() => mockAdhan.cancelAll()).thenAnswer((_) async {});
+      when(
+        () => mockScheduler.rescheduleLocationIndependentReminders(
+          now: any(named: 'now'),
+          locale: any(named: 'locale'),
+          location: any(named: 'location'),
+        ),
+      ).thenAnswer((_) async {});
+      when(() => mockScheduler.cancelQaylulah()).thenAnswer((_) async {});
+
+      GetIt.I.registerSingleton<AdhanNotificationService>(mockAdhan);
+      GetIt.I.registerSingleton<PrayerNotificationScheduler>(mockScheduler);
+
+      // Ensure position is null
+      service.setCachedPositionForTesting(null);
+      await settingsService.setAdhanNotificationsEnabled(true);
+      await settingsService.setLocaleCode('ar');
+
+      await service.onPrayerCalculationSettingsChanged();
+
+      verify(() => mockAdhan.cancelAll()).called(1);
+      verify(
+        () =>
+            mockScheduler.rescheduleLocationIndependentReminders(locale: 'ar'),
+      ).called(1);
+      verify(() => mockScheduler.cancelQaylulah()).called(1);
+      verifyNever(
+        () => mockScheduler.rescheduleAll(
+          prayerTimes: any(named: 'prayerTimes'),
+          tomorrowPrayerTimes: any(named: 'tomorrowPrayerTimes'),
+          locale: any(named: 'locale'),
+          location: any(named: 'location'),
+        ),
+      );
+    });
+
+    test('onPrayerCalculationSettingsChanged schedules Arabic reminders with real scheduler', () async {
+      final mockPlugin = MockNotificationPluginAdapter();
+      when(() => mockPlugin.supported).thenReturn(true);
+      when(() => mockPlugin.localTimezoneName).thenReturn('UTC');
+      when(() => mockPlugin.updateLocalTimezone(any()))
+          .thenAnswer((_) async {});
+      when(
+        () => mockPlugin.initialize(
+          onNotificationTapped: any(named: 'onNotificationTapped'),
+        ),
+      ).thenAnswer((_) async {});
+      when(() => mockPlugin.hasPermission()).thenAnswer((_) async => true);
+      when(() => mockPlugin.cancel(any())).thenAnswer((_) async {});
+      when(
+        () => mockPlugin.zonedSchedule(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: any(named: 'matchTimeOnly'),
+        ),
+      ).thenAnswer((_) async {});
+
+      final realScheduler = PrayerNotificationScheduler(
+        settingsService: settingsService,
+        plugin: mockPlugin,
+      );
+      GetIt.I.registerSingleton<PrayerNotificationScheduler>(realScheduler);
+
+      service.setCachedPositionForTesting(makkahPos);
+      await settingsService.setLocaleCode('ar');
+      await settingsService.setMorningAdhkarNotificationEnabled(true);
+      await settingsService.setPrayerCalculationMethod(
+        CalculationMethod.karachi,
+      );
+
+      await service.onPrayerCalculationSettingsChanged();
+
+      verify(
+        () => mockPlugin.zonedSchedule(
+          id: PrayerNotificationScheduler.idMorningAdhkar,
+          title: 'أذكار الصباح',
+          body: 'ابدأ يومك بذكر الله وحصّن يومك بالسكينة.',
+          scheduledDate: any(named: 'scheduledDate'),
+          payload: any(named: 'payload'),
+          channelId: any(named: 'channelId'),
+          channelName: any(named: 'channelName'),
+          matchTimeOnly: true,
+        ),
+      ).called(1);
+    });
   });
 }

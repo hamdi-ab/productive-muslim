@@ -122,6 +122,9 @@ void main() {
   });
 
   testWidgets('shows prayer times when loaded', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final position = Position(
       latitude: 40.7128,
       longitude: -74.0060,

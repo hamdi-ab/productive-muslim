@@ -483,13 +483,14 @@ class PrayerTimeService {
   Future<void> onPrayerCalculationSettingsChanged() async {
     refreshPrayerTimesCache();
 
-    // 1. Reschedule Adhan notifications if active
     final settings = _effectiveSettings;
+    final pos = getCachedOrSavedPosition();
+
+    // 1. Reschedule Adhan notifications if active
     if (settings != null &&
         settings.adhanNotificationsEnabled &&
         getIt.isRegistered<AdhanNotificationService>()) {
       final adhanService = getIt<AdhanNotificationService>();
-      final pos = getCachedOrSavedPosition();
       if (pos != null) {
         final times = getPrayerTimes(pos);
         if (times != null) {
@@ -502,13 +503,19 @@ class PrayerTimeService {
             isha: times.isha,
           );
         }
+      } else {
+        await adhanService.cancelAll();
       }
     }
 
     // 2. Reschedule Smart Reminders / Sunnah (Qaylulah depends on Dhuhr)
     if (getIt.isRegistered<PrayerNotificationScheduler>()) {
       final scheduler = getIt<PrayerNotificationScheduler>();
-      final pos = getCachedOrSavedPosition();
+      final effectiveLocale =
+          settings?.localeNotifier.value?.languageCode ??
+          (settings?.localeCode != null && settings!.localeCode != 'system'
+              ? settings.localeCode
+              : null);
       if (pos != null) {
         final now = DateTime.now();
         final times = getPrayerTimes(pos, date: now);
@@ -519,9 +526,13 @@ class PrayerTimeService {
         await scheduler.rescheduleAll(
           prayerTimes: times,
           tomorrowPrayerTimes: tomorrowTimes,
+          locale: effectiveLocale,
         );
       } else {
-        await scheduler.rescheduleLocationIndependentReminders();
+        await scheduler.rescheduleLocationIndependentReminders(
+          locale: effectiveLocale,
+        );
+        await scheduler.cancelQaylulah();
       }
     }
   }
