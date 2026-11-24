@@ -200,8 +200,8 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
           _buildDimensionCard(
             title: l10n.energySpiritual,
             arabicSubtitle: isAr
-                ? 'رُوح (Ruh) • السكينة والغاية'
-                : 'رُوح (Ruh) • Inner Peace & Purpose',
+                ? 'رُوح (Ruh) • طمأنينة القلب'
+                : 'رُوح (Ruh) • Heart & Purpose',
             desc: isAr
                 ? 'السكينة الداخلية، والصفاء الروحي، وتجديد النية'
                 : 'Inner peace, spiritual calm & feeling aligned with purpose',

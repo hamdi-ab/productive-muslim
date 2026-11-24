@@ -862,7 +862,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get energyTitle => 'Daily Energy & Sunnah Routine';
 
   @override
-  String get energySubtitle => 'Qaylulah & Battery';
+  String get energySubtitle =>
+      'Reflect on your inner peace, physical vitality, and mental clarity';
 
   @override
   String get qaylulah => 'Sunnah Qaylulah';
@@ -892,7 +893,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get energyPhysical => 'Physical Vitality';
 
   @override
-  String get energySpiritual => 'Spiritual State';
+  String get energySpiritual => 'Inner Peace';
 
   @override
   String get energyMental => 'Mental Focus';
@@ -1480,6 +1481,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fastingSubtitle => 'Sunnah Days';
+
+  @override
+  String get energyQuickSubtitle => 'Qaylulah & Battery';
 
   @override
   String get adhkarSubtitle => 'Daily Remembrances';

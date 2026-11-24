@@ -14,11 +14,12 @@ void main() {
     }
   });
 
-  Widget buildSubject() {
-    return const MaterialApp(
+  Widget buildSubject({Locale locale = const Locale('en')}) {
+    return MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: EnergyScreen(),
+      home: const EnergyScreen(),
     );
   }
 
@@ -32,6 +33,47 @@ void main() {
       expect(find.text('Today\'s Energy Levels'), findsOneWidget);
       expect(find.byType(Switch), findsOneWidget);
       expect(find.text('20:00'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'renders Inner Peace dimension and avoids spiritual scoring or Spiritual State',
+    (tester) async {
+      await tester.pumpWidget(buildSubject());
+      await tester.pumpAndSettle();
+
+      // Confirms dimension is framed as Inner Peace and wellbeing
+      expect(find.text('Inner Peace'), findsOneWidget);
+      expect(find.text('Physical Vitality'), findsOneWidget);
+      expect(find.text('Mental Focus'), findsOneWidget);
+      expect(
+        find.text(
+          'Reflect on your inner peace, physical vitality, and mental clarity',
+        ),
+        findsAtLeastNWidgets(1),
+      );
+
+      // Verifies old worship assessment and spiritual scoring labels are absent
+      expect(find.text('Spiritual State'), findsNothing);
+      expect(find.text('SELF-AUDIT'), findsNothing);
+      expect(find.textContaining('Presence in Salah'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'renders Arabic Inner Peace dimension and avoids spiritual scoring in Arabic',
+    (tester) async {
+      await tester.pumpWidget(buildSubject(locale: const Locale('ar')));
+      await tester.pumpAndSettle();
+
+      // Confirms Arabic dimension is framed as Inner Peace (السكينة الداخلية)
+      expect(find.text('السكينة الداخلية'), findsOneWidget);
+      expect(find.text('الطاقة الجسدية'), findsOneWidget);
+      expect(find.text('التركيز الذهني'), findsOneWidget);
+
+      // Verifies old assessment and spiritual scoring labels are absent
+      expect(find.text('الحالة الروحية'), findsNothing);
+      expect(find.text('التقييم الذاتي'), findsNothing);
     },
   );
 
