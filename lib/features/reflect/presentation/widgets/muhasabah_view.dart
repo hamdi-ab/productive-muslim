@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
+import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/domain/models/muhasabah_entry.dart';
 import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart';
 import 'package:productive_muslim/features/intentions/presentation/widgets/intention_adhkar_bookend_card.dart';
@@ -366,6 +369,8 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             const SizedBox(height: AppSpacing.md),
             if (repo != null)
               _buildSavedReflectionsSection(isDark, isAr, l10n, repo, today),
+            const SizedBox(height: AppSpacing.md),
+            _buildEnergyReflectCard(context, isDark, isAr),
             const SizedBox(height: AppSpacing.md),
             IntentionAdhkarBookendCard(isDark: isDark),
             const SizedBox(height: AppSpacing.md),
@@ -1213,6 +1218,81 @@ class _MuhasabahViewState extends State<MuhasabahView> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildEnergyReflectCard(BuildContext context, bool isDark, bool isAr) {
+    return AppPressable(
+      key: const Key('muhasabah_energy_shortcut_card'),
+      onTap: () {
+        AppHaptics.lightImpact();
+        context.push(AppRoutes.energy);
+      },
+      pressedScale: 0.98,
+      borderRadius: BorderRadius.circular(20),
+      child: GlassContainer(
+        borderRadius: 20,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE9C349).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.spa_rounded,
+                color: Color(0xFFE9C349),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isAr
+                        ? 'تأمل الحيوية والعافية اليومية'
+                        : 'Personal Vitality & Wellbeing',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isAr
+                        ? 'تأمل في السكينة الداخلية وراحة البدن والصفاء الذهني'
+                        : 'Reflect on inner peace, bodily rest & mental clarity',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              isAr
+                  ? Icons.arrow_back_ios_new_rounded
+                  : Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary,
+            ),
+          ],
+        ),
       ),
     );
   }

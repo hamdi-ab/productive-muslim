@@ -849,7 +849,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get energyTitle => 'طاقة اليوم وروتين السنة';
 
   @override
-  String get energySubtitle => 'القيلولة وبطارية الطاقة';
+  String get energySubtitle =>
+      'اعتنِ بسكينتك الداخلية، وراحتك البدنية، وصفاء ذهنك';
 
   @override
   String get qaylulah => 'القيلولة النبوية';
@@ -878,13 +879,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get energyPhysical => 'الطاقة الجسدية';
 
   @override
-  String get energySpiritual => 'الحالة الروحية';
+  String get energySpiritual => 'السكينة الداخلية';
 
   @override
   String get energyMental => 'التركيز الذهني';
 
   @override
-  String get energySaved => 'تم تحديث تقييم الطاقة';
+  String get energySaved => 'تم حفظ تأمل الطاقة';
 
   @override
   String get qualityDetailsAction => 'التطبيق العملي';
@@ -1470,6 +1471,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get fastingSubtitle => 'أيام السنة والهجري';
+
+  @override
+  String get energyQuickSubtitle => 'القيلولة وبطارية الطاقة';
 
   @override
   String get adhkarSubtitle => 'الأذكار والتلاوة';

@@ -80,6 +80,10 @@ void main() {
           path: AppRoutes.settings,
           builder: (_, _) => const Scaffold(body: Text('Settings Screen')),
         ),
+        GoRoute(
+          path: AppRoutes.fasting,
+          builder: (_, _) => const Scaffold(body: Text('Fasting Screen')),
+        ),
       ],
     );
 
@@ -420,5 +424,38 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Settings Screen'), findsOneWidget);
+  });
+
+  testWidgets('tapping fasting entry card navigates to fasting screen', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final position = Position(
+      latitude: 40.7128,
+      longitude: -74.0060,
+      timestamp: DateTime.now(),
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+    );
+    mockService.setPosition(position);
+    mockService.setPrayerTimes(createPrayerTimes());
+
+    await tester.pumpWidget(buildScreenWithRouter());
+    await tester.pumpAndSettle();
+
+    final fastingFinder = find.byKey(const Key('prayer_fasting_entry_card'));
+    expect(fastingFinder, findsOneWidget);
+
+    await tester.tap(fastingFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fasting Screen'), findsOneWidget);
   });
 }

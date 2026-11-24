@@ -100,7 +100,7 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      isAr ? 'التقييم الذاتي' : 'SELF-AUDIT',
+                      isAr ? 'تأمل العافية' : 'WELLBEING REFLECTION',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -151,7 +151,7 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          isAr ? 'توازن واعي' : 'Daily Check-in',
+                          isAr ? 'تأمل شخصي' : 'Daily Reflection',
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -199,8 +199,12 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
           // 3 Energy Dimensions (Spiritual, Physical, Mental)
           _buildDimensionCard(
             title: l10n.energySpiritual,
-            arabicSubtitle: 'رُوح (Ruh) • Divine Connection',
-            desc: 'Presence in Salah, heartfelt Dhikr & purified intention',
+            arabicSubtitle: isAr
+                ? 'رُوح (Ruh) • طمأنينة القلب'
+                : 'رُوح (Ruh) • Heart & Purpose',
+            desc: isAr
+                ? 'السكينة الداخلية، والصفاء الروحي، وتجديد النية'
+                : 'Inner peace, spiritual calm & feeling aligned with purpose',
             icon: Icons.spa_rounded,
             color: const Color(0xFFE9C349),
             value: _spiritual,
@@ -210,8 +214,12 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
           const SizedBox(height: 10),
           _buildDimensionCard(
             title: l10n.energyPhysical,
-            arabicSubtitle: 'جِسْم (Jism) • Bodily Amanah',
-            desc: 'Nutrition, hydration, sleep quality & restorative recovery',
+            arabicSubtitle: isAr
+                ? 'جِسْم (Jism) • أمانة البدن'
+                : 'جِسْم (Jism) • Bodily Amanah',
+            desc: isAr
+                ? 'التغذية، والترطيب، وجودة النوم والراحة البدنية'
+                : 'Nutrition, hydration, sleep quality & physical recovery',
             icon: Icons.fitness_center_rounded,
             color: const Color(0xFF4EDEA3),
             value: _physical,
@@ -221,8 +229,12 @@ class _EnergyTriadCardState extends State<EnergyTriadCard> {
           const SizedBox(height: 10),
           _buildDimensionCard(
             title: l10n.energyMental,
-            arabicSubtitle: 'عَقْل (Aql) • Cognitive Clarity',
-            desc: 'Executive mental focus, attentiveness & deep work reserves',
+            arabicSubtitle: isAr
+                ? 'عَقْل (Aql) • صفاء الفكر'
+                : 'عَقْل (Aql) • Cognitive Clarity',
+            desc: isAr
+                ? 'حضور الذهن، والصفاء الفكري، وتجديد التركيز'
+                : 'Mental clarity, focus reserves & cognitive presence',
             icon: Icons.psychology_rounded,
             color: const Color(0xFF99D3BA),
             value: _mental,

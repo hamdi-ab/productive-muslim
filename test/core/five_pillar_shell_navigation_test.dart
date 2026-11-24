@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/core/router/app_router.dart';
@@ -8,6 +9,7 @@ import 'package:productive_muslim/core/widgets/floating_glass_nav_bar.dart';
 import 'package:productive_muslim/core/widgets/productive_app_bar.dart';
 import 'package:productive_muslim/data/services/adhkar_service.dart';
 import 'package:productive_muslim/data/services/barakah_reminder_service.dart';
+import 'package:productive_muslim/data/services/hijri_service.dart';
 import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 import 'package:productive_muslim/domain/repositories/barakah_repository.dart';
@@ -17,6 +19,8 @@ import 'package:productive_muslim/domain/repositories/muhasabah_repository.dart'
 import 'package:productive_muslim/domain/repositories/task_repository.dart';
 import 'package:productive_muslim/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:productive_muslim/features/barakah/presentation/screens/barakah_screen.dart';
+import 'package:productive_muslim/features/energy/presentation/screens/energy_screen.dart';
+import 'package:productive_muslim/features/fasting/presentation/screens/fasting_screen.dart';
 import 'package:productive_muslim/features/focus/presentation/screens/focus_screen.dart';
 import 'package:productive_muslim/features/habits/presentation/screens/habit_screen.dart';
 import 'package:productive_muslim/features/home/presentation/screens/home_content.dart';
@@ -82,9 +86,24 @@ void main() {
     getIt.registerSingleton<TaskRepository>(taskRepo);
     getIt.registerSingleton<IntentionRepository>(intentionRepo);
     getIt.registerSingleton<MuhasabahRepository>(muhasabahRepo);
-    getIt.registerLazySingleton<PrayerTimeService>(
-      () => MockPrayerTimeService(),
+    final mockPos = Position(
+      latitude: 21.4225,
+      longitude: 39.8262,
+      timestamp: DateTime.now(),
+      accuracy: 10,
+      altitude: 277,
+      heading: 0,
+      speed: 0,
+      speedAccuracy: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
     );
+    getIt.registerLazySingleton<PrayerTimeService>(
+      () => MockPrayerTimeService(mockPosition: mockPos),
+    );
+    if (!getIt.isRegistered<HijriService>()) {
+      getIt.registerSingleton<HijriService>(HijriService());
+    }
     getIt.registerLazySingleton<AdhkarService>(
       () => AdhkarService(settingsService: settings),
     );
@@ -329,6 +348,132 @@ void main() {
       expect(find.byType(HomeContent), findsOneWidget);
       expect(AppRouter.router.routeInformationProvider.value.uri.path, '/');
     });
+
+    testWidgets(
+      'Prayer Times tab allows discovering and pushing FastingScreen and returning',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(800, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await pumpRouter(tester);
+
+        // Switch to Prayer tab (index 3)
+        final prayerTab = find.descendant(
+          of: find.byType(FloatingGlassNavBar),
+          matching: find.text('Prayer Times'),
+        );
+        expect(prayerTab, findsOneWidget);
+
+        await tester.tap(prayerTab);
+        await pumpFrames(tester);
+
+        expect(find.byType(PrayerTimesScreen), findsOneWidget);
+
+        final fastingEntry = find.byKey(const Key('prayer_fasting_entry_card'));
+        expect(fastingEntry, findsOneWidget);
+
+        await tester.tap(fastingEntry);
+        await pumpFrames(tester);
+
+        expect(find.byType(FastingScreen), findsOneWidget);
+
+        // Pop back to Prayer Times
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(find.byType(PrayerTimesScreen), findsOneWidget);
+        expect(find.byType(FastingScreen), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'My Day tab overview allows discovering and pushing EnergyScreen and returning',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(800, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await pumpRouter(tester);
+
+        // Switch to My Day tab (index 2)
+        final myDayTab = find.descendant(
+          of: find.byType(FloatingGlassNavBar),
+          matching: find.text('My Day'),
+        );
+        expect(myDayTab, findsOneWidget);
+
+        await tester.tap(myDayTab);
+        await pumpFrames(tester);
+
+        expect(find.byType(PlanScreen), findsOneWidget);
+
+        final energyEntry = find.byKey(
+          const Key('my_day_energy_shortcut_card'),
+        );
+        expect(energyEntry, findsOneWidget);
+
+        await tester.ensureVisible(energyEntry);
+        await tester.tap(energyEntry);
+        await pumpFrames(tester);
+
+        expect(find.byType(EnergyScreen), findsOneWidget);
+
+        // Pop back to My Day
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(find.byType(PlanScreen), findsOneWidget);
+        expect(find.byType(EnergyScreen), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'navigating to Reflect tab displays vitality shortcut and pushes to EnergyScreen',
+      (tester) async {
+        await pumpRouter(tester);
+
+        // Switch to Reflect tab (index 4)
+        final reflectTab = find.descendant(
+          of: find.byType(FloatingGlassNavBar),
+          matching: find.text('Reflect'),
+        );
+        expect(reflectTab, findsOneWidget);
+
+        await tester.tap(reflectTab);
+        await pumpFrames(tester);
+
+        expect(find.byType(ReflectScreen), findsOneWidget);
+
+        final energyEntry = find.byKey(
+          const Key('muhasabah_energy_shortcut_card'),
+        );
+        expect(energyEntry, findsOneWidget);
+
+        await tester.ensureVisible(energyEntry);
+        await tester.tap(energyEntry);
+        await pumpFrames(tester);
+
+        expect(find.byType(EnergyScreen), findsOneWidget);
+
+        // Pop back to Reflect
+        final backButton = find.descendant(
+          of: find.byType(ProductiveAppBar),
+          matching: find.byType(Tooltip),
+        );
+        await tester.tap(backButton.first);
+        await pumpFrames(tester);
+
+        expect(find.byType(ReflectScreen), findsOneWidget);
+        expect(find.byType(EnergyScreen), findsNothing);
+      },
+    );
 
     testWidgets(
       'Legacy routes (/plan, /tasks, /habits, /focus, /journal, /barakah) resolve compatibly',

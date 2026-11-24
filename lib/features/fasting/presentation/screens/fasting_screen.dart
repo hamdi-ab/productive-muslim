@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/core/utils/app_haptics.dart';
+import 'package:productive_muslim/core/widgets/app_pressable.dart';
 import 'package:productive_muslim/core/widgets/glass_container.dart';
 import 'package:productive_muslim/core/widgets/gradient_card.dart';
 import 'package:productive_muslim/data/services/hijri_service.dart';
@@ -234,6 +238,78 @@ class _FastingScreenState extends State<FastingScreen> {
                       isDark: isDark,
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // 5. Sunnah Energy & Physical Anchors Cross-link
+              AppPressable(
+                key: const Key('fasting_energy_shortcut_card'),
+                onTap: () {
+                  AppHaptics.lightImpact();
+                  context.push(AppRoutes.energy);
+                },
+                pressedScale: 0.98,
+                borderRadius: BorderRadius.circular(20),
+                child: GlassContainer(
+                  borderRadius: 20,
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981)
+                              .withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.bolt_rounded,
+                          color: Color(0xFF10B981),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isArabic
+                                  ? 'إدارة الطاقة والسنن البدنية'
+                                  : 'Energy & Physical Anchors',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isArabic
+                                  ? 'سنة القيلولة والنشاط البدني لدعم صيامك'
+                                  : 'Qaylulah nap and physical anchors to support your fast.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 13,
+                        color: AppColors.secondary,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),

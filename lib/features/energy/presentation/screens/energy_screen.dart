@@ -12,7 +12,7 @@ import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Screen orchestrating the Islamic Triple-Energy framework:
 /// 1. Hero Header & Al-Qawiyy tier
-/// 2. Energy Triad self-audit (Ruh, Jism, Aql)
+/// 2. Energy Triad personal reflection (Ruh, Jism, Aql)
 /// 3. Qaylulah (Sunnah midday nap) recharge
 /// 4. Sunnah Fasting metabolic alignment
 /// 5. Sunnah Physical Anchors

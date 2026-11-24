@@ -1583,7 +1583,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Qaylulah & Battery'**
+  /// **'Reflect on your inner peace, physical vitality, and mental clarity'**
   String get energySubtitle;
 
   /// No description provided for @qaylulah.
@@ -1637,7 +1637,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySpiritual.
   ///
   /// In en, this message translates to:
-  /// **'Spiritual State'**
+  /// **'Inner Peace'**
   String get energySpiritual;
 
   /// No description provided for @energyMental.
@@ -1649,7 +1649,7 @@ abstract class AppLocalizations {
   /// No description provided for @energySaved.
   ///
   /// In en, this message translates to:
-  /// **'Energy check-in updated'**
+  /// **'Energy reflection saved'**
   String get energySaved;
 
   /// No description provided for @qualityDetailsAction.
@@ -2677,6 +2677,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunnah Days'**
   String get fastingSubtitle;
+
+  /// No description provided for @energyQuickSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Qaylulah & Battery'**
+  String get energyQuickSubtitle;
 
   /// No description provided for @adhkarSubtitle.
   ///

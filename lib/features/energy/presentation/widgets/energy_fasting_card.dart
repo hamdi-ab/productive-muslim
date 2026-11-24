@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:productive_muslim/core/constants/app_spacing.dart';
 import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
 import 'package:productive_muslim/core/utils/app_haptics.dart';
 import 'package:productive_muslim/core/widgets/app_pressable.dart';
@@ -93,7 +94,7 @@ class _EnergyFastingCardState extends State<EnergyFastingCard> {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: TextButton.icon(
-                  onPressed: () => context.push('/fasting'),
+                  onPressed: () => context.push(AppRoutes.fasting),
                   icon: const Icon(Icons.calendar_month_rounded, size: 16),
                   label: Text(
                     l10n.hijriCalendarTitle,
@@ -246,7 +247,7 @@ class _EnergyFastingCardState extends State<EnergyFastingCard> {
               AppPressable(
                 onTap: () {
                   AppHaptics.lightImpact();
-                  context.push('/fasting');
+                  context.push(AppRoutes.fasting);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(

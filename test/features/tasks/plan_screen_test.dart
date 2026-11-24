@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/domain/models/habit.dart';
 import 'package:productive_muslim/domain/models/task.dart';
 import 'package:productive_muslim/domain/repositories/habit_repository.dart';
@@ -73,4 +75,47 @@ void main() {
     expect(find.text('New Habit'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
   });
+
+  testWidgets(
+    'overview tab renders Energy & Sunnah Anchors shortcut and navigates to EnergyScreen',
+    (tester) async {
+      final router = GoRouter(
+        initialLocation: '/plan',
+        routes: [
+          GoRoute(
+            path: '/plan',
+            builder: (_, _) => const PlanScreen(initialTab: PlanTab.overview),
+          ),
+          GoRoute(
+            path: AppRoutes.energy,
+            builder: (_, _) => const Scaffold(body: Text('Energy Screen')),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<TaskRepository>.value(value: mockTaskRepo),
+            RepositoryProvider<HabitRepository>.value(value: mockHabitRepo),
+          ],
+          child: MaterialApp.router(
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final energyFinder = find.byKey(const Key('my_day_energy_shortcut_card'));
+      expect(energyFinder, findsOneWidget);
+
+      await tester.ensureVisible(energyFinder);
+      await tester.tap(energyFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Energy Screen'), findsOneWidget);
+    },
+  );
 }
