@@ -12,9 +12,11 @@ import 'package:productive_muslim/features/settings/logic/settings_event.dart';
 import 'package:productive_muslim/features/settings/logic/settings_state.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_adhan_notification_tile.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_arabic_typography_tile.dart';
+import 'package:productive_muslim/features/settings/presentation/widgets/settings_asr_madhab_tile.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_background_painter.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_backup_restore_card.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_barakah_reminder_card.dart';
+import 'package:productive_muslim/features/settings/presentation/widgets/settings_calculation_method_tile.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_haptic_feedback_tile.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_hero_card.dart';
 import 'package:productive_muslim/features/settings/presentation/widgets/settings_locale_selector.dart';
@@ -285,6 +287,20 @@ class SettingsView extends StatelessWidget {
                               color: dividerColor,
                             ),
                             const SettingsAdhanNotificationTile(),
+                            Divider(
+                              height: 1,
+                              indent: 56,
+                              endIndent: 16,
+                              color: dividerColor,
+                            ),
+                            const SettingsCalculationMethodTile(),
+                            Divider(
+                              height: 1,
+                              indent: 56,
+                              endIndent: 16,
+                              color: dividerColor,
+                            ),
+                            const SettingsAsrMadhabTile(),
                           ],
                         ),
                       ),

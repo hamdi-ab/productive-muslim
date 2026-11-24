@@ -1,6 +1,12 @@
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:productive_muslim/core/constants/app_spacing.dart';
+import 'package:productive_muslim/core/di/di.dart';
+import 'package:productive_muslim/core/router/app_routes.dart';
 import 'package:productive_muslim/core/theme/app_colors_extension.dart';
+import 'package:productive_muslim/data/services/settings_service.dart';
+import 'package:productive_muslim/features/prayer_times/models/prayer_calculation_options.dart';
 import 'package:productive_muslim/l10n/app_localizations.dart';
 
 /// Astrological & Location Header for Prayer Times screen.
@@ -168,47 +174,89 @@ class PrayerLocationHeader extends StatelessWidget {
                 ),
               ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: maxPillWidth),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF141E1A)
-                        : AppColors.surfaceSubtle,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: const Key('prayer_calculation_method_badge'),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isDark
-                          ? AppColors.borderDark
-                          : AppColors.borderLight,
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          isAr ? 'أم القرى / رابطة العالم' : 'MWL Aligned',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.textSecondary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                    onTap: () {
+                      context.push(AppRoutes.settings);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF141E1A)
+                            : AppColors.surfaceSubtle,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isDark
+                              ? AppColors.borderDark
+                              : AppColors.borderLight,
+                          width: 0.8,
                         ),
                       ),
-                      const SizedBox(width: 3),
-                      Icon(
-                        Icons.tune_rounded,
-                        size: 11,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.textSecondary,
+                      child: Builder(
+                        builder: (context) {
+                          final settings = getIt.isRegistered<SettingsService>()
+                              ? getIt<SettingsService>()
+                              : null;
+                          final CalculationMethod method;
+                          final Madhab madhab;
+                          if (prayerTimes is PrayerTimes) {
+                            method = prayerTimes.calculationParameters.method;
+                            madhab =
+                                prayerTimes.calculationParameters.madhab ??
+                                Madhab.shafi;
+                          } else {
+                            method =
+                                settings?.prayerCalculationMethod ??
+                                CalculationMethod.muslimWorldLeague;
+                            madhab = settings?.prayerMadhab ?? Madhab.shafi;
+                          }
+
+                          final shortName =
+                              PrayerCalculationOptions.getMethodShortName(
+                                method,
+                                isArabic: isAr,
+                              );
+                          final badgeLabel = madhab == Madhab.hanafi
+                              ? (isAr
+                                    ? '$shortName • حنفي'
+                                    : '$shortName • Hanafi')
+                              : shortName;
+
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  badgeLabel,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.tune_rounded,
+                                size: 11,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textSecondary,
+                              ),
+                            ],
+                          );
+                        },
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

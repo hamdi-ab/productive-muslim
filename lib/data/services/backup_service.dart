@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
+import 'package:productive_muslim/core/di/di.dart';
 import 'package:productive_muslim/data/local/database/app_database.dart';
+import 'package:productive_muslim/data/services/prayer_time_service.dart';
 import 'package:productive_muslim/data/services/settings_service.dart';
 
 class BackupService {
@@ -351,6 +353,10 @@ class BackupService {
           // the database changes together with the settings write.
           if (_settingsService != null && settingsMap != null) {
             await _settingsService.importSettings(settingsMap);
+            if (getIt.isRegistered<PrayerTimeService>()) {
+              await getIt<PrayerTimeService>()
+                  .onPrayerCalculationSettingsChanged();
+            }
           }
         });
 

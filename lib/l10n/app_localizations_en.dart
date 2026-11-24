@@ -459,6 +459,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhanNotificationsDescription => 'Get notified at prayer times';
 
   @override
+  String get prayerCalculationMethod => 'Calculation Method';
+
+  @override
+  String get prayerCalculationMethodDesc =>
+      'Astronomical convention used to calculate prayer times';
+
+  @override
+  String get prayerMadhab => 'Asr Calculation (Madhab)';
+
+  @override
+  String get prayerMadhabDesc =>
+      'Shadow factor used to determine Asr prayer time';
+
+  @override
+  String get prayerMadhabShafi => 'Standard (Shafi\'i, Maliki, Hanbali)';
+
+  @override
+  String get prayerMadhabShafiDesc =>
+      'Asr begins when an object\'s shadow equals its height (factor 1)';
+
+  @override
+  String get prayerMadhabHanafi => 'Hanafi';
+
+  @override
+  String get prayerMadhabHanafiDesc =>
+      'Asr begins when an object\'s shadow equals twice its height (factor 2)';
+
+  @override
   String get islam => 'Islam';
 
   @override

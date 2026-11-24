@@ -1,3 +1,4 @@
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ class SettingsService {
     _initThemeMode();
     _initLocale();
     _initArabicTypography();
+    _initPrayerCalculationSettings();
   }
 
   SettingsService._empty() : _prefs = null;
@@ -21,6 +23,8 @@ class SettingsService {
   static const _localeKey = 'app_locale';
   static const _arabicFontFamilyKey = 'arabic_font_family';
   static const _arabicFontSizeKey = 'arabic_font_size';
+  static const _prayerCalculationMethodKey = 'prayer_calculation_method';
+  static const _prayerMadhabKey = 'prayer_madhab';
   static const _onboardingCompletedKey = 'onboarding_completed';
   static const _userNameKey = 'user_name';
   static const _userIntentionKey = 'user_intention';
@@ -50,6 +54,13 @@ class SettingsService {
     22.0,
   );
 
+  final ValueNotifier<CalculationMethod> calculationMethodNotifier =
+      ValueNotifier<CalculationMethod>(CalculationMethod.muslimWorldLeague);
+
+  final ValueNotifier<Madhab> madhabNotifier = ValueNotifier<Madhab>(
+    Madhab.shafi,
+  );
+
   void _initThemeMode() {
     final modeStr = _prefs?.getString(_themeModeKey) ?? 'system';
     themeModeNotifier.value = _parseThemeMode(modeStr);
@@ -65,6 +76,11 @@ class SettingsService {
         _prefs?.getString(_arabicFontFamilyKey) ?? 'amiri';
     arabicFontSizeNotifier.value =
         _prefs?.getDouble(_arabicFontSizeKey) ?? 22.0;
+  }
+
+  void _initPrayerCalculationSettings() {
+    calculationMethodNotifier.value = prayerCalculationMethod;
+    madhabNotifier.value = prayerMadhab;
   }
 
   static ThemeMode _parseThemeMode(String mode) {
@@ -98,6 +114,39 @@ class SettingsService {
   }
 
   String get localeCode => _prefs?.getString(_localeKey) ?? 'system';
+
+  /// Returns the explicit locale if set ('en' or 'ar'), or resolves the
+  /// platform/device locale when the preference is 'system' (or unset).
+  Locale get effectiveLocale {
+    final explicit = localeNotifier.value;
+    if (explicit != null) {
+      return explicit;
+    }
+    final code = _prefs?.getString(_localeKey);
+    final parsed = _parseLocale(code);
+    if (parsed != null) {
+      return parsed;
+    }
+    return _resolvePlatformLocale();
+  }
+
+  /// Returns the 2-letter language code of [effectiveLocale] ('ar' or 'en').
+  String get effectiveLanguageCode {
+    final lang = effectiveLocale.languageCode.toLowerCase();
+    return lang.startsWith('ar') ? 'ar' : 'en';
+  }
+
+  static Locale _resolvePlatformLocale() {
+    try {
+      return WidgetsBinding.instance.platformDispatcher.locale;
+    } catch (_) {
+      try {
+        return PlatformDispatcher.instance.locale;
+      } catch (_) {
+        return const Locale('en');
+      }
+    }
+  }
 
   Future<void> setLocaleCode(String code) async {
     await _prefs?.setString(_localeKey, code);
@@ -222,6 +271,34 @@ class SettingsService {
 
   Future<void> setAdhanNotificationsEnabled(bool enabled) async =>
       _prefs?.setBool(_adhanNotificationsKey, enabled);
+
+  CalculationMethod get prayerCalculationMethod {
+    final name = _prefs?.getString(_prayerCalculationMethodKey);
+    if (name == null) return CalculationMethod.muslimWorldLeague;
+    return CalculationMethod.values.firstWhere(
+      (m) => m.name == name,
+      orElse: () => CalculationMethod.muslimWorldLeague,
+    );
+  }
+
+  Future<void> setPrayerCalculationMethod(CalculationMethod method) async {
+    await _prefs?.setString(_prayerCalculationMethodKey, method.name);
+    calculationMethodNotifier.value = method;
+  }
+
+  Madhab get prayerMadhab {
+    final name = _prefs?.getString(_prayerMadhabKey);
+    if (name == null) return Madhab.shafi;
+    return Madhab.values.firstWhere(
+      (m) => m.name == name,
+      orElse: () => Madhab.shafi,
+    );
+  }
+
+  Future<void> setPrayerMadhab(Madhab madhab) async {
+    await _prefs?.setString(_prayerMadhabKey, madhab.name);
+    madhabNotifier.value = madhab;
+  }
 
   int get totalFocusMinutes => _prefs?.getInt(_totalFocusMinutesKey) ?? 0;
 
@@ -554,5 +631,9 @@ class SettingsService {
         );
       }
     }
+    _initThemeMode();
+    _initLocale();
+    _initArabicTypography();
+    _initPrayerCalculationSettings();
   }
 }
